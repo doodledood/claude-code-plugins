@@ -1,0 +1,108 @@
+# Claude Code Plugins Marketplace
+A curated marketplace of Claude Code plugins for agentic development workflows, featuring tools for architecture, knowledge management, and development automation.
+
+## 🎯 What is This?
+
+This is a **Claude Code plugins marketplace** - a curated collection of plugins that enhance your development workflow with Claude Code, focusing on agentic development, code analysis, and planning tools.
+
+## 🚀 Quick Start - Using the Marketplace
+
+### Install the Marketplace
+
+Add this marketplace to your Claude Code installation:
+
+```bash
+/plugin marketplace add https://github.com/doodledood/claude-code-plugins
+```
+
+For local development:
+
+```bash
+/plugin marketplace add /path/to/claude-code-plugins
+```
+
+### Browse & Install Plugins
+
+```bash
+# List available marketplaces
+/plugin marketplace list
+
+# List all plugins
+/plugin list
+
+# Install a specific plugin
+/plugin install oracle@claude-code-plugins-marketplace
+```
+
+## 📦 Available Plugins
+
+All plugins are located in `claude-plugins/`:
+
+#### oracle (v1.0.0)
+Comprehensive code analysis using oracle CLI tool for deep AI-powered reviews and architectural analysis.
+
+**Components:**
+- **Agent:** `oracle-consulter` - Expert agent for leveraging high-token AI analysis
+- **Commands:**
+  - `/oracle-review` - Production-level PR reviews with severity-tagged findings
+  - `/oracle-investigate-bug` - Deep bug investigation with root cause analysis
+- **Skill:** `oracle` - Oracle CLI knowledge and best practices
+- **Category:** development
+
+#### planning (v1.0.0)
+Comprehensive planning tools with automatic keyword detection via hooks.
+
+**Components:**
+- **Skills:**
+  - `plan` - Mini-PR based implementation plans
+  - `execplan` - Comprehensive execution plans following PLANS.md
+- **Command:** `/oracle-execplan` - Deep planning analysis with oracle CLI
+- **Hook:** `check-planning-keywords.py` - Auto-detects planning keywords and activates skills
+- **Category:** development
+
+> More plugins coming soon!
+
+## 🛠️ Development
+
+### Repository Structure
+
+```
+claude-code-plugins/
+├── .claude-plugin/
+│   └── marketplace.json       # Marketplace configuration
+├── claude-plugins/            # Claude Code plugins directory
+│   ├── README.md             # Plugin development guide
+│   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
+│   ├── oracle/               # Oracle plugin
+│   └── planning/             # Planning plugin
+├── CONTRIBUTING.md            # Contributing guidelines
+└── README.md                  # This file
+```
+
+### Contributing Plugins
+
+See [claude-plugins/README.md](./claude-plugins/README.md) for detailed instructions on:
+- Creating new plugins
+- Plugin structure and components
+- Testing locally
+- Submitting contributions
+
+## 🎓 Learn More
+
+- [Claude Code Documentation](https://code.claude.com/docs)
+- [Plugin Marketplaces Guide](https://code.claude.com/docs/en/plugin-marketplaces)
+- [Model Context Protocol](https://modelcontextprotocol.io)
+
+## 📄 License
+
+MIT
+
+## 🤝 Contributing
+
+We welcome contributions! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Add your tool or plugin
+4. Submit a pull request
+
+For plugin contributions, see the [plugin development guide](./claude-plugins/README.md).
