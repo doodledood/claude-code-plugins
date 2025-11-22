@@ -1,7 +1,8 @@
 {
   "name": "claude-code-plugins-marketplace",
   "owner": {
-    "name": "doodledood"
+    "name": "doodledood",
+    "email": "doodledood@github.com"
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins for agentic development workflows, featuring tools for architecture, knowledge management, and development automation",
