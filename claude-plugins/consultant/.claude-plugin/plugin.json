@@ -1,0 +1,12 @@
+{
+  "name": "consultant",
+  "description": "Flexible multi-provider LLM consultations using Python/LiteLLM - includes consultant-consulter agent, review/bug-investigation/execplan commands, and consultant skill for deep AI-powered code analysis across 100+ models",
+  "version": "1.0.0",
+  "author": {
+    "name": "doodledood",
+    "email": "doodledood@example.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["consultant", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis", "litellm", "multi-provider"]
+}

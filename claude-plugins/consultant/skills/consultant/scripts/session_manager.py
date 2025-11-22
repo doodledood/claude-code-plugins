@@ -1,0 +1,231 @@
+"""
+Session management for async oracle executions
+Handles background processes, session persistence, and status tracking
+"""
+
+import json
+import time
+import multiprocessing
+import sys
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Optional, List
+
+import config
+
+
+class SessionManager:
+    """Manages oracle consultation sessions with async execution"""
+
+    def __init__(self, sessions_dir: Optional[Path] = None):
+        self.sessions_dir = sessions_dir or config.DEFAULT_SESSIONS_DIR
+        self.sessions_dir.mkdir(parents=True, exist_ok=True)
+
+    def create_session(
+        self,
+        slug: str,
+        prompt: str,
+        files: List[Dict],
+        model: str,
+        base_url: Optional[str] = None,
+        api_key: Optional[str] = None
+    ) -> str:
+        """Create a new session and start background execution"""
+
+        session_id = f"{slug}-{int(time.time())}"
+        session_dir = self.sessions_dir / session_id
+        session_dir.mkdir(exist_ok=True)
+
+        # Save session metadata
+        metadata = {
+            "id": session_id,
+            "slug": slug,
+            "created_at": datetime.now().isoformat(),
+            "status": "running",
+            "model": model,
+            "base_url": base_url,
+            "prompt": prompt[:200] + "..." if len(prompt) > 200 else prompt,
+            "files": [f["path"] for f in files],
+            "total_input_tokens": sum(f.get("tokens", 0) for f in files)
+        }
+
+        metadata_file = session_dir / "metadata.json"
+        metadata_file.write_text(json.dumps(metadata, indent=2))
+
+        # Save full prompt and files
+        prompt_file = session_dir / "prompt.txt"
+        prompt_file.write_text(prompt)
+
+        for file_info in files:
+            file_name = Path(file_info["path"]).name
+            safe_name = file_name.replace("/", "_").replace("\\", "_")
+            (session_dir / f"file_{safe_name}").write_text(file_info["content"])
+
+        # Start background process
+        process = multiprocessing.Process(
+            target=self._execute_session,
+            args=(session_id, prompt, files, model, base_url, api_key)
+        )
+        process.start()
+
+        # Store PID for potential cleanup
+        (session_dir / "pid").write_text(str(process.pid))
+
+        return session_id
+
+    def _execute_session(
+        self,
+        session_id: str,
+        prompt: str,
+        files: List[Dict],
+        model: str,
+        base_url: Optional[str],
+        api_key: Optional[str]
+    ):
+        """Background execution of LLM consultation"""
+
+        session_dir = self.sessions_dir / session_id
+
+        try:
+            # Import here to avoid issues with multiprocessing
+            from litellm_client import LiteLLMClient
+
+            # Initialize client
+            client = LiteLLMClient(base_url=base_url, api_key=api_key)
+
+            # Construct full prompt with file contents
+            full_prompt = prompt + "\n\n" + "="*80 + "\n\n"
+            full_prompt += "## Attached Files\n\n"
+
+            for file_info in files:
+                full_prompt += f"### {file_info['path']}\n\n"
+                full_prompt += f"```\n{file_info['content']}\n```\n\n"
+
+            # Make LLM call
+            self._update_status(session_id, "calling_llm")
+
+            # Stream and save response
+            output_file = session_dir / "output.txt"
+            full_response = ""
+
+            with output_file.open("w") as f:
+                for chunk in client.complete(
+                    model=model,
+                    prompt=full_prompt,
+                    stream=True
+                ):
+                    content = chunk.get("content", "")
+                    full_response += content
+                    f.write(content)
+                    f.flush()
+
+            # Update metadata
+            self._update_status(session_id, "completed", response=full_response)
+
+        except Exception as e:
+            error_msg = f"Error: {str(e)}\n\nType: {type(e).__name__}"
+            (session_dir / "error.txt").write_text(error_msg)
+            self._update_status(session_id, "error", error=error_msg)
+
+    def _update_status(
+        self,
+        session_id: str,
+        status: str,
+        response: Optional[str] = None,
+        error: Optional[str] = None
+    ):
+        """Update session status in metadata"""
+
+        session_dir = self.sessions_dir / session_id
+        metadata_file = session_dir / "metadata.json"
+
+        if not metadata_file.exists():
+            return
+
+        metadata = json.loads(metadata_file.read_text())
+        metadata["status"] = status
+        metadata["updated_at"] = datetime.now().isoformat()
+
+        if response:
+            metadata["completed_at"] = datetime.now().isoformat()
+            metadata["output_length"] = len(response)
+
+        if error:
+            metadata["error"] = error[:500]  # Truncate long errors
+
+        metadata_file.write_text(json.dumps(metadata, indent=2))
+
+    def get_session_status(self, slug: str) -> Dict:
+        """Get current status of a session by slug"""
+
+        # Find most recent session with this slug
+        matching_sessions = sorted(
+            [d for d in self.sessions_dir.iterdir()
+             if d.is_dir() and d.name.startswith(slug)],
+            key=lambda x: x.stat().st_mtime,
+            reverse=True
+        )
+
+        if not matching_sessions:
+            return {"error": f"No session found with slug: {slug}"}
+
+        session_dir = matching_sessions[0]
+        metadata_file = session_dir / "metadata.json"
+
+        if not metadata_file.exists():
+            return {"error": f"Session metadata not found: {slug}"}
+
+        metadata = json.loads(metadata_file.read_text())
+
+        # Add output if completed
+        if metadata["status"] == "completed":
+            output_file = session_dir / "output.txt"
+            if output_file.exists():
+                metadata["output"] = output_file.read_text()
+
+        # Add error if failed
+        if metadata["status"] == "error":
+            error_file = session_dir / "error.txt"
+            if error_file.exists():
+                metadata["error_details"] = error_file.read_text()
+
+        return metadata
+
+    def wait_for_completion(self, session_id: str, timeout: int = 3600):
+        """Block until session completes or timeout"""
+
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            session_dir = self.sessions_dir / session_id
+            metadata_file = session_dir / "metadata.json"
+
+            if not metadata_file.exists():
+                time.sleep(1)
+                continue
+
+            metadata = json.loads(metadata_file.read_text())
+
+            if metadata["status"] in ["completed", "error"]:
+                return metadata
+
+            time.sleep(config.POLLING_INTERVAL_SECONDS)
+
+        raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
+
+    def list_sessions(self) -> List[Dict]:
+        """List all sessions"""
+
+        sessions = []
+        for session_dir in self.sessions_dir.iterdir():
+            if not session_dir.is_dir():
+                continue
+
+            metadata_file = session_dir / "metadata.json"
+            if metadata_file.exists():
+                try:
+                    sessions.append(json.loads(metadata_file.read_text()))
+                except:
+                    pass
+
+        return sorted(sessions, key=lambda x: x.get("created_at", ""), reverse=True)

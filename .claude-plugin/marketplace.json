@@ -25,6 +25,14 @@
       "version": "1.0.0",
       "category": "development",
       "keywords": ["planning", "execplan", "implementation-plan", "methodology", "hooks"]
+    },
+    {
+      "name": "consultant",
+      "source": "./claude-plugins/consultant",
+      "description": "Flexible multi-provider LLM consultations using Python/LiteLLM - includes consultant-consulter agent, review/bug-investigation/execplan commands, and consultant skill for deep AI-powered code analysis across 100+ models with custom base URL support",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["consultant", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis", "litellm", "multi-provider", "local-models"]
     }
   ]
 }
