@@ -4,7 +4,7 @@ Comprehensive code analysis plugin using the oracle CLI tool for deep AI-powered
 
 ## Overview
 
-Oracle is a CLI tool that provides access to more powerful AI models for complex analysis tasks. This plugin bundles the complete oracle workflow including agent, commands, and skills.
+Oracle is a CLI tool that provides access to more powerful AI models for complex analysis tasks. This plugin bundles the complete oracle workflow including agent, commands, and skills for code review, bug investigation, and execution planning.
 
 ## Components
 
@@ -51,6 +51,25 @@ Deep bug investigation with root cause analysis and fix recommendations.
 - Assesses blast radius and impact
 - Provides concrete fix suggestions
 - Recommends regression tests to prevent recurrence
+
+#### `/oracle-execplan`
+Create comprehensive execution plans using oracle CLI tool for deep analysis and specification design.
+
+**Usage:**
+```bash
+/oracle-execplan
+# Infers feature context from branch name and git history
+
+# Or with explicit parameters:
+/oracle-execplan FEATURE="Add rate limiting" GOAL="Prevent API abuse"
+```
+
+**What it does:**
+- Invokes oracle-consulter agent for deep planning analysis
+- Gathers comprehensive codebase context
+- Creates detailed, self-contained execution plans following PLANS.md methodology
+- Provides living document structure with decision logs and discovery tracking
+- Breaks down work into small, shippable chunks with clear dependencies
 
 ### Skill: oracle
 
@@ -110,6 +129,18 @@ Provide bug details when prompted, or let it infer from:
 - Error messages in conversation
 - Git history and recent changes
 
+### 3. Create an Execution Plan
+
+```bash
+/oracle-execplan
+```
+
+Creates a comprehensive execution plan with oracle's deep analysis capabilities:
+- Analyzes codebase patterns and architecture
+- Identifies dependencies and integration points
+- Provides detailed implementation steps
+- Includes validation criteria and testing strategies
+
 ## Example Workflows
 
 ### Production PR Review
@@ -143,6 +174,21 @@ git checkout feature/user-authentication
 # - Assess blast radius
 # - Suggest concrete fixes
 # - Recommend regression tests
+```
+
+### Execution Planning
+
+```bash
+# Planning a complex feature:
+/oracle-execplan FEATURE="Add rate limiting to API" GOAL="Prevent API abuse"
+
+# Oracle will:
+# - Gather comprehensive codebase context
+# - Analyze existing patterns and architecture
+# - Create detailed execution plan following PLANS.md methodology
+# - Break down work into small, testable chunks
+# - Provide validation steps and acceptance criteria
+# - Include decision logs for key architectural choices
 ```
 
 ## How Oracle Works
