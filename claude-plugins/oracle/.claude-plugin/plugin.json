@@ -7,6 +7,5 @@
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["oracle", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis"],
-  "category": "development"
+  "keywords": ["oracle", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis"]
 }

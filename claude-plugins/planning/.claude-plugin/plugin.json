@@ -8,18 +8,13 @@
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
   "keywords": ["planning", "execplan", "implementation-plan", "methodology", "hooks"],
-  "category": "development",
   "hooks": {
     "user-prompt-submit": [
       {
         "matcher": ".*",
         "description": "Detect planning keywords (plan, execplan) and remind Claude to activate appropriate planning skills",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-planning-keywords.py"
-          }
-        ]
+        "type": "command",
+        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-planning-keywords.py"
       }
     ]
   }
