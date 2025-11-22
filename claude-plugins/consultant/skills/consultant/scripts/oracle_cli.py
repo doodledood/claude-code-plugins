@@ -19,21 +19,37 @@ from litellm_client import LiteLLMClient
 from model_selector import ModelSelector
 
 
+def build_full_prompt(prompt: str, files: list) -> str:
+    """
+    Build the full prompt with all file contents attached.
+    This is the actual prompt that will be sent to the LLM.
+    """
+    if not files:
+        return prompt
+
+    full_prompt = prompt + "\n\n" + "="*80 + "\n\n"
+    full_prompt += "## Attached Files\n\n"
+
+    for file_info in files:
+        full_prompt += f"### {file_info['path']}\n\n"
+        full_prompt += f"```\n{file_info['content']}\n```\n\n"
+
+    return full_prompt
+
+
 def validate_context_size(
-    prompt: str,
-    files: list,
+    full_prompt: str,
     model: str,
-    client: LiteLLMClient
+    client: LiteLLMClient,
+    num_files: int
 ) -> bool:
     """
-    Validate that prompt + files fit in model context.
+    Validate that full prompt fits in model context.
     Returns True if OK, raises ValueError if exceeds.
     """
 
-    # Count tokens
-    prompt_tokens = client.count_tokens(prompt, model)
-    file_tokens = sum(f.get("tokens", 0) for f in files)
-    total_tokens = prompt_tokens + file_tokens
+    # Count tokens for the complete prompt
+    total_tokens = client.count_tokens(full_prompt, model)
 
     # Get limit
     max_tokens = client.get_max_tokens(model)
@@ -43,9 +59,7 @@ def validate_context_size(
 
     # Print summary
     print(f"\n📊 Token Usage:")
-    print(f"- Prompt: {prompt_tokens:,} tokens")
-    print(f"- Files: {file_tokens:,} tokens ({len(files)} files)")
-    print(f"- Total: {total_tokens:,} tokens")
+    print(f"- Input: {total_tokens:,} tokens ({num_files} files)")
     print(f"- Limit: {max_tokens:,} tokens")
     print(f"- Available: {available_tokens:,} tokens ({int((available_tokens/max_tokens)*100)}%)\n")
 
@@ -56,7 +70,7 @@ def validate_context_size(
             f"  Limit: {max_tokens:,} tokens\n"
             f"  Overage: {total_tokens - max_tokens:,} tokens\n\n"
             f"Suggestions:\n"
-            f"1. Reduce number of files (currently {len(files)})\n"
+            f"1. Reduce number of files (currently {num_files})\n"
             f"2. Use a model with larger context\n"
             f"3. Shorten the prompt"
         )
@@ -87,7 +101,6 @@ def handle_invocation(args):
 
     # Validate and prepare files
     file_contents = []
-    total_tokens = 0
 
     if args.files:
         for file_path in args.files:
@@ -106,13 +119,10 @@ def handle_invocation(args):
                 print(f"ERROR: Could not read {file_path}: {e}", file=sys.stderr)
                 return 1
 
-            tokens = client.count_tokens(content, args.model or config.DEFAULT_MODEL)
             file_contents.append({
                 "path": str(file_path),
-                "content": content,
-                "tokens": tokens
+                "content": content
             })
-            total_tokens += tokens
 
     # Determine model
     if not args.model:
@@ -120,9 +130,12 @@ def handle_invocation(args):
         args.model = ModelSelector.select_best_model(base_url)
         print(f"Selected model: {args.model}")
 
-    # Check context limits
+    # Build full prompt with all file contents
+    full_prompt = build_full_prompt(args.prompt, file_contents)
+
+    # Check context limits on the full prompt
     try:
-        validate_context_size(args.prompt, file_contents, args.model, client)
+        validate_context_size(full_prompt, args.model, client, len(file_contents))
     except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
@@ -130,8 +143,7 @@ def handle_invocation(args):
     # Create and start session
     session_id = session_mgr.create_session(
         slug=args.slug,
-        prompt=args.prompt,
-        files=file_contents,
+        prompt=full_prompt,
         model=args.model,
         base_url=base_url,
         api_key=args.api_key
