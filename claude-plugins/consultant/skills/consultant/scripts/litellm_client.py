@@ -98,8 +98,8 @@ class LiteLLMClient:
         """Count tokens for given text and model"""
 
         try:
-            messages = [{"role": "user", "content": text}]
-            return token_counter(model=model, messages=messages)
+            # Use text parameter directly for plain text (not chat messages)
+            return token_counter(model=model, text=text)
         except Exception:
             # Fallback: rough estimate (4 chars per token)
             return max(1, len(text) // 4)
