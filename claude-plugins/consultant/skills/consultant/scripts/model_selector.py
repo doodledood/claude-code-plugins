@@ -11,42 +11,59 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
+try:
+    from litellm import model_cost
+    LITELLM_AVAILABLE = True
+except ImportError:
+    LITELLM_AVAILABLE = False
+    model_cost = {}
+
 
 class ModelSelector:
     """Handles model discovery and automatic selection"""
 
     @staticmethod
     def list_models(base_url: Optional[str] = None) -> List[Dict]:
-        """Query available models from provider"""
+        """
+        Query available models.
+
+        Without base_url: Uses LiteLLM's model_cost dictionary for dynamic discovery
+        With base_url: Calls proxy's /models or /v1/models endpoint
+        """
 
         if not base_url:
-            # Return list of known models
-            return ModelSelector._get_known_models()
+            # Use LiteLLM's model_cost for dynamic discovery
+            return ModelSelector._get_litellm_models()
 
         if not REQUESTS_AVAILABLE:
-            print("Warning: requests library not available, using known models")
-            return ModelSelector._get_known_models()
+            print("Warning: requests library not available, using LiteLLM model list")
+            return ModelSelector._get_litellm_models()
 
-        # Try OpenAI-compatible /v1/models endpoint
-        try:
-            models_url = f"{base_url.rstrip('/')}/v1/models"
-            response = requests.get(models_url, timeout=10)
-            response.raise_for_status()
+        # Try LiteLLM proxy /models endpoint first, then OpenAI-compatible /v1/models
+        for endpoint in ["/models", "/v1/models"]:
+            try:
+                models_url = f"{base_url.rstrip('/')}{endpoint}"
+                response = requests.get(models_url, timeout=10)
+                response.raise_for_status()
 
-            data = response.json()
-            models = data.get("data", [])
+                data = response.json()
+                models = data.get("data", [])
 
-            return [
-                {
-                    "id": m.get("id"),
-                    "created": m.get("created"),
-                    "owned_by": m.get("owned_by"),
-                }
-                for m in models
-            ]
-        except Exception as e:
-            print(f"Warning: Could not fetch models from {base_url}: {e}")
-            return ModelSelector._get_known_models()
+                return [
+                    {
+                        "id": m.get("id"),
+                        "created": m.get("created"),
+                        "owned_by": m.get("owned_by"),
+                    }
+                    for m in models
+                ]
+            except Exception as e:
+                # Try next endpoint
+                continue
+
+        # If all endpoints fail, fall back to LiteLLM model list
+        print(f"Warning: Could not fetch models from {base_url}, using LiteLLM model list")
+        return ModelSelector._get_litellm_models()
 
     @staticmethod
     def select_best_model(base_url: Optional[str] = None) -> str:
@@ -114,19 +131,29 @@ class ModelSelector:
         return score
 
     @staticmethod
-    def _get_known_models() -> List[Dict]:
-        """Return list of commonly known models across providers"""
+    def _get_litellm_models() -> List[Dict]:
+        """
+        Get models from LiteLLM's model_cost dictionary.
+        This provides dynamic model discovery without hardcoded lists.
+        """
 
-        return [
-            {"id": "gpt-5-pro", "provider": "openai"},
-            {"id": "gpt-5", "provider": "openai"},
-            {"id": "gpt-5-mini", "provider": "openai"},
-            {"id": "gpt-4o", "provider": "openai"},
-            {"id": "gpt-4-turbo", "provider": "openai"},
-            {"id": "gpt-4", "provider": "openai"},
-            {"id": "claude-3-5-sonnet-20241022", "provider": "anthropic"},
-            {"id": "claude-3-opus-20240229", "provider": "anthropic"},
-            {"id": "claude-3-sonnet-20240229", "provider": "anthropic"},
-            {"id": "gemini-2.0-flash-exp", "provider": "google"},
-            {"id": "gemini-1.5-pro", "provider": "google"},
-        ]
+        if not LITELLM_AVAILABLE or not model_cost:
+            # Fallback: minimal hardcoded list if LiteLLM not available
+            return [
+                {"id": "gpt-5-pro", "provider": "openai"},
+                {"id": "gpt-4o", "provider": "openai"},
+                {"id": "claude-3-5-sonnet-20241022", "provider": "anthropic"},
+            ]
+
+        # Convert model_cost dictionary to list format
+        models = []
+        for model_id, info in model_cost.items():
+            models.append({
+                "id": model_id,
+                "provider": info.get("litellm_provider", "unknown"),
+                "max_tokens": info.get("max_tokens"),
+                "input_cost_per_token": info.get("input_cost_per_token"),
+                "output_cost_per_token": info.get("output_cost_per_token"),
+            })
+
+        return models
