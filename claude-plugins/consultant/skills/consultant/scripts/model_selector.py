@@ -59,11 +59,11 @@ class ModelSelector:
 
         if not models:
             # Fallback to default
-            return "gpt-4o"
+            return "gpt-5-pro"
 
         # Score models based on name heuristics
         best_model = max(models, key=ModelSelector._score_model)
-        return best_model.get("id", "gpt-4o")
+        return best_model.get("id", "gpt-5-pro")
 
     @staticmethod
     def _score_model(model: Dict) -> float:
@@ -118,6 +118,9 @@ class ModelSelector:
         """Return list of commonly known models across providers"""
 
         return [
+            {"id": "gpt-5-pro", "provider": "openai"},
+            {"id": "gpt-5", "provider": "openai"},
+            {"id": "gpt-5-mini", "provider": "openai"},
             {"id": "gpt-4o", "provider": "openai"},
             {"id": "gpt-4-turbo", "provider": "openai"},
             {"id": "gpt-4", "provider": "openai"},

@@ -9,7 +9,7 @@ from pathlib import Path
 DEFAULT_SESSIONS_DIR = Path.home() / ".oracle-python" / "sessions"
 
 # Default model if none specified and discovery fails
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-5-pro"
 
 # Environment variable names
 ENV_LITELLM_API_KEY = "LITELLM_API_KEY"
@@ -29,6 +29,9 @@ POLLING_INTERVAL_SECONDS = 2
 
 # Known model context sizes (fallback if get_max_tokens fails)
 KNOWN_CONTEXT_SIZES = {
+    "gpt-5-pro": 128000,
+    "gpt-5": 128000,
+    "gpt-5-mini": 128000,
     "gpt-4o": 128000,
     "gpt-4-turbo": 128000,
     "gpt-4": 8192,

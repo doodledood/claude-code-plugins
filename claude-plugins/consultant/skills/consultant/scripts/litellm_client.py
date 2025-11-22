@@ -8,7 +8,7 @@ import config
 
 try:
     import litellm
-    from litellm import completion, token_counter, get_max_tokens
+    from litellm import responses, token_counter, get_max_tokens
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
@@ -39,34 +39,46 @@ class LiteLLMClient:
         stream: bool = False,
         **kwargs
     ) -> Iterator[Dict]:
-        """Make a completion request"""
+        """Make a request using the responses API (auto-bridges to completion for unsupported models)"""
 
-        messages = [{"role": "user", "content": prompt}]
-
-        completion_kwargs = {
+        response_kwargs = {
             "model": model,
-            "messages": messages,
+            "input": prompt,
             "stream": stream,
             **kwargs
         }
 
         if self.base_url:
-            completion_kwargs["api_base"] = self.base_url
+            response_kwargs["api_base"] = self.base_url
 
         try:
-            response = completion(**completion_kwargs)
+            response = responses(**response_kwargs)
 
             if stream:
                 for chunk in response:
-                    if hasattr(chunk.choices[0], 'delta') and hasattr(chunk.choices[0].delta, 'content'):
-                        content = chunk.choices[0].delta.content
-                        if content:
-                            yield {"content": content}
+                    # Handle streaming response format
+                    if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
+                        choice = chunk.choices[0]
+                        # Check for delta content (streaming format)
+                        if hasattr(choice, 'delta') and hasattr(choice.delta, 'content'):
+                            content = choice.delta.content
+                            if content:
+                                yield {"content": content}
+                        # Check for message content (some models use this)
+                        elif hasattr(choice, 'message') and hasattr(choice.message, 'content'):
+                            content = choice.message.content
+                            if content:
+                                yield {"content": content}
             else:
-                yield {
-                    "content": response.choices[0].message.content,
-                    "usage": response.usage if hasattr(response, 'usage') else None
-                }
+                # Non-streaming response
+                if hasattr(response, 'choices') and len(response.choices) > 0:
+                    message = response.choices[0].message
+                    yield {
+                        "content": message.content if hasattr(message, 'content') else str(message),
+                        "usage": response.usage if hasattr(response, 'usage') else None
+                    }
+                else:
+                    raise RuntimeError("Invalid response format from LLM")
 
         except Exception as e:
             # Map to standardized errors
