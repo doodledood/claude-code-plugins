@@ -9,12 +9,16 @@
   "license": "MIT",
   "keywords": ["planning", "execplan", "implementation-plan", "methodology", "hooks"],
   "hooks": {
-    "user-prompt-submit": [
+    "UserPromptSubmit": [
       {
         "matcher": ".*",
         "description": "Detect planning keywords (plan, execplan) and remind Claude to activate appropriate planning skills",
-        "type": "command",
-        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-planning-keywords.py"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-planning-keywords.py"
+          }
+        ]
       }
     ]
   }
