@@ -19,21 +19,37 @@ from litellm_client import LiteLLMClient
 from model_selector import ModelSelector
 
 
+def build_full_prompt(prompt: str, files: list) -> str:
+    """
+    Build the full prompt with all file contents attached.
+    This is the actual prompt that will be sent to the LLM.
+    """
+    if not files:
+        return prompt
+
+    full_prompt = prompt + "\n\n" + "="*80 + "\n\n"
+    full_prompt += "## Attached Files\n\n"
+
+    for file_info in files:
+        full_prompt += f"### {file_info['path']}\n\n"
+        full_prompt += f"```\n{file_info['content']}\n```\n\n"
+
+    return full_prompt
+
+
 def validate_context_size(
-    prompt: str,
-    files: list,
+    full_prompt: str,
     model: str,
-    client: LiteLLMClient
+    client: LiteLLMClient,
+    num_files: int
 ) -> bool:
     """
-    Validate that prompt + files fit in model context.
+    Validate that full prompt fits in model context.
     Returns True if OK, raises ValueError if exceeds.
     """
 
-    # Count tokens
-    prompt_tokens = client.count_tokens(prompt, model)
-    file_tokens = sum(f.get("tokens", 0) for f in files)
-    total_tokens = prompt_tokens + file_tokens
+    # Count tokens for the complete prompt
+    total_tokens = client.count_tokens(full_prompt, model)
 
     # Get limit
     max_tokens = client.get_max_tokens(model)
@@ -43,9 +59,7 @@ def validate_context_size(
 
     # Print summary
     print(f"\n📊 Token Usage:")
-    print(f"- Prompt: {prompt_tokens:,} tokens")
-    print(f"- Files: {file_tokens:,} tokens ({len(files)} files)")
-    print(f"- Total: {total_tokens:,} tokens")
+    print(f"- Input: {total_tokens:,} tokens ({num_files} files)")
     print(f"- Limit: {max_tokens:,} tokens")
     print(f"- Available: {available_tokens:,} tokens ({int((available_tokens/max_tokens)*100)}%)\n")
 
@@ -56,7 +70,7 @@ def validate_context_size(
             f"  Limit: {max_tokens:,} tokens\n"
             f"  Overage: {total_tokens - max_tokens:,} tokens\n\n"
             f"Suggestions:\n"
-            f"1. Reduce number of files (currently {len(files)})\n"
+            f"1. Reduce number of files (currently {num_files})\n"
             f"2. Use a model with larger context\n"
             f"3. Shorten the prompt"
         )
@@ -87,7 +101,6 @@ def handle_invocation(args):
 
     # Validate and prepare files
     file_contents = []
-    total_tokens = 0
 
     if args.files:
         for file_path in args.files:
@@ -106,13 +119,10 @@ def handle_invocation(args):
                 print(f"ERROR: Could not read {file_path}: {e}", file=sys.stderr)
                 return 1
 
-            tokens = client.count_tokens(content, args.model or config.DEFAULT_MODEL)
             file_contents.append({
                 "path": str(file_path),
-                "content": content,
-                "tokens": tokens
+                "content": content
             })
-            total_tokens += tokens
 
     # Determine model
     if not args.model:
@@ -120,9 +130,34 @@ def handle_invocation(args):
         args.model = ModelSelector.select_best_model(base_url)
         print(f"Selected model: {args.model}")
 
-    # Check context limits
+    # Validate environment variables (only if no custom base URL)
+    if not base_url:
+        env_status = client.validate_environment(args.model)
+        if not env_status.get("keys_in_environment", False):
+            missing = env_status.get("missing_keys", [])
+            error = env_status.get("error", "")
+
+            print(f"\n❌ ERROR: Missing required environment variables for model '{args.model}'", file=sys.stderr)
+            print(f"\nMissing keys: {', '.join(missing)}", file=sys.stderr)
+
+            if error:
+                print(f"\nDetails: {error}", file=sys.stderr)
+
+            print("\n💡 To fix this:", file=sys.stderr)
+            print("   1. Set the required environment variable(s):", file=sys.stderr)
+            for key in missing:
+                print(f"      export {key}=your-api-key", file=sys.stderr)
+            print("   2. Or use --base-url to specify a custom LiteLLM endpoint", file=sys.stderr)
+            print("   3. Or use --model to specify a different model\n", file=sys.stderr)
+
+            return 1
+
+    # Build full prompt with all file contents
+    full_prompt = build_full_prompt(args.prompt, file_contents)
+
+    # Check context limits on the full prompt
     try:
-        validate_context_size(args.prompt, file_contents, args.model, client)
+        validate_context_size(full_prompt, args.model, client, len(file_contents))
     except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
@@ -130,8 +165,7 @@ def handle_invocation(args):
     # Create and start session
     session_id = session_mgr.create_session(
         slug=args.slug,
-        prompt=args.prompt,
-        files=file_contents,
+        prompt=full_prompt,
         model=args.model,
         base_url=base_url,
         api_key=args.api_key
@@ -139,30 +173,50 @@ def handle_invocation(args):
 
     print(f"Session created: {session_id}")
     print(f"Reattach via: python3 {__file__} session {args.slug}")
+    print("Waiting for completion...")
 
-    if args.wait:
-        print("Waiting for completion...")
-        try:
-            result = session_mgr.wait_for_completion(session_id)
+    try:
+        result = session_mgr.wait_for_completion(session_id)
 
-            if result.get("status") == "completed":
-                print("\n" + "="*80)
-                print(result.get("output", "No output available"))
-                print("="*80)
-                return 0
-            else:
-                print(f"\nSession ended with status: {result.get('status')}")
-                if "error" in result:
-                    print(f"Error: {result['error']}")
-                return 1
+        if result.get("status") == "completed":
+            print("\n" + "="*80)
+            print(result.get("output", "No output available"))
+            print("="*80)
 
-        except TimeoutError as e:
-            print(f"\nERROR: {e}", file=sys.stderr)
+            # Display token usage and cost if available
+            usage = result.get("usage")
+            cost_info = result.get("cost_info")
+
+            if usage or cost_info:
+                print("\n📊 Usage & Cost:")
+
+                if cost_info:
+                    print(f"- Input tokens:  {cost_info.get('input_tokens', 0):,}")
+                    print(f"- Output tokens: {cost_info.get('output_tokens', 0):,}")
+                    print(f"- Total tokens:  {cost_info.get('input_tokens', 0) + cost_info.get('output_tokens', 0):,}")
+                    print(f"\n- Input cost:  ${cost_info.get('input_cost', 0):.6f}")
+                    print(f"- Output cost: ${cost_info.get('output_cost', 0):.6f}")
+                    print(f"- Total cost:  ${cost_info.get('total_cost', 0):.6f} {cost_info.get('currency', 'USD')}")
+                elif usage:
+                    # If we have usage but no cost info
+                    input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
+                    output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+                    print(f"- Input tokens:  {input_tokens:,}")
+                    print(f"- Output tokens: {output_tokens:,}")
+                    print(f"- Total tokens:  {input_tokens + output_tokens:,}")
+
+                print()
+
+            return 0
+        else:
+            print(f"\nSession ended with status: {result.get('status')}")
+            if "error" in result:
+                print(f"Error: {result['error']}")
             return 1
-    else:
-        print("Session running in background.")
 
-    return 0
+    except TimeoutError as e:
+        print(f"\nERROR: {e}", file=sys.stderr)
+        return 1
 
 
 def handle_session_status(args):
@@ -232,11 +286,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Start a consultation (runs in background)
+  # Start a consultation (runs synchronously until completion)
   %(prog)s --prompt "Analyze this code" --file src/*.py --slug "review"
-
-  # Wait for completion (blocking)
-  %(prog)s --prompt "..." --file ... --slug "..." --wait
 
   # Check session status
   %(prog)s session review
@@ -260,8 +311,6 @@ Examples:
     parser.add_argument("-m", "--model", help="Specific model to use")
     parser.add_argument("--base-url", help="Custom base URL for LiteLLM")
     parser.add_argument("--api-key", help="API key for the provider")
-    parser.add_argument("--wait", action="store_true",
-                       help="Wait for completion (blocking)")
 
     # Session status
     session_parser = subparsers.add_parser("session", help="Check session status")

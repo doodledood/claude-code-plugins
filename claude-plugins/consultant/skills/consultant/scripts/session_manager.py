@@ -25,7 +25,6 @@ class SessionManager:
         self,
         slug: str,
         prompt: str,
-        files: List[Dict],
         model: str,
         base_url: Optional[str] = None,
         api_key: Optional[str] = None
@@ -44,27 +43,20 @@ class SessionManager:
             "status": "running",
             "model": model,
             "base_url": base_url,
-            "prompt": prompt[:200] + "..." if len(prompt) > 200 else prompt,
-            "files": [f["path"] for f in files],
-            "total_input_tokens": sum(f.get("tokens", 0) for f in files)
+            "prompt_preview": prompt[:200] + "..." if len(prompt) > 200 else prompt
         }
 
         metadata_file = session_dir / "metadata.json"
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
-        # Save full prompt and files
+        # Save full prompt
         prompt_file = session_dir / "prompt.txt"
         prompt_file.write_text(prompt)
-
-        for file_info in files:
-            file_name = Path(file_info["path"]).name
-            safe_name = file_name.replace("/", "_").replace("\\", "_")
-            (session_dir / f"file_{safe_name}").write_text(file_info["content"])
 
         # Start background process
         process = multiprocessing.Process(
             target=self._execute_session,
-            args=(session_id, prompt, files, model, base_url, api_key)
+            args=(session_id, prompt, model, base_url, api_key)
         )
         process.start()
 
@@ -77,7 +69,6 @@ class SessionManager:
         self,
         session_id: str,
         prompt: str,
-        files: List[Dict],
         model: str,
         base_url: Optional[str],
         api_key: Optional[str]
@@ -93,34 +84,37 @@ class SessionManager:
             # Initialize client
             client = LiteLLMClient(base_url=base_url, api_key=api_key)
 
-            # Construct full prompt with file contents
-            full_prompt = prompt + "\n\n" + "="*80 + "\n\n"
-            full_prompt += "## Attached Files\n\n"
-
-            for file_info in files:
-                full_prompt += f"### {file_info['path']}\n\n"
-                full_prompt += f"```\n{file_info['content']}\n```\n\n"
-
-            # Make LLM call
+            # Make LLM call with the full prompt (already includes file contents)
             self._update_status(session_id, "calling_llm")
 
-            # Stream and save response
+            # Get full response (pass session_dir for resumability support)
+            result = client.complete(
+                model=model,
+                prompt=prompt,
+                session_dir=session_dir  # Enables background job resumption if supported
+            )
+
+            full_response = result.get("content", "")
+            usage = result.get("usage")
+            response_obj = result.get("response")  # Full response object for cost calculation
+
+            # Save response to file
             output_file = session_dir / "output.txt"
-            full_response = ""
+            output_file.write_text(full_response)
 
-            with output_file.open("w") as f:
-                for chunk in client.complete(
-                    model=model,
-                    prompt=full_prompt,
-                    stream=True
-                ):
-                    content = chunk.get("content", "")
-                    full_response += content
-                    f.write(content)
-                    f.flush()
+            # Calculate cost using response object (preferred) or usage dict (fallback)
+            cost_info = None
+            if response_obj or usage:
+                cost_info = client.calculate_cost(model, response=response_obj, usage=usage)
 
-            # Update metadata
-            self._update_status(session_id, "completed", response=full_response)
+            # Update metadata with usage and cost
+            self._update_status(
+                session_id,
+                "completed",
+                response=full_response,
+                usage=usage,
+                cost_info=cost_info
+            )
 
         except Exception as e:
             error_msg = f"Error: {str(e)}\n\nType: {type(e).__name__}"
@@ -132,7 +126,9 @@ class SessionManager:
         session_id: str,
         status: str,
         response: Optional[str] = None,
-        error: Optional[str] = None
+        error: Optional[str] = None,
+        usage: Optional[Dict] = None,
+        cost_info: Optional[Dict] = None
     ):
         """Update session status in metadata"""
 
@@ -152,6 +148,12 @@ class SessionManager:
 
         if error:
             metadata["error"] = error[:500]  # Truncate long errors
+
+        if usage:
+            metadata["usage"] = usage
+
+        if cost_info:
+            metadata["cost_info"] = cost_info
 
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
@@ -207,6 +209,18 @@ class SessionManager:
             metadata = json.loads(metadata_file.read_text())
 
             if metadata["status"] in ["completed", "error"]:
+                # Add output if completed
+                if metadata["status"] == "completed":
+                    output_file = session_dir / "output.txt"
+                    if output_file.exists():
+                        metadata["output"] = output_file.read_text()
+
+                # Add error if failed
+                if metadata["status"] == "error":
+                    error_file = session_dir / "error.txt"
+                    if error_file.exists():
+                        metadata["error_details"] = error_file.read_text()
+
                 return metadata
 
             time.sleep(config.POLLING_INTERVAL_SECONDS)
