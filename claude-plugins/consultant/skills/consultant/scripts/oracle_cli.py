@@ -139,30 +139,25 @@ def handle_invocation(args):
 
     print(f"Session created: {session_id}")
     print(f"Reattach via: python3 {__file__} session {args.slug}")
+    print("Waiting for completion...")
 
-    if args.wait:
-        print("Waiting for completion...")
-        try:
-            result = session_mgr.wait_for_completion(session_id)
+    try:
+        result = session_mgr.wait_for_completion(session_id)
 
-            if result.get("status") == "completed":
-                print("\n" + "="*80)
-                print(result.get("output", "No output available"))
-                print("="*80)
-                return 0
-            else:
-                print(f"\nSession ended with status: {result.get('status')}")
-                if "error" in result:
-                    print(f"Error: {result['error']}")
-                return 1
-
-        except TimeoutError as e:
-            print(f"\nERROR: {e}", file=sys.stderr)
+        if result.get("status") == "completed":
+            print("\n" + "="*80)
+            print(result.get("output", "No output available"))
+            print("="*80)
+            return 0
+        else:
+            print(f"\nSession ended with status: {result.get('status')}")
+            if "error" in result:
+                print(f"Error: {result['error']}")
             return 1
-    else:
-        print("Session running in background.")
 
-    return 0
+    except TimeoutError as e:
+        print(f"\nERROR: {e}", file=sys.stderr)
+        return 1
 
 
 def handle_session_status(args):
@@ -232,11 +227,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Start a consultation (runs in background)
+  # Start a consultation (runs synchronously until completion)
   %(prog)s --prompt "Analyze this code" --file src/*.py --slug "review"
-
-  # Wait for completion (blocking)
-  %(prog)s --prompt "..." --file ... --slug "..." --wait
 
   # Check session status
   %(prog)s session review
@@ -260,8 +252,6 @@ Examples:
     parser.add_argument("-m", "--model", help="Specific model to use")
     parser.add_argument("--base-url", help="Custom base URL for LiteLLM")
     parser.add_argument("--api-key", help="API key for the provider")
-    parser.add_argument("--wait", action="store_true",
-                       help="Wait for completion (blocking)")
 
     # Session status
     session_parser = subparsers.add_parser("session", help="Check session status")

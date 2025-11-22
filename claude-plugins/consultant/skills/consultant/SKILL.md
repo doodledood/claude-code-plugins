@@ -40,7 +40,11 @@ Where `{CONSULTANT_SCRIPTS_PATH}` is the path to `claude-plugins/consultant/skil
 
 ## Basic Usage
 
-### Start a Consultation (Background)
+### Start a Consultation
+
+The consultant script runs synchronously (blocking until completion). For long-running analyses, you should run it in the background using the Bash tool with `run_in_background: true`, then use BashOutput to periodically check progress.
+
+**Example: Running in background via Bash tool**
 
 ```bash
 python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
@@ -49,10 +53,18 @@ python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
   --slug "security-audit"
 ```
 
-The consultation runs in the background. You'll see:
+When calling via the Bash tool:
+1. Use `run_in_background: true` parameter
+2. Periodically use BashOutput tool with the returned bash_id to check progress
+3. The script will print output as it completes each step
+4. Final results appear after "Waiting for completion..." message
+
+**What you'll see:**
 - Token usage summary
 - Session ID
-- Command to check status
+- "Waiting for completion..." status
+- Streaming output from the LLM
+- Final results after completion
 
 ### Check Session Status
 
@@ -64,18 +76,6 @@ This returns JSON with:
 - Current status (running/completed/error)
 - Full output if completed
 - Error details if failed
-
-### Wait for Completion (Blocking)
-
-```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
-  --prompt "Review this PR" \
-  --file src/**/*.ts \
-  --slug "pr-review" \
-  --wait
-```
-
-The `--wait` flag blocks until completion and prints the output.
 
 ### List All Sessions
 
@@ -426,8 +426,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
 python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
   --prompt "Identify the top 5 highest-impact architectural issues causing tight coupling. For each: explain the problem, show affected components, and recommend a solution." \
   --file "apps/*/src/**/*.ts" \
-  --slug "arch-review" \
-  --wait
+  --slug "arch-review"
 ```
 
 ### PR Review
@@ -439,8 +438,7 @@ git diff origin/main...HEAD > /tmp/pr-diff.txt
 python3 {CONSULTANT_SCRIPTS_PATH}/oracle_cli.py \
   --prompt "Review this PR for production deployment. Flag blockers, high-risk changes, and suggest regression tests." \
   --file /tmp/pr-diff.txt \
-  --slug "pr-review" \
-  --wait
+  --slug "pr-review"
 ```
 
 ## Integration with Consultant-Consulter Agent
