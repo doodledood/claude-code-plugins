@@ -131,17 +131,12 @@ class BackgroundJobStrategy(ResponseStrategy):
                         raise RuntimeError(f"Background job failed: {error}")
                     elif result.status in ["in_progress", "queued"]:
                         # Still processing, wait and retry
-                        delay = self._calculate_backoff_delay(
-                            attempt,
-                            config.POLL_INITIAL_DELAY,
-                            config.POLL_MAX_DELAY
-                        )
-                        time.sleep(delay)
+                        time.sleep(config.POLL_INTERVAL)
                         attempt += 1
                         continue
                     else:
                         # Unknown status, wait and retry
-                        time.sleep(config.POLL_INITIAL_DELAY)
+                        time.sleep(config.POLL_INTERVAL)
                         continue
                 else:
                     # No status field - might be complete already
@@ -152,7 +147,7 @@ class BackgroundJobStrategy(ResponseStrategy):
                             "usage": result.usage if hasattr(result, 'usage') else None
                         }
                     # No content, wait and retry
-                    time.sleep(config.POLL_INITIAL_DELAY)
+                    time.sleep(config.POLL_INTERVAL)
                     continue
 
             except Exception as e:

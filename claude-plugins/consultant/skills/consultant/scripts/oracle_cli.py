@@ -182,6 +182,31 @@ def handle_invocation(args):
             print("\n" + "="*80)
             print(result.get("output", "No output available"))
             print("="*80)
+
+            # Display token usage and cost if available
+            usage = result.get("usage")
+            cost_info = result.get("cost_info")
+
+            if usage or cost_info:
+                print("\n📊 Usage & Cost:")
+
+                if cost_info:
+                    print(f"- Input tokens:  {cost_info.get('input_tokens', 0):,}")
+                    print(f"- Output tokens: {cost_info.get('output_tokens', 0):,}")
+                    print(f"- Total tokens:  {cost_info.get('input_tokens', 0) + cost_info.get('output_tokens', 0):,}")
+                    print(f"\n- Input cost:  ${cost_info.get('input_cost', 0):.6f}")
+                    print(f"- Output cost: ${cost_info.get('output_cost', 0):.6f}")
+                    print(f"- Total cost:  ${cost_info.get('total_cost', 0):.6f} {cost_info.get('currency', 'USD')}")
+                elif usage:
+                    # If we have usage but no cost info
+                    input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
+                    output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+                    print(f"- Input tokens:  {input_tokens:,}")
+                    print(f"- Output tokens: {output_tokens:,}")
+                    print(f"- Total tokens:  {input_tokens + output_tokens:,}")
+
+                print()
+
             return 0
         else:
             print(f"\nSession ended with status: {result.get('status')}")

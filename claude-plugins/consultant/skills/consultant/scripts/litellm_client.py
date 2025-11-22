@@ -116,6 +116,40 @@ class LiteLLMClient:
                 # Conservative fallback if both methods fail
                 return 8192
 
+    def calculate_cost(self, model: str, usage: Optional[Dict]) -> Optional[Dict]:
+        """
+        Calculate cost based on token usage and model pricing.
+        Returns dict with input_cost, output_cost, total_cost or None if unavailable.
+        """
+        if not usage:
+            return None
+
+        try:
+            # Get model pricing info
+            info = get_model_info(model=model)
+
+            input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
+            output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+
+            input_cost_per_token = info.get("input_cost_per_token", 0)
+            output_cost_per_token = info.get("output_cost_per_token", 0)
+
+            input_cost = input_tokens * input_cost_per_token
+            output_cost = output_tokens * output_cost_per_token
+            total_cost = input_cost + output_cost
+
+            return {
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "input_cost": input_cost,
+                "output_cost": output_cost,
+                "total_cost": total_cost,
+                "currency": "USD"  # LiteLLM uses USD
+            }
+        except Exception:
+            # If we can't get pricing info, return None
+            return None
+
     def validate_environment(self, model: str) -> Dict:
         """
         Check if required environment variables are set for the model.

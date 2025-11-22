@@ -95,13 +95,25 @@ class SessionManager:
             )
 
             full_response = result.get("content", "")
+            usage = result.get("usage")
 
             # Save response to file
             output_file = session_dir / "output.txt"
             output_file.write_text(full_response)
 
-            # Update metadata
-            self._update_status(session_id, "completed", response=full_response)
+            # Calculate cost if usage info available
+            cost_info = None
+            if usage:
+                cost_info = client.calculate_cost(model, usage)
+
+            # Update metadata with usage and cost
+            self._update_status(
+                session_id,
+                "completed",
+                response=full_response,
+                usage=usage,
+                cost_info=cost_info
+            )
 
         except Exception as e:
             error_msg = f"Error: {str(e)}\n\nType: {type(e).__name__}"
@@ -113,7 +125,9 @@ class SessionManager:
         session_id: str,
         status: str,
         response: Optional[str] = None,
-        error: Optional[str] = None
+        error: Optional[str] = None,
+        usage: Optional[Dict] = None,
+        cost_info: Optional[Dict] = None
     ):
         """Update session status in metadata"""
 
@@ -133,6 +147,12 @@ class SessionManager:
 
         if error:
             metadata["error"] = error[:500]  # Truncate long errors
+
+        if usage:
+            metadata["usage"] = usage
+
+        if cost_info:
+            metadata["cost_info"] = cost_info
 
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
