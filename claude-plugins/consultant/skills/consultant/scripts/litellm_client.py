@@ -3,6 +3,7 @@ LiteLLM client wrapper with token counting and error handling
 """
 
 import os
+from pathlib import Path
 from typing import Optional, Dict
 import config
 
@@ -13,6 +14,8 @@ try:
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
+
+from response_strategy import ResponseStrategyFactory
 
 
 class LiteLLMClient:
@@ -37,40 +40,44 @@ class LiteLLMClient:
         self,
         model: str,
         prompt: str,
+        session_dir: Optional[Path] = None,
         **kwargs
     ) -> Dict:
-        """Make a request using the responses API (auto-bridges to completion for unsupported models)"""
+        """
+        Make a request using the responses API with automatic retry/background job handling.
 
-        response_kwargs = {
-            "model": model,
-            "input": prompt,
-            "stream": False,
-            **kwargs
-        }
+        Uses strategy pattern to:
+        - Use background jobs for OpenAI/Azure (resumable after network failures)
+        - Use sync with retries for other providers
 
+        Args:
+            model: Model identifier
+            prompt: Full prompt text
+            session_dir: Optional session directory for state persistence (enables resumability)
+            **kwargs: Additional args passed to litellm.responses()
+
+        Returns:
+            Dict with 'content' and optional 'usage'
+        """
+
+        # Add base_url if configured
         if self.base_url:
-            response_kwargs["api_base"] = self.base_url
+            kwargs["api_base"] = self.base_url
+
+        # Select appropriate strategy based on model
+        strategy = ResponseStrategyFactory.get_strategy(model)
+
+        if session_dir:
+            print(f"Using {strategy.__class__.__name__} (resumable: {strategy.can_resume()})")
 
         try:
-            response = responses(**response_kwargs)
-
-            # Extract content from response.output structure
-            # response.output[0].content[0].text contains the actual text
-            content = ""
-            if hasattr(response, 'output') and len(response.output) > 0:
-                for item in response.output:
-                    if hasattr(item, 'content'):
-                        for content_item in item.content:
-                            if hasattr(content_item, 'text'):
-                                content += content_item.text
-
-            if not content:
-                raise RuntimeError("No content in response from LLM")
-
-            return {
-                "content": content,
-                "usage": response.usage if hasattr(response, 'usage') else None
-            }
+            # Execute with strategy-specific retry/background logic
+            return strategy.execute(
+                model=model,
+                prompt=prompt,
+                session_dir=session_dir,
+                **kwargs
+            )
 
         except Exception as e:
             # Map to standardized errors

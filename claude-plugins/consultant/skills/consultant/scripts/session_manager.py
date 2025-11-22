@@ -87,10 +87,11 @@ class SessionManager:
             # Make LLM call with the full prompt (already includes file contents)
             self._update_status(session_id, "calling_llm")
 
-            # Get full response
+            # Get full response (pass session_dir for resumability support)
             result = client.complete(
                 model=model,
-                prompt=prompt
+                prompt=prompt,
+                session_dir=session_dir  # Enables background job resumption if supported
             )
 
             full_response = result.get("content", "")

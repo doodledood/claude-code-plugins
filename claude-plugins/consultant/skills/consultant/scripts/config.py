@@ -22,7 +22,13 @@ CONTEXT_RESERVE_RATIO = 0.2  # 20% reserved for response
 
 # Retry configuration
 MAX_RETRIES = 3
-RETRY_DELAY_SECONDS = 5
+INITIAL_RETRY_DELAY = 2  # seconds
+MAX_RETRY_DELAY = 60     # seconds
+
+# Background job polling configuration
+POLL_INITIAL_DELAY = 2   # seconds
+POLL_MAX_DELAY = 10      # seconds
+POLL_TIMEOUT = 3600      # 1 hour max wait for background jobs
 
 # Session polling
 POLLING_INTERVAL_SECONDS = 2
