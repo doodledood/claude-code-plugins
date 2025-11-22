@@ -3,6 +3,7 @@ LiteLLM client wrapper with token counting and error handling
 """
 
 import os
+import requests
 from pathlib import Path
 from typing import Optional, Dict
 import config
@@ -93,13 +94,42 @@ class LiteLLMClient:
                 raise RuntimeError(f"LLM request failed: {error_msg}")
 
     def count_tokens(self, text: str, model: str) -> int:
-        """Count tokens for given text and model"""
+        """
+        Count tokens for given text and model.
 
+        When base_url is set (proxy mode), uses the proxy's /utils/token_counter endpoint
+        for accurate tokenization of custom models. Otherwise uses local token_counter.
+        """
+
+        # If using a proxy (base_url set), use the proxy's token counter endpoint
+        if self.base_url:
+            try:
+                url = f"{self.base_url.rstrip('/')}/utils/token_counter"
+                payload = {
+                    "model": model,
+                    "text": text
+                }
+
+                headers = {"Content-Type": "application/json"}
+                if self.api_key:
+                    headers["Authorization"] = f"Bearer {self.api_key}"
+
+                response = requests.post(url, json=payload, headers=headers, timeout=30)
+                response.raise_for_status()
+
+                # Response typically has format: {"token_count": 123}
+                result = response.json()
+                return result.get("token_count") or result.get("tokens", 0)
+
+            except Exception as e:
+                # If proxy token counting fails, fall back to local
+                print(f"Warning: Proxy token counting failed ({e}), using local tokenizer")
+
+        # Use local token counter (direct API mode or proxy fallback)
         try:
-            # Use text parameter directly for plain text (not chat messages)
             return token_counter(model=model, text=text)
         except Exception:
-            # Fallback: rough estimate (4 chars per token)
+            # Final fallback: rough estimate (4 chars per token)
             return max(1, len(text) // 4)
 
     def get_max_tokens(self, model: str) -> int:
