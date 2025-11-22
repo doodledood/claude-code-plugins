@@ -3,7 +3,7 @@ LiteLLM client wrapper with token counting and error handling
 """
 
 import os
-from typing import Optional, Dict, Iterator
+from typing import Optional, Dict
 import config
 
 try:
@@ -37,15 +37,14 @@ class LiteLLMClient:
         self,
         model: str,
         prompt: str,
-        stream: bool = False,
         **kwargs
-    ) -> Iterator[Dict]:
+    ) -> Dict:
         """Make a request using the responses API (auto-bridges to completion for unsupported models)"""
 
         response_kwargs = {
             "model": model,
             "input": prompt,
-            "stream": stream,
+            "stream": False,
             **kwargs
         }
 
@@ -55,31 +54,23 @@ class LiteLLMClient:
         try:
             response = responses(**response_kwargs)
 
-            if stream:
-                for chunk in response:
-                    # Handle streaming response format
-                    if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
-                        choice = chunk.choices[0]
-                        # Check for delta content (streaming format)
-                        if hasattr(choice, 'delta') and hasattr(choice.delta, 'content'):
-                            content = choice.delta.content
-                            if content:
-                                yield {"content": content}
-                        # Check for message content (some models use this)
-                        elif hasattr(choice, 'message') and hasattr(choice.message, 'content'):
-                            content = choice.message.content
-                            if content:
-                                yield {"content": content}
-            else:
-                # Non-streaming response
-                if hasattr(response, 'choices') and len(response.choices) > 0:
-                    message = response.choices[0].message
-                    yield {
-                        "content": message.content if hasattr(message, 'content') else str(message),
-                        "usage": response.usage if hasattr(response, 'usage') else None
-                    }
-                else:
-                    raise RuntimeError("Invalid response format from LLM")
+            # Extract content from response.output structure
+            # response.output[0].content[0].text contains the actual text
+            content = ""
+            if hasattr(response, 'output') and len(response.output) > 0:
+                for item in response.output:
+                    if hasattr(item, 'content'):
+                        for content_item in item.content:
+                            if hasattr(content_item, 'text'):
+                                content += content_item.text
+
+            if not content:
+                raise RuntimeError("No content in response from LLM")
+
+            return {
+                "content": content,
+                "usage": response.usage if hasattr(response, 'usage') else None
+            }
 
         except Exception as e:
             # Map to standardized errors
@@ -137,11 +128,11 @@ class LiteLLMClient:
         """Test if we can connect to the model"""
 
         try:
-            result = list(self.complete(
+            result = self.complete(
                 model=model,
                 prompt="Hello",
                 max_tokens=5
-            ))
-            return len(result) > 0
+            )
+            return result.get("content") is not None
         except Exception:
             return False

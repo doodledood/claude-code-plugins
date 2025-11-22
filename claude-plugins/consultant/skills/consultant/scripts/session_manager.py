@@ -87,20 +87,17 @@ class SessionManager:
             # Make LLM call with the full prompt (already includes file contents)
             self._update_status(session_id, "calling_llm")
 
-            # Stream and save response
-            output_file = session_dir / "output.txt"
-            full_response = ""
+            # Get full response
+            result = client.complete(
+                model=model,
+                prompt=prompt
+            )
 
-            with output_file.open("w") as f:
-                for chunk in client.complete(
-                    model=model,
-                    prompt=prompt,
-                    stream=True
-                ):
-                    content = chunk.get("content", "")
-                    full_response += content
-                    f.write(content)
-                    f.flush()
+            full_response = result.get("content", "")
+
+            # Save response to file
+            output_file = session_dir / "output.txt"
+            output_file.write_text(full_response)
 
             # Update metadata
             self._update_status(session_id, "completed", response=full_response)
