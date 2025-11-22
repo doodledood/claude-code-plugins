@@ -96,15 +96,16 @@ class SessionManager:
 
             full_response = result.get("content", "")
             usage = result.get("usage")
+            response_obj = result.get("response")  # Full response object for cost calculation
 
             # Save response to file
             output_file = session_dir / "output.txt"
             output_file.write_text(full_response)
 
-            # Calculate cost if usage info available
+            # Calculate cost using response object (preferred) or usage dict (fallback)
             cost_info = None
-            if usage:
-                cost_info = client.calculate_cost(model, usage)
+            if response_obj or usage:
+                cost_info = client.calculate_cost(model, response=response_obj, usage=usage)
 
             # Update metadata with usage and cost
             self._update_status(

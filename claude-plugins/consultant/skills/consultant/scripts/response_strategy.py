@@ -10,10 +10,11 @@ from abc import ABC, abstractmethod
 
 try:
     import litellm
-    from litellm import responses
+    from litellm import responses, _should_retry
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
+    _should_retry = None
 
 import config
 
@@ -89,6 +90,7 @@ class BackgroundJobStrategy(ResponseStrategy):
                 model=model,
                 input=prompt,
                 background=True,  # Returns immediately with response_id
+                num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
                 **kwargs
             )
 
@@ -124,7 +126,8 @@ class BackgroundJobStrategy(ResponseStrategy):
                             raise RuntimeError("No content in completed response")
                         return {
                             "content": content,
-                            "usage": result.usage if hasattr(result, 'usage') else None
+                            "usage": result.usage if hasattr(result, 'usage') else None,
+                            "response": result  # Include full response for cost calculation
                         }
                     elif result.status == "failed":
                         error = getattr(result, 'error', 'Unknown error')
@@ -144,7 +147,8 @@ class BackgroundJobStrategy(ResponseStrategy):
                     if content:
                         return {
                             "content": content,
-                            "usage": result.usage if hasattr(result, 'usage') else None
+                            "usage": result.usage if hasattr(result, 'usage') else None,
+                            "response": result  # Include full response for cost calculation
                         }
                     # No content, wait and retry
                     time.sleep(config.POLL_INTERVAL)
@@ -198,6 +202,7 @@ class SyncRetryStrategy(ResponseStrategy):
                     model=model,
                     input=prompt,
                     stream=False,
+                    num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
                     **kwargs
                 )
 
@@ -208,32 +213,29 @@ class SyncRetryStrategy(ResponseStrategy):
 
                 return {
                     "content": content,
-                    "usage": response.usage if hasattr(response, 'usage') else None
+                    "usage": response.usage if hasattr(response, 'usage') else None,
+                    "response": response  # Include full response for cost calculation
                 }
 
             except Exception as e:
-                error_msg = str(e).lower()
+                # Use LiteLLM's built-in retry logic for HTTP errors
+                if _should_retry and hasattr(e, 'status_code'):
+                    retryable = _should_retry(e.status_code)
+                else:
+                    # Fallback to string matching for non-HTTP errors
+                    error_msg = str(e).lower()
+                    retryable = any(x in error_msg for x in [
+                        "network", "timeout", "connection",
+                        "429", "rate limit", "503", "overloaded"
+                    ])
+                    non_retryable = any(x in error_msg for x in [
+                        "auth", "key", "context", "token limit", "not found", "invalid"
+                    ])
 
-                # Determine if we should retry
-                retryable = any(x in error_msg for x in [
-                    "network", "timeout", "connection",
-                    "429", "rate limit", "too many requests",
-                    "503", "service unavailable", "overloaded"
-                ])
-
-                # Don't retry auth, context, or validation errors
-                non_retryable = any(x in error_msg for x in [
-                    "auth", "key", "unauthorized", "forbidden",
-                    "context", "token limit", "too long",
-                    "not found", "404", "invalid"
-                ])
-
-                if non_retryable:
-                    # These errors won't be fixed by retrying
-                    raise
+                    if non_retryable:
+                        raise
 
                 if retryable and attempt < config.MAX_RETRIES - 1:
-                    # Retry with exponential backoff
                     delay = self._calculate_backoff_delay(
                         attempt,
                         config.INITIAL_RETRY_DELAY,
@@ -243,7 +245,6 @@ class SyncRetryStrategy(ResponseStrategy):
                     time.sleep(delay)
                     continue
 
-                # Final attempt or non-retryable error
                 raise
 
         raise RuntimeError("Max retries exceeded")

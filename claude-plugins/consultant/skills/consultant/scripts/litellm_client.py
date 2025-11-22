@@ -9,7 +9,7 @@ import config
 
 try:
     import litellm
-    from litellm import responses, token_counter, get_max_tokens, validate_environment
+    from litellm import responses, token_counter, get_max_tokens, validate_environment, completion_cost
     from litellm.utils import get_model_info
     LITELLM_AVAILABLE = True
 except ImportError:
@@ -116,36 +116,55 @@ class LiteLLMClient:
                 # Conservative fallback if both methods fail
                 return 8192
 
-    def calculate_cost(self, model: str, usage: Optional[Dict]) -> Optional[Dict]:
+    def calculate_cost(self, model: str, response=None, usage: Optional[Dict] = None) -> Optional[Dict]:
         """
-        Calculate cost based on token usage and model pricing.
-        Returns dict with input_cost, output_cost, total_cost or None if unavailable.
+        Calculate cost using LiteLLM's built-in completion_cost() function.
+
+        Args:
+            model: Model identifier
+            response: Optional response object from litellm.responses()
+            usage: Optional usage dict (fallback if response not available)
+
+        Returns:
+            Dict with input_tokens, output_tokens, costs, or None if unavailable
         """
-        if not usage:
+        try:
+            # Prefer using response object with built-in function
+            if response:
+                total_cost = completion_cost(completion_response=response)
+
+                # Extract token counts from response.usage if available
+                if hasattr(response, 'usage'):
+                    usage = response.usage
+
+            # Calculate from usage dict if provided
+            if usage:
+                input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
+                output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+
+                # Get per-token costs from model info
+                info = get_model_info(model=model)
+                input_cost_per_token = info.get("input_cost_per_token", 0)
+                output_cost_per_token = info.get("output_cost_per_token", 0)
+
+                input_cost = input_tokens * input_cost_per_token
+                output_cost = output_tokens * output_cost_per_token
+
+                # Use total_cost from completion_cost if available, else calculate
+                if not response:
+                    total_cost = input_cost + output_cost
+
+                return {
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "input_cost": input_cost,
+                    "output_cost": output_cost,
+                    "total_cost": total_cost,
+                    "currency": "USD"
+                }
+
             return None
 
-        try:
-            # Get model pricing info
-            info = get_model_info(model=model)
-
-            input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
-            output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
-
-            input_cost_per_token = info.get("input_cost_per_token", 0)
-            output_cost_per_token = info.get("output_cost_per_token", 0)
-
-            input_cost = input_tokens * input_cost_per_token
-            output_cost = output_tokens * output_cost_per_token
-            total_cost = input_cost + output_cost
-
-            return {
-                "input_tokens": input_tokens,
-                "output_tokens": output_tokens,
-                "input_cost": input_cost,
-                "output_cost": output_cost,
-                "total_cost": total_cost,
-                "currency": "USD"  # LiteLLM uses USD
-            }
         except Exception:
             # If we can't get pricing info, return None
             return None
