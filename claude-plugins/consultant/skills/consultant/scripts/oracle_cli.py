@@ -130,6 +130,28 @@ def handle_invocation(args):
         args.model = ModelSelector.select_best_model(base_url)
         print(f"Selected model: {args.model}")
 
+    # Validate environment variables (only if no custom base URL)
+    if not base_url:
+        env_status = client.validate_environment(args.model)
+        if not env_status.get("keys_in_environment", False):
+            missing = env_status.get("missing_keys", [])
+            error = env_status.get("error", "")
+
+            print(f"\n❌ ERROR: Missing required environment variables for model '{args.model}'", file=sys.stderr)
+            print(f"\nMissing keys: {', '.join(missing)}", file=sys.stderr)
+
+            if error:
+                print(f"\nDetails: {error}", file=sys.stderr)
+
+            print("\n💡 To fix this:", file=sys.stderr)
+            print("   1. Set the required environment variable(s):", file=sys.stderr)
+            for key in missing:
+                print(f"      export {key}=your-api-key", file=sys.stderr)
+            print("   2. Or use --base-url to specify a custom LiteLLM endpoint", file=sys.stderr)
+            print("   3. Or use --model to specify a different model\n", file=sys.stderr)
+
+            return 1
+
     # Build full prompt with all file contents
     full_prompt = build_full_prompt(args.prompt, file_contents)
 

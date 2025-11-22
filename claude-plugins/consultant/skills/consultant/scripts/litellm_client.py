@@ -8,7 +8,7 @@ import config
 
 try:
     import litellm
-    from litellm import responses, token_counter, get_max_tokens
+    from litellm import responses, token_counter, get_max_tokens, validate_environment
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
@@ -114,6 +114,21 @@ class LiteLLMClient:
                 return config.KNOWN_CONTEXT_SIZES[model]
             # Conservative fallback
             return 8192
+
+    def validate_environment(self, model: str) -> Dict:
+        """
+        Check if required environment variables are set for the model.
+        Returns dict with 'keys_in_environment' (bool) and 'missing_keys' (list).
+        """
+        try:
+            return validate_environment(model=model)
+        except Exception as e:
+            # If validation fails, return a generic response
+            return {
+                "keys_in_environment": False,
+                "missing_keys": ["API_KEY"],
+                "error": str(e)
+            }
 
     def test_connection(self, model: str) -> bool:
         """Test if we can connect to the model"""
