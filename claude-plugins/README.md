@@ -23,7 +23,9 @@ Or, for local development:
 Once the marketplace is added, install any plugin:
 
 ```bash
+/plugin install consultant@claude-code-plugins-marketplace
 /plugin install oracle@claude-code-plugins-marketplace
+/plugin install planning@claude-code-plugins-marketplace
 ```
 
 List available plugins:
@@ -33,6 +35,35 @@ List available plugins:
 ```
 
 ## 📦 Available Plugins
+
+### consultant (v1.0.0)
+Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-powered code analysis across 100+ models.
+
+**Features:**
+- `consultant-consulter` agent - Expert agent for multi-provider AI analysis with automatic model selection
+- `/consultant-review` command - Production-level PR reviews with severity-tagged findings
+- `/consultant-investigate-bug` command - Deep bug investigation with root cause analysis
+- `/consultant-execplan` command - Comprehensive execution planning with architectural analysis
+- `consultant` skill - Python/LiteLLM CLI knowledge and best practices
+
+**Key Capabilities:**
+- 100+ LLM provider support (OpenAI, Anthropic, Google, Azure, Bedrock, local models)
+- Custom base URLs for any provider or local LLM server
+- Automatic model discovery via `/v1/models` endpoint
+- Intelligent model selection with scoring algorithm
+- Token counting with pre-flight validation
+- Async execution with session management
+- OPENAI_BASE_URL environment variable support
+
+**Requirements:**
+```bash
+pip install litellm requests
+```
+
+**Category:** development
+**Keywords:** consultant, code-review, analysis, architecture, bug-investigation, ai-analysis, litellm, multi-provider, local-models
+
+---
 
 ### oracle (v1.0.0)
 Comprehensive code analysis using oracle CLI tool for deep AI-powered reviews and architectural analysis.

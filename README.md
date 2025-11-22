@@ -31,12 +31,31 @@ For local development:
 /plugin list
 
 # Install a specific plugin
+/plugin install consultant@claude-code-plugins-marketplace
 /plugin install oracle@claude-code-plugins-marketplace
 ```
 
 ## 📦 Available Plugins
 
 All plugins are located in `claude-plugins/`:
+
+#### consultant (v1.0.0)
+Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-powered code analysis across 100+ models.
+
+**Components:**
+- **Agent:** `consultant-consulter` - Expert agent for multi-provider AI analysis with automatic model selection
+- **Commands:**
+  - `/consultant-review` - Production-level PR reviews with severity-tagged findings
+  - `/consultant-investigate-bug` - Deep bug investigation with root cause analysis
+  - `/consultant-execplan` - Comprehensive execution planning with architectural analysis
+- **Skill:** `consultant` - Python/LiteLLM CLI knowledge and best practices
+- **Category:** development
+- **Key Features:**
+  - 100+ LLM provider support (OpenAI, Anthropic, Google, Azure, local models)
+  - Custom base URLs for local LLM deployments
+  - Automatic model discovery and selection
+  - Token management with context validation
+  - Async execution with session reattachment
 
 #### oracle (v1.0.0)
 Comprehensive code analysis using oracle CLI tool for deep AI-powered reviews and architectural analysis.
@@ -73,6 +92,7 @@ claude-code-plugins/
 ├── claude-plugins/            # Claude Code plugins directory
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
+│   ├── consultant/           # Consultant plugin (Python/LiteLLM)
 │   ├── oracle/               # Oracle plugin
 │   └── planning/             # Planning plugin
 ├── CONTRIBUTING.md            # Contributing guidelines
