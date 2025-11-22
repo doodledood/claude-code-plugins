@@ -1,6 +1,6 @@
 # Planning Plugin
 
-Comprehensive planning tools for Claude Code with automatic keyword detection. Includes plan and execplan skills, oracle-execplan command, and smart hooks that remind Claude to activate planning skills when needed.
+Comprehensive planning tools for Claude Code with automatic keyword detection. Includes plan and execplan skills with smart hooks that remind Claude to activate planning skills when needed.
 
 ## Overview
 
@@ -44,23 +44,6 @@ Create comprehensive execution plans following PLANS.md methodology.
 - Decision logs and discovery tracking
 - Proof of concepts for challenging requirements
 
-### Command
-
-#### `/oracle-execplan`
-Create comprehensive execution plans using oracle CLI tool for deep analysis.
-
-**Usage:**
-```bash
-/oracle-execplan
-# Infers feature context from branch name and git history
-```
-
-**What it does:**
-- Invokes oracle-consulter agent for deep planning analysis
-- Gathers comprehensive codebase context
-- Creates detailed, self-contained execution plans
-- Follows PLANS.md methodology with oracle's extended reasoning
-
 ### Hook: check-planning-keywords.py
 
 **Automatic activation on user prompt submit**
@@ -88,7 +71,6 @@ The hook detects planning keywords in your messages and reminds Claude to activa
 ## Requirements
 
 - Python 3 (for hook script)
-- Oracle CLI (for `/oracle-execplan` command - requires OPENAI_API_KEY)
 
 ## Quick Start
 
@@ -110,16 +92,6 @@ The hook detects planning keywords in your messages and reminds Claude to activa
 
 # The hook automatically reminds Claude to activate the execplan skill
 # Claude creates a comprehensive, self-contained execution plan
-```
-
-### 3. Use Oracle for Deep Planning
-
-```bash
-/oracle-execplan FEATURE="Add rate limiting" GOAL="Prevent API abuse"
-
-# Invokes oracle-consulter agent with planning focus
-# Gathers extensive codebase context
-# Creates detailed execution plan with oracle's extended reasoning
 ```
 
 ## Example Workflows
@@ -149,18 +121,6 @@ User: "Create an execplan for migrating to new auth system"
 # Includes: milestones, validation steps, decision logs
 # Novice-friendly, self-contained specification
 # Living document updated during implementation
-```
-
-### Oracle-Powered Planning
-
-```bash
-User: /oracle-execplan
-
-# Oracle-consulter agent activated
-# Gathers: code patterns, architecture, dependencies
-# Invokes oracle CLI for deep analysis
-# Creates execution plan with extended reasoning
-# Comprehensive context and recommendations
 ```
 
 ## Planning Methodologies
@@ -280,13 +240,6 @@ load the Plan methodology BEFORE beginning any planning work.
 - Significant architectural changes
 - Proof of concepts required
 
-### Use `/oracle-execplan` when:
-- Need deep codebase analysis
-- Architectural validation required
-- Complex dependencies to untangle
-- High-stakes planning (production systems)
-- Extended reasoning beneficial
-
 ## Troubleshooting
 
 ### Hook not triggering
@@ -310,14 +263,6 @@ Skill tool with skill="plan"
 
 # For execution plans:
 Skill tool with skill="execplan"
-```
-
-### Oracle command not working
-
-Requires oracle CLI and OPENAI_API_KEY:
-```bash
-export OPENAI_API_KEY=your-key-here
-npx -y @steipete/oracle@latest --help
 ```
 
 ## Resources
