@@ -9,6 +9,7 @@ import config
 try:
     import litellm
     from litellm import responses, token_counter, get_max_tokens, validate_environment
+    from litellm.utils import get_model_info
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
@@ -109,11 +110,13 @@ class LiteLLMClient:
         try:
             return get_max_tokens(model)
         except Exception:
-            # Try known models
-            if model in config.KNOWN_CONTEXT_SIZES:
-                return config.KNOWN_CONTEXT_SIZES[model]
-            # Conservative fallback
-            return 8192
+            # Try get_model_info as fallback
+            try:
+                info = get_model_info(model=model)
+                return info.get("max_tokens", 8192)
+            except Exception:
+                # Conservative fallback if both methods fail
+                return 8192
 
     def validate_environment(self, model: str) -> Dict:
         """

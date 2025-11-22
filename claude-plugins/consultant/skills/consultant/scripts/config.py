@@ -27,20 +27,6 @@ RETRY_DELAY_SECONDS = 5
 # Session polling
 POLLING_INTERVAL_SECONDS = 2
 
-# Known model context sizes (fallback if get_max_tokens fails)
-KNOWN_CONTEXT_SIZES = {
-    "gpt-5-pro": 128000,
-    "gpt-5": 128000,
-    "gpt-5-mini": 128000,
-    "gpt-4o": 128000,
-    "gpt-4-turbo": 128000,
-    "gpt-4": 8192,
-    "gpt-3.5-turbo": 16385,
-    "claude-3-5-sonnet-20241022": 200000,
-    "claude-3-opus-20240229": 200000,
-    "claude-3-sonnet-20240229": 200000,
-    "gemini-2.0-flash-exp": 1000000,
-}
 
 def get_api_key():
     """Get API key from environment in priority order"""
