@@ -36,10 +36,10 @@ class ModelSelector:
             return ModelSelector._get_litellm_models()
 
         if not REQUESTS_AVAILABLE:
-            print("Warning: requests library not available, using LiteLLM model list")
-            return ModelSelector._get_litellm_models()
+            raise RuntimeError("requests library not available - cannot fetch models from proxy")
 
         # Try LiteLLM proxy /models endpoint first, then OpenAI-compatible /v1/models
+        last_error = None
         for endpoint in ["/models", "/v1/models"]:
             try:
                 models_url = f"{base_url.rstrip('/')}{endpoint}"
@@ -58,12 +58,11 @@ class ModelSelector:
                     for m in models
                 ]
             except Exception as e:
-                # Try next endpoint
+                last_error = e
                 continue
 
-        # If all endpoints fail, fall back to LiteLLM model list
-        print(f"Warning: Could not fetch models from {base_url}, using LiteLLM model list")
-        return ModelSelector._get_litellm_models()
+        # If all endpoints fail, raise an error
+        raise RuntimeError(f"Could not fetch models from {base_url}: {last_error}")
 
     @staticmethod
     def select_best_model(base_url: Optional[str] = None) -> str:
@@ -75,12 +74,14 @@ class ModelSelector:
         models = ModelSelector.list_models(base_url)
 
         if not models:
-            # Fallback to default
-            return "gpt-5-pro"
+            raise RuntimeError("No models available - cannot auto-select model")
 
         # Score models based on name heuristics
         best_model = max(models, key=ModelSelector._score_model)
-        return best_model.get("id", "gpt-5-pro")
+        model_id = best_model.get("id")
+        if not model_id:
+            raise RuntimeError("Best model has no id - cannot auto-select model")
+        return model_id
 
     @staticmethod
     def _score_model(model: Dict) -> float:
@@ -137,13 +138,11 @@ class ModelSelector:
         This provides dynamic model discovery without hardcoded lists.
         """
 
-        if not LITELLM_AVAILABLE or not model_cost:
-            # Fallback: minimal hardcoded list if LiteLLM not available
-            return [
-                {"id": "gpt-5-pro", "provider": "openai"},
-                {"id": "gpt-4o", "provider": "openai"},
-                {"id": "claude-3-5-sonnet-20241022", "provider": "anthropic"},
-            ]
+        if not LITELLM_AVAILABLE:
+            raise RuntimeError("LiteLLM is not installed - cannot discover models")
+
+        if not model_cost:
+            raise RuntimeError("LiteLLM model_cost is empty - cannot discover models")
 
         # Convert model_cost dictionary to list format
         models = []

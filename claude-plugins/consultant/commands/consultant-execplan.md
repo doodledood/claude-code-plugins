@@ -1,77 +1,34 @@
 ---
-description: Create comprehensive execution plans using consultant-consulter agent for deep analysis and specification design. Gathers codebase context, analyzes patterns, and provides detailed implementation steps with validation criteria using any LiteLLM-compatible model.
+description: Create comprehensive execution plans using consultant-consulter agent for deep analysis and specification design. Gathers codebase context, analyzes patterns, and provides detailed implementation steps with validation criteria.
 ---
 
 # Consultant ExecPlan Command
 
-## Usage
-
-```bash
-/consultant-execplan [FEATURE="feature description"] [GOAL="objective"] [MODEL=model-name] [BASE_URL=http://localhost:8000]
-```
-
-## Parameters
-
-- `FEATURE` (optional): Feature or change to plan (if not provided, inferred from context/branch name)
-- `GOAL` (optional): High-level objective or success criteria
-- `MODEL` (optional): Specific LLM model to use (default: auto-select best model)
-- `BASE_URL` (optional): Custom LiteLLM base URL (default: use default provider)
+Creates comprehensive execution plans using the consultant-consulter agent.
 
 ## What It Does
 
-This command invokes the consultant-consulter agent to create comprehensive execution plans using powerful LLM models via LiteLLM. The agent will:
+Invokes the consultant-consulter agent to create a detailed implementation plan:
 
-1. Gather comprehensive codebase context
-2. Analyze existing patterns and architecture
-3. Identify dependencies and integration points
-4. Break down work into small, shippable chunks
-5. Provide detailed implementation steps
-6. Include validation criteria and testing strategies
+1. Gathers comprehensive codebase context
+2. Analyzes existing patterns and architecture
+3. Identifies dependencies and integration points
+4. Breaks down work into small, shippable chunks
+5. Invokes the consultant CLI (agent will run --help first to learn current arguments)
+6. Provides detailed implementation steps with validation criteria
 
 ## Output
 
 The execution plan provides:
 
 - **Implementation Steps**: Detailed, ordered tasks with dependencies
-- **Architecture Analysis**: Existing patterns and integration points
+- **Architecture Analysis**: Existing patterns and integration points to follow
 - **File Organization**: Where to make changes and why
 - **Validation Criteria**: How to verify correctness at each step
 - **Testing Strategy**: Unit tests, integration tests, edge cases
 - **Decision Logs**: Key architectural choices and rationale
-
-## Examples
-
-### Basic Usage
-
-```bash
-/consultant-execplan
-```
-
-Infers feature from branch name and git history.
-
-### Explicit Feature
-
-```bash
-/consultant-execplan FEATURE="Add rate limiting to API" GOAL="Prevent API abuse"
-```
-
-Plans specific feature with clear objective.
-
-### Custom Model
-
-```bash
-/consultant-execplan FEATURE="Implement caching layer" MODEL=claude-3-5-sonnet-20241022
-```
-
-Uses specific Claude model for planning.
-
-### Custom LiteLLM Server
-
-```bash
-/consultant-execplan BASE_URL=http://localhost:8000
-```
-
-Uses local LiteLLM instance with automatic model selection.
+- **Risks & Mitigations**: Potential issues and how to address them
+- **Metadata**: Model used, reasoning effort, tokens consumed, cost
 
 ## What Gets Analyzed
 
@@ -169,8 +126,6 @@ The consultant-consulter agent analyzes:
 **Choice**: [What was chosen]
 **Rationale**: [Why this choice]
 
-[Additional decisions...]
-
 ## Risks & Mitigations
 
 - **Risk 1**: [Description]
@@ -178,12 +133,6 @@ The consultant-consulter agent analyzes:
 - **Risk 2**: [Description]
   - **Mitigation**: [How to address]
 ```
-
-## Environment Variables
-
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-- `CONSULTANT_MODEL`: Default model if not specified in command
-- `CONSULTANT_BASE_URL`: Default base URL if not specified in command
 
 ## When to Use
 
@@ -235,28 +184,22 @@ The agent will gather:
 - Configuration and deployment scripts
 - Documentation and architectural notes
 
-**Tip**: The more context you provide in FEATURE and GOAL, the more detailed and accurate the plan.
+**Tip**: The more context you provide about the feature and goals, the more detailed and accurate the plan.
 
-## Session Management
+## Environment Variables
 
-The consultant-consulter agent runs the planning asynchronously. You can:
-
-- View progress in real-time (agent waits for completion)
-- Check session status: `python3 {consultant_scripts_path}/oracle_cli.py session <slug>`
-- Review execution plan after completion
+The consultant CLI reads these environment variables (run the CLI with --help for full details):
+- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
 
 ## Troubleshooting
 
 **Issue**: "Plan is too high-level"
-
-**Solution**: Provide more details in FEATURE parameter. Include specific requirements, constraints, or technical approach.
+**Solution**: Provide more details about requirements, constraints, or technical approach.
 
 **Issue**: "Context limit exceeded"
-
-**Solution**: Planning is gathering too much code. Agent will automatically focus on most relevant files. Consider narrowing FEATURE scope.
+**Solution**: Agent will automatically focus on most relevant files. Consider narrowing the feature scope.
 
 **Issue**: "No API key provided"
-
 **Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
 
 ## Relationship to Other Commands
@@ -267,4 +210,9 @@ The consultant-consulter agent runs the planning asynchronously. You can:
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` and provides the feature description, goal, model, and base URL as context. The agent adapts its workflow for execution planning vs PR review.
+This command invokes the Task tool with `subagent_type='consultant-consulter'` for an execution planning task. The agent will:
+1. Run `--help` on the CLI to learn current arguments
+2. Gather codebase context and similar implementations
+3. Construct a planning prompt with appropriate role and focus areas
+4. Invoke the CLI and parse the structured output
+5. Report detailed execution plan with metadata back to user

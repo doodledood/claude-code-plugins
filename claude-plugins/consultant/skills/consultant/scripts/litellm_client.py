@@ -42,6 +42,7 @@ class LiteLLMClient:
         model: str,
         prompt: str,
         session_dir: Optional[Path] = None,
+        reasoning_effort: str = "high",
         **kwargs
     ) -> Dict:
         """
@@ -55,6 +56,7 @@ class LiteLLMClient:
             model: Model identifier
             prompt: Full prompt text
             session_dir: Optional session directory for state persistence (enables resumability)
+            reasoning_effort: Reasoning effort level (low, medium, high) - default high
             **kwargs: Additional args passed to litellm.responses()
 
         Returns:
@@ -65,11 +67,15 @@ class LiteLLMClient:
         if self.base_url:
             kwargs["api_base"] = self.base_url
 
+        # Add reasoning_effort parameter
+        kwargs["reasoning_effort"] = reasoning_effort
+
         # Select appropriate strategy based on model
         strategy = ResponseStrategyFactory.get_strategy(model)
 
         if session_dir:
             print(f"Using {strategy.__class__.__name__} (resumable: {strategy.can_resume()})")
+            print(f"Reasoning effort: {reasoning_effort}")
 
         try:
             # Execute with strategy-specific retry/background logic
@@ -103,48 +109,44 @@ class LiteLLMClient:
 
         # If using a proxy (base_url set), use the proxy's token counter endpoint
         if self.base_url:
-            try:
-                url = f"{self.base_url.rstrip('/')}/utils/token_counter"
-                payload = {
-                    "model": model,
-                    "text": text
-                }
+            url = f"{self.base_url.rstrip('/')}/utils/token_counter"
+            payload = {
+                "model": model,
+                "text": text
+            }
 
-                headers = {"Content-Type": "application/json"}
-                if self.api_key:
-                    headers["Authorization"] = f"Bearer {self.api_key}"
+            headers = {"Content-Type": "application/json"}
+            if self.api_key:
+                headers["Authorization"] = f"Bearer {self.api_key}"
 
-                response = requests.post(url, json=payload, headers=headers, timeout=30)
-                response.raise_for_status()
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            response.raise_for_status()
 
-                # Response typically has format: {"token_count": 123}
-                result = response.json()
-                return result.get("token_count") or result.get("tokens", 0)
+            # Response typically has format: {"token_count": 123}
+            result = response.json()
+            token_count = result.get("token_count") or result.get("tokens")
+            if token_count is None:
+                raise RuntimeError(f"Proxy token counter returned invalid response: {result}")
+            return token_count
 
-            except Exception as e:
-                # If proxy token counting fails, fall back to local
-                print(f"Warning: Proxy token counting failed ({e}), using local tokenizer")
-
-        # Use local token counter (direct API mode or proxy fallback)
-        try:
-            return token_counter(model=model, text=text)
-        except Exception:
-            # Final fallback: rough estimate (4 chars per token)
-            return max(1, len(text) // 4)
+        # Use local token counter (direct API mode)
+        return token_counter(model=model, text=text)
 
     def get_max_tokens(self, model: str) -> int:
         """Get maximum context size for model"""
 
         try:
             return get_max_tokens(model)
-        except Exception:
-            # Try get_model_info as fallback
+        except Exception as e:
+            # Try get_model_info as alternative method
             try:
                 info = get_model_info(model=model)
-                return info.get("max_tokens", 8192)
-            except Exception:
-                # Conservative fallback if both methods fail
-                return 8192
+                max_tokens = info.get("max_tokens")
+                if max_tokens is None:
+                    raise RuntimeError(f"Could not determine max_tokens for model {model}")
+                return max_tokens
+            except Exception as inner_e:
+                raise RuntimeError(f"Could not get max tokens for model {model}: {e}, {inner_e}")
 
     def calculate_cost(self, model: str, response=None, usage: Optional[Dict] = None) -> Optional[Dict]:
         """

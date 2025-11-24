@@ -1,83 +1,40 @@
 ---
-description: Deep bug investigation using consultant-consulter agent. Identifies root causes, traces execution flow, assesses blast radius, and provides concrete fix suggestions with regression test recommendations using any LiteLLM-compatible model.
+description: Deep bug investigation using consultant-consulter agent. Identifies root causes, traces execution flow, assesses blast radius, and provides concrete fix suggestions with regression test recommendations.
 ---
 
 # Consultant Investigate Bug Command
 
-## Usage
-
-```bash
-/consultant-investigate-bug [SYMPTOM="error description"] [MODEL=model-name] [BASE_URL=http://localhost:8000]
-```
-
-## Parameters
-
-- `SYMPTOM` (optional): Bug symptom or error message (if not provided, agent will infer from context)
-- `MODEL` (optional): Specific LLM model to use (default: auto-select best model)
-- `BASE_URL` (optional): Custom LiteLLM base URL (default: use default provider)
+Performs deep bug investigation using the consultant-consulter agent.
 
 ## What It Does
 
-This command invokes the consultant-consulter agent to perform deep bug investigation using powerful LLM models via LiteLLM. The agent will:
+Invokes the consultant-consulter agent to investigate a bug:
 
-1. Gather bug symptoms from context or user description
-2. Collect relevant files and recent changes
-3. Trace execution flow from symptom to potential root causes
-4. Assess blast radius and affected systems
-5. Provide concrete fix suggestions
-6. Recommend regression tests to prevent recurrence
+1. Gathers bug symptoms from context or user description
+2. Collects relevant files, error logs, and recent changes
+3. Traces execution flow from symptom to potential root causes
+4. Assesses blast radius and affected systems
+5. Invokes the consultant CLI (agent will run --help first to learn current arguments)
+6. Provides concrete fix suggestions and regression tests
 
 ## Output
 
 The investigation provides:
 
-- **Root Cause Analysis**: Specific file locations and logic errors
-- **Execution Flow Trace**: Step-by-step path from symptom to source
-- **Blast Radius Assessment**: What systems and users are affected
+- **Root Cause Analysis**: Specific file locations and logic errors causing the bug
+- **Execution Flow Trace**: Step-by-step path from trigger to failure point
+- **Blast Radius Assessment**: What systems, users, and data are affected
 - **Fix Recommendations**: Concrete code changes with rationale
-- **Regression Test Plan**: Test scenarios to catch similar bugs
-
-## Examples
-
-### Basic Usage
-
-```bash
-/consultant-investigate-bug
-```
-
-Analyzes context (recent errors, test failures, conversation) to infer bug.
-
-### Explicit Symptom
-
-```bash
-/consultant-investigate-bug SYMPTOM="API returns 500 on user profile update with error: Cannot read property 'id' of undefined"
-```
-
-Investigates specific error message.
-
-### Custom Model
-
-```bash
-/consultant-investigate-bug SYMPTOM="Race condition in order processing" MODEL=claude-3-5-sonnet-20241022
-```
-
-Uses specific Claude model for investigation.
-
-### Custom LiteLLM Server
-
-```bash
-/consultant-investigate-bug BASE_URL=http://localhost:8000
-```
-
-Uses local LiteLLM instance with automatic model selection.
+- **Regression Test Plan**: Test scenarios to catch similar bugs in the future
+- **Metadata**: Model used, reasoning effort, tokens consumed, cost
 
 ## What Gets Investigated
 
 The consultant-consulter agent analyzes:
 
 1. **Error Context**: Stack traces, error messages, logs
-2. **Recent Changes**: Git history, recent commits, PRs
-3. **Affected Code**: Files involved in execution path
+2. **Recent Changes**: Git history, recent commits, PRs that might have introduced the bug
+3. **Affected Code**: Files involved in the execution path
 4. **Related Systems**: Dependencies, integrations, data flow
 5. **Test Coverage**: Existing tests, missing test scenarios
 6. **Historical Patterns**: Similar bugs, known issues
@@ -130,12 +87,6 @@ The consultant-consulter agent analyzes:
 - [ ] Edge case validation
 ```
 
-## Environment Variables
-
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-- `CONSULTANT_MODEL`: Default model if not specified in command
-- `CONSULTANT_BASE_URL`: Default base URL if not specified in command
-
 ## When to Use
 
 **Perfect for:**
@@ -165,30 +116,29 @@ The agent may gather:
 - System architecture documentation
 - Recent deployments or config changes
 
-**Tip**: Provide as much context as possible in the SYMPTOM parameter for best results.
+**Tip**: Provide as much context as possible about the bug symptoms for best results.
 
-## Session Management
+## Environment Variables
 
-The consultant-consulter agent runs the investigation asynchronously. You can:
-
-- View progress in real-time (agent waits for completion)
-- Check session status: `python3 {consultant_scripts_path}/oracle_cli.py session <slug>`
-- Review investigation report after completion
+The consultant CLI reads these environment variables (run the CLI with --help for full details):
+- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
 
 ## Troubleshooting
 
 **Issue**: "Not enough context to investigate"
-
-**Solution**: Provide more details in SYMPTOM parameter or ensure relevant error logs/stack traces are in conversation context.
+**Solution**: Provide more details about the bug symptoms or ensure relevant error logs/stack traces are available.
 
 **Issue**: "Context limit exceeded"
-
-**Solution**: Investigation is gathering too much code. Agent will automatically reduce scope and focus on most relevant files.
+**Solution**: Agent will automatically reduce scope and focus on most relevant files.
 
 **Issue**: "No API key provided"
-
 **Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` and provides the bug symptom, model, and base URL as context. The agent adapts its workflow for bug investigation vs PR review.
+This command invokes the Task tool with `subagent_type='consultant-consulter'` for a bug investigation task. The agent will:
+1. Run `--help` on the CLI to learn current arguments
+2. Gather bug symptoms and related files
+3. Construct an investigation prompt with appropriate role and focus areas
+4. Invoke the CLI and parse the structured output
+5. Report root cause analysis and fix recommendations with metadata back to user

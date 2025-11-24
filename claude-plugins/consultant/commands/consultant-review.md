@@ -1,89 +1,59 @@
 ---
-description: Production-level PR review using consultant-consulter agent. Provides severity-tagged findings, regression test guidance, and security validation using any LiteLLM-compatible model. Supports custom base URLs and automatic model selection.
+description: Production-level PR review using consultant-consulter agent. Provides severity-tagged findings, regression test guidance, and security validation using any LiteLLM-compatible model.
 ---
 
 # Consultant Review Command
 
-## Usage
-
-```bash
-/consultant-review [PR_REF=origin/main...feature-branch] [MODEL=model-name] [BASE_URL=http://localhost:8000]
-```
-
-## Parameters
-
-- `PR_REF` (optional): Git reference for the PR diff (default: origin/master...HEAD)
-- `MODEL` (optional): Specific LLM model to use (default: auto-select best model)
-- `BASE_URL` (optional): Custom LiteLLM base URL (default: use default provider)
+Performs a comprehensive PR review using the consultant-consulter agent.
 
 ## What It Does
 
-This command invokes the consultant-consulter agent to perform a comprehensive PR review using powerful LLM models via LiteLLM. The agent will:
+Invokes the consultant-consulter agent to perform a thorough code review:
 
-1. Gather all changed files and generate extensive diffs
-2. Organize code into prioritized attachments
-3. Construct a detailed review prompt
-4. Invoke consultant Python CLI with all context
-5. Monitor the session until completion
-6. Synthesize findings into actionable recommendations
+1. Gathers all changed files and generates extensive diffs
+2. Organizes code into prioritized attachments (core logic, schemas, tests, infrastructure)
+3. Constructs a detailed review prompt with role, context, and focus areas
+4. Invokes the consultant CLI (agent will run --help first to learn current arguments)
+5. Monitors session until completion
+6. Synthesizes findings into actionable recommendations with severity tags
 
 ## Output
 
 The review provides:
 
 - **Severity-tagged findings**: BLOCKER, HIGH, MEDIUM, LOW, INFO
-- **File references**: Exact locations with line numbers
-- **Specific fixes**: Actionable recommendations
-- **Regression tests**: Test scenarios to prevent issues
+- **File references**: Exact locations with line numbers (path/to/file.ts:123-145)
+- **Specific fixes**: Actionable recommendations or validation steps
+- **Regression tests**: Test scenarios to prevent issues from recurring
 - **Overall risk assessment**: Production readiness evaluation
+- **Metadata**: Model used, reasoning effort, tokens consumed, cost
 
-## Examples
+## What Gets Reviewed
 
-### Basic Usage
+The consultant-consulter agent analyzes:
 
-```bash
-/consultant-review
-```
+1. **Core Logic**: Business rules, algorithms, state machines, domain models
+2. **Schemas/Types**: Database schemas, API contracts, type definitions, interfaces
+3. **Tests**: Test coverage, test quality, edge case handling, test fixtures
+4. **Infrastructure**: Migrations, config changes, deployment scripts
+5. **Security**: Auth changes, data validation, injection risks
+6. **Performance**: Query patterns, caching, algorithm complexity
 
-Reviews current branch against origin/master using default settings.
+## Review Focus Areas
 
-### Custom PR Reference
+1. **Correctness**: Logic errors, edge cases, invalid state handling
+2. **Security**: Auth bypasses, injection risks, data validation gaps
+3. **Reliability**: Error handling, retry logic, graceful degradation
+4. **Performance**: N+1 queries, unbounded loops, expensive operations
+5. **Maintainability**: Code clarity, test coverage, documentation
 
-```bash
-/consultant-review PR_REF=origin/develop...feature/my-feature
-```
+## Severity Levels
 
-Reviews specific branch comparison.
-
-### Specify Model
-
-```bash
-/consultant-review MODEL=claude-3-5-sonnet-20241022
-```
-
-Uses specific Claude model for review.
-
-### Custom LiteLLM Server
-
-```bash
-/consultant-review BASE_URL=http://localhost:8000
-```
-
-Uses local LiteLLM instance with automatic model selection.
-
-### Full Configuration
-
-```bash
-/consultant-review PR_REF=origin/main...feature/auth MODEL=gpt-4o BASE_URL=http://localhost:8000
-```
-
-Reviews specific PR using specific model from custom server.
-
-## Environment Variables
-
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-- `CONSULTANT_MODEL`: Default model if not specified in command
-- `CONSULTANT_BASE_URL`: Default base URL if not specified in command
+- **BLOCKER**: Production-breaking, data loss, critical security breach (merge should be blocked)
+- **HIGH**: Significant malfunction, major bug, auth weakness (should fix before merge)
+- **MEDIUM**: Edge case bug, performance degradation, maintainability concern (fix soon)
+- **LOW**: Minor improvement, style issue, optimization (can fix later)
+- **INFO**: Observation, architectural note, informational context
 
 ## When to Use
 
@@ -102,55 +72,24 @@ Reviews specific PR using specific model from custom server.
 - Changes already reviewed by multiple senior engineers
 - Non-critical experimental branches
 
-## What Gets Reviewed
+## Environment Variables
 
-The consultant-consulter agent analyzes:
-
-1. **Core Logic**: Business rules, algorithms, state machines
-2. **Schemas/Types**: Database schemas, API contracts, type definitions
-3. **Tests**: Test coverage, test quality, edge case handling
-4. **Infrastructure**: Migrations, config changes, deployment scripts
-5. **Security**: Auth changes, data validation, injection risks
-6. **Performance**: Query patterns, caching, algorithm complexity
-
-## Review Focus Areas
-
-1. **Correctness**: Logic errors, edge cases, invalid states
-2. **Security**: Auth bypasses, injection risks, data validation gaps
-3. **Reliability**: Error handling, retry logic, graceful degradation
-4. **Performance**: N+1 queries, unbounded loops, expensive operations
-5. **Maintainability**: Code clarity, test coverage, documentation
-
-## Severity Levels
-
-- **BLOCKER**: Production-breaking, data loss, critical security breach (merge should be blocked)
-- **HIGH**: Significant malfunction, major bug, auth weakness (should fix before merge)
-- **MEDIUM**: Edge case bug, performance degradation, maintainability concern (fix soon)
-- **LOW**: Minor improvement, style issue, optimization (can fix later)
-- **INFO**: Observation, architectural note, informational context
-
-## Session Management
-
-The consultant-consulter agent runs the consultation asynchronously. You can:
-
-- View progress in real-time (agent waits for completion)
-- Check session status: `python3 {consultant_scripts_path}/oracle_cli.py session <slug>`
-- Review output file after completion
+The consultant CLI reads these environment variables (run the CLI with --help for full details):
+- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
 
 ## Troubleshooting
 
 **Issue**: "Context limit exceeded"
-
-**Solution**: The consultant CLI will report this clearly. Reduce the number of files or use a model with larger context (e.g., claude-3-opus with 200k tokens).
+**Solution**: The consultant CLI will report this clearly. Agent will automatically reduce scope by removing docs, reducing diff context, or splitting into separate consultations.
 
 **Issue**: "No API key provided"
-
 **Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
-
-**Issue**: "Model not found"
-
-**Solution**: Check available models: `python3 {consultant_scripts_path}/oracle_cli.py models --base-url {your_url}`
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` and provides the PR reference, model, and base URL as context.
+This command invokes the Task tool with `subagent_type='consultant-consulter'` for a PR review task. The agent will:
+1. Run `--help` on the CLI to learn current arguments
+2. Gather diffs and organize into prioritized attachments
+3. Construct a review prompt with appropriate role and focus areas
+4. Invoke the CLI and parse the structured output
+5. Report findings with severity tags and metadata back to user

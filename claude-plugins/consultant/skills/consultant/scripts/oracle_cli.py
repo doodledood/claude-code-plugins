@@ -124,11 +124,8 @@ def handle_invocation(args):
                 "content": content
             })
 
-    # Determine model
-    if not args.model:
-        print("No model specified. Discovering available models...")
-        args.model = ModelSelector.select_best_model(base_url)
-        print(f"Selected model: {args.model}")
+    # Log model being used
+    print(f"Using model: {args.model}")
 
     # Validate environment variables (only if no custom base URL)
     if not base_url:
@@ -168,7 +165,8 @@ def handle_invocation(args):
         prompt=full_prompt,
         model=args.model,
         base_url=base_url,
-        api_key=args.api_key
+        api_key=args.api_key,
+        reasoning_effort=args.reasoning_effort
     )
 
     print(f"Session created: {session_id}")
@@ -180,32 +178,39 @@ def handle_invocation(args):
 
         if result.get("status") == "completed":
             print("\n" + "="*80)
+            print("RESPONSE:")
+            print("="*80)
             print(result.get("output", "No output available"))
             print("="*80)
 
-            # Display token usage and cost if available
+            # Print metadata section (model, reasoning effort, tokens, cost)
+            print("\n" + "="*80)
+            print("METADATA:")
+            print("="*80)
+
+            # Model info
+            print(f"model: {result.get('model', args.model)}")
+            print(f"reasoning_effort: {result.get('reasoning_effort', args.reasoning_effort)}")
+
+            # Token usage and cost
             usage = result.get("usage")
             cost_info = result.get("cost_info")
 
-            if usage or cost_info:
-                print("\n📊 Usage & Cost:")
+            if cost_info:
+                print(f"input_tokens: {cost_info.get('input_tokens', 0)}")
+                print(f"output_tokens: {cost_info.get('output_tokens', 0)}")
+                print(f"total_tokens: {cost_info.get('input_tokens', 0) + cost_info.get('output_tokens', 0)}")
+                print(f"input_cost_usd: {cost_info.get('input_cost', 0):.6f}")
+                print(f"output_cost_usd: {cost_info.get('output_cost', 0):.6f}")
+                print(f"total_cost_usd: {cost_info.get('total_cost', 0):.6f}")
+            elif usage:
+                input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
+                output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+                print(f"input_tokens: {input_tokens}")
+                print(f"output_tokens: {output_tokens}")
+                print(f"total_tokens: {input_tokens + output_tokens}")
 
-                if cost_info:
-                    print(f"- Input tokens:  {cost_info.get('input_tokens', 0):,}")
-                    print(f"- Output tokens: {cost_info.get('output_tokens', 0):,}")
-                    print(f"- Total tokens:  {cost_info.get('input_tokens', 0) + cost_info.get('output_tokens', 0):,}")
-                    print(f"\n- Input cost:  ${cost_info.get('input_cost', 0):.6f}")
-                    print(f"- Output cost: ${cost_info.get('output_cost', 0):.6f}")
-                    print(f"- Total cost:  ${cost_info.get('total_cost', 0):.6f} {cost_info.get('currency', 'USD')}")
-                elif usage:
-                    # If we have usage but no cost info
-                    input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
-                    output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
-                    print(f"- Input tokens:  {input_tokens:,}")
-                    print(f"- Output tokens: {output_tokens:,}")
-                    print(f"- Total tokens:  {input_tokens + output_tokens:,}")
-
-                print()
+            print("="*80)
 
             return 0
         else:
@@ -282,46 +287,162 @@ def handle_list_models(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Oracle CLI - LiteLLM-powered code analysis",
+        description="""
+Consultant CLI - LiteLLM-powered LLM consultation tool
+
+This CLI tool allows you to consult powerful LLM models for code analysis,
+reviews, architectural decisions, and complex technical questions. It supports
+100+ LLM providers via LiteLLM with custom base URLs.
+
+CORE WORKFLOW:
+  1. Provide a prompt describing your analysis task
+  2. Attach relevant files for context
+  3. The CLI sends everything to the LLM and waits for completion
+  4. Results are printed with full metadata (model, tokens, cost)
+
+OUTPUT FORMAT:
+  The CLI prints structured output with clear sections:
+  - RESPONSE: The LLM's analysis/response
+  - METADATA: Model used, reasoning effort, token counts, costs
+
+ENVIRONMENT VARIABLES:
+  LITELLM_API_KEY      Primary API key (checked first)
+  OPENAI_API_KEY       OpenAI API key (fallback)
+  ANTHROPIC_API_KEY    Anthropic API key (fallback)
+  OPENAI_BASE_URL      Default base URL for custom LiteLLM proxy
+""",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  # Start a consultation (runs synchronously until completion)
-  %(prog)s --prompt "Analyze this code" --file src/*.py --slug "review"
+EXAMPLES:
 
-  # Check session status
-  %(prog)s session review
+  Basic consultation with prompt and files:
+    %(prog)s -p "Review this code for bugs" -f src/main.py -s code-review
 
-  # List all sessions
-  %(prog)s list
+  Multiple files:
+    %(prog)s -p "Analyze architecture" -f src/api.py -f src/db.py -f src/models.py -s arch-review
 
-  # List available models
-  %(prog)s models --base-url http://localhost:8000
+  Specify model explicitly:
+    %(prog)s -p "Security audit" -f auth.py -s security -m claude-3-5-sonnet-20241022
+
+  Use custom LiteLLM proxy:
+    %(prog)s -p "Code review" -f app.py -s review --base-url http://localhost:8000
+
+  Lower reasoning effort (faster, cheaper):
+    %(prog)s -p "Quick check" -f code.py -s quick --reasoning-effort low
+
+  Check session status:
+    %(prog)s session my-review
+
+  List all sessions:
+    %(prog)s list
+
+  List available models from proxy:
+    %(prog)s models --base-url http://localhost:8000
+
+SUBCOMMANDS:
+  session <slug>    Check status of a session by its slug
+  list              List all sessions with their status
+  models            List available models (from proxy or known models)
+
+For more information, see the consultant plugin documentation.
 """
     )
 
     # Subcommands
-    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
-    # Main invocation (default if no subcommand)
-    parser.add_argument("-p", "--prompt", help="Analysis prompt")
-    parser.add_argument("-f", "--file", action="append", dest="files",
-                       help="Files to attach (can specify multiple times)")
-    parser.add_argument("-s", "--slug", help="Session identifier")
-    parser.add_argument("-m", "--model", help="Specific model to use")
-    parser.add_argument("--base-url", help="Custom base URL for LiteLLM")
-    parser.add_argument("--api-key", help="API key for the provider")
+    # Main invocation arguments
+    parser.add_argument(
+        "-p", "--prompt",
+        metavar="TEXT",
+        help="""The analysis prompt to send to the LLM. This should describe
+                what you want the model to analyze or review. The prompt will
+                be combined with any attached files to form the full request.
+                REQUIRED for main invocation."""
+    )
+    parser.add_argument(
+        "-f", "--file",
+        action="append",
+        dest="files",
+        metavar="PATH",
+        help="""File to attach for analysis. Can be specified multiple times
+                to attach multiple files. Each file's contents will be included
+                in the prompt sent to the LLM. Supports any text file format.
+                Example: -f src/main.py -f src/utils.py -f README.md"""
+    )
+    parser.add_argument(
+        "-s", "--slug",
+        metavar="NAME",
+        help="""Unique identifier for this session. Used to track and retrieve
+                session results. Should be descriptive (e.g., "pr-review-123",
+                "security-audit", "arch-analysis"). REQUIRED for main invocation."""
+    )
+    parser.add_argument(
+        "-m", "--model",
+        metavar="MODEL_ID",
+        default="gpt-5-pro",
+        help="""Specific LLM model to use. Default: gpt-5-pro. Examples:
+                "gpt-4o", "claude-3-5-sonnet-20241022", "gemini-2.0-flash-exp".
+                Use the "models" subcommand to see available models."""
+    )
+    parser.add_argument(
+        "--base-url",
+        metavar="URL",
+        help="""Custom base URL for LiteLLM proxy server (e.g., "http://localhost:8000").
+                When set, all API calls go through this proxy. The proxy's /v1/models
+                endpoint will be queried for available models. If not set, uses
+                direct provider APIs based on the model prefix."""
+    )
+    parser.add_argument(
+        "--api-key",
+        metavar="KEY",
+        help="""API key for the LLM provider. If not provided, the CLI will look
+                for keys in environment variables: LITELLM_API_KEY, OPENAI_API_KEY,
+                or ANTHROPIC_API_KEY (in that order)."""
+    )
+    parser.add_argument(
+        "--reasoning-effort",
+        choices=["low", "medium", "high"],
+        default="high",
+        metavar="LEVEL",
+        help="""Reasoning effort level for the LLM. Higher effort = more thorough
+                analysis but slower and more expensive. Choices: low, medium, high.
+                Default: high. Use "low" for quick checks, "high" for thorough reviews."""
+    )
 
-    # Session status
-    session_parser = subparsers.add_parser("session", help="Check session status")
-    session_parser.add_argument("slug", help="Session slug to check")
+    # Session status subcommand
+    session_parser = subparsers.add_parser(
+        "session",
+        help="Check the status of a session",
+        description="""Check the current status of a consultation session.
+                       Returns JSON with session metadata, status, and output if completed."""
+    )
+    session_parser.add_argument(
+        "slug",
+        help="Session slug/identifier to check (the value passed to -s/--slug)"
+    )
 
-    # List sessions
-    list_parser = subparsers.add_parser("list", help="List all sessions")
+    # List sessions subcommand
+    list_parser = subparsers.add_parser(
+        "list",
+        help="List all consultation sessions",
+        description="""List all consultation sessions with their status.
+                       Shows session slug, status, creation time, model used, and any errors."""
+    )
 
-    # List models
-    models_parser = subparsers.add_parser("models", help="List available models")
-    models_parser.add_argument("--base-url", help="Base URL to query models from")
+    # List models subcommand
+    models_parser = subparsers.add_parser(
+        "models",
+        help="List available LLM models",
+        description="""List available LLM models. If --base-url is provided, queries
+                       the proxy's /v1/models endpoint. Otherwise, returns known models
+                       from LiteLLM's model registry."""
+    )
+    models_parser.add_argument(
+        "--base-url",
+        metavar="URL",
+        help="Base URL of LiteLLM proxy to query for available models"
+    )
 
     args = parser.parse_args()
 

@@ -27,7 +27,8 @@ class SessionManager:
         prompt: str,
         model: str,
         base_url: Optional[str] = None,
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        reasoning_effort: str = "high"
     ) -> str:
         """Create a new session and start background execution"""
 
@@ -43,6 +44,7 @@ class SessionManager:
             "status": "running",
             "model": model,
             "base_url": base_url,
+            "reasoning_effort": reasoning_effort,
             "prompt_preview": prompt[:200] + "..." if len(prompt) > 200 else prompt
         }
 
@@ -56,7 +58,7 @@ class SessionManager:
         # Start background process
         process = multiprocessing.Process(
             target=self._execute_session,
-            args=(session_id, prompt, model, base_url, api_key)
+            args=(session_id, prompt, model, base_url, api_key, reasoning_effort)
         )
         process.start()
 
@@ -71,7 +73,8 @@ class SessionManager:
         prompt: str,
         model: str,
         base_url: Optional[str],
-        api_key: Optional[str]
+        api_key: Optional[str],
+        reasoning_effort: str = "high"
     ):
         """Background execution of LLM consultation"""
 
@@ -91,7 +94,8 @@ class SessionManager:
             result = client.complete(
                 model=model,
                 prompt=prompt,
-                session_dir=session_dir  # Enables background job resumption if supported
+                session_dir=session_dir,  # Enables background job resumption if supported
+                reasoning_effort=reasoning_effort
             )
 
             full_response = result.get("content", "")
@@ -113,7 +117,8 @@ class SessionManager:
                 "completed",
                 response=full_response,
                 usage=usage,
-                cost_info=cost_info
+                cost_info=cost_info,
+                reasoning_effort=reasoning_effort
             )
 
         except Exception as e:
@@ -128,7 +133,8 @@ class SessionManager:
         response: Optional[str] = None,
         error: Optional[str] = None,
         usage: Optional[Dict] = None,
-        cost_info: Optional[Dict] = None
+        cost_info: Optional[Dict] = None,
+        reasoning_effort: Optional[str] = None
     ):
         """Update session status in metadata"""
 
@@ -154,6 +160,9 @@ class SessionManager:
 
         if cost_info:
             metadata["cost_info"] = cost_info
+
+        if reasoning_effort:
+            metadata["reasoning_effort"] = reasoning_effort
 
         metadata_file.write_text(json.dumps(metadata, indent=2))
 

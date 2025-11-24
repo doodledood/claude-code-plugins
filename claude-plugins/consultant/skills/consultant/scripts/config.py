@@ -8,9 +8,6 @@ from pathlib import Path
 # Session storage location
 DEFAULT_SESSIONS_DIR = Path.home() / ".oracle-python" / "sessions"
 
-# Default model if none specified and discovery fails
-DEFAULT_MODEL = "gpt-5-pro"
-
 # Environment variable names
 ENV_LITELLM_API_KEY = "LITELLM_API_KEY"
 ENV_OPENAI_API_KEY = "OPENAI_API_KEY"
