@@ -4,6 +4,7 @@
 # dependencies = [
 #     "litellm",
 #     "requests>=2.31.0",
+#     "tenacity",
 # ]
 # ///
 """
