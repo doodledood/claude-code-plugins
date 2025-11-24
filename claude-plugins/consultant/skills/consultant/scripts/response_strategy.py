@@ -50,14 +50,26 @@ class ResponseStrategy(ABC):
         return delay + jitter
 
     def _extract_content(self, response) -> str:
-        """Extract text content from response.output structure"""
+        """
+        Extract text content from response.output structure.
+
+        Handles different output item types:
+        - ResponseOutputMessage (type='message'): has content with text
+        - ResponseReasoningItem (type='reasoning'): has summary, no content
+        """
         content = ""
-        if hasattr(response, 'output') and len(response.output) > 0:
+        if hasattr(response, 'output') and response.output:
             for item in response.output:
-                if hasattr(item, 'content'):
-                    for content_item in item.content:
-                        if hasattr(content_item, 'text'):
-                            content += content_item.text
+                # Check item type - only 'message' type has content
+                item_type = getattr(item, 'type', None)
+
+                if item_type == 'message':
+                    # ResponseOutputMessage: extract text from content
+                    if hasattr(item, 'content') and item.content:
+                        for content_item in item.content:
+                            if hasattr(content_item, 'text'):
+                                content += content_item.text
+                # Skip 'reasoning' items (ResponseReasoningItem) - they have summary, not content
         return content
 
     def _serialize_usage(self, usage) -> Optional[Dict]:
