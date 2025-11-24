@@ -18,16 +18,22 @@ Oracle is a CLI tool that provides access to more powerful AI models for complex
 
 ## Getting Started
 
-**IMPORTANT: Always run `npx -y @steipete/oracle@latest --help` first to understand current capabilities and command syntax.**
+**CRITICAL: The oracle tool evolves rapidly. The only source of truth for commands and arguments is the help output.**
 
-The tool's help output is the source of truth for:
+Always start by running:
 
-- Available options and flags
-- Current command syntax
-- Session management commands
-- Examples and usage patterns
+```bash
+npx -y @steipete/oracle@latest --help
+```
 
-**Requirement:** `OPENAI_API_KEY` environment variable must be set (or use `--engine browser` mode).
+**Do not rely on memory or previous documentation for flag syntax.** The help output provides:
+
+- The exact flags to pass prompts and files
+- How to manage sessions (list, reattach, view)
+- Available models and selection syntax
+- Current command structure
+
+**Requirement:** `OPENAI_API_KEY` environment variable must be set (or use the browser engine if supported).
 
 ## When to Use Oracle
 
@@ -51,7 +57,12 @@ Consult oracle when you need:
 
 ### Step 1: Check Help Output
 
-Run `npx -y @steipete/oracle@latest --help` to see current options, commands, and examples.
+Run `npx -y @steipete/oracle@latest --help` to determine the current syntax for:
+
+- Providing a prompt
+- Providing file patterns/globs
+- Selecting a model
+- Managing background sessions
 
 ### Step 2: Formulate the Question
 
@@ -63,72 +74,62 @@ Create a clear, specific prompt with a focused objective and expected deliverabl
 - "List all public API endpoints that lack rate limiting. For each endpoint, assess the risk level and recommend appropriate rate limit configurations."
 - "Map the data transformation pipeline from the /checkout endpoint to database persistence. Document each validation, transformation, and potential data loss point."
 
-**Poor prompts (vague, unfocused):**
-
-- "Review the code" - No focus or deliverable specified
-- "Is this good?" - No evaluation criteria
-- "Check for security issues" - Too broad, no prioritization
-
 ### Step 3: Select Relevant Files
 
 Choose file globs that optimize for **recall** (include everything relevant) over precision. Oracle can handle extensive context.
 
-See [references/glob-patterns.md](references/glob-patterns.md) for common patterns by query type.
-
 **Key principles:**
 
 - Use glob patterns to include entire directories
-- Prefix with `!` to exclude patterns (e.g., `!**/*.test.ts`)
-- Oracle handles large file sets - prioritize completeness over precision
+- Exclude irrelevant files (like tests or styles) if the tool supports exclusion patterns
+- Prioritize completeness over precision
 
 ### Step 4: Start the Query
 
-Oracle runs asynchronously by default. The command outputs a session ID for reattachment.
+Construct your command based on the **current help output**.
 
-**Check help for:**
+**Look for flags that allow you to:**
 
-- Current flag syntax (`-p`, `-f`, `--model`, etc.)
-- Preview options to validate before running
-- Available models and how to select them
+1. Pass your formulated prompt
+2. Pass your selected file globs
+3. (Optional) Select a specific model if needed
 
 ### Step 5: Continue Other Work
 
-The query runs in background. Continue with other tasks while processing.
+The query typically runs in the background or returns a session ID. Continue with other tasks while processing.
 
 ### Step 6: Check Status and Reattach
 
-Use the session management commands (see `npx -y @steipete/oracle@latest --help` for current syntax) to:
+Refer to the `--help` output for commands to:
 
-- List all sessions and their status
-- Reattach to completed sessions
-- View results
+- List active/completed sessions
+- Reattach to a specific session
+- Retrieve the output
 
 **Use the insights:** Apply oracle's analysis to complete your original task.
 
 ## Session Management
 
-Run `npx -y @steipete/oracle@latest --help` and check the `session` and `status` commands for current syntax.
+Session management syntax may change. **Always check `--help`** to find commands for:
 
-**Key capabilities:**
+- Listing recent sessions
+- Reattaching to a running session
+- Viewing results of a completed session
+- Clearing/pruning old sessions
 
-- List recent sessions with status and timestamps
-- Reattach to any session (running or completed)
-- Clean old sessions
-- Sessions persist in `~/.oracle/sessions/<slug>`
+Sessions typically persist locally until explicitly cleared.
 
 ## Model Selection
 
-Oracle uses a default model suitable for most complex analysis tasks. For critical analysis requiring maximum reasoning capability, more powerful models may be available.
+**Default Recommendation:** Always use the default model provided by the tool unless you have a specific reason not to (e.g., user explicitly requests a different model, or you encounter specific errors requiring a different capability).
 
-Check `npx -y @steipete/oracle@latest --help` for:
+Oracle uses a capable default model suitable for most tasks. If you need specific reasoning capabilities (e.g., a model with a larger context window or stronger reasoning), check `--help` to see:
 
-- Available models
-- Current default model
-- How to select different models via the `--model` flag
+- Which models are currently available
+- The flag or syntax to specify a model
+- The default model being used
 
 ## Example Use Cases
-
-See [references/glob-patterns.md](references/glob-patterns.md) for file selection patterns.
 
 **Security audit:**
 
@@ -147,23 +148,11 @@ See [references/glob-patterns.md](references/glob-patterns.md) for file selectio
 
 ## Automation & Resource Management
 
-When using oracle in automated workflows or agent scripts:
-
-1. **Polling**: If waiting for completion, use `sleep 30` between status checks.
-2. **Cleanup**: If running in a persistent shell session, explicitly terminate it (e.g., using `KillShell`) when the task is complete.
-3. **Context**: Trust oracle's token limit reporting; don't prematurely optimize context size.
+- **Polling**: If automating, verify via help if there are flags for waiting or if polling is required.
+- **Cleanup**: Manage session artifacts as described in the help documentation to avoid disk clutter.
+- **Context**: Trust the tool's handling of context limits; providing broad context is usually better than manually pruning.
 
 ## Troubleshooting
 
-**Environment issues:**
-
-- Ensure `OPENAI_API_KEY` is set, or use `--engine browser` mode
-- Run `npx -y @steipete/oracle@latest --help` to verify available engines and options
-
-**Session management:**
-
-- Use the `status` command to see available sessions
-- Sessions persist in `~/.oracle/sessions/` until explicitly cleared
-- Some queries can take several minutes - check status periodically
-
-**For detailed examples and current syntax:** Always consult `npx -y @steipete/oracle@latest --help`
+- **Environment**: Ensure required API keys are set. Check help for alternative engines (like browser-based) if keys are an issue.
+- **Syntax Errors**: If a command fails, it is likely because flags have changed. **Run `--help` immediately to see the valid syntax.**
