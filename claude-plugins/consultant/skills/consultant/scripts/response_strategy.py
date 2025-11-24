@@ -60,6 +60,37 @@ class ResponseStrategy(ABC):
                             content += content_item.text
         return content
 
+    def _serialize_usage(self, usage) -> Optional[Dict]:
+        """
+        Safely convert usage object to a JSON-serializable dict.
+        Handles Pydantic models (OpenAI), dataclasses, and plain dicts.
+        """
+        if usage is None:
+            return None
+
+        # Already a dict - return as-is
+        if isinstance(usage, dict):
+            return usage
+
+        # Pydantic v2 model
+        if hasattr(usage, 'model_dump'):
+            return usage.model_dump()
+
+        # Pydantic v1 model
+        if hasattr(usage, 'dict'):
+            return usage.dict()
+
+        # Dataclass or object with __dict__
+        if hasattr(usage, '__dict__'):
+            return dict(usage.__dict__)
+
+        # Last resort - try to convert directly
+        try:
+            return dict(usage)
+        except (TypeError, ValueError):
+            # If all else fails, return None rather than crash
+            return None
+
 
 class BackgroundJobStrategy(ResponseStrategy):
     """
@@ -126,7 +157,7 @@ class BackgroundJobStrategy(ResponseStrategy):
                             raise RuntimeError("No content in completed response")
                         return {
                             "content": content,
-                            "usage": result.usage if hasattr(result, 'usage') else None,
+                            "usage": self._serialize_usage(getattr(result, 'usage', None)),
                             "response": result  # Include full response for cost calculation
                         }
                     elif result.status == "failed":
@@ -147,7 +178,7 @@ class BackgroundJobStrategy(ResponseStrategy):
                     if content:
                         return {
                             "content": content,
-                            "usage": result.usage if hasattr(result, 'usage') else None,
+                            "usage": self._serialize_usage(getattr(result, 'usage', None)),
                             "response": result  # Include full response for cost calculation
                         }
                     # No content, wait and retry
@@ -213,7 +244,7 @@ class SyncRetryStrategy(ResponseStrategy):
 
                 return {
                     "content": content,
-                    "usage": response.usage if hasattr(response, 'usage') else None,
+                    "usage": self._serialize_usage(getattr(response, 'usage', None)),
                     "response": response  # Include full response for cost calculation
                 }
 

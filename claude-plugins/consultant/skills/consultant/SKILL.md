@@ -20,23 +20,20 @@ Consultant is a Python-based tool using LiteLLM to provide access to powerful AI
 
 ## Requirements
 
-Install Python dependencies:
+The CLI uses [uv](https://docs.astral.sh/uv/) for automatic dependency management. Dependencies (litellm, requests) are installed automatically on first run via PEP 723 inline script metadata.
 
+If `uv` is not installed:
 ```bash
-pip install litellm requests
-```
-
-Or from the consultant plugin directory:
-
-```bash
-pip install -r requirements.txt
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ## Getting Started
 
-**IMPORTANT: Always run `python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --help` first to understand current capabilities.**
+**IMPORTANT: Always run `uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --help` first to understand current capabilities.**
 
 Where `{CONSULTANT_SCRIPTS_PATH}` is the path to `claude-plugins/consultant/skills/consultant/scripts/`
+
+**Note:** `uv run` automatically installs/updates `litellm` and other dependencies on first run. No manual `pip install` needed.
 
 ## Basic Usage
 
@@ -47,7 +44,7 @@ The consultant script runs synchronously (blocking until completion). For long-r
 **Example: Running in background via Bash tool**
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Analyze this code for security vulnerabilities" \
   --file src/**/*.py \
   --slug "security-audit"
@@ -69,7 +66,7 @@ When calling via the Bash tool:
 ### Check Session Status
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session security-audit
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session security-audit
 ```
 
 This returns JSON with:
@@ -80,7 +77,7 @@ This returns JSON with:
 ### List All Sessions
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py list
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py list
 ```
 
 Shows all sessions with status, timestamps, and models used.
@@ -91,7 +88,7 @@ Shows all sessions with status, timestamps, and models used.
 
 ```bash
 # Use custom LiteLLM endpoint
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Review this PR" \
   --file src/**/*.ts \
   --slug "pr-review" \
@@ -106,7 +103,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 Query models from a custom LiteLLM endpoint:
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
   --base-url "http://localhost:8000"
 ```
 
@@ -127,7 +124,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
 Query known models from major providers:
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 ```
 
 **What happens:**
@@ -147,7 +144,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 #### Scenario 1: With Base URL (custom provider)
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Architectural review" \
   --file "**/*.py" \
   --slug "arch-review" \
@@ -169,7 +166,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 2: Without Base URL (default providers)
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Code review" \
   --file src/*.py \
   --slug "review"
@@ -186,7 +183,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 3: Explicit Model (no auto-selection)
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Bug analysis" \
   --file src/*.py \
   --slug "bug" \
@@ -202,7 +199,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Specify API Key
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "..." \
   --file ... \
   --slug "..." \
@@ -233,7 +230,7 @@ export LITELLM_API_KEY="your-key-here"
 export OPENAI_BASE_URL="http://localhost:8000"
 
 # Now consultant will use the base URL automatically
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --prompt "..." --file ... --slug "..."
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --prompt "..." --file ... --slug "..."
 ```
 
 ## When to Use Consultant
@@ -270,7 +267,7 @@ Sessions are stored in `~/.consultant/sessions/{session-id}/` with:
 Query status anytime:
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session <slug>
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session <slug>
 ```
 
 The most recent session with that slug will be returned.
@@ -379,11 +376,18 @@ Retrying in 5 seconds... (attempt 2/3)
 
 ## Troubleshooting
 
-**Issue**: `ImportError: No module named 'litellm'`
+**Issue**: `uv: command not found`
 
 **Solution**:
 ```bash
-pip install litellm requests
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Issue**: `ImportError: No module named 'litellm'`
+
+**Solution**: This shouldn't happen with `uv run`, but if it does, clear uv cache:
+```bash
+uv cache clean
 ```
 
 **Issue**: Session stuck in "running" status
@@ -413,7 +417,7 @@ pip install litellm requests
 ### Security Audit
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify SQL injection vulnerabilities in the authentication module. For each finding, provide: vulnerable code location, attack vector, and recommended fix." \
   --file "apps/*/src/**/*.{service,controller}.ts" \
   --slug "security-audit" \
@@ -423,7 +427,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Architectural Review
 
 ```bash
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify the top 5 highest-impact architectural issues causing tight coupling. For each: explain the problem, show affected components, and recommend a solution." \
   --file "apps/*/src/**/*.ts" \
   --slug "arch-review"
@@ -435,7 +439,7 @@ python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 # Generate diff first
 git diff origin/main...HEAD > /tmp/pr-diff.txt
 
-python3 {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uv run {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Review this PR for production deployment. Flag blockers, high-risk changes, and suggest regression tests." \
   --file /tmp/pr-diff.txt \
   --slug "pr-review"

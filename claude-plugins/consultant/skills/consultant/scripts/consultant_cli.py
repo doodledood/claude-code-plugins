@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "litellm",
+#     "requests>=2.31.0",
+# ]
+# ///
 """
 Consultant CLI - LiteLLM-powered LLM consultation tool
 Supports async invocation, custom base URLs, and flexible model selection
+
+Run with: uv run consultant_cli.py [args]
+This automatically installs/updates dependencies (litellm, requests) on first run.
 """
 
 import sys
