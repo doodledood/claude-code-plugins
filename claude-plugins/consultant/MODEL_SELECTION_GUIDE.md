@@ -32,7 +32,7 @@ Quick reference for how consultant queries and selects models.
 
 **Command:**
 ```bash
-python3 oracle_cli.py models --base-url "http://localhost:8000"
+python3 consultant_cli.py models --base-url "http://localhost:8000"
 ```
 
 **What happens:**
@@ -62,7 +62,7 @@ Falls back to known models list (Method 2)
 
 **Command:**
 ```bash
-python3 oracle_cli.py models
+python3 consultant_cli.py models
 ```
 
 **What happens:**
@@ -235,16 +235,16 @@ Priority order for base URL:
 ```bash
 # Explicit flag wins
 export CONSULTANT_MODEL=gpt-4
-python3 oracle_cli.py --model claude-3-opus ...
+python3 consultant_cli.py --model claude-3-opus ...
 # Uses: claude-3-opus (flag wins)
 
 # Env var as fallback
 export CONSULTANT_MODEL=gpt-4
-python3 oracle_cli.py ...
+python3 consultant_cli.py ...
 # Uses: gpt-4 (env var)
 
 # Auto-select as last resort
-python3 oracle_cli.py ...
+python3 consultant_cli.py ...
 # Uses: claude-3-5-sonnet or gpt-4o (auto-selected)
 ```
 
@@ -274,10 +274,10 @@ python3 oracle_cli.py ...
 **Solution:**
 ```bash
 # See what models are available
-python3 oracle_cli.py models [--base-url http://localhost:8000]
+python3 consultant_cli.py models [--base-url http://localhost:8000]
 
 # Pick one explicitly
-python3 oracle_cli.py --model "your-chosen-model" ...
+python3 consultant_cli.py --model "your-chosen-model" ...
 ```
 
 ### Issue: "Model not found"
@@ -287,10 +287,10 @@ python3 oracle_cli.py --model "your-chosen-model" ...
 **Solution:**
 ```bash
 # Query available models first
-python3 oracle_cli.py models --base-url http://localhost:8000
+python3 consultant_cli.py models --base-url http://localhost:8000
 
 # Use one from the list
-python3 oracle_cli.py --model "available-model" --base-url http://localhost:8000 ...
+python3 consultant_cli.py --model "available-model" --base-url http://localhost:8000 ...
 ```
 
 ### Issue: "No API key provided"
@@ -306,7 +306,7 @@ export OPENAI_API_KEY="your-key"
 export ANTHROPIC_API_KEY="your-key"
 
 # Or use --api-key flag
-python3 oracle_cli.py --api-key "your-key" ...
+python3 consultant_cli.py --api-key "your-key" ...
 ```
 
 ---

@@ -1,5 +1,5 @@
 """
-Session management for async oracle executions
+Session management for async consultant executions
 Handles background processes, session persistence, and status tracking
 """
 
@@ -15,7 +15,7 @@ import config
 
 
 class SessionManager:
-    """Manages oracle consultation sessions with async execution"""
+    """Manages consultant sessions with async execution"""
 
     def __init__(self, sessions_dir: Optional[Path] = None):
         self.sessions_dir = sessions_dir or config.DEFAULT_SESSIONS_DIR

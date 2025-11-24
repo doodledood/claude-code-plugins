@@ -1,12 +1,12 @@
 """
-Configuration and constants for oracle Python implementation
+Configuration and constants for consultant Python implementation
 """
 
 import os
 from pathlib import Path
 
 # Session storage location
-DEFAULT_SESSIONS_DIR = Path.home() / ".oracle-python" / "sessions"
+DEFAULT_SESSIONS_DIR = Path.home() / ".consultant" / "sessions"
 
 # Environment variable names
 ENV_LITELLM_API_KEY = "LITELLM_API_KEY"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Oracle CLI - In-house implementation using LiteLLM
+Consultant CLI - LiteLLM-powered LLM consultation tool
 Supports async invocation, custom base URLs, and flexible model selection
 """
 

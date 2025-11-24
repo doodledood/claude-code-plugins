@@ -270,7 +270,7 @@ Skill tool with skill="execplan"
 - [PLANS.md](./skills/execplan/PLANS.md) - Complete ExecPlan methodology
 - [Plan Skill](./skills/plan/SKILL.md) - Mini-PR planning methodology
 - [ExecPlan Skill](./skills/execplan/SKILL.md) - Comprehensive planning methodology
-- [Oracle Plugin](../oracle/) - Oracle CLI integration for deep analysis
+- [Consultant Plugin](../consultant/) - LiteLLM integration for deep analysis
 
 ## License
 

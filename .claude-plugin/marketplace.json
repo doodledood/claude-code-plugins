@@ -11,14 +11,6 @@
   },
   "plugins": [
     {
-      "name": "oracle",
-      "source": "./claude-plugins/oracle",
-      "description": "Comprehensive code analysis using the oracle CLI tool - includes oracle-consulter agent, review/bug-investigation commands, and oracle skill for deep AI-powered code reviews and architectural analysis",
-      "version": "1.0.0",
-      "category": "development",
-      "keywords": ["oracle", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis"]
-    },
-    {
       "name": "planning",
       "source": "./claude-plugins/planning",
       "description": "Comprehensive planning tools including plan and execplan skills with automatic keyword detection via hooks. Creates implementation plans and execution plans following proven methodologies.",

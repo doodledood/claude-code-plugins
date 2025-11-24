@@ -24,7 +24,6 @@ Once the marketplace is added, install any plugin:
 
 ```bash
 /plugin install consultant@claude-code-plugins-marketplace
-/plugin install oracle@claude-code-plugins-marketplace
 /plugin install planning@claude-code-plugins-marketplace
 ```
 
@@ -65,27 +64,12 @@ pip install litellm requests
 
 ---
 
-### oracle (v1.0.0)
-Comprehensive code analysis using oracle CLI tool for deep AI-powered reviews and architectural analysis.
-
-**Features:**
-- `oracle-consulter` agent - Expert agent for high-token AI analysis workflows
-- `/oracle-review` command - Production-level PR reviews with severity-tagged findings
-- `/oracle-investigate-bug` command - Deep bug investigation with root cause analysis
-- `oracle` skill - Oracle CLI knowledge and best practices
-
-**Category:** development
-**Keywords:** oracle, code-review, analysis, architecture, bug-investigation, ai-analysis
-
----
-
 ### planning (v1.0.0)
 Comprehensive planning tools with automatic keyword detection via hooks.
 
 **Features:**
 - `plan` skill - Mini-PR based implementation plans for iterative development
 - `execplan` skill - Comprehensive execution plans following PLANS.md methodology
-- `/oracle-execplan` command - Deep planning analysis using oracle CLI
 - `check-planning-keywords.py` hook - Auto-detects "plan" or "execplan" keywords and activates appropriate skills
 
 **Category:** development

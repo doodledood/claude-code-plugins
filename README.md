@@ -32,7 +32,6 @@ For local development:
 
 # Install a specific plugin
 /plugin install consultant@claude-code-plugins-marketplace
-/plugin install oracle@claude-code-plugins-marketplace
 ```
 
 ## 📦 Available Plugins
@@ -57,17 +56,6 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
   - Token management with context validation
   - Async execution with session reattachment
 
-#### oracle (v1.0.0)
-Comprehensive code analysis using oracle CLI tool for deep AI-powered reviews and architectural analysis.
-
-**Components:**
-- **Agent:** `oracle-consulter` - Expert agent for leveraging high-token AI analysis
-- **Commands:**
-  - `/oracle-review` - Production-level PR reviews with severity-tagged findings
-  - `/oracle-investigate-bug` - Deep bug investigation with root cause analysis
-- **Skill:** `oracle` - Oracle CLI knowledge and best practices
-- **Category:** development
-
 #### planning (v1.0.0)
 Comprehensive planning tools with automatic keyword detection via hooks.
 
@@ -75,7 +63,6 @@ Comprehensive planning tools with automatic keyword detection via hooks.
 - **Skills:**
   - `plan` - Mini-PR based implementation plans
   - `execplan` - Comprehensive execution plans following PLANS.md
-- **Command:** `/oracle-execplan` - Deep planning analysis with oracle CLI
 - **Hook:** `check-planning-keywords.py` - Auto-detects planning keywords and activates skills
 - **Category:** development
 
@@ -93,7 +80,6 @@ claude-code-plugins/
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
 │   ├── consultant/           # Consultant plugin (Python/LiteLLM)
-│   ├── oracle/               # Oracle plugin
 │   └── planning/             # Planning plugin
 ├── CONTRIBUTING.md            # Contributing guidelines
 └── README.md                  # This file

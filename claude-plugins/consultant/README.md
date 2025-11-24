@@ -18,7 +18,7 @@ Consultant is a Claude Code plugin that provides access to powerful LLM models f
 
 ✅ **Async Execution**: Background sessions with status tracking and reattachment
 
-✅ **Feature Parity**: Complete replacement for oracle with consultant-consulter agent, review/bug-investigation/execplan commands
+✅ **Full-Featured**: Includes consultant-consulter agent, review/bug-investigation/execplan commands
 
 ## Components
 
@@ -194,7 +194,7 @@ export CONSULTANT_BASE_URL="http://localhost:8000"
 
 # For direct Python CLI usage
 export OPENAI_BASE_URL="http://localhost:8000"
-python3 {consultant_scripts}/oracle_cli.py --prompt "..." --file ...
+python3 {consultant_scripts}/consultant_cli.py --prompt "..." --file ...
 ```
 
 Or specify per-command/invocation:
@@ -204,7 +204,7 @@ Or specify per-command/invocation:
 /consultant-review BASE_URL=http://localhost:8000
 
 # Python CLI
-python3 {consultant_scripts}/oracle_cli.py --base-url "http://localhost:8000" ...
+python3 {consultant_scripts}/consultant_cli.py --base-url "http://localhost:8000" ...
 ```
 
 ### Model Selection
@@ -226,7 +226,7 @@ Or let consultant auto-select:
 1. **Context Gathering**: Collects relevant files, diffs, and documentation
 2. **Artifact Organization**: Creates structured, numbered attachments
 3. **Prompt Engineering**: Constructs detailed analysis prompts
-4. **Consultant Invocation**: Runs Python CLI via `oracle_cli.py`
+4. **Consultant Invocation**: Runs Python CLI via `consultant_cli.py`
 5. **Session Management**: Monitors asynchronously until completion
 6. **Findings Synthesis**: Transforms output into actionable recommendations
 
@@ -281,7 +281,7 @@ When no model is specified, consultant:
 
 ### Session Storage
 
-Sessions are stored in `~/.oracle-python/sessions/{session-id}/` with:
+Sessions are stored in `~/.consultant/sessions/{session-id}/` with:
 
 - `metadata.json`: Status, timestamps, token counts, model info
 - `prompt.txt`: Original user prompt
@@ -294,13 +294,13 @@ Sessions are stored in `~/.oracle-python/sessions/{session-id}/` with:
 Query status anytime:
 
 ```bash
-python3 {consultant_scripts_path}/oracle_cli.py session <slug>
+python3 {consultant_scripts_path}/consultant_cli.py session <slug>
 ```
 
 ### List Sessions
 
 ```bash
-python3 {consultant_scripts_path}/oracle_cli.py list
+python3 {consultant_scripts_path}/consultant_cli.py list
 ```
 
 ## Examples
@@ -354,7 +354,7 @@ export CONSULTANT_BASE_URL="http://localhost:8000"
 You can also use the consultant Python CLI directly:
 
 ```bash
-python3 {consultant_scripts_path}/oracle_cli.py \
+python3 {consultant_scripts_path}/consultant_cli.py \
   --prompt "Analyze this code for performance issues" \
   --file src/**/*.py \
   --slug "perf-analysis" \
@@ -365,14 +365,14 @@ python3 {consultant_scripts_path}/oracle_cli.py \
 ### List Available Models
 
 ```bash
-python3 {consultant_scripts_path}/oracle_cli.py models \
+python3 {consultant_scripts_path}/consultant_cli.py models \
   --base-url "http://localhost:8000"
 ```
 
 ### Check Session Status
 
 ```bash
-python3 {consultant_scripts_path}/oracle_cli.py session <slug>
+python3 {consultant_scripts_path}/consultant_cli.py session <slug>
 ```
 
 ## Troubleshooting
@@ -423,22 +423,9 @@ export ANTHROPIC_API_KEY="your-key"
 **Issue**: Session shows "running" but seems stuck
 
 **Solution**:
-- Check session directory: `ls ~/.oracle-python/sessions/{session-id}/`
-- Look for `error.txt`: `cat ~/.oracle-python/sessions/{session-id}/error.txt`
-- Check process: `ps aux | grep oracle_cli.py`
-
-## Comparison with Oracle Plugin
-
-| Feature | Oracle Plugin | Consultant Plugin |
-|---------|---------------|-------------------|
-| Provider Support | Single (via @steipete/oracle) | 100+ (via LiteLLM) |
-| Custom Base URL | No | Yes |
-| Model Selection | Fixed | Automatic or manual |
-| Local Models | No | Yes (Ollama, vLLM, etc.) |
-| Token Counting | External | Built-in |
-| Implementation | npm package | Python/LiteLLM |
-| Session Storage | ~/.oracle/ | ~/.oracle-python/ |
-| CLI Access | npx command | Python script |
+- Check session directory: `ls ~/.consultant/sessions/{session-id}/`
+- Look for `error.txt`: `cat ~/.consultant/sessions/{session-id}/error.txt`
+- Check process: `ps aux | grep consultant_cli.py`
 
 ## When to Use Consultant
 
@@ -477,4 +464,4 @@ Contributions welcome! This plugin is part of the [claude-code-plugins](https://
 
 ## Credits
 
-Created by doodledood as a flexible alternative to the oracle plugin, providing multi-provider LLM support through Python and LiteLLM.
+Created by doodledood, providing multi-provider LLM support through Python and LiteLLM.

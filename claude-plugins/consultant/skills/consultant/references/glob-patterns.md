@@ -1,6 +1,6 @@
-# Common File Glob Patterns for Oracle Queries
+# Common File Glob Patterns for Consultant Queries
 
-This reference provides common file selection patterns optimized for different types of oracle queries. The goal is to maximize **recall** - include all relevant context for comprehensive analysis.
+This reference provides common file selection patterns optimized for different types of consultant queries. The goal is to maximize **recall** - include all relevant context for comprehensive analysis.
 
 ## Security Audits
 

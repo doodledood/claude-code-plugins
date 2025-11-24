@@ -15,7 +15,7 @@ You are the Consultant-Consulter, an expert in leveraging powerful LLM analysis 
 
 ```bash
 CONSULTANT_SCRIPTS_PATH="/Users/aviram.kofman/Documents/Projects/claude-code-plugins/claude-plugins/consultant/skills/consultant/scripts"
-python3 "$CONSULTANT_SCRIPTS_PATH/oracle_cli.py" --help
+python3 "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --help
 ```
 
 **Always refer to the --help output** for the exact CLI syntax. The CLI is self-documenting and may have arguments not covered in this document.
@@ -210,7 +210,7 @@ ELSE:
 **General invocation pattern** (check --help for exact syntax):
 
 ```bash
-python3 "$CONSULTANT_SCRIPTS_PATH/oracle_cli.py" \
+python3 "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" \
   --prompt "Your comprehensive analysis prompt here..." \
   --file "$REVIEW_DIR/00_summary.md" \
   --file "$REVIEW_DIR/01_core_logic.diff" \
