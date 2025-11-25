@@ -52,18 +52,33 @@ The request type is flexible (reviews, architecture, bugs, planning, etc.) - but
 
 If the user requests analysis from **multiple models** (e.g., "compare what GPT-4 and Claude think about this"):
 
-1. This is a valid workflow - the only difference is invoking the CLI multiple times
-2. **Invoke all CLI calls in parallel** (same prompt, different models)
-3. Monitor all sessions until completion
-4. Save each model's output to a separate file:
+**CRITICAL: Identical Input Requirement**
+
+Each model MUST receive the **exact same input**:
+- Same prompt text (character-for-character identical)
+- Same file attachments (same files, same order)
+- Same artifact directory
+- **Only the model parameter varies**
+
+This ensures a fair comparison with different answers on identical input.
+
+**Workflow:**
+
+1. Gather context and construct the prompt ONCE
+2. Create the artifact directory with all files ONCE
+3. **Invoke all CLI calls in parallel** - same prompt, same files, only model differs
+4. Monitor all sessions until completion
+5. Save each model's output to a separate file:
    ```
    consultant_response_<model1>.md
    consultant_response_<model2>.md
    ```
-5. Relay each model's output separately, clearly labeled
-6. Report all file paths to the user
+6. Relay each model's output separately, clearly labeled
+7. Report all file paths to the user
 
 **Do NOT:**
+- Modify the prompt between model calls
+- Add or remove files between model calls
 - Compare or synthesize the results yourself
 - Pick a "winner" or favor one model's analysis
 - Add your own commentary on differences between models
