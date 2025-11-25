@@ -277,44 +277,16 @@ def build_prompt_with_references(prompt: str, files: list[ProcessedFile]) -> str
     return "".join(parts)
 
 
-def build_multimodal_content_for_responses_api(
+def build_multimodal_content(
     text_prompt: str, files: list[ProcessedFile]
 ) -> list[dict[str, Any]]:
     """
-    Build multimodal content array for OpenAI Responses API.
+    Build multimodal content array for LLM APIs.
 
-    The Responses API uses different format:
-    - Text: {"type": "input_text", "text": "..."}
-    - Image: {"type": "input_image", "image_url": "data:image/png;base64,..."}
+    Uses the standard OpenAI Chat Completions format which is widely supported.
+    Response strategies will convert to API-specific formats as needed.
 
-    Args:
-        text_prompt: The text portion of the prompt (with reference files)
-        files: List of successfully processed files
-
-    Returns:
-        Multimodal content array for Responses API
-    """
-    content: list[dict[str, Any]] = []
-
-    # Add text content first (input_text for responses API)
-    content.append({"type": "input_text", "text": text_prompt})
-
-    # Add images (input_image with direct URL string for responses API)
-    image_files = [f for f in files if f.category == FileCategory.IMAGE]
-    for img in image_files:
-        data_url = f"data:{img.mime_type};base64,{img.base64_data}"
-        content.append({"type": "input_image", "image_url": data_url})
-
-    return content
-
-
-def build_multimodal_content_for_completions_api(
-    text_prompt: str, files: list[ProcessedFile]
-) -> list[dict[str, Any]]:
-    """
-    Build multimodal content array for Chat Completions API.
-
-    The Completions API uses standard format:
+    Format:
     - Text: {"type": "text", "text": "..."}
     - Image: {"type": "image_url", "image_url": {"url": "data:...", "detail": "auto"}}
 
@@ -323,23 +295,25 @@ def build_multimodal_content_for_completions_api(
         files: List of successfully processed files
 
     Returns:
-        Multimodal content array for Completions API
+        Multimodal content array
     """
     content: list[dict[str, Any]] = []
 
-    # Add text content first
+    # Text content
     content.append({"type": "text", "text": text_prompt})
 
-    # Add images with nested url object
-    image_files = [f for f in files if f.category == FileCategory.IMAGE]
-    for img in image_files:
-        data_url = f"data:{img.mime_type};base64,{img.base64_data}"
-        content.append(
-            {
-                "type": "image_url",
-                "image_url": {"url": data_url, "detail": "auto"},
-            }
-        )
+    # Images with base64 data URLs
+    for f in files:
+        if f.category == FileCategory.IMAGE:
+            content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:{f.mime_type};base64,{f.base64_data}",
+                        "detail": "auto",
+                    },
+                }
+            )
 
     return content
 
@@ -347,8 +321,3 @@ def build_multimodal_content_for_completions_api(
 def has_images(files: list[ProcessedFile]) -> bool:
     """Check if any processed files are images"""
     return any(f.category == FileCategory.IMAGE for f in files)
-
-
-# Alias for backwards compatibility - uses Completions API format
-# (strategies will convert to Responses API format as needed)
-build_multimodal_content = build_multimodal_content_for_completions_api
