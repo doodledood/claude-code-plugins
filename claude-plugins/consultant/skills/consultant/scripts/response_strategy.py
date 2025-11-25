@@ -9,13 +9,8 @@ from pathlib import Path
 from typing import Optional, Dict, Set
 from abc import ABC, abstractmethod
 
-try:
-    import litellm
-    from litellm import responses, completion, _should_retry
-    LITELLM_AVAILABLE = True
-except ImportError:
-    LITELLM_AVAILABLE = False
-    _should_retry = None
+import litellm
+from litellm import responses, completion, _should_retry
 
 import config
 
@@ -73,9 +68,6 @@ def get_responses_api_models() -> Set[str]:
         Set of model identifiers that support the responses API natively.
     """
     responses_models: Set[str] = set()
-
-    if not LITELLM_AVAILABLE:
-        return responses_models
 
     # Get OpenAI models from litellm
     openai_models = litellm.models_by_provider.get("openai", [])
