@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # /// script
-# requires-python = ">=3.9"
+# requires-python = ">=3.10"
 # dependencies = [
 #     "litellm",
 #     "requests>=2.31.0",
 #     "tenacity",
+#     "markitdown>=0.1.0",
 # ]
 # ///
 """
@@ -25,27 +26,16 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import config
+from file_handler import (
+    FileHandler,
+    build_multimodal_content,
+    build_prompt_with_references,
+    has_images,
+    validate_vision_support,
+)
 from litellm_client import LiteLLMClient
 from model_selector import ModelSelector
 from session_manager import SessionManager
-
-
-def build_full_prompt(prompt: str, files: list[dict[str, str]]) -> str:
-    """
-    Build the full prompt with all file contents attached.
-    This is the actual prompt that will be sent to the LLM.
-    """
-    if not files:
-        return prompt
-
-    full_prompt = prompt + "\n\n" + "=" * 80 + "\n\n"
-    full_prompt += "## Attached Files\n\n"
-
-    for file_info in files:
-        full_prompt += f"### {file_info['path']}\n\n"
-        full_prompt += f"```\n{file_info['content']}\n```\n\n"
-
-    return full_prompt
 
 
 def validate_context_size(
@@ -106,27 +96,38 @@ def handle_invocation(args: argparse.Namespace) -> int:
     session_mgr = SessionManager()
     client = LiteLLMClient(base_url=base_url, api_key=args.api_key)
 
-    # Validate and prepare files
-    file_contents = []
+    # Process files using FileHandler
+    file_handler = FileHandler()
+    processed_files = []
+    multimodal_content = None
 
     if args.files:
-        for file_path in args.files:
-            path = Path(file_path)
-            if not path.exists():
-                print(f"ERROR: File not found: {file_path}", file=sys.stderr)
-                return 1
+        processed_files, file_errors = file_handler.process_files(args.files)
 
-            if not path.is_file():
-                print(f"ERROR: Not a file: {file_path}", file=sys.stderr)
-                return 1
+        # If any files failed, report errors and exit
+        if file_errors:
+            print("\nERROR: Some files could not be processed:", file=sys.stderr)
+            for err in file_errors:
+                print(f"  - {err.path}: {err.reason}", file=sys.stderr)
+            print(
+                "\nPlease fix or remove the problematic files and try again.",
+                file=sys.stderr,
+            )
+            return 1
 
-            try:
-                content = path.read_text()
-            except Exception as e:
-                print(f"ERROR: Could not read {file_path}: {e}", file=sys.stderr)
-                return 1
+        # Validate vision support if images present
+        if has_images(processed_files):
+            validate_vision_support(args.model, has_images=True)
 
-            file_contents.append({"path": str(file_path), "content": content})
+        # Print file processing summary
+        text_count = sum(1 for f in processed_files if f.category.value == "text")
+        office_count = sum(1 for f in processed_files if f.category.value == "office")
+        image_count = sum(1 for f in processed_files if f.category.value == "image")
+
+        print("\nFile Processing Summary:")
+        print(f"  - Text files: {text_count}")
+        print(f"  - Office documents (converted): {office_count}")
+        print(f"  - Images: {image_count}")
 
     # Log model being used
     print(f"Using model: {args.model}")
@@ -161,12 +162,16 @@ def handle_invocation(args: argparse.Namespace) -> int:
 
             return 1
 
-    # Build full prompt with all file contents
-    full_prompt = build_full_prompt(args.prompt, file_contents)
+    # Build full prompt with reference files section
+    full_prompt = build_prompt_with_references(args.prompt, processed_files)
+
+    # Build multimodal content if we have images
+    if has_images(processed_files):
+        multimodal_content = build_multimodal_content(full_prompt, processed_files)
 
     # Check context limits on the full prompt
     try:
-        validate_context_size(full_prompt, args.model, client, len(file_contents))
+        validate_context_size(full_prompt, args.model, client, len(processed_files))
     except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
@@ -179,6 +184,7 @@ def handle_invocation(args: argparse.Namespace) -> int:
         base_url=base_url,
         api_key=args.api_key,
         reasoning_effort=args.reasoning_effort,
+        multimodal_content=multimodal_content,
     )
 
     print(f"Session created: {session_id}")

@@ -51,3 +51,6 @@ uv.lock
 
 # Node (if any JS plugins)
 node_modules/
+
+# .claude stuff
+settings.local.json

@@ -30,6 +30,7 @@ class SessionManager:
         base_url: str | None = None,
         api_key: str | None = None,
         reasoning_effort: str = "high",
+        multimodal_content: list[dict[str, Any]] | None = None,
     ) -> str:
         """Create a new session and start background execution"""
 
@@ -47,6 +48,7 @@ class SessionManager:
             "base_url": base_url,
             "reasoning_effort": reasoning_effort,
             "prompt_preview": prompt[:200] + "..." if len(prompt) > 200 else prompt,
+            "has_images": multimodal_content is not None,
         }
 
         metadata_file = session_dir / "metadata.json"
@@ -59,7 +61,15 @@ class SessionManager:
         # Start background process
         process = multiprocessing.Process(
             target=self._execute_session,
-            args=(session_id, prompt, model, base_url, api_key, reasoning_effort),
+            args=(
+                session_id,
+                prompt,
+                model,
+                base_url,
+                api_key,
+                reasoning_effort,
+                multimodal_content,
+            ),
         )
         process.start()
 
@@ -76,6 +86,7 @@ class SessionManager:
         base_url: str | None,
         api_key: str | None,
         reasoning_effort: str = "high",
+        multimodal_content: list[dict[str, Any]] | None = None,
     ) -> None:
         """Background execution of LLM consultation"""
 
@@ -97,6 +108,7 @@ class SessionManager:
                 prompt=prompt,
                 session_dir=session_dir,  # Enables background job resumption if supported
                 reasoning_effort=reasoning_effort,
+                multimodal_content=multimodal_content,
             )
 
             full_response = result.get("content", "")

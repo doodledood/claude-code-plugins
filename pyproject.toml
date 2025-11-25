@@ -1,7 +1,7 @@
 [project]
 name = "claude-code-plugins"
 version = "1.0.0"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [tool.mypy]
 python_version = "3.11"
@@ -26,7 +26,7 @@ ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
@@ -47,8 +47,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["config", "session_manager", "litellm_client", "model_selector", "response_strategy"]
+known-first-party = ["config", "session_manager", "litellm_client", "model_selector", "response_strategy", "file_handler"]
 
 [tool.black]
 line-length = 88
-target-version = ["py39"]
+target-version = ["py310"]

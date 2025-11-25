@@ -117,11 +117,23 @@ class ResponseStrategy(ABC):
 
     @abstractmethod
     def execute(
-        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+        self,
+        model: str,
+        prompt: str,
+        session_dir: Path | None = None,
+        multimodal_content: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """
         Execute LLM request with provider-specific strategy.
         Returns dict with 'content' and optional 'usage'.
+
+        Args:
+            model: Model identifier
+            prompt: Text prompt
+            session_dir: Optional session directory for state persistence
+            multimodal_content: Optional multimodal content array for images
+            **kwargs: Additional provider-specific arguments
         """
         raise NotImplementedError
 
@@ -204,8 +216,34 @@ class BackgroundJobStrategy(ResponseStrategy):
     Supports resuming after network failures by persisting response_id.
     """
 
+    def _convert_to_responses_api_format(
+        self, multimodal_content: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """
+        Convert multimodal content from Completions API format to Responses API format.
+
+        Completions format: [{"type": "text/image_url", ...}]
+        Responses format: [{"type": "input_text/input_image", ...}]
+        """
+        converted: list[dict[str, Any]] = []
+        for item in multimodal_content:
+            item_type = item.get("type", "")
+            if item_type == "text":
+                converted.append({"type": "input_text", "text": item.get("text", "")})
+            elif item_type == "image_url":
+                # Extract URL from nested object
+                image_url = item.get("image_url", {})
+                url = image_url.get("url", "") if isinstance(image_url, dict) else ""
+                converted.append({"type": "input_image", "image_url": url})
+        return converted
+
     def execute(
-        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+        self,
+        model: str,
+        prompt: str,
+        session_dir: Path | None = None,
+        multimodal_content: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Execute with background job and polling"""
 
@@ -217,11 +255,18 @@ class BackgroundJobStrategy(ResponseStrategy):
             print(f"Resuming background job: {response_id}")
             return self._poll_for_completion(response_id)
 
+        # Build input - convert multimodal to Responses API format if provided
+        input_content: str | list[dict[str, Any]]
+        if multimodal_content:
+            input_content = self._convert_to_responses_api_format(multimodal_content)
+        else:
+            input_content = prompt
+
         # Start new background job
         try:
             response = responses(
                 model=model,
-                input=prompt,
+                input=input_content,
                 background=True,  # Returns immediately with response_id
                 num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
                 **kwargs,
@@ -328,16 +373,49 @@ class SyncRetryStrategy(ResponseStrategy):
     Cannot resume - must retry from scratch if it fails.
     """
 
+    def _convert_to_responses_api_format(
+        self, multimodal_content: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """
+        Convert multimodal content from Completions API format to Responses API format.
+
+        Completions format: [{"type": "text/image_url", ...}]
+        Responses format: [{"type": "input_text/input_image", ...}]
+        """
+        converted: list[dict[str, Any]] = []
+        for item in multimodal_content:
+            item_type = item.get("type", "")
+            if item_type == "text":
+                converted.append({"type": "input_text", "text": item.get("text", "")})
+            elif item_type == "image_url":
+                # Extract URL from nested object
+                image_url = item.get("image_url", {})
+                url = image_url.get("url", "") if isinstance(image_url, dict) else ""
+                converted.append({"type": "input_image", "image_url": url})
+        return converted
+
     def execute(
-        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+        self,
+        model: str,
+        prompt: str,
+        session_dir: Path | None = None,
+        multimodal_content: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Execute with synchronous retries using responses API"""
+
+        # Build input - convert multimodal to Responses API format if provided
+        input_content: str | list[dict[str, Any]]
+        if multimodal_content:
+            input_content = self._convert_to_responses_api_format(multimodal_content)
+        else:
+            input_content = prompt
 
         for attempt in range(config.MAX_RETRIES):
             try:
                 response = responses(
                     model=model,
-                    input=prompt,
+                    input=input_content,
                     stream=False,
                     num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
                     **kwargs,
@@ -413,7 +491,12 @@ class CompletionsAPIStrategy(ResponseStrategy):
     """
 
     def execute(
-        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+        self,
+        model: str,
+        prompt: str,
+        session_dir: Path | None = None,
+        multimodal_content: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Execute with chat completions API"""
 
@@ -421,12 +504,17 @@ class CompletionsAPIStrategy(ResponseStrategy):
         kwargs.pop("reasoning_effort", None)
         kwargs.pop("background", None)
 
+        # Build message content - use multimodal content if provided, else plain prompt
+        message_content: str | list[dict[str, Any]] = (
+            multimodal_content if multimodal_content else prompt
+        )
+
         for attempt in range(config.MAX_RETRIES):
             try:
                 # Use chat completions API
                 response = completion(
                     model=model,
-                    messages=[{"role": "user", "content": prompt}],
+                    messages=[{"role": "user", "content": message_content}],
                     stream=False,
                     num_retries=config.MAX_RETRIES,
                     **kwargs,

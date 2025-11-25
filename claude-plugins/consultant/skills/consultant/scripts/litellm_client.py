@@ -38,6 +38,7 @@ class LiteLLMClient:
         prompt: str,
         session_dir: Path | None = None,
         reasoning_effort: str = "high",
+        multimodal_content: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         """
@@ -52,6 +53,7 @@ class LiteLLMClient:
             prompt: Full prompt text
             session_dir: Optional session directory for state persistence (enables resumability)
             reasoning_effort: Reasoning effort level (low, medium, high) - default high
+            multimodal_content: Optional multimodal content array for images
             **kwargs: Additional args passed to litellm.responses()
 
         Returns:
@@ -78,7 +80,11 @@ class LiteLLMClient:
         try:
             # Execute with strategy-specific retry/background logic
             result: dict[str, Any] = strategy.execute(
-                model=model, prompt=prompt, session_dir=session_dir, **kwargs
+                model=model,
+                prompt=prompt,
+                session_dir=session_dir,
+                multimodal_content=multimodal_content,
+                **kwargs,
             )
             return result
 
