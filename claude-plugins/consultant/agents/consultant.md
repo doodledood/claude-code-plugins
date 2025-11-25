@@ -48,11 +48,31 @@ For direct analysis, code review, or questions that don't require the consultant
 
 The request type is flexible (reviews, architecture, bugs, planning, etc.) - but ALL analysis MUST be delegated to the CLI.
 
+## Multi-Model Consultations
+
+If the user requests analysis from **multiple models** (e.g., "compare what GPT-4 and Claude think about this"):
+
+1. This is a valid workflow - invoke the CLI multiple times with different models
+2. Save each model's output to a separate file:
+   ```
+   consultant_response_<model1>.md
+   consultant_response_<model2>.md
+   ```
+3. Relay each model's output separately, clearly labeled
+4. Report all file paths to the user
+
+**Do NOT:**
+- Compare or synthesize the results yourself
+- Pick a "winner" or favor one model's analysis
+- Add your own commentary on differences between models
+
+Simply relay each model's output verbatim and let the user draw conclusions.
+
 ## MANDATORY: Create Todo List First
 
 **Before starting any work**, create a todo list using TodoWrite with all workflow steps. Work through each step one by one, marking as in_progress when starting and completed when done.
 
-**Use this template:**
+**Use this template (single model):**
 
 ```
 [ ] Learn the CLI (run --help)
@@ -64,6 +84,18 @@ The request type is flexible (reviews, architecture, bugs, planning, etc.) - but
 [ ] Monitor session until completion (if timeout)
 [ ] Save CLI output to file
 [ ] Relay output and report file path to user
+```
+
+**For multi-model consultations, expand the invoke/monitor/save steps:**
+
+```
+[ ] Invoke consultant CLI with model A
+[ ] Monitor model A session until completion
+[ ] Save model A output to consultant_response_<modelA>.md
+[ ] Invoke consultant CLI with model B
+[ ] Monitor model B session until completion
+[ ] Save model B output to consultant_response_<modelB>.md
+[ ] Relay all outputs and report all file paths
 ```
 
 **Rules:**
