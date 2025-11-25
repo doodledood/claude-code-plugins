@@ -1,18 +1,18 @@
 ---
-description: Multi-model ensemble consultation. Invokes the consultant agent with 3 different models in parallel for diverse perspectives. Default models are gpt-5-pro, gemini-3-pro-preview, and claude-opus-4-5-20251101.
+description: Multi-model ensemble consultation. Invokes the consultant agent with one or more models in parallel. Defaults to 3 models (gpt-5-pro, gemini-3-pro-preview, claude-opus-4-5-20251101) for diverse perspectives.
 ---
 
 # Counsil Command
 
-Performs a multi-model ensemble consultation using the consultant agent with 3 different vendor models in parallel.
+Performs a consultation using the consultant agent with one or more models. By default, runs 3 different vendor models in parallel for ensemble diversity.
 
 ## What It Does
 
-Invokes the consultant agent to run the same analysis across 3 different LLM providers simultaneously:
+Invokes the consultant agent to run the same analysis across one or more LLM models:
 
 1. Gathers context based on the user's request
 2. Constructs a single prompt for the analysis
-3. Invokes the consultant CLI **in parallel** with 3 different models
+3. Invokes the consultant CLI with the specified model(s) - runs in parallel if multiple
 4. Monitors all sessions until completion
 5. Saves each model's output to a separate file
 6. Relays all outputs verbatim without comparison or synthesis
@@ -54,13 +54,21 @@ For each model, you receive:
 
 ## Usage
 
+Default (3 models):
+
 ```
 /counsil Review this PR for security vulnerabilities
 /counsil Analyze the architecture of this authentication system
 /counsil Investigate the root cause of this bug
 ```
 
-To use different models:
+Single model:
+
+```
+/counsil Use claude-opus-4-5-20251101 to review this code
+```
+
+Custom models:
 
 ```
 /counsil Use gpt-4-turbo, claude-sonnet-4, and gemini-2.0-flash to review this code
@@ -70,24 +78,26 @@ To use different models:
 
 - The consultant agent will **NOT** compare or synthesize results
 - Each model's output is relayed **verbatim**
-- You (the user) draw conclusions from the ensemble
-- All 3 CLI calls run in parallel for efficiency
+- You (the user) draw conclusions from the results
+- Multiple CLI calls run in parallel for efficiency
 
 ## Environment Variables
 
-Requires API keys for all 3 providers:
+Requires API keys for the providers you're using:
 
 - `OPENAI_API_KEY`: For GPT models
 - `GOOGLE_API_KEY` or `GEMINI_API_KEY`: For Gemini models
 - `ANTHROPIC_API_KEY`: For Claude models
 
+For the default 3-model ensemble, all 3 keys are required.
+
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant:consultant'` for a multi-model consultation. The agent will:
+This command invokes the Task tool with `subagent_type='consultant:consultant'`. The agent will:
 
 1. Run `--help` on the CLI to learn current arguments
 2. Gather context and construct the prompt
-3. Invoke the CLI **in parallel** with all 3 models (or user-specified models)
+3. Invoke the CLI with specified model(s) - defaults to 3 models, runs in parallel if multiple
 4. Monitor all sessions until completion
 5. Save each output to a separate file
 6. Relay all outputs with file paths back to user
