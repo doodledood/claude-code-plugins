@@ -19,13 +19,19 @@ Invokes the consultant agent to run the same analysis across one or more LLM mod
 
 ## Default Models
 
-The following models are used by default (one from each major vendor for ensemble diversity):
+**CRITICAL: If the user does NOT explicitly specify model(s) in their request, you MUST use ALL 3 default models:**
 
 - **OpenAI**: `gpt-5-pro`
 - **Google**: `gemini-3-pro-preview`
 - **Anthropic**: `claude-opus-4-5-20251101`
 
-Users can override these by specifying different models in their request.
+Only use different models if the user explicitly names them (e.g., "use gpt-4o to review" or "use claude-sonnet-4 and gemini-2.0-flash").
+
+**How to detect if user specified models:**
+- User DID specify: "use gpt-4o", "with claude-opus", "using gemini-2.5-pro and gpt-4"
+- User DID NOT specify: "review this PR", "analyze the architecture", "investigate this bug"
+
+When in doubt, use all 3 default models.
 
 ## Output
 
@@ -71,15 +77,17 @@ Single model:
 Custom models:
 
 ```
-/counsil Use gpt-4-turbo, claude-sonnet-4, and gemini-2.0-flash to review this code
+/counsil Use gpt-5-pro, claude-opus-4-5-20251101, and gemini-3.0-pro-preview to review this code
 ```
 
 ## Important Notes
 
+- **Always use 3 default models unless user explicitly specifies otherwise**
 - The consultant agent will **NOT** compare or synthesize results
 - Each model's output is relayed **verbatim**
 - You (the user) draw conclusions from the results
-- Multiple CLI calls run in parallel for efficiency
+- All CLI calls run in background mode and in parallel for efficiency
+- Sessions are polled every 30 seconds until completion
 
 ## Environment Variables
 
@@ -96,8 +104,13 @@ For the default 3-model ensemble, all 3 keys are required.
 This command invokes the Task tool with `subagent_type='consultant:consultant'`. The agent will:
 
 1. Run `--help` on the CLI to learn current arguments
-2. Gather context and construct the prompt
-3. Invoke the CLI with specified model(s) - defaults to 3 models, runs in parallel if multiple
-4. Monitor all sessions until completion
-5. Save each output to a separate file
-6. Relay all outputs with file paths back to user
+2. **Check if user specified models** - if NOT, use all 3 defaults: `gpt-5-pro`, `gemini-3-pro-preview`, `claude-opus-4-5-20251101`
+3. Gather context and construct the prompt
+4. **Launch all CLI calls in background mode** (`run_in_background: true`) - one per model, all in parallel
+5. **Poll all sessions every 30 seconds** using BashOutput until completion
+6. Save each output to a separate file
+7. Relay all outputs with file paths back to user
+
+
+## Custom User Instructions
+$ARGUMENTS

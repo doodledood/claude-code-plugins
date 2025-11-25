@@ -62,12 +62,35 @@ Each model MUST receive the **exact same input**:
 
 This ensures a fair comparison with different answers on identical input.
 
+**CRITICAL: Background Execution & Parallel Invocation**
+
+For multi-model consultations, you MUST:
+1. **Run all CLI calls in background mode** - Use the Bash tool with `run_in_background: true`
+2. **Launch all models in parallel** - Send a single message with multiple Bash tool calls (one per model)
+3. **Poll each session every 30 seconds** - Use BashOutput to check status until completion
+
+This is essential because:
+- LLM API calls can take minutes to complete
+- Running in foreground would cause timeouts
+- Parallel execution is more efficient than sequential
+
 **Workflow:**
 
 1. Gather context and construct the prompt ONCE
 2. Create the artifact directory with all files ONCE
-3. **Invoke all CLI calls in parallel** - same prompt, same files, only model differs
-4. Monitor all sessions until completion
+3. **Launch all CLI calls in parallel using background mode:**
+   ```
+   # In a SINGLE message, send multiple Bash calls with run_in_background: true
+   # Example: 3 models = 3 parallel Bash calls in one message
+
+   Bash(command="uv run ... --model gpt-4o ...", run_in_background=true)
+   Bash(command="uv run ... --model claude-sonnet-4 ...", run_in_background=true)
+   Bash(command="uv run ... --model gemini-2.5-pro ...", run_in_background=true)
+   ```
+4. **Monitor all sessions every 30 seconds:**
+   - Use BashOutput with each shell_id to check progress
+   - Continue polling until all sessions complete or error
+   - Check all sessions in parallel (multiple BashOutput calls in one message)
 5. Save each model's output to a separate file:
    ```
    consultant_response_<model1>.md
@@ -77,6 +100,8 @@ This ensures a fair comparison with different answers on identical input.
 7. Report all file paths to the user
 
 **Do NOT:**
+- Run CLI calls in foreground mode (will timeout)
+- Run models sequentially (inefficient)
 - Modify the prompt between model calls
 - Add or remove files between model calls
 - Compare or synthesize the results yourself
@@ -113,8 +138,8 @@ Simply relay each model's output verbatim and let the user draw conclusions.
 [ ] Gather context (files, diffs, documentation)
 [ ] Create temp directory and organize artifacts
 [ ] Construct the prompt
-[ ] Invoke consultant CLI in parallel (model A, model B, ...)
-[ ] Monitor all sessions until completion
+[ ] Launch all CLI calls in background mode (parallel Bash calls with run_in_background: true)
+[ ] Poll all sessions every 30 seconds using BashOutput until completion
 [ ] Save each model's output to consultant_response_<model>.md
 [ ] Relay all outputs and report all file paths
 ```
@@ -371,13 +396,42 @@ The CLI will:
 - Report any context overflow errors clearly
 - Print structured output with RESPONSE and METADATA sections
 
-### Phase 5b: Session Monitoring (if timeout)
+### Phase 5b: Session Monitoring
 
-If the CLI invocation times out (bash returns before completion), you MUST monitor the session until it completes:
+For **single-model** consultations where the CLI times out, or for **multi-model** consultations (which ALWAYS use background mode), you MUST monitor sessions until completion.
 
-**Check the --help output for the session status/check command** (learned in Phase 1).
+**For multi-model consultations (MANDATORY):**
 
-**Monitoring loop:**
+All CLI calls are launched in background mode. You MUST poll every 30 seconds:
+
+```
+# After launching all models in parallel with run_in_background: true,
+# you'll have multiple shell IDs (e.g., shell_1, shell_2, shell_3)
+
+# Poll ALL sessions in parallel using BashOutput:
+BashOutput(bash_id="shell_1")
+BashOutput(bash_id="shell_2")
+BashOutput(bash_id="shell_3")
+
+# Check status of each:
+# - If "running" or no final output → wait 30 seconds and poll again
+# - If complete → extract output and mark that model as done
+# - If error → record error and mark that model as failed
+
+# Continue polling every 30 seconds until ALL sessions complete or error
+```
+
+**Polling workflow:**
+
+1. After launching background processes, wait ~30 seconds
+2. Send a single message with BashOutput calls for ALL active sessions
+3. For each session, check if output contains final RESPONSE/METADATA sections
+4. If any session still running → wait 30 seconds and repeat
+5. Once all complete → proceed to Phase 6
+
+**For single-model consultations (if timeout):**
+
+If the CLI invocation times out (bash returns before completion), monitor the session:
 
 ```bash
 # Check session status every 30 seconds until done or error
@@ -632,6 +686,13 @@ When creating execution plans:
 **Phase 5 - Consultant Invocation:**
 - [ ] CLI invoked correctly (per --help)
 - [ ] Token usage summary displayed
+- [ ] For multi-model: All CLI calls launched in background mode (run_in_background: true)
+- [ ] For multi-model: All models launched in parallel (single message, multiple Bash calls)
+
+**Phase 5b - Session Monitoring (multi-model):**
+- [ ] Polling all sessions every 30 seconds using BashOutput
+- [ ] Checking all sessions in parallel (multiple BashOutput calls in one message)
+- [ ] Continuing until all sessions complete or error
 
 **Phase 6 - Output Parsing:**
 - [ ] RESPONSE section extracted
