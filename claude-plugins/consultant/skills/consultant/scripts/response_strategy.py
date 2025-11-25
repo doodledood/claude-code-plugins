@@ -5,12 +5,12 @@ Automatically detects responses API vs completions API support.
 """
 
 import time
-from pathlib import Path
-from typing import Optional, Dict, Set
 from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any
 
 import litellm
-from litellm import responses, completion, _should_retry
+from litellm import _should_retry, completion, responses
 
 import config
 
@@ -35,7 +35,7 @@ def _is_responses_api_model(model_name: str) -> bool:
 
     # GPT-4 and above (gpt-4, gpt-5, gpt-6, etc. but not gpt-3.5)
     # Matches: gpt-4, gpt4, gpt-4-turbo, gpt-5.1, gpt-6-turbo, etc.
-    gpt_match = re.search(r'gpt-?(\d+)', model_name)
+    gpt_match = re.search(r"gpt-?(\d+)", model_name)
     if gpt_match:
         version = int(gpt_match.group(1))
         if version >= 4:
@@ -43,7 +43,7 @@ def _is_responses_api_model(model_name: str) -> bool:
 
     # O-series reasoning models (o1, o2, o3, o4, etc.)
     # Matches: o1, o1-pro, o3-mini, o4-preview, etc.
-    if re.search(r'\bo\d+\b', model_name) or re.search(r'\bo\d+-', model_name):
+    if re.search(r"\bo\d+\b", model_name) or re.search(r"\bo\d+-", model_name):
         return True
 
     # Codex models (use responses API)
@@ -51,13 +51,10 @@ def _is_responses_api_model(model_name: str) -> bool:
         return True
 
     # Computer-use models
-    if "computer-use" in model_name:
-        return True
-
-    return False
+    return "computer-use" in model_name
 
 
-def get_responses_api_models() -> Set[str]:
+def get_responses_api_models() -> set[str]:
     """
     Determine which models support the native OpenAI Responses API.
 
@@ -67,7 +64,7 @@ def get_responses_api_models() -> Set[str]:
     Returns:
         Set of model identifiers that support the responses API natively.
     """
-    responses_models: Set[str] = set()
+    responses_models: set[str] = set()
 
     # Get OpenAI models from litellm
     openai_models = litellm.models_by_provider.get("openai", [])
@@ -120,12 +117,8 @@ class ResponseStrategy(ABC):
 
     @abstractmethod
     def execute(
-        self,
-        model: str,
-        prompt: str,
-        session_dir: Optional[Path] = None,
-        **kwargs
-    ) -> Dict:
+        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+    ) -> dict[str, Any]:
         """
         Execute LLM request with provider-specific strategy.
         Returns dict with 'content' and optional 'usage'.
@@ -137,15 +130,18 @@ class ResponseStrategy(ABC):
         """Whether this strategy supports resuming after failure"""
         raise NotImplementedError
 
-    def _calculate_backoff_delay(self, attempt: int, base_delay: int, max_delay: int) -> float:
+    def _calculate_backoff_delay(
+        self, attempt: int, base_delay: int, max_delay: int
+    ) -> float:
         """Calculate exponential backoff delay with jitter"""
-        delay = min(base_delay * (2 ** attempt), max_delay)
-        # Add 10% jitter to avoid thundering herd
         import random
-        jitter = delay * 0.1 * random.random()
-        return delay + jitter
 
-    def _extract_content(self, response) -> str:
+        delay = min(base_delay * (2**attempt), max_delay)
+        # Add 10% jitter to avoid thundering herd
+        jitter = delay * 0.1 * random.random()
+        return float(delay + jitter)
+
+    def _extract_content(self, response: Any) -> str:
         """
         Extract text content from response.output structure.
 
@@ -154,21 +150,21 @@ class ResponseStrategy(ABC):
         - ResponseReasoningItem (type='reasoning'): has summary, no content
         """
         content = ""
-        if hasattr(response, 'output') and response.output:
+        if hasattr(response, "output") and response.output:
             for item in response.output:
                 # Check item type - only 'message' type has content
-                item_type = getattr(item, 'type', None)
+                item_type = getattr(item, "type", None)
 
-                if item_type == 'message':
+                if item_type == "message":
                     # ResponseOutputMessage: extract text from content
-                    if hasattr(item, 'content') and item.content:
+                    if hasattr(item, "content") and item.content:
                         for content_item in item.content:
-                            if hasattr(content_item, 'text'):
+                            if hasattr(content_item, "text"):
                                 content += content_item.text
                 # Skip 'reasoning' items (ResponseReasoningItem) - they have summary, not content
         return content
 
-    def _serialize_usage(self, usage) -> Optional[Dict]:
+    def _serialize_usage(self, usage: Any) -> dict[str, Any] | None:
         """
         Safely convert usage object to a JSON-serializable dict.
         Handles Pydantic models (OpenAI), dataclasses, and plain dicts.
@@ -178,18 +174,20 @@ class ResponseStrategy(ABC):
 
         # Already a dict - return as-is
         if isinstance(usage, dict):
-            return usage
+            return dict(usage)
 
         # Pydantic v2 model
-        if hasattr(usage, 'model_dump'):
-            return usage.model_dump()
+        if hasattr(usage, "model_dump"):
+            result: dict[str, Any] = usage.model_dump()
+            return result
 
         # Pydantic v1 model
-        if hasattr(usage, 'dict'):
-            return usage.dict()
+        if hasattr(usage, "dict"):
+            result = usage.dict()
+            return dict(result)
 
         # Dataclass or object with __dict__
-        if hasattr(usage, '__dict__'):
+        if hasattr(usage, "__dict__"):
             return dict(usage.__dict__)
 
         # Last resort - try to convert directly
@@ -207,12 +205,8 @@ class BackgroundJobStrategy(ResponseStrategy):
     """
 
     def execute(
-        self,
-        model: str,
-        prompt: str,
-        session_dir: Optional[Path] = None,
-        **kwargs
-    ) -> Dict:
+        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+    ) -> dict[str, Any]:
         """Execute with background job and polling"""
 
         response_id_file = session_dir / "response_id.txt" if session_dir else None
@@ -230,7 +224,7 @@ class BackgroundJobStrategy(ResponseStrategy):
                 input=prompt,
                 background=True,  # Returns immediately with response_id
                 num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
-                **kwargs
+                **kwargs,
             )
 
             response_id = response.id
@@ -245,9 +239,9 @@ class BackgroundJobStrategy(ResponseStrategy):
 
         except Exception as e:
             # If background mode fails, maybe not supported - raise for fallback
-            raise RuntimeError(f"Background job failed to start: {e}")
+            raise RuntimeError(f"Background job failed to start: {e}") from e
 
-    def _poll_for_completion(self, response_id: str) -> Dict:
+    def _poll_for_completion(self, response_id: str) -> dict[str, Any]:
         """Poll for completion with exponential backoff and retries"""
 
         start_time = time.time()
@@ -258,18 +252,20 @@ class BackgroundJobStrategy(ResponseStrategy):
                 # Retrieve the response by ID
                 result = litellm.get_response(response_id=response_id)
 
-                if hasattr(result, 'status'):
+                if hasattr(result, "status"):
                     if result.status == "completed":
                         content = self._extract_content(result)
                         if not content:
                             raise RuntimeError("No content in completed response")
                         return {
                             "content": content,
-                            "usage": self._serialize_usage(getattr(result, 'usage', None)),
-                            "response": result  # Include full response for cost calculation
+                            "usage": self._serialize_usage(
+                                getattr(result, "usage", None)
+                            ),
+                            "response": result,  # Include full response for cost calculation
                         }
                     elif result.status == "failed":
-                        error = getattr(result, 'error', 'Unknown error')
+                        error = getattr(result, "error", "Unknown error")
                         raise RuntimeError(f"Background job failed: {error}")
                     elif result.status in ["in_progress", "queued"]:
                         # Still processing, wait and retry
@@ -286,8 +282,10 @@ class BackgroundJobStrategy(ResponseStrategy):
                     if content:
                         return {
                             "content": content,
-                            "usage": self._serialize_usage(getattr(result, 'usage', None)),
-                            "response": result  # Include full response for cost calculation
+                            "usage": self._serialize_usage(
+                                getattr(result, "usage", None)
+                            ),
+                            "response": result,  # Include full response for cost calculation
                         }
                     # No content, wait and retry
                     time.sleep(config.POLL_INTERVAL)
@@ -300,21 +298,25 @@ class BackgroundJobStrategy(ResponseStrategy):
                 if any(x in error_msg for x in ["network", "timeout", "connection"]):
                     if attempt < config.MAX_RETRIES:
                         delay = self._calculate_backoff_delay(
-                            attempt,
-                            config.INITIAL_RETRY_DELAY,
-                            config.MAX_RETRY_DELAY
+                            attempt, config.INITIAL_RETRY_DELAY, config.MAX_RETRY_DELAY
                         )
-                        print(f"Network error polling job, retrying in {delay:.1f}s... (attempt {attempt + 1}/{config.MAX_RETRIES})")
+                        print(
+                            f"Network error polling job, retrying in {delay:.1f}s... (attempt {attempt + 1}/{config.MAX_RETRIES})"
+                        )
                         time.sleep(delay)
                         attempt += 1
                         continue
                     else:
-                        raise RuntimeError(f"Network errors exceeded max retries: {e}")
+                        raise RuntimeError(
+                            f"Network errors exceeded max retries: {e}"
+                        ) from e
 
                 # Other errors - raise immediately
                 raise
 
-        raise TimeoutError(f"Background job {response_id} did not complete within {config.POLL_TIMEOUT}s")
+        raise TimeoutError(
+            f"Background job {response_id} did not complete within {config.POLL_TIMEOUT}s"
+        )
 
     def can_resume(self) -> bool:
         return True
@@ -327,12 +329,8 @@ class SyncRetryStrategy(ResponseStrategy):
     """
 
     def execute(
-        self,
-        model: str,
-        prompt: str,
-        session_dir: Optional[Path] = None,
-        **kwargs
-    ) -> Dict:
+        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+    ) -> dict[str, Any]:
         """Execute with synchronous retries using responses API"""
 
         for attempt in range(config.MAX_RETRIES):
@@ -342,7 +340,7 @@ class SyncRetryStrategy(ResponseStrategy):
                     input=prompt,
                     stream=False,
                     num_retries=config.MAX_RETRIES,  # Use LiteLLM's built-in retries
-                    **kwargs
+                    **kwargs,
                 )
 
                 content = self._extract_content(response)
@@ -352,35 +350,51 @@ class SyncRetryStrategy(ResponseStrategy):
 
                 return {
                     "content": content,
-                    "usage": self._serialize_usage(getattr(response, 'usage', None)),
-                    "response": response  # Include full response for cost calculation
+                    "usage": self._serialize_usage(getattr(response, "usage", None)),
+                    "response": response,  # Include full response for cost calculation
                 }
 
             except Exception as e:
                 # Use LiteLLM's built-in retry logic for HTTP errors
-                if _should_retry and hasattr(e, 'status_code'):
+                if _should_retry and hasattr(e, "status_code"):
                     retryable = _should_retry(e.status_code)
                 else:
                     # Fallback to string matching for non-HTTP errors
                     error_msg = str(e).lower()
-                    retryable = any(x in error_msg for x in [
-                        "network", "timeout", "connection",
-                        "429", "rate limit", "503", "overloaded"
-                    ])
-                    non_retryable = any(x in error_msg for x in [
-                        "auth", "key", "context", "token limit", "not found", "invalid"
-                    ])
+                    retryable = any(
+                        x in error_msg
+                        for x in [
+                            "network",
+                            "timeout",
+                            "connection",
+                            "429",
+                            "rate limit",
+                            "503",
+                            "overloaded",
+                        ]
+                    )
+                    non_retryable = any(
+                        x in error_msg
+                        for x in [
+                            "auth",
+                            "key",
+                            "context",
+                            "token limit",
+                            "not found",
+                            "invalid",
+                        ]
+                    )
 
                     if non_retryable:
                         raise
 
                 if retryable and attempt < config.MAX_RETRIES - 1:
                     delay = self._calculate_backoff_delay(
-                        attempt,
-                        config.INITIAL_RETRY_DELAY,
-                        config.MAX_RETRY_DELAY
+                        attempt, config.INITIAL_RETRY_DELAY, config.MAX_RETRY_DELAY
                     )
-                    print(f"Retryable error, waiting {delay:.1f}s before retry {attempt + 2}/{config.MAX_RETRIES}...")
+                    print(
+                        f"Retryable error, waiting {delay:.1f}s before retry {attempt + 2}/{config.MAX_RETRIES}..."
+                    )
                     time.sleep(delay)
                     continue
 
@@ -399,12 +413,8 @@ class CompletionsAPIStrategy(ResponseStrategy):
     """
 
     def execute(
-        self,
-        model: str,
-        prompt: str,
-        session_dir: Optional[Path] = None,
-        **kwargs
-    ) -> Dict:
+        self, model: str, prompt: str, session_dir: Path | None = None, **kwargs: Any
+    ) -> dict[str, Any]:
         """Execute with chat completions API"""
 
         # Remove responses-specific kwargs that don't apply to completions
@@ -419,7 +429,7 @@ class CompletionsAPIStrategy(ResponseStrategy):
                     messages=[{"role": "user", "content": prompt}],
                     stream=False,
                     num_retries=config.MAX_RETRIES,
-                    **kwargs
+                    **kwargs,
                 )
 
                 # Extract content from chat completion response
@@ -430,34 +440,50 @@ class CompletionsAPIStrategy(ResponseStrategy):
 
                 return {
                     "content": content,
-                    "usage": self._serialize_usage(getattr(response, 'usage', None)),
-                    "response": response
+                    "usage": self._serialize_usage(getattr(response, "usage", None)),
+                    "response": response,
                 }
 
             except Exception as e:
                 # Use LiteLLM's built-in retry logic for HTTP errors
-                if _should_retry and hasattr(e, 'status_code'):
+                if _should_retry and hasattr(e, "status_code"):
                     retryable = _should_retry(e.status_code)
                 else:
                     error_msg = str(e).lower()
-                    retryable = any(x in error_msg for x in [
-                        "network", "timeout", "connection",
-                        "429", "rate limit", "503", "overloaded"
-                    ])
-                    non_retryable = any(x in error_msg for x in [
-                        "auth", "key", "context", "token limit", "not found", "invalid"
-                    ])
+                    retryable = any(
+                        x in error_msg
+                        for x in [
+                            "network",
+                            "timeout",
+                            "connection",
+                            "429",
+                            "rate limit",
+                            "503",
+                            "overloaded",
+                        ]
+                    )
+                    non_retryable = any(
+                        x in error_msg
+                        for x in [
+                            "auth",
+                            "key",
+                            "context",
+                            "token limit",
+                            "not found",
+                            "invalid",
+                        ]
+                    )
 
                     if non_retryable:
                         raise
 
                 if retryable and attempt < config.MAX_RETRIES - 1:
                     delay = self._calculate_backoff_delay(
-                        attempt,
-                        config.INITIAL_RETRY_DELAY,
-                        config.MAX_RETRY_DELAY
+                        attempt, config.INITIAL_RETRY_DELAY, config.MAX_RETRY_DELAY
                     )
-                    print(f"Retryable error, waiting {delay:.1f}s before retry {attempt + 2}/{config.MAX_RETRIES}...")
+                    print(
+                        f"Retryable error, waiting {delay:.1f}s before retry {attempt + 2}/{config.MAX_RETRIES}..."
+                    )
                     time.sleep(delay)
                     continue
 
@@ -465,11 +491,11 @@ class CompletionsAPIStrategy(ResponseStrategy):
 
         raise RuntimeError("Max retries exceeded")
 
-    def _extract_completion_content(self, response) -> str:
+    def _extract_completion_content(self, response: Any) -> str:
         """Extract text content from chat completions response"""
-        if hasattr(response, 'choices') and response.choices:
+        if hasattr(response, "choices") and response.choices:
             choice = response.choices[0]
-            if hasattr(choice, 'message') and hasattr(choice.message, 'content'):
+            if hasattr(choice, "message") and hasattr(choice.message, "content"):
                 return choice.message.content or ""
         return ""
 
@@ -513,8 +539,10 @@ class ResponseStrategyFactory:
     def supports_background(model: str) -> bool:
         """Check if model supports background job execution (OpenAI/Azure only)"""
         model_lower = model.lower()
-        return any(model_lower.startswith(prefix)
-                   for prefix in ResponseStrategyFactory.BACKGROUND_SUPPORTED)
+        return any(
+            model_lower.startswith(prefix)
+            for prefix in ResponseStrategyFactory.BACKGROUND_SUPPORTED
+        )
 
     @staticmethod
     def get_api_type(model: str) -> str:

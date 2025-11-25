@@ -3,31 +3,26 @@ LiteLLM client wrapper with token counting and error handling
 """
 
 import os
-import requests
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Any
+
+import requests
+from litellm import (
+    completion_cost,
+    get_max_tokens,
+    token_counter,
+    validate_environment,
+)
+from litellm.utils import get_model_info
+
 import config
-
-try:
-    import litellm
-    from litellm import responses, token_counter, get_max_tokens, validate_environment, completion_cost
-    from litellm.utils import get_model_info
-    LITELLM_AVAILABLE = True
-except ImportError:
-    LITELLM_AVAILABLE = False
-
-from response_strategy import ResponseStrategyFactory, supports_responses_api
+from response_strategy import ResponseStrategyFactory
 
 
 class LiteLLMClient:
     """Wrapper around LiteLLM with enhanced functionality"""
 
-    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None):
-        if not LITELLM_AVAILABLE:
-            raise ImportError(
-                "LiteLLM is not installed. Install with: pip install litellm"
-            )
-
+    def __init__(self, base_url: str | None = None, api_key: str | None = None) -> None:
         self.base_url = base_url
         self.api_key = api_key or config.get_api_key()
 
@@ -41,10 +36,10 @@ class LiteLLMClient:
         self,
         model: str,
         prompt: str,
-        session_dir: Optional[Path] = None,
+        session_dir: Path | None = None,
         reasoning_effort: str = "high",
-        **kwargs
-    ) -> Dict:
+        **kwargs: Any,
+    ) -> dict[str, Any]:
         """
         Make a request using the responses API with automatic retry/background job handling.
 
@@ -75,30 +70,30 @@ class LiteLLMClient:
 
         if session_dir:
             api_type = ResponseStrategyFactory.get_api_type(model)
-            print(f"Using {strategy.__class__.__name__} (resumable: {strategy.can_resume()})")
+            print(
+                f"Using {strategy.__class__.__name__} (resumable: {strategy.can_resume()})"
+            )
             print(f"API: {api_type} | Reasoning effort: {reasoning_effort}")
 
         try:
             # Execute with strategy-specific retry/background logic
-            return strategy.execute(
-                model=model,
-                prompt=prompt,
-                session_dir=session_dir,
-                **kwargs
+            result: dict[str, Any] = strategy.execute(
+                model=model, prompt=prompt, session_dir=session_dir, **kwargs
             )
+            return result
 
         except Exception as e:
             # Map to standardized errors
             error_msg = str(e)
 
             if "context" in error_msg.lower() or "token" in error_msg.lower():
-                raise ValueError(f"Context limit exceeded: {error_msg}")
+                raise ValueError(f"Context limit exceeded: {error_msg}") from e
             elif "auth" in error_msg.lower() or "key" in error_msg.lower():
-                raise PermissionError(f"Authentication failed: {error_msg}")
+                raise PermissionError(f"Authentication failed: {error_msg}") from e
             elif "not found" in error_msg.lower() or "404" in error_msg:
-                raise ValueError(f"Model not found: {error_msg}")
+                raise ValueError(f"Model not found: {error_msg}") from e
             else:
-                raise RuntimeError(f"LLM request failed: {error_msg}")
+                raise RuntimeError(f"LLM request failed: {error_msg}") from e
 
     def count_tokens(self, text: str, model: str) -> int:
         """
@@ -111,10 +106,7 @@ class LiteLLMClient:
         # If using a proxy (base_url set), use the proxy's token counter endpoint
         if self.base_url:
             url = f"{self.base_url.rstrip('/')}/utils/token_counter"
-            payload = {
-                "model": model,
-                "text": text
-            }
+            payload = {"model": model, "text": text}
 
             headers = {"Content-Type": "application/json"}
             if self.api_key:
@@ -127,29 +119,40 @@ class LiteLLMClient:
             result = response.json()
             token_count = result.get("token_count") or result.get("tokens")
             if token_count is None:
-                raise RuntimeError(f"Proxy token counter returned invalid response: {result}")
-            return token_count
+                raise RuntimeError(
+                    f"Proxy token counter returned invalid response: {result}"
+                )
+            return int(token_count)
 
         # Use local token counter (direct API mode)
-        return token_counter(model=model, text=text)
+        return int(token_counter(model=model, text=text))
 
     def get_max_tokens(self, model: str) -> int:
         """Get maximum context size for model"""
 
         try:
-            return get_max_tokens(model)
+            return int(get_max_tokens(model))
         except Exception as e:
             # Try get_model_info as alternative method
             try:
                 info = get_model_info(model=model)
                 max_tokens = info.get("max_tokens")
                 if max_tokens is None:
-                    raise RuntimeError(f"Could not determine max_tokens for model {model}")
-                return max_tokens
+                    raise RuntimeError(
+                        f"Could not determine max_tokens for model {model}"
+                    )
+                return int(max_tokens)
             except Exception as inner_e:
-                raise RuntimeError(f"Could not get max tokens for model {model}: {e}, {inner_e}")
+                raise RuntimeError(
+                    f"Could not get max tokens for model {model}: {e}, {inner_e}"
+                ) from inner_e
 
-    def calculate_cost(self, model: str, response=None, usage: Optional[Dict] = None) -> Optional[Dict]:
+    def calculate_cost(
+        self,
+        model: str,
+        response: Any = None,
+        usage: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
         """
         Calculate cost using LiteLLM's built-in completion_cost() function.
 
@@ -167,13 +170,17 @@ class LiteLLMClient:
                 total_cost = completion_cost(completion_response=response)
 
                 # Extract token counts from response.usage if available
-                if hasattr(response, 'usage'):
+                if hasattr(response, "usage"):
                     usage = response.usage
 
             # Calculate from usage dict if provided
             if usage:
-                input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens", 0)
-                output_tokens = usage.get("completion_tokens") or usage.get("output_tokens", 0)
+                input_tokens = usage.get("prompt_tokens") or usage.get(
+                    "input_tokens", 0
+                )
+                output_tokens = usage.get("completion_tokens") or usage.get(
+                    "output_tokens", 0
+                )
 
                 # Get per-token costs from model info
                 info = get_model_info(model=model)
@@ -193,7 +200,7 @@ class LiteLLMClient:
                     "input_cost": input_cost,
                     "output_cost": output_cost,
                     "total_cost": total_cost,
-                    "currency": "USD"
+                    "currency": "USD",
                 }
 
             return None
@@ -202,30 +209,27 @@ class LiteLLMClient:
             # If we can't get pricing info, return None
             return None
 
-    def validate_environment(self, model: str) -> Dict:
+    def validate_environment(self, model: str) -> dict[str, Any]:
         """
         Check if required environment variables are set for the model.
         Returns dict with 'keys_in_environment' (bool) and 'missing_keys' (list).
         """
         try:
-            return validate_environment(model=model)
+            result: dict[str, Any] = validate_environment(model=model)
+            return result
         except Exception as e:
             # If validation fails, return a generic response
             return {
                 "keys_in_environment": False,
                 "missing_keys": ["API_KEY"],
-                "error": str(e)
+                "error": str(e),
             }
 
     def test_connection(self, model: str) -> bool:
         """Test if we can connect to the model"""
 
         try:
-            result = self.complete(
-                model=model,
-                prompt="Hello",
-                max_tokens=5
-            )
+            result = self.complete(model=model, prompt="Hello", max_tokens=5)
             return result.get("content") is not None
         except Exception:
             return False

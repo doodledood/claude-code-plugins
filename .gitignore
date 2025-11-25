@@ -41,6 +41,10 @@ htmlcov/
 .pytest_cache/
 .tox/
 
+# Type checking
+.mypy_cache/
+.ruff_cache/
+
 # uv
 .uv/
 uv.lock

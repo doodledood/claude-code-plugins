@@ -2,28 +2,17 @@
 Model discovery and selection logic
 """
 
-import json
-from typing import List, Dict, Optional
+from typing import Any
 
-try:
-    import requests
-    REQUESTS_AVAILABLE = True
-except ImportError:
-    REQUESTS_AVAILABLE = False
-
-try:
-    from litellm import model_cost
-    LITELLM_AVAILABLE = True
-except ImportError:
-    LITELLM_AVAILABLE = False
-    model_cost = {}
+import requests
+from litellm import model_cost
 
 
 class ModelSelector:
     """Handles model discovery and automatic selection"""
 
     @staticmethod
-    def list_models(base_url: Optional[str] = None) -> List[Dict]:
+    def list_models(base_url: str | None = None) -> list[dict[str, Any]]:
         """
         Query available models.
 
@@ -34,9 +23,6 @@ class ModelSelector:
         if not base_url:
             # Use LiteLLM's model_cost for dynamic discovery
             return ModelSelector._get_litellm_models()
-
-        if not REQUESTS_AVAILABLE:
-            raise RuntimeError("requests library not available - cannot fetch models from proxy")
 
         # Try LiteLLM proxy /models endpoint first, then OpenAI-compatible /v1/models
         last_error = None
@@ -65,7 +51,7 @@ class ModelSelector:
         raise RuntimeError(f"Could not fetch models from {base_url}: {last_error}")
 
     @staticmethod
-    def select_best_model(base_url: Optional[str] = None) -> str:
+    def select_best_model(base_url: str | None = None) -> str:
         """
         Automatically select the best available model.
         Heuristic: Prefer models with "large", "pro", or higher version numbers
@@ -81,10 +67,10 @@ class ModelSelector:
         model_id = best_model.get("id")
         if not model_id:
             raise RuntimeError("Best model has no id - cannot auto-select model")
-        return model_id
+        return str(model_id)
 
     @staticmethod
-    def _score_model(model: Dict) -> float:
+    def _score_model(model: dict[str, Any]) -> float:
         """Score a model based on capabilities (higher is better)"""
 
         model_id = model.get("id", "").lower()
@@ -132,14 +118,11 @@ class ModelSelector:
         return score
 
     @staticmethod
-    def _get_litellm_models() -> List[Dict]:
+    def _get_litellm_models() -> list[dict[str, Any]]:
         """
         Get models from LiteLLM's model_cost dictionary.
         This provides dynamic model discovery without hardcoded lists.
         """
-
-        if not LITELLM_AVAILABLE:
-            raise RuntimeError("LiteLLM is not installed - cannot discover models")
 
         if not model_cost:
             raise RuntimeError("LiteLLM model_cost is empty - cannot discover models")
@@ -147,12 +130,14 @@ class ModelSelector:
         # Convert model_cost dictionary to list format
         models = []
         for model_id, info in model_cost.items():
-            models.append({
-                "id": model_id,
-                "provider": info.get("litellm_provider", "unknown"),
-                "max_tokens": info.get("max_tokens"),
-                "input_cost_per_token": info.get("input_cost_per_token"),
-                "output_cost_per_token": info.get("output_cost_per_token"),
-            })
+            models.append(
+                {
+                    "id": model_id,
+                    "provider": info.get("litellm_provider", "unknown"),
+                    "max_tokens": info.get("max_tokens"),
+                    "input_cost_per_token": info.get("input_cost_per_token"),
+                    "output_cost_per_token": info.get("output_cost_per_token"),
+                }
+            )
 
         return models

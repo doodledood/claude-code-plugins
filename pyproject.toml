@@ -1,0 +1,54 @@
+[project]
+name = "claude-code-plugins"
+version = "1.0.0"
+requires-python = ">=3.9"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+files = [
+    "claude-plugins/consultant/skills/consultant/scripts",
+    "claude-plugins/planning/hooks"
+]
+explicit_package_bases = true
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "E402",  # module level import not at top (needed for sys.path manipulation)
+    "SIM102", # nested if statements (often more readable)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "session_manager", "litellm_client", "model_selector", "response_strategy"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]

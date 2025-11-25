@@ -3,13 +3,14 @@ Session management for async consultant executions
 Handles background processes, session persistence, and status tracking
 """
 
+import builtins
+import contextlib
 import json
-import time
 import multiprocessing
-import sys
-from pathlib import Path
+import time
 from datetime import datetime
-from typing import Dict, Optional, List
+from pathlib import Path
+from typing import Any
 
 import config
 
@@ -17,7 +18,7 @@ import config
 class SessionManager:
     """Manages consultant sessions with async execution"""
 
-    def __init__(self, sessions_dir: Optional[Path] = None):
+    def __init__(self, sessions_dir: Path | None = None) -> None:
         self.sessions_dir = sessions_dir or config.DEFAULT_SESSIONS_DIR
         self.sessions_dir.mkdir(parents=True, exist_ok=True)
 
@@ -26,9 +27,9 @@ class SessionManager:
         slug: str,
         prompt: str,
         model: str,
-        base_url: Optional[str] = None,
-        api_key: Optional[str] = None,
-        reasoning_effort: str = "high"
+        base_url: str | None = None,
+        api_key: str | None = None,
+        reasoning_effort: str = "high",
     ) -> str:
         """Create a new session and start background execution"""
 
@@ -45,7 +46,7 @@ class SessionManager:
             "model": model,
             "base_url": base_url,
             "reasoning_effort": reasoning_effort,
-            "prompt_preview": prompt[:200] + "..." if len(prompt) > 200 else prompt
+            "prompt_preview": prompt[:200] + "..." if len(prompt) > 200 else prompt,
         }
 
         metadata_file = session_dir / "metadata.json"
@@ -58,7 +59,7 @@ class SessionManager:
         # Start background process
         process = multiprocessing.Process(
             target=self._execute_session,
-            args=(session_id, prompt, model, base_url, api_key, reasoning_effort)
+            args=(session_id, prompt, model, base_url, api_key, reasoning_effort),
         )
         process.start()
 
@@ -72,10 +73,10 @@ class SessionManager:
         session_id: str,
         prompt: str,
         model: str,
-        base_url: Optional[str],
-        api_key: Optional[str],
-        reasoning_effort: str = "high"
-    ):
+        base_url: str | None,
+        api_key: str | None,
+        reasoning_effort: str = "high",
+    ) -> None:
         """Background execution of LLM consultation"""
 
         session_dir = self.sessions_dir / session_id
@@ -95,12 +96,14 @@ class SessionManager:
                 model=model,
                 prompt=prompt,
                 session_dir=session_dir,  # Enables background job resumption if supported
-                reasoning_effort=reasoning_effort
+                reasoning_effort=reasoning_effort,
             )
 
             full_response = result.get("content", "")
             usage = result.get("usage")
-            response_obj = result.get("response")  # Full response object for cost calculation
+            response_obj = result.get(
+                "response"
+            )  # Full response object for cost calculation
 
             # Save response to file
             output_file = session_dir / "output.txt"
@@ -109,7 +112,9 @@ class SessionManager:
             # Calculate cost using response object (preferred) or usage dict (fallback)
             cost_info = None
             if response_obj or usage:
-                cost_info = client.calculate_cost(model, response=response_obj, usage=usage)
+                cost_info = client.calculate_cost(
+                    model, response=response_obj, usage=usage
+                )
 
             # Update metadata with usage and cost
             self._update_status(
@@ -118,7 +123,7 @@ class SessionManager:
                 response=full_response,
                 usage=usage,
                 cost_info=cost_info,
-                reasoning_effort=reasoning_effort
+                reasoning_effort=reasoning_effort,
             )
 
         except Exception as e:
@@ -130,12 +135,12 @@ class SessionManager:
         self,
         session_id: str,
         status: str,
-        response: Optional[str] = None,
-        error: Optional[str] = None,
-        usage: Optional[Dict] = None,
-        cost_info: Optional[Dict] = None,
-        reasoning_effort: Optional[str] = None
-    ):
+        response: str | None = None,
+        error: str | None = None,
+        usage: dict[str, Any] | None = None,
+        cost_info: dict[str, Any] | None = None,
+        reasoning_effort: str | None = None,
+    ) -> None:
         """Update session status in metadata"""
 
         session_dir = self.sessions_dir / session_id
@@ -166,15 +171,18 @@ class SessionManager:
 
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
-    def get_session_status(self, slug: str) -> Dict:
+    def get_session_status(self, slug: str) -> dict[str, Any]:
         """Get current status of a session by slug"""
 
         # Find most recent session with this slug
         matching_sessions = sorted(
-            [d for d in self.sessions_dir.iterdir()
-             if d.is_dir() and d.name.startswith(slug)],
+            [
+                d
+                for d in self.sessions_dir.iterdir()
+                if d.is_dir() and d.name.startswith(slug)
+            ],
             key=lambda x: x.stat().st_mtime,
-            reverse=True
+            reverse=True,
         )
 
         if not matching_sessions:
@@ -186,7 +194,7 @@ class SessionManager:
         if not metadata_file.exists():
             return {"error": f"Session metadata not found: {slug}"}
 
-        metadata = json.loads(metadata_file.read_text())
+        metadata: dict[str, Any] = json.loads(metadata_file.read_text())
 
         # Add output if completed
         if metadata["status"] == "completed":
@@ -202,7 +210,9 @@ class SessionManager:
 
         return metadata
 
-    def wait_for_completion(self, session_id: str, timeout: int = 3600):
+    def wait_for_completion(
+        self, session_id: str, timeout: int = 3600
+    ) -> dict[str, Any]:
         """Block until session completes or timeout"""
 
         start_time = time.time()
@@ -215,7 +225,7 @@ class SessionManager:
                 time.sleep(1)
                 continue
 
-            metadata = json.loads(metadata_file.read_text())
+            metadata: dict[str, Any] = json.loads(metadata_file.read_text())
 
             if metadata["status"] in ["completed", "error"]:
                 # Add output if completed
@@ -236,7 +246,7 @@ class SessionManager:
 
         raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
 
-    def list_sessions(self) -> List[Dict]:
+    def list_sessions(self) -> list[dict[str, Any]]:
         """List all sessions"""
 
         sessions = []
@@ -246,9 +256,7 @@ class SessionManager:
 
             metadata_file = session_dir / "metadata.json"
             if metadata_file.exists():
-                try:
+                with contextlib.suppress(builtins.BaseException):
                     sessions.append(json.loads(metadata_file.read_text()))
-                except:
-                    pass
 
         return sorted(sessions, key=lambda x: x.get("created_at", ""), reverse=True)
