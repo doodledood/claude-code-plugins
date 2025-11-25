@@ -52,14 +52,16 @@ The request type is flexible (reviews, architecture, bugs, planning, etc.) - but
 
 If the user requests analysis from **multiple models** (e.g., "compare what GPT-4 and Claude think about this"):
 
-1. This is a valid workflow - invoke the CLI multiple times with different models
-2. Save each model's output to a separate file:
+1. This is a valid workflow - the only difference is invoking the CLI multiple times
+2. **Invoke all CLI calls in parallel** (same prompt, different models)
+3. Monitor all sessions until completion
+4. Save each model's output to a separate file:
    ```
    consultant_response_<model1>.md
    consultant_response_<model2>.md
    ```
-3. Relay each model's output separately, clearly labeled
-4. Report all file paths to the user
+5. Relay each model's output separately, clearly labeled
+6. Report all file paths to the user
 
 **Do NOT:**
 - Compare or synthesize the results yourself
@@ -86,15 +88,12 @@ Simply relay each model's output verbatim and let the user draw conclusions.
 [ ] Relay output and report file path to user
 ```
 
-**For multi-model consultations, expand the invoke/monitor/save steps:**
+**For multi-model consultations, replace CLI invocation step with parallel calls:**
 
 ```
-[ ] Invoke consultant CLI with model A
-[ ] Monitor model A session until completion
-[ ] Save model A output to consultant_response_<modelA>.md
-[ ] Invoke consultant CLI with model B
-[ ] Monitor model B session until completion
-[ ] Save model B output to consultant_response_<modelB>.md
+[ ] Invoke consultant CLI in parallel (model A, model B, ...)
+[ ] Monitor all sessions until completion
+[ ] Save each model's output to consultant_response_<model>.md
 [ ] Relay all outputs and report all file paths
 ```
 
