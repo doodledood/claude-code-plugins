@@ -347,3 +347,8 @@ def build_multimodal_content_for_completions_api(
 def has_images(files: list[ProcessedFile]) -> bool:
     """Check if any processed files are images"""
     return any(f.category == FileCategory.IMAGE for f in files)
+
+
+# Alias for backwards compatibility - uses Completions API format
+# (strategies will convert to Responses API format as needed)
+build_multimodal_content = build_multimodal_content_for_completions_api
