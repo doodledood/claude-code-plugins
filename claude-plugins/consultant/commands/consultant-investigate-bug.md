@@ -1,14 +1,14 @@
 ---
-description: Deep bug investigation using consultant-consulter agent. Identifies root causes, traces execution flow, assesses blast radius, and provides concrete fix suggestions with regression test recommendations.
+description: Deep bug investigation using consultant agent. Identifies root causes, traces execution flow, assesses blast radius, and provides concrete fix suggestions with regression test recommendations.
 ---
 
 # Consultant Investigate Bug Command
 
-Performs deep bug investigation using the consultant-consulter agent.
+Performs deep bug investigation using the consultant agent.
 
 ## What It Does
 
-Invokes the consultant-consulter agent to investigate a bug:
+Invokes the consultant agent to investigate a bug:
 
 1. Gathers bug symptoms from context or user description
 2. Collects relevant files, error logs, and recent changes
@@ -30,7 +30,7 @@ The investigation provides:
 
 ## What Gets Investigated
 
-The consultant-consulter agent analyzes:
+The consultant agent analyzes:
 
 1. **Error Context**: Stack traces, error messages, logs
 2. **Recent Changes**: Git history, recent commits, PRs that might have introduced the bug
@@ -136,7 +136,7 @@ The consultant CLI reads these environment variables (run the CLI with --help fo
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` for a bug investigation task. The agent will:
+This command invokes the Task tool with `subagent_type='consultant:consultant'` for a bug investigation task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather bug symptoms and related files
 3. Construct an investigation prompt with appropriate role and focus areas

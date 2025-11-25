@@ -1,14 +1,14 @@
 ---
-description: Create comprehensive execution plans using consultant-consulter agent for deep analysis and specification design. Gathers codebase context, analyzes patterns, and provides detailed implementation steps with validation criteria.
+description: Create comprehensive execution plans using consultant agent for deep analysis and specification design. Gathers codebase context, analyzes patterns, and provides detailed implementation steps with validation criteria.
 ---
 
 # Consultant ExecPlan Command
 
-Creates comprehensive execution plans using the consultant-consulter agent.
+Creates comprehensive execution plans using the consultant agent.
 
 ## What It Does
 
-Invokes the consultant-consulter agent to create a detailed implementation plan:
+Invokes the consultant agent to create a detailed implementation plan:
 
 1. Gathers comprehensive codebase context
 2. Analyzes existing patterns and architecture
@@ -32,7 +32,7 @@ The execution plan provides:
 
 ## What Gets Analyzed
 
-The consultant-consulter agent analyzes:
+The consultant agent analyzes:
 
 1. **Codebase Structure**: Existing architecture, patterns, conventions
 2. **Related Features**: Similar implementations, reusable components
@@ -210,7 +210,7 @@ The consultant CLI reads these environment variables (run the CLI with --help fo
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` for an execution planning task. The agent will:
+This command invokes the Task tool with `subagent_type='consultant:consultant'` for an execution planning task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather codebase context and similar implementations
 3. Construct a planning prompt with appropriate role and focus areas

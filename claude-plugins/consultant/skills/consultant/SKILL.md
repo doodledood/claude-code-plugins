@@ -445,9 +445,9 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --slug "pr-review"
 ```
 
-## Integration with Consultant-Consulter Agent
+## Integration with Consultant Agent
 
-The consultant-consulter agent uses this Python CLI automatically. When you invoke:
+The consultant agent uses this Python CLI automatically. When you invoke:
 
 - `/consultant-review`
 - `/consultant-investigate-bug`

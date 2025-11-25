@@ -42,7 +42,7 @@ All plugins are located in `claude-plugins/`:
 Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-powered code analysis across 100+ models.
 
 **Components:**
-- **Agent:** `consultant-consulter` - Expert agent for multi-provider AI analysis with automatic model selection
+- **Agent:** `consultant` - Expert agent for multi-provider AI analysis with automatic model selection
 - **Commands:**
   - `/consultant-review` - Production-level PR reviews with severity-tagged findings
   - `/consultant-investigate-bug` - Deep bug investigation with root cause analysis

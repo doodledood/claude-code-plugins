@@ -81,7 +81,7 @@ consultant/
 │   ├── model_selector.py          # Auto model selection
 │   ├── session_manager.py         # Async session handling
 │   └── config.py                  # Configuration constants
-├── agents/consultant-consulter.md # Agent that orchestrates the CLI
+├── agents/consultant.md           # Agent that orchestrates the CLI
 └── commands/                      # Slash commands (/consultant-review, etc.)
 ```
 

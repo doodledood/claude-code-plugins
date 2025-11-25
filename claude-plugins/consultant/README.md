@@ -18,11 +18,11 @@ Consultant is a Claude Code plugin that provides access to powerful LLM models f
 
 ✅ **Async Execution**: Background sessions with status tracking and reattachment
 
-✅ **Full-Featured**: Includes consultant-consulter agent, review/bug-investigation/execplan commands
+✅ **Full-Featured**: Includes consultant agent, review/bug-investigation/execplan commands
 
 ## Components
 
-### Agent: consultant-consulter
+### Agent: consultant
 
 Expert agent for leveraging powerful LLM analysis through Python/LiteLLM. Handles the full workflow from context gathering to findings synthesis.
 

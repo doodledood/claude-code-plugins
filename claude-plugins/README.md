@@ -39,7 +39,7 @@ List available plugins:
 Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-powered code analysis across 100+ models.
 
 **Features:**
-- `consultant-consulter` agent - Expert agent for multi-provider AI analysis with automatic model selection
+- `consultant` agent - Expert agent for multi-provider AI analysis with automatic model selection
 - `/consultant-review` command - Production-level PR reviews with severity-tagged findings
 - `/consultant-investigate-bug` command - Deep bug investigation with root cause analysis
 - `/consultant-execplan` command - Comprehensive execution planning with architectural analysis

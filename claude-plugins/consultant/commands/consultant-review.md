@@ -1,14 +1,14 @@
 ---
-description: Production-level PR review using consultant-consulter agent. Provides severity-tagged findings, regression test guidance, and security validation using any LiteLLM-compatible model.
+description: Production-level PR review using consultant agent. Provides severity-tagged findings, regression test guidance, and security validation using any LiteLLM-compatible model.
 ---
 
 # Consultant Review Command
 
-Performs a comprehensive PR review using the consultant-consulter agent.
+Performs a comprehensive PR review using the consultant agent.
 
 ## What It Does
 
-Invokes the consultant-consulter agent to perform a thorough code review:
+Invokes the consultant agent to perform a thorough code review:
 
 1. Gathers all changed files and generates extensive diffs
 2. Organizes code into prioritized attachments (core logic, schemas, tests, infrastructure)
@@ -30,7 +30,7 @@ The review provides:
 
 ## What Gets Reviewed
 
-The consultant-consulter agent analyzes:
+The consultant agent analyzes:
 
 1. **Core Logic**: Business rules, algorithms, state machines, domain models
 2. **Schemas/Types**: Database schemas, API contracts, type definitions, interfaces
@@ -87,7 +87,7 @@ The consultant CLI reads these environment variables (run the CLI with --help fo
 
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant-consulter'` for a PR review task. The agent will:
+This command invokes the Task tool with `subagent_type='consultant:consultant'` for a PR review task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather diffs and organize into prioritized attachments
 3. Construct a review prompt with appropriate role and focus areas
