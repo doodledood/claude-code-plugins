@@ -16,7 +16,7 @@ try:
 except ImportError:
     LITELLM_AVAILABLE = False
 
-from response_strategy import ResponseStrategyFactory
+from response_strategy import ResponseStrategyFactory, supports_responses_api
 
 
 class LiteLLMClient:
@@ -74,8 +74,9 @@ class LiteLLMClient:
         strategy = ResponseStrategyFactory.get_strategy(model)
 
         if session_dir:
+            api_type = ResponseStrategyFactory.get_api_type(model)
             print(f"Using {strategy.__class__.__name__} (resumable: {strategy.can_resume()})")
-            print(f"Reasoning effort: {reasoning_effort}")
+            print(f"API: {api_type} | Reasoning effort: {reasoning_effort}")
 
         try:
             # Execute with strategy-specific retry/background logic

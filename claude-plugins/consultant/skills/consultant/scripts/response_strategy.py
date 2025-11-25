@@ -1,22 +1,126 @@
 """
 Response strategies for different LLM providers.
 Handles retries, background jobs, and provider-specific quirks.
+Automatically detects responses API vs completions API support.
 """
 
 import time
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, Set
 from abc import ABC, abstractmethod
 
 try:
     import litellm
-    from litellm import responses, _should_retry
+    from litellm import responses, completion, _should_retry
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
     _should_retry = None
 
 import config
+
+
+def _is_responses_api_model(model_name: str) -> bool:
+    """
+    Check if a model name indicates responses API support.
+
+    Uses general patterns that will work for future model versions:
+    - GPT-4+ (gpt-4, gpt-5, gpt-6, etc.)
+    - O-series reasoning models (o1, o2, o3, o4, etc.)
+    - Codex models
+    - Computer-use models
+
+    Args:
+        model_name: Model name without provider prefix (lowercase)
+
+    Returns:
+        True if model should use responses API
+    """
+    import re
+
+    # GPT-4 and above (gpt-4, gpt-5, gpt-6, etc. but not gpt-3.5)
+    # Matches: gpt-4, gpt4, gpt-4-turbo, gpt-5.1, gpt-6-turbo, etc.
+    gpt_match = re.search(r'gpt-?(\d+)', model_name)
+    if gpt_match:
+        version = int(gpt_match.group(1))
+        if version >= 4:
+            return True
+
+    # O-series reasoning models (o1, o2, o3, o4, etc.)
+    # Matches: o1, o1-pro, o3-mini, o4-preview, etc.
+    if re.search(r'\bo\d+\b', model_name) or re.search(r'\bo\d+-', model_name):
+        return True
+
+    # Codex models (use responses API)
+    if "codex" in model_name:
+        return True
+
+    # Computer-use models
+    if "computer-use" in model_name:
+        return True
+
+    return False
+
+
+def get_responses_api_models() -> Set[str]:
+    """
+    Determine which models support the native OpenAI Responses API.
+
+    Uses litellm.models_by_provider to get OpenAI models, then filters
+    to those that support the responses API.
+
+    Returns:
+        Set of model identifiers that support the responses API natively.
+    """
+    responses_models: Set[str] = set()
+
+    if not LITELLM_AVAILABLE:
+        return responses_models
+
+    # Get OpenAI models from litellm
+    openai_models = litellm.models_by_provider.get("openai", [])
+    azure_models = litellm.models_by_provider.get("azure", [])
+
+    for model in openai_models + azure_models:
+        if _is_responses_api_model(model.lower()):
+            responses_models.add(model)
+            responses_models.add(f"openai/{model}")
+            responses_models.add(f"azure/{model}")
+
+    return responses_models
+
+
+def supports_responses_api(model: str) -> bool:
+    """
+    Check if a model supports the native OpenAI Responses API.
+
+    Uses general patterns that work for current and future models:
+    - GPT-4+ series (gpt-4, gpt-5, gpt-6, etc.)
+    - O-series reasoning models (o1, o2, o3, etc.)
+    - Codex models
+    - Computer-use models
+
+    Args:
+        model: Model identifier (e.g., "openai/gpt-4", "gpt-5-mini")
+
+    Returns:
+        True if model supports responses API natively, False otherwise.
+    """
+    model_lower = model.lower()
+
+    # Extract model name and provider
+    if "/" in model_lower:
+        provider, model_name = model_lower.split("/", 1)
+    else:
+        provider = "openai"  # Default provider for bare model names
+        model_name = model_lower
+
+    # Only OpenAI and Azure support the responses API natively
+    if provider not in ("openai", "azure"):
+        return False
+
+    # Use the generalized pattern matching
+    return _is_responses_api_model(model_name)
 
 
 class ResponseStrategy(ABC):
@@ -226,7 +330,7 @@ class BackgroundJobStrategy(ResponseStrategy):
 
 class SyncRetryStrategy(ResponseStrategy):
     """
-    For Anthropic/Google/other providers - direct sync calls with retry logic.
+    For OpenAI/Azure models using responses API - direct sync calls with retry logic.
     Cannot resume - must retry from scratch if it fails.
     """
 
@@ -237,7 +341,7 @@ class SyncRetryStrategy(ResponseStrategy):
         session_dir: Optional[Path] = None,
         **kwargs
     ) -> Dict:
-        """Execute with synchronous retries"""
+        """Execute with synchronous retries using responses API"""
 
         for attempt in range(config.MAX_RETRIES):
             try:
@@ -296,38 +400,139 @@ class SyncRetryStrategy(ResponseStrategy):
         return False
 
 
-class ResponseStrategyFactory:
-    """Factory to select appropriate strategy based on model/provider"""
+class CompletionsAPIStrategy(ResponseStrategy):
+    """
+    For Anthropic/Google/other providers - uses chat completions API directly.
+    More efficient than bridging through responses API for non-OpenAI providers.
+    """
 
-    # Models/providers that support background jobs
+    def execute(
+        self,
+        model: str,
+        prompt: str,
+        session_dir: Optional[Path] = None,
+        **kwargs
+    ) -> Dict:
+        """Execute with chat completions API"""
+
+        # Remove responses-specific kwargs that don't apply to completions
+        kwargs.pop("reasoning_effort", None)
+        kwargs.pop("background", None)
+
+        for attempt in range(config.MAX_RETRIES):
+            try:
+                # Use chat completions API
+                response = completion(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    stream=False,
+                    num_retries=config.MAX_RETRIES,
+                    **kwargs
+                )
+
+                # Extract content from chat completion response
+                content = self._extract_completion_content(response)
+
+                if not content:
+                    raise RuntimeError("No content in response from LLM")
+
+                return {
+                    "content": content,
+                    "usage": self._serialize_usage(getattr(response, 'usage', None)),
+                    "response": response
+                }
+
+            except Exception as e:
+                # Use LiteLLM's built-in retry logic for HTTP errors
+                if _should_retry and hasattr(e, 'status_code'):
+                    retryable = _should_retry(e.status_code)
+                else:
+                    error_msg = str(e).lower()
+                    retryable = any(x in error_msg for x in [
+                        "network", "timeout", "connection",
+                        "429", "rate limit", "503", "overloaded"
+                    ])
+                    non_retryable = any(x in error_msg for x in [
+                        "auth", "key", "context", "token limit", "not found", "invalid"
+                    ])
+
+                    if non_retryable:
+                        raise
+
+                if retryable and attempt < config.MAX_RETRIES - 1:
+                    delay = self._calculate_backoff_delay(
+                        attempt,
+                        config.INITIAL_RETRY_DELAY,
+                        config.MAX_RETRY_DELAY
+                    )
+                    print(f"Retryable error, waiting {delay:.1f}s before retry {attempt + 2}/{config.MAX_RETRIES}...")
+                    time.sleep(delay)
+                    continue
+
+                raise
+
+        raise RuntimeError("Max retries exceeded")
+
+    def _extract_completion_content(self, response) -> str:
+        """Extract text content from chat completions response"""
+        if hasattr(response, 'choices') and response.choices:
+            choice = response.choices[0]
+            if hasattr(choice, 'message') and hasattr(choice.message, 'content'):
+                return choice.message.content or ""
+        return ""
+
+    def can_resume(self) -> bool:
+        return False
+
+
+class ResponseStrategyFactory:
+    """Factory to select appropriate strategy based on model/provider and API support"""
+
+    # Models/providers that support background jobs (OpenAI Responses API feature)
     BACKGROUND_SUPPORTED = {
         "openai/",
         "azure/",
-        # Add more as LiteLLM adds support
     }
 
     @staticmethod
     def get_strategy(model: str) -> ResponseStrategy:
         """
-        Select strategy based on model capabilities.
-        Tries to use background jobs for supported providers,
-        falls back to sync retry strategy.
+        Select strategy based on model capabilities and API support.
+
+        Decision tree:
+        1. If model supports responses API AND background jobs -> BackgroundJobStrategy
+        2. If model supports responses API (no background) -> SyncRetryStrategy
+        3. If model doesn't support responses API -> CompletionsAPIStrategy
+
+        Uses litellm.models_by_provider to determine support.
         """
-
-        # Normalize model string
-        model_lower = model.lower()
-
-        # Check if model supports background jobs
-        for prefix in ResponseStrategyFactory.BACKGROUND_SUPPORTED:
-            if model_lower.startswith(prefix):
+        # Check if model supports native responses API
+        if supports_responses_api(model):
+            # Check if it also supports background jobs
+            if ResponseStrategyFactory.supports_background(model):
                 return BackgroundJobStrategy()
+            return SyncRetryStrategy()
 
-        # Fallback to sync retry strategy
-        return SyncRetryStrategy()
+        # For all other providers (Anthropic, Google, Bedrock, etc.)
+        # Use completions API directly - more efficient than bridging
+        return CompletionsAPIStrategy()
 
     @staticmethod
     def supports_background(model: str) -> bool:
-        """Check if model supports background job execution"""
+        """Check if model supports background job execution (OpenAI/Azure only)"""
         model_lower = model.lower()
         return any(model_lower.startswith(prefix)
                    for prefix in ResponseStrategyFactory.BACKGROUND_SUPPORTED)
+
+    @staticmethod
+    def get_api_type(model: str) -> str:
+        """
+        Determine which API type will be used for a given model.
+
+        Returns:
+            'responses' for models using OpenAI Responses API
+            'completions' for models using Chat Completions API
+        """
+        if supports_responses_api(model):
+            return "responses"
+        return "completions"
