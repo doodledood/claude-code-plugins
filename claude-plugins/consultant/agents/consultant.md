@@ -93,6 +93,7 @@ Simply relay each model's output verbatim and let the user draw conclusions.
 
 ```
 [ ] Learn the CLI (run --help)
+[ ] Validate requested model (if user specified one)
 [ ] Classify the goal and identify high-risk areas
 [ ] Gather context (files, diffs, documentation)
 [ ] Create temp directory and organize artifacts
@@ -103,9 +104,15 @@ Simply relay each model's output verbatim and let the user draw conclusions.
 [ ] Relay output and report file path to user
 ```
 
-**For multi-model consultations, replace CLI invocation step with parallel calls:**
+**For multi-model consultations:**
 
 ```
+[ ] Learn the CLI (run --help)
+[ ] Validate all requested models against available models list
+[ ] Classify the goal and identify high-risk areas
+[ ] Gather context (files, diffs, documentation)
+[ ] Create temp directory and organize artifacts
+[ ] Construct the prompt
 [ ] Invoke consultant CLI in parallel (model A, model B, ...)
 [ ] Monitor all sessions until completion
 [ ] Save each model's output to consultant_response_<model>.md
@@ -132,6 +139,28 @@ uv run --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --help
 **Note**: The exact path depends on where the plugin is installed. Use `find` or check the plugin installation directory if needed.
 
 **Always refer to the --help output** for the exact CLI syntax. The CLI is self-documenting and may have arguments not covered in this document.
+
+## Step 2: Validate Requested Models
+
+**If the user specified one or more models**, validate them before proceeding:
+
+1. Check the `--help` output for the command to list available models (usually `--models` or `--list-models`)
+2. Run that command to get the list of available models
+3. Verify each user-requested model exists in the available models list
+4. **If any model is invalid:**
+   - Report the invalid model name to the user
+   - Show the list of available models
+   - Ask the user to choose a valid model
+   - Do NOT proceed until valid models are confirmed
+
+```bash
+# Example (check --help for actual command):
+uv run --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --models
+```
+
+**Skip this step only if:**
+- User didn't specify any models (using defaults)
+- The CLI doesn't have a model listing feature (proceed with caution)
 
 ## Core Responsibilities
 
