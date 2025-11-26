@@ -93,7 +93,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --file src/**/*.ts \
   --slug "pr-review" \
   --base-url "http://localhost:8000" \
-  --model "gpt-4o"
+  --model "gpt-5.1"
 ```
 
 ### List Available Models
@@ -114,8 +114,8 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
 - Example output:
   ```json
   [
-    {"id": "gpt-4o", "created": 1234567890, "owned_by": "openai"},
-    {"id": "claude-3-5-sonnet-20241022", "created": 1234567890, "owned_by": "anthropic"}
+    {"id": "gpt-5.1", "created": 1234567890, "owned_by": "openai"},
+    {"id": "claude-sonnet-4-5", "created": 1234567890, "owned_by": "anthropic"}
   ]
   ```
 
@@ -133,9 +133,9 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 - Example output:
   ```json
   [
-    {"id": "gpt-4o", "provider": "openai"},
-    {"id": "claude-3-5-sonnet-20241022", "provider": "anthropic"},
-    {"id": "gemini-2.0-flash-exp", "provider": "google"}
+    {"id": "gpt-5.1", "provider": "openai"},
+    {"id": "claude-sonnet-4-5", "provider": "anthropic"},
+    {"id": "gemini/gemini-2.5-flash", "provider": "google"}
   ]
   ```
 
@@ -154,14 +154,9 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 
 **Consultant will:**
 1. Query `http://localhost:8000/v1/models` to get available models
-2. Score each model based on:
-   - Version number (GPT-5 > GPT-4 > GPT-3.5)
-   - Capability tier (opus/pro > sonnet > haiku)
-   - Context size (200k > 128k > 32k)
-   - Reasoning capability (o1/o3 models get bonus)
-3. Select the highest-scoring model
-4. Report: `Selected model: claude-3-5-sonnet-20241022`
-5. Use that model with the provided base URL
+2. Select a model based on the task requirements
+
+**For model selection guidance:** Check https://artificialanalysis.ai for up-to-date model benchmarks and rankings to choose the best model for your use case.
 
 #### Scenario 2: Without Base URL (default providers)
 
@@ -175,10 +170,9 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 
 **Consultant will:**
 1. Use known models list (OpenAI, Anthropic, Google)
-2. Score each model using same algorithm
-3. Select the highest-scoring model (likely `claude-3-5-sonnet-20241022` or `gpt-4o`)
-4. Report: `Selected model: claude-3-5-sonnet-20241022`
-5. Use that model with its default provider (requires appropriate API key)
+2. Select a model based on task requirements
+
+**For model selection guidance:** Check https://artificialanalysis.ai for up-to-date model benchmarks and rankings. Recommended defaults: `gpt-5-pro`, `claude-opus-4-5-20251101`, `gemini/gemini-3-pro-preview`.
 
 #### Scenario 3: Explicit Model (no auto-selection)
 
@@ -187,13 +181,13 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Bug analysis" \
   --file src/*.py \
   --slug "bug" \
-  --model "gpt-4o"
+  --model "gpt-5.1"
 ```
 
 **Consultant will:**
 1. Skip model querying and scoring
-2. Use `gpt-4o` directly
-3. Use default provider for GPT-4 (OpenAI)
+2. Use `gpt-5.1` directly
+3. Use default provider for GPT-5 (OpenAI)
 4. No "Selected model" message
 
 ### Specify API Key
@@ -333,8 +327,8 @@ When no model is specified, consultant:
 Through LiteLLM, consultant supports:
 
 - OpenAI (GPT-4, GPT-5, o1, etc.)
-- Anthropic (Claude 3.5 Sonnet, Opus, etc.)
-- Google (Gemini 2.0, 1.5, etc.)
+- Anthropic (Claude Sonnet 4, Opus 4, etc.)
+- Google (Gemini 3, 2.5, etc.)
 - Azure OpenAI
 - AWS Bedrock
 - Cohere
@@ -421,7 +415,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify SQL injection vulnerabilities in the authentication module. For each finding, provide: vulnerable code location, attack vector, and recommended fix." \
   --file "apps/*/src/**/*.{service,controller}.ts" \
   --slug "security-audit" \
-  --model "claude-3-5-sonnet-20241022"
+  --model "claude-sonnet-4-5"
 ```
 
 ### Architectural Review

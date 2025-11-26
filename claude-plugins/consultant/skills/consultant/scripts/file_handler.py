@@ -218,13 +218,13 @@ def validate_vision_support(model: str, has_images: bool) -> None:
         )
         print("\nSuggestions:", file=sys.stderr)
         print("  1. Use a vision-capable model:", file=sys.stderr)
-        print("     - gpt-4o, gpt-4-vision-preview (OpenAI)", file=sys.stderr)
+        print("     - gpt-5.1, gpt-5-vision (OpenAI)", file=sys.stderr)
         print(
-            "     - claude-3-5-sonnet-20241022, claude-3-opus (Anthropic)",
+            "     - claude-sonnet-4-5, claude-opus-4 (Anthropic)",
             file=sys.stderr,
         )
         print(
-            "     - gemini-2.0-flash-exp, gemini-pro-vision (Google)", file=sys.stderr
+            "     - gemini/gemini-2.5-flash, gemini/gemini-3-pro-preview (Google)", file=sys.stderr
         )
         print("  2. Remove image files from the request", file=sys.stderr)
         print("  3. Convert images to text descriptions first\n", file=sys.stderr)

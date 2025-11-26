@@ -42,7 +42,7 @@ Production-level PR reviews with severity-tagged findings, regression test guida
 ```bash
 /consultant-review
 # Or with parameters:
-/consultant-review PR_REF=origin/main...feature-branch MODEL=claude-3-5-sonnet-20241022
+/consultant-review PR_REF=origin/main...feature-branch MODEL=claude-sonnet-4-5
 ```
 
 **What it does:**
@@ -209,7 +209,7 @@ uv run {consultant_scripts}/consultant_cli.py --base-url "http://localhost:8000"
 Specify a model explicitly:
 
 ```bash
-/consultant-review MODEL=claude-3-5-sonnet-20241022
+/consultant-review MODEL=claude-sonnet-4-5
 ```
 
 Or let consultant auto-select:
@@ -252,8 +252,8 @@ Example output:
 Through LiteLLM, consultant supports:
 
 - **OpenAI**: GPT-4, GPT-5, o1, o3
-- **Anthropic**: Claude 3.5 Sonnet, Opus, Haiku
-- **Google**: Gemini 2.0, 1.5 Pro
+- **Anthropic**: Claude Sonnet 4, Opus 4, Haiku
+- **Google**: Gemini 3 Pro, 2.5 Flash
 - **Azure OpenAI**: All Azure-hosted models
 - **AWS Bedrock**: Claude, Llama, Mistral
 - **Cohere**: Command models
@@ -305,7 +305,7 @@ uv run {consultant_scripts_path}/consultant_cli.py list
 ### Security Audit
 
 ```bash
-/consultant-review MODEL=claude-3-5-sonnet-20241022
+/consultant-review MODEL=claude-sonnet-4-5
 ```
 
 With custom focus:
@@ -355,7 +355,7 @@ uv run {consultant_scripts_path}/consultant_cli.py \
   --prompt "Analyze this code for performance issues" \
   --file src/**/*.py \
   --slug "perf-analysis" \
-  --model "claude-3-5-sonnet-20241022" \
+  --model "claude-sonnet-4-5" \
   --wait
 ```
 

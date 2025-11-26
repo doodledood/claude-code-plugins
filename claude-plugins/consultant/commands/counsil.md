@@ -25,10 +25,10 @@ Invokes the consultant agent to run the same analysis across one or more LLM mod
 - **Google**: `gemini/gemini-3-pro-preview`
 - **Anthropic**: `claude-opus-4-5-20251101`
 
-Only use different models if the user explicitly names them (e.g., "use gpt-4o to review" or "use claude-sonnet-4 and gemini-2.0-flash").
+Only use different models if the user explicitly names them (e.g., "use gpt-5.1 to review" or "use claude-sonnet-4-5 and gemini/gemini-2.5-flash").
 
 **How to detect if user specified models:**
-- User DID specify: "use gpt-4o", "with claude-opus", "using gemini-2.5-pro and gpt-4"
+- User DID specify: "use gpt-5.1", "with claude-opus", "using gemini/gemini-3-pro-preview and gpt-5"
 - User DID NOT specify: "review this PR", "analyze the architecture", "investigate this bug"
 
 When in doubt, use all 3 default models.
