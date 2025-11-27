@@ -1,7 +1,7 @@
 {
   "name": "consultant",
   "description": "Flexible multi-provider LLM consultations using Python/LiteLLM - includes consultant agent, review/bug-investigation/execplan commands, and consultant skill for deep AI-powered code analysis across 100+ models",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
