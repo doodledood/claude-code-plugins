@@ -3,11 +3,9 @@ name: plan
 description: Create implementation plans using the Planning Playbook methodology. Use when user asks to "plan", "create a plan", "make a plan", or needs a structured implementation roadmap. ALSO use by default when in Planning Mode, even if user doesn't mention "plan". Do NOT use if user explicitly requests "execplan" or "exec plan".
 ---
 
-# Implementation Planning
+Create an implementation plan using the Planning Playbook methodology.
 
-You are creating an implementation plan using the Planning Playbook methodology.
-
-**Note:** This skill activates when you're in Planning Mode or when the user explicitly requests a plan. If the user specifically requests "execplan", use the execplan skill instead.
+If the user specifically requests "execplan", use the execplan skill instead.
 
 ## Planning Workflow
 
@@ -278,4 +276,4 @@ Before finalizing:
 
 ---
 
-Begin by gathering requirements from the user, then follow this methodology to create the plan.
+Gather requirements from the user, then follow this methodology to create the plan.

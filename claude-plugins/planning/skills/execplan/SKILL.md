@@ -3,9 +3,7 @@ name: execplan
 description: Create comprehensive execution plans (ExecPlans) following PLANS.md methodology. Use ONLY when user explicitly mentions "execplan" or "exec plan" in their request.
 ---
 
-# ExecPlan Creation
-
-You are creating an execution plan following `PLANS.md` methodology.
+Create an execution plan following `PLANS.md` methodology.
 
 ## Instructions
 
@@ -53,4 +51,4 @@ Research exhaustively first (files, codebase, docs), then use `AskUserQuestion` 
 
 ---
 
-Begin by gathering requirements from the user, then follow PLANS.md to create the ExecPlan.
+Gather requirements from the user, then follow PLANS.md to create the ExecPlan.
