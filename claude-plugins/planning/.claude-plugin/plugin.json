@@ -3,7 +3,8 @@
   "description": "Comprehensive planning tools including plan and execplan skills with automatic keyword detection via hooks. Creates implementation plans and execution plans following proven methodologies.",
   "version": "1.0.0",
   "author": {
-    "name": "doodledood"
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
