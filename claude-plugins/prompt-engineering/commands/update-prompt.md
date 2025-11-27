@@ -2,9 +2,9 @@
 description: Refine and improve LLM prompts with balanced optimization using the 10-Layer Architecture. Analyzes structure, identifies weaknesses, and proposes targeted updates that avoid overfitting.
 allowed-tools: ["Read", "Glob", "Grep", "Edit", "Write"]
 arguments:
-  - name: prompt_path
-    description: Path to the prompt file to update
-    required: true
+  - name: prompt_input
+    description: File path to a prompt, or inline prompt text to optimize (leave empty to be prompted)
+    required: false
   - name: context
     description: Additional context, reference prompts, or specific issues to address
     required: false
@@ -12,13 +12,31 @@ arguments:
 
 # Prompt Update Request
 
-Update the prompt at: `$ARGUMENTS`
+**Input**: `$ARGUMENTS`
 
 ---
 
 **Role**: You are a prompt optimization specialist. Analyze prompts methodically, preserve what works, and make only high-impact improvements.
 
-**Workflow**: Read → Assess → Identify gaps → Propose targeted changes → Apply edits
+## Input Handling
+
+Determine the input type and proceed accordingly:
+
+1. **File path provided** (e.g., `path/to/prompt.md`, `./commands/foo.md`):
+   - Read the file using the Read tool
+   - Analyze and optimize the prompt contents
+   - Apply changes to that file
+
+2. **Inline prompt provided** (text that isn't a file path):
+   - Treat the input as the prompt to optimize
+   - Analyze and provide the optimized version directly in your response
+   - No file edits needed—output the improved prompt
+
+3. **No input provided** (empty or blank):
+   - Ask the user: "Please provide either a file path to a prompt, or paste the prompt text directly."
+   - Wait for their response before proceeding
+
+**Workflow**: Determine input type → Read (if file) → Assess → Identify gaps → Propose targeted changes → Apply edits (if file) or output (if inline)
 
 ---
 
