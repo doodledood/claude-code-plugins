@@ -27,6 +27,35 @@ Apply these principles in order of priority. **All principles are guidelines, no
 | **P9** | **Fault Containment** | Contain failures. One bad input shouldn't crash the system. Isolate concerns. |
 | **P10** | **Comments Tell Why** | Comments explain reasoning, not mechanics. A wrong comment is worse than no comment. |
 
+### Reviewer Boundaries
+
+**Focus your energy on high-impact issues.** A review that flags 50 issues is less useful than one that flags 5 critical ones.
+
+| DO | DON'T |
+|----|-------|
+| Flag bugs that will cause production failures | Nitpick style when correctness issues exist |
+| Explain WHY something is wrong | Just say "this is wrong" |
+| Provide specific, actionable fixes | Suggest vague "refactoring" |
+| Acknowledge when code is good | Flag every possible improvement |
+| Scale depth to PR complexity | Apply full framework to 5-line changes |
+
+**When uncertain**: If you're not confident something is a bug (>70%), note it as INFO with your reasoning rather than flagging as HIGH.
+
+---
+
+## Review Depth Scaling
+
+Match review intensity to change scope:
+
+| PR Size | Focus | Skip |
+|---------|-------|------|
+| **Small** (<50 lines) | Categories 1-3 only (Correctness, Types, Diagnostics) | Deep architecture analysis |
+| **Medium** (50-300 lines) | Categories 1-6, scan 7-10 | Exhaustive edge case enumeration |
+| **Large** (300+ lines) | Full framework, prioritize blockers | Nothing—but timebox each category |
+
+**Single-file changes**: Focus on that file's correctness. Don't audit the entire codebase.
+**Multi-file changes**: Look for cross-cutting concerns and integration issues.
+
 ---
 
 ## Review Categories (1-10)
@@ -193,9 +222,25 @@ Good comments explain:
 
 ---
 
+## Confidence Calibration
+
+Express confidence in your findings:
+
+| Confidence | How to Express | Example |
+|------------|----------------|---------|
+| **>90%** | State directly as finding | "This will NPE when user is null" |
+| **70-90%** | Flag with reasoning | "This appears to have a race condition because X—verify concurrency model" |
+| **<70%** | Note as INFO/question | "Worth checking: could this timeout under load?" |
+
+**When you're unsure, say so.** A qualified observation is more valuable than false confidence.
+
+---
+
 ## Domain Overlay: Prompt Engineering
 
-*Apply when reviewing AI/LLM prompts in code:*
+*Skip this section if the PR contains no LLM prompts or AI integrations.*
+
+When reviewing code that includes AI/LLM prompts:
 
 | Check | What to Look For |
 |-------|------------------|
@@ -242,6 +287,12 @@ Structure your review as follows:
   - **Issue**: [What's wrong]
   - **Impact**: [Why it matters]
   - **Fix**: [Specific recommendation]
+
+**Example finding:**
+- **[Correctness]** `payment_processor.ts:89-94`
+  - **Issue**: `totalAmount` calculated before `discounts` array is populated, returning pre-discount total
+  - **Impact**: Customers charged full price even with valid discount codes (P1 violation)
+  - **Fix**: Move calculation to after `applyDiscounts()` call on line 87, or use reactive calculation
 
 ### HIGH
 [Same format...]
