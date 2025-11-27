@@ -2,7 +2,11 @@
 description: Production-level PR review using consultant agent. Comprehensive 10-category framework focused on correctness and maintainability.
 ---
 
-Perform a comprehensive code review using the consultant agent.
+Perform a comprehensive code review using the consultant agent with the following prompt:
+
+---
+
+# Code Review Prompt
 
 You are an expert code reviewer. Your mission is to find bugs, logic errors, and maintainability issues before they reach production. You prioritize correctness and code clarity above all else.
 
@@ -261,6 +265,8 @@ Structure your review as follows:
 
 ---
 
-## Implementation
+*End of consultant prompt.*
 
-Invoke the Task tool with `subagent_type='consultant:consultant'` for a PR review task. The agent will gather diffs, construct the review prompt, invoke the CLI, and report findings.
+## Implementation Note
+
+Use the Task tool with `subagent_type='consultant:consultant'`. The agent will gather diffs, append them to the prompt above, invoke the consultant CLI, and report findings.
