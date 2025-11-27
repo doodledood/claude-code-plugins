@@ -69,6 +69,18 @@ Each plugin can contain:
 - `skills/` - Contextual skills with `SKILL.md` files
 - `hooks/` - Event handlers triggered by Claude Code events
 
+### Plugin Versioning
+
+When updating plugin files (agents, commands, skills, hooks, scripts), **always update the plugin version** in `.claude-plugin/plugin.json`:
+
+- **Patch** (0.0.x): Bug fixes, minor wording changes, typo fixes
+- **Minor** (0.x.0): New features, new commands/agents, significant improvements
+- **Major** (x.0.0): Breaking changes, complete rewrites, API changes
+
+Example: After updating `consultant/commands/review.md` with a major rewrite, bump the version in `claude-plugins/consultant/.claude-plugin/plugin.json`.
+
+*Note: README updates and documentation-only changes don't require version bumps.*
+
 ### Consultant Plugin Architecture
 
 The consultant plugin (`claude-plugins/consultant/`) provides multi-provider LLM consultations:
