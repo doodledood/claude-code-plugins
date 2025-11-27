@@ -96,11 +96,17 @@ Gather:
 - System architecture documentation
 - Recent deployments or config changes
 
+## Important Notes
+
+- Run CLI in background mode (`run_in_background: true`) for efficiency
+- Poll session every 30 seconds using BashOutput until completion
+- Relay output verbatim with metadata (model, tokens, cost)
+
 ## Implementation
 
 Invoke the Task tool with `subagent_type='consultant:consultant'` for a bug investigation task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather bug symptoms and related files
 3. Construct an investigation prompt with appropriate role and focus areas
-4. Invoke the CLI and parse the structured output
+4. Launch CLI in background mode, poll every 30 seconds until completion
 5. Report root cause analysis and fix recommendations with metadata back to user

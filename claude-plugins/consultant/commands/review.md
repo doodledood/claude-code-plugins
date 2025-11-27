@@ -53,11 +53,17 @@ Analyze:
 - **LOW**: Minor improvement, style issue, optimization (can fix later)
 - **INFO**: Observation, architectural note, informational context
 
+## Important Notes
+
+- Run CLI in background mode (`run_in_background: true`) for efficiency
+- Poll session every 30 seconds using BashOutput until completion
+- Relay output verbatim with metadata (model, tokens, cost)
+
 ## Implementation
 
 Invoke the Task tool with `subagent_type='consultant:consultant'` for a PR review task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather diffs and organize into prioritized attachments
 3. Construct a review prompt with appropriate role and focus areas
-4. Invoke the CLI and parse the structured output
+4. Launch CLI in background mode, poll every 30 seconds until completion
 5. Report findings with severity tags and metadata back to user
