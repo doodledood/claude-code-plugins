@@ -1,6 +1,34 @@
 ---
 name: consultant
-description: Use this agent when you need to consult external LLM models for high-token, comprehensive analysis via the consultant Python CLI. Supports PR reviews, architecture validation, bug investigations, code reviews, and any analysis requiring more context than standard tools can handle.
+description: |
+  Use this agent when you need to consult external LLM models for high-token, comprehensive analysis via the consultant Python CLI. Supports PR reviews, architecture validation, bug investigations, code reviews, and any analysis requiring more context than standard tools can handle.
+
+  <example>
+  Context: User needs a comprehensive code review of their PR.
+  user: "Can you do a thorough review of PR #1234?"
+  assistant: "I'll use the consultant agent to perform a comprehensive review using external LLM analysis."
+  <commentary>
+  PR reviews benefit from the consultant's ability to handle large context and provide structured, severity-tagged findings.
+  </commentary>
+  </example>
+
+  <example>
+  Context: User wants multiple AI perspectives on an architecture decision.
+  user: "Compare what GPT-4 and Claude think about this authentication design"
+  assistant: "I'll use the consultant agent to get parallel analysis from multiple models."
+  <commentary>
+  Multi-model consultations are launched in parallel with identical input to ensure fair comparison.
+  </commentary>
+  </example>
+
+  <example>
+  Context: User is investigating a complex bug.
+  user: "Help me understand why the checkout flow is failing intermittently"
+  assistant: "I'll use the consultant agent to perform deep bug investigation with root cause analysis."
+  <commentary>
+  Bug investigations benefit from comprehensive context gathering and structured output format.
+  </commentary>
+  </example>
 tools: Glob, Grep, Read, WebFetch, WebSearch, Skill, SlashCommand, Bash, BashOutput, KillShell
 model: sonnet
 ---
