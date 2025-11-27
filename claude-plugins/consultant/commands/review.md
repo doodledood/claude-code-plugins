@@ -2,24 +2,22 @@
 description: Production-level PR review using consultant agent. Provides severity-tagged findings, regression test guidance, and security validation using any LiteLLM-compatible model.
 ---
 
-# Consultant Review Command
+Perform a comprehensive PR review using the consultant agent.
 
-Performs a comprehensive PR review using the consultant agent.
+## What to Do
 
-## What It Does
+Invoke the consultant agent to perform a thorough code review:
 
-Invokes the consultant agent to perform a thorough code review:
-
-1. Gathers all changed files and generates extensive diffs
-2. Organizes code into prioritized attachments (core logic, schemas, tests, infrastructure)
-3. Constructs a detailed review prompt with role, context, and focus areas
-4. Invokes the consultant CLI (agent will run --help first to learn current arguments)
-5. Monitors session until completion
-6. Synthesizes findings into actionable recommendations with severity tags
+1. Gather all changed files and generate extensive diffs
+2. Organize code into prioritized attachments (core logic, schemas, tests, infrastructure)
+3. Construct a detailed review prompt with role, context, and focus areas
+4. Invoke the consultant CLI (run --help first to learn current arguments)
+5. Monitor session until completion
+6. Synthesize findings into actionable recommendations with severity tags
 
 ## Output
 
-The review provides:
+Provide:
 
 - **Severity-tagged findings**: BLOCKER, HIGH, MEDIUM, LOW, INFO
 - **File references**: Exact locations with line numbers (path/to/file.ts:123-145)
@@ -30,7 +28,7 @@ The review provides:
 
 ## What Gets Reviewed
 
-The consultant agent analyzes:
+Analyze:
 
 1. **Core Logic**: Business rules, algorithms, state machines, domain models
 2. **Schemas/Types**: Database schemas, API contracts, type definitions, interfaces
@@ -55,39 +53,9 @@ The consultant agent analyzes:
 - **LOW**: Minor improvement, style issue, optimization (can fix later)
 - **INFO**: Observation, architectural note, informational context
 
-## When to Use
-
-**Perfect for:**
-
-- Pre-merge PR reviews for production deployments
-- Security vulnerability assessments
-- Architectural validation of large changes
-- Performance impact analysis
-- Compliance and best practice checks
-
-**Not needed for:**
-
-- Simple typo fixes or documentation updates
-- Single-file changes you can review yourself
-- Changes already reviewed by multiple senior engineers
-- Non-critical experimental branches
-
-## Environment Variables
-
-The consultant CLI reads these environment variables (run the CLI with --help for full details):
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-
-## Troubleshooting
-
-**Issue**: "Context limit exceeded"
-**Solution**: The consultant CLI will report this clearly. Agent will automatically reduce scope by removing docs, reducing diff context, or splitting into separate consultations.
-
-**Issue**: "No API key provided"
-**Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
-
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant:consultant'` for a PR review task. The agent will:
+Invoke the Task tool with `subagent_type='consultant:consultant'` for a PR review task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather diffs and organize into prioritized attachments
 3. Construct a review prompt with appropriate role and focus areas

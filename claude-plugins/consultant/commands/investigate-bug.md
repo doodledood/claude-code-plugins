@@ -2,24 +2,22 @@
 description: Deep bug investigation using consultant agent. Identifies root causes, traces execution flow, assesses blast radius, and provides concrete fix suggestions with regression test recommendations.
 ---
 
-# Consultant Investigate Bug Command
+Perform deep bug investigation using the consultant agent.
 
-Performs deep bug investigation using the consultant agent.
+## What to Do
 
-## What It Does
+Invoke the consultant agent to investigate a bug:
 
-Invokes the consultant agent to investigate a bug:
-
-1. Gathers bug symptoms from context or user description
-2. Collects relevant files, error logs, and recent changes
-3. Traces execution flow from symptom to potential root causes
-4. Assesses blast radius and affected systems
-5. Invokes the consultant CLI (agent will run --help first to learn current arguments)
-6. Provides concrete fix suggestions and regression tests
+1. Gather bug symptoms from context or user description
+2. Collect relevant files, error logs, and recent changes
+3. Trace execution flow from symptom to potential root causes
+4. Assess blast radius and affected systems
+5. Invoke the consultant CLI (run --help first to learn current arguments)
+6. Provide concrete fix suggestions and regression tests
 
 ## Output
 
-The investigation provides:
+Provide:
 
 - **Root Cause Analysis**: Specific file locations and logic errors causing the bug
 - **Execution Flow Trace**: Step-by-step path from trigger to failure point
@@ -30,7 +28,7 @@ The investigation provides:
 
 ## What Gets Investigated
 
-The consultant agent analyzes:
+Analyze:
 
 1. **Error Context**: Stack traces, error messages, logs
 2. **Recent Changes**: Git history, recent commits, PRs that might have introduced the bug
@@ -87,27 +85,9 @@ The consultant agent analyzes:
 - [ ] Edge case validation
 ```
 
-## When to Use
-
-**Perfect for:**
-
-- Intermittent bugs that are hard to reproduce
-- Production incidents requiring rapid root cause analysis
-- Bugs in unfamiliar codebases
-- Race conditions and concurrency issues
-- Performance degradations with unclear causes
-- Security vulnerabilities discovered in production
-
-**Not needed for:**
-
-- Simple syntax errors or typos
-- Bugs with obvious fixes (e.g., null pointer with clear source)
-- Issues easily debuggable with standard tools
-- Bugs already fully understood
-
 ## Information Gathering
 
-The agent may gather:
+Gather:
 
 - Recent git commits and changes
 - Error logs and stack traces
@@ -116,27 +96,9 @@ The agent may gather:
 - System architecture documentation
 - Recent deployments or config changes
 
-**Tip**: Provide as much context as possible about the bug symptoms for best results.
-
-## Environment Variables
-
-The consultant CLI reads these environment variables (run the CLI with --help for full details):
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-
-## Troubleshooting
-
-**Issue**: "Not enough context to investigate"
-**Solution**: Provide more details about the bug symptoms or ensure relevant error logs/stack traces are available.
-
-**Issue**: "Context limit exceeded"
-**Solution**: Agent will automatically reduce scope and focus on most relevant files.
-
-**Issue**: "No API key provided"
-**Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
-
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant:consultant'` for a bug investigation task. The agent will:
+Invoke the Task tool with `subagent_type='consultant:consultant'` for a bug investigation task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather bug symptoms and related files
 3. Construct an investigation prompt with appropriate role and focus areas

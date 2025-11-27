@@ -2,24 +2,22 @@
 description: Create comprehensive execution plans using consultant agent for deep analysis and specification design. Gathers codebase context, analyzes patterns, and provides detailed implementation steps with validation criteria.
 ---
 
-# Consultant ExecPlan Command
+Create a comprehensive execution plan using the consultant agent.
 
-Creates comprehensive execution plans using the consultant agent.
+## What to Do
 
-## What It Does
+Invoke the consultant agent to create a detailed implementation plan:
 
-Invokes the consultant agent to create a detailed implementation plan:
-
-1. Gathers comprehensive codebase context
-2. Analyzes existing patterns and architecture
-3. Identifies dependencies and integration points
-4. Breaks down work into small, shippable chunks
-5. Invokes the consultant CLI (agent will run --help first to learn current arguments)
-6. Provides detailed implementation steps with validation criteria
+1. Gather comprehensive codebase context
+2. Analyze existing patterns and architecture
+3. Identify dependencies and integration points
+4. Break down work into small, shippable chunks
+5. Invoke the consultant CLI (run --help first to learn current arguments)
+6. Provide detailed implementation steps with validation criteria
 
 ## Output
 
-The execution plan provides:
+Provide:
 
 - **Implementation Steps**: Detailed, ordered tasks with dependencies
 - **Architecture Analysis**: Existing patterns and integration points to follow
@@ -32,7 +30,7 @@ The execution plan provides:
 
 ## What Gets Analyzed
 
-The consultant agent analyzes:
+Analyze:
 
 1. **Codebase Structure**: Existing architecture, patterns, conventions
 2. **Related Features**: Similar implementations, reusable components
@@ -134,27 +132,9 @@ The consultant agent analyzes:
   - **Mitigation**: [How to address]
 ```
 
-## When to Use
-
-**Perfect for:**
-
-- Complex features requiring careful planning
-- Refactoring large systems
-- Architectural changes with broad impact
-- Features touching unfamiliar parts of codebase
-- Critical production changes requiring validation plan
-- Projects needing detailed implementation roadmap
-
-**Not needed for:**
-
-- Simple bug fixes with obvious solutions
-- Trivial features (e.g., add new field to form)
-- Well-understood changes you've done many times
-- Experimental/spike work
-
 ## Plan Quality
 
-The execution plan will be:
+Ensure the execution plan is:
 
 - **Detailed**: Specific files, functions, and code patterns
 - **Ordered**: Clear dependencies and sequencing
@@ -162,20 +142,9 @@ The execution plan will be:
 - **Practical**: Implementable with current codebase
 - **Risk-Aware**: Identifies potential issues and mitigations
 
-## Using the Plan
-
-After receiving the plan:
-
-1. **Review**: Ensure it aligns with your understanding
-2. **Refine**: Ask consultant for clarification or adjustments
-3. **Implement**: Follow steps in order
-4. **Validate**: Check validation criteria after each step
-5. **Test**: Run tests as described
-6. **Iterate**: Update plan based on discoveries
-
 ## Context Gathering
 
-The agent will gather:
+Gather:
 
 - Current branch name and git history
 - Related files and their implementations
@@ -184,33 +153,9 @@ The agent will gather:
 - Configuration and deployment scripts
 - Documentation and architectural notes
 
-**Tip**: The more context you provide about the feature and goals, the more detailed and accurate the plan.
-
-## Environment Variables
-
-The consultant CLI reads these environment variables (run the CLI with --help for full details):
-- `LITELLM_API_KEY` or `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`: API key for the provider
-
-## Troubleshooting
-
-**Issue**: "Plan is too high-level"
-**Solution**: Provide more details about requirements, constraints, or technical approach.
-
-**Issue**: "Context limit exceeded"
-**Solution**: Agent will automatically focus on most relevant files. Consider narrowing the feature scope.
-
-**Issue**: "No API key provided"
-**Solution**: Set one of: `LITELLM_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
-
-## Relationship to Other Commands
-
-- **/consultant-review**: Use AFTER implementation to validate changes
-- **/consultant-investigate-bug**: Use BEFORE execplan if fixing complex bugs
-- **/consultant-execplan**: Use BEFORE implementation to plan approach
-
 ## Implementation
 
-This command invokes the Task tool with `subagent_type='consultant:consultant'` for an execution planning task. The agent will:
+Invoke the Task tool with `subagent_type='consultant:consultant'` for an execution planning task. The agent will:
 1. Run `--help` on the CLI to learn current arguments
 2. Gather codebase context and similar implementations
 3. Construct a planning prompt with appropriate role and focus areas

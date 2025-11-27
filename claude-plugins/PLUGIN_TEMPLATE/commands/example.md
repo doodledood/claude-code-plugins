@@ -2,55 +2,26 @@
 description: An example command showing the basic structure
 ---
 
-# Example Command Template
+Analyze the current project and provide a brief summary.
 
-This is a template for creating custom slash commands in Claude Code plugins.
+## What to Do
 
-## How Commands Work
+1. Read the project's package.json or similar manifest file
+2. Identify the main technologies and frameworks used
+3. List the key directories and their purposes
+4. Summarize the project in 2-3 sentences
 
-When a user types `/example`, Claude receives this entire markdown file as context and follows the instructions within it.
+## Output
 
-## Command Structure
+Provide:
 
-Your command can include:
+- **Project Name**: From manifest file
+- **Tech Stack**: Main languages, frameworks, libraries
+- **Structure**: Key directories and what they contain
+- **Summary**: Brief description of what this project does
 
-### 1. Instructions
-Clear step-by-step instructions for what Claude should do:
-- First, do this...
-- Then, analyze that...
-- Finally, output results...
+## Notes
 
-### 2. Context and Guidelines
-Provide relevant context:
-- What this command is for
-- When to use it
-- What to avoid
-
-### 3. Output Format
-Specify how results should be presented:
-```
-Expected output format here
-```
-
-### 4. Examples
-Show concrete examples:
-```
-Example input -> Expected output
-```
-
-## Your Command Instructions Here
-
-Replace this section with your actual command logic.
-
-For example:
-1. Read the current project structure
-2. Analyze the codebase
-3. Generate a report showing...
-
-## Tips for Writing Commands
-
-- Be specific and clear
-- Include error handling guidance
-- Provide examples
-- Specify expected tools to use
-- Define success criteria
+- If no manifest file exists, infer from file extensions and directory structure
+- Focus on the most important aspects, not exhaustive detail
+- Keep the summary concise and actionable
