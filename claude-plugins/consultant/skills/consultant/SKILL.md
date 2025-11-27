@@ -39,7 +39,7 @@ Where `{CONSULTANT_SCRIPTS_PATH}` is the path to `claude-plugins/consultant/skil
 
 ### Start a Consultation
 
-The consultant script runs synchronously (blocking until completion). For long-running analyses, you should run it in the background using the Bash tool with `run_in_background: true`, then use BashOutput to periodically check progress.
+The consultant script runs synchronously (blocking until completion). For long-running analyses, you should run it in the background using the Bash tool with `run_in_background: true`, then use BashOutput to check progress every 30 seconds until completion.
 
 **Example: Running in background via Bash tool**
 
@@ -52,9 +52,10 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 
 When calling via the Bash tool:
 1. Use `run_in_background: true` parameter
-2. Periodically use BashOutput tool with the returned bash_id to check progress
-3. The script will print output as it completes each step
-4. Final results appear after "Waiting for completion..." message
+2. Wait at least 30 seconds, then use BashOutput tool with the returned bash_id to check progress
+3. If still running, wait another 30 seconds and check again - repeat until completion
+4. The script will print output as it completes each step
+5. Final results appear after "Waiting for completion..." message
 
 **What you'll see:**
 - Token usage summary
