@@ -27,6 +27,23 @@ Planning is optional but recommended for complex tasks. Follow this workflow:
 - **Conflicts**: Safety > Clarity > Minimalism > Forward focus
 - **Cognitive load**: Ruthlessly minimize extraneous cognitive load across plans, code, and architecture. Prefer deep modules with simple interfaces over many shallow parts; reduce choices; keep the happy path obvious.
 
+### Code Quality Principles (P1-P10)
+
+Plans must produce code that passes rigorous review. Apply these principles when designing chunks. **All principles are guidelines, not laws—the user's explicit intent always takes precedence.** If the user deliberately requests an approach that violates a principle, respect that decision.
+
+| # | Principle | Planning Implication |
+|---|-----------|----------------------|
+| **P1** | **Correctness Above All** | Every chunk must demonstrably work. Prove behavior, not just compilation. |
+| **P2** | **Diagnostics & Observability** | Plan logging and error visibility. Silent failures are unacceptable. |
+| **P3** | **Make Illegal States Unrepresentable** | Design types that prevent bugs at compile-time. Types before implementations. |
+| **P4** | **Single Responsibility** | Each chunk does ONE thing. If you need "and" to describe it, split it. |
+| **P5** | **Explicit Over Implicit** | Plan clear APIs. No hidden behaviors, magic values, or implicit config. |
+| **P6** | **Minimal Surface Area** | Solve today's problem. Don't plan for hypothetical futures. YAGNI. |
+| **P7** | **Prove It With Tests** | Every chunk includes specific test cases, not "add tests". |
+| **P8** | **Safe Evolution** | Public API/schema changes need migration paths. Internal changes can break freely. |
+| **P9** | **Fault Containment** | Plan for failure isolation. Include retry/fallback strategies. |
+| **P10** | **Comments Tell Why** | Plan documentation for complex logic—why, not what. |
+
 **Values**: Mini‑PR chunks over monolithic changes; parallel work streams over sequential waterfalls; function‑level planning over code details; dependency clarity over implicit coupling; ship‑ready increments over half‑built features
 
 ## 2. Mini‑PR Chunks
@@ -176,6 +193,44 @@ Types: TypeName
 - **Good**: each chunk ships value; deps ordered; parallel work identified; files explicit; context has reasons; tests in todos; gates listed
 - **Excellent**: adds optimal parallelization, line numbers for large files, clear integration points, risk notes, alternatives, and explicitly reduces extraneous cognitive load (deep modules, simple interfaces, minimal layers)
 
+### Quality Checklist for Each Chunk
+
+Before finalizing a chunk in the plan, verify it addresses:
+
+- [ ] **Correctness**: Handles boundaries, null/empty, error paths (not just happy path)
+- [ ] **Type Safety**: Types prevent invalid states; validation at boundaries
+- [ ] **Observability**: Errors logged with context; failures visible, not silent
+- [ ] **Resilience**: External calls have timeouts; retries with backoff; resource cleanup
+- [ ] **Clarity**: Names descriptive; no magic values; explicit control flow
+- [ ] **Modularity**: Single responsibility; <200 LOC; minimal coupling
+- [ ] **Tests**: Critical paths tested; error paths tested; boundaries tested
+- [ ] **Evolution**: Public API/schema changes have migration paths; internal changes break freely
+
+### Test Coverage Priority
+
+Align test planning with code review expectations:
+
+| Priority | What | Requirement |
+|----------|------|-------------|
+| 9-10 | Data mutations, money/finance, auth, state machines | MUST test |
+| 7-8 | Business logic branches, API contracts, error paths | SHOULD test |
+| 5-6 | Edge cases, boundaries, integration points | GOOD to test |
+| 1-4 | Trivial getters, simple pass-through | OPTIONAL |
+
+### Error Handling in Plans
+
+For chunks touching external systems or user input, specify:
+
+1. **What can fail**: List failure modes explicitly
+2. **How failures surface**: Logging, user-facing messages
+3. **Recovery strategy**: Retry, fallback, fail-fast
+
+Avoid planning for:
+- Empty catch blocks
+- Catch-and-return-null without logging
+- Silent fallbacks to defaults
+- Broad exception catching
+
 ## 11. Problem Scenarios & Strategic Clarification
 
 ### No detailed requirements
@@ -266,6 +321,9 @@ Before finalizing:
 5. Do dependencies determine order?
 6. Have I researched first, then asked strategically?
 7. Does this reduce or increase cognitive load?
+8. Does each chunk satisfy P1-P10? (Correctness, Observability, Types, SRP, Explicit, Minimal, Tests, Evolution, Faults, Comments)
+9. Are error paths planned, not afterthoughts?
+10. Will this pass code review on first submission?
 
 ## Recognize & Adjust
 

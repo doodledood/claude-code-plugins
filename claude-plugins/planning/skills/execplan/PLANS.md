@@ -56,6 +56,62 @@ Validation is not optional. Include instructions to run tests, to start the syst
 
 Capture evidence. When your steps produce terminal output, short diffs, or logs, include them inside the single fenced block as indented examples. Keep them concise and focused on what proves success. If you need to include a patch, prefer file-scoped diffs or small excerpts that a reader can recreate by following your instructions rather than pasting large blobs.
 
+## Code Quality Principles
+
+Plans must produce code that passes rigorous review. Apply these principles when designing chunks. **All principles are guidelines, not laws—the user's explicit intent always takes precedence.** If the user deliberately requests an approach that violates a principle, respect that decision.
+
+| # | Principle | Planning Implication |
+|---|-----------|----------------------|
+| **P1** | **Correctness Above All** | Every chunk must demonstrably work. Include validation steps that prove correct behavior, not just compilation. |
+| **P2** | **Diagnostics & Observability** | Plan logging, error visibility, and traceability from the start. Silent failures are unacceptable—plan explicit error handling. |
+| **P3** | **Make Illegal States Unrepresentable** | Design types and interfaces that prevent bugs at compile-time. Plan type definitions before implementations. |
+| **P4** | **Single Responsibility** | Each chunk does ONE thing. If describing a chunk requires "and", split it. |
+| **P5** | **Explicit Over Implicit** | Plan clear, predictable APIs. No hidden behaviors or magic. Specify explicit configuration over convention. |
+| **P6** | **Minimal Surface Area** | Solve today's problem today. Don't plan for hypothetical futures. YAGNI. |
+| **P7** | **Prove It With Tests** | Every chunk includes specific test cases. Untested code is unverified code. |
+| **P8** | **Safe Evolution** | Public API/schema changes need migration paths. Internal changes can break freely. |
+| **P9** | **Fault Containment** | Plan for failure isolation. One bad input shouldn't crash the system. Include retry/fallback strategies. |
+| **P10** | **Comments Tell Why** | Plan documentation for complex logic—why, not what. |
+
+### Quality Checklist for Each Chunk
+
+Before marking a chunk complete, verify:
+
+- [ ] **Correctness**: Logic handles boundaries, null/empty, error paths (not just happy path)
+- [ ] **Type Safety**: Types prevent invalid states; validation at boundaries; no `any` escape hatches
+- [ ] **Observability**: Errors are logged with context; failures are visible, not silent
+- [ ] **Resilience**: External calls have timeouts; retries use backoff; resources are cleaned up
+- [ ] **Clarity**: Names are descriptive; no magic values; control flow is explicit
+- [ ] **Modularity**: Single responsibility; <200 LOC; minimal coupling
+- [ ] **Tests**: Critical paths tested; error paths tested; boundaries tested
+- [ ] **Evolution**: Public API/schema changes have migration paths; internal changes break freely
+
+### Test Coverage Priority
+
+Align test planning with review expectations:
+
+| Priority | What | Requirement |
+|----------|------|-------------|
+| 9-10 | Data mutations, money/finance, auth, state machines | MUST test |
+| 7-8 | Business logic branches, API contracts, error paths | SHOULD test |
+| 5-6 | Edge cases, boundaries, integration points | GOOD to test |
+| 1-4 | Trivial getters, simple pass-through | OPTIONAL |
+
+### Error Handling Requirements
+
+Every chunk touching external systems or user input must specify:
+
+1. **What can fail**: List failure modes explicitly
+2. **How failures surface**: Logging, metrics, user-facing messages
+3. **Recovery strategy**: Retry, fallback, fail-fast
+4. **Resource cleanup**: Connections, handles, locks released
+
+Anti-patterns to avoid in plans:
+- Empty catch blocks
+- Catch-and-return-null without logging
+- Optional chaining hiding bugs (`data?.user?.settings?.theme ?? 'dark'`)
+- Broad exception catching hiding unrelated errors
+
 ## Chunk sizing and dependency heuristics
 
 - Keep each chunk small enough to ship independently (aim for 1–3 functions or roughly 200 lines of code).
