@@ -12,7 +12,7 @@ arguments:
 
 # Prompt Update Request
 
-**Input**: `$ARGUMENTS`
+**Input**: $ARGUMENTS
 
 ---
 
