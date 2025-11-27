@@ -1,0 +1,12 @@
+{
+  "name": "prompt-engineering",
+  "description": "Tools for crafting, refining, and improving LLM prompts - includes update-prompt command for balanced prompt optimization",
+  "version": "1.0.0",
+  "author": {
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["prompt-engineering", "prompts", "llm", "optimization", "prompt-design"]
+}

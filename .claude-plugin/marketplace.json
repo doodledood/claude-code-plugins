@@ -25,6 +25,14 @@
       "version": "1.0.0",
       "category": "development",
       "keywords": ["consultant", "code-review", "analysis", "architecture", "bug-investigation", "ai-analysis", "litellm", "multi-provider", "local-models"]
+    },
+    {
+      "name": "prompt-engineering",
+      "source": "./claude-plugins/prompt-engineering",
+      "description": "Tools for crafting, refining, and improving LLM prompts - includes update-prompt command for balanced prompt optimization that avoids overfitting",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["prompt-engineering", "prompts", "llm", "optimization", "prompt-design", "prompt-refinement"]
     }
   ]
 }
