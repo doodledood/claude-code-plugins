@@ -49,6 +49,40 @@ Apply these when analyzing and updating prompts. **Balance is key—every change
 | **Actionable Language** | Use imperative verbs. "Analyze X" not "You should try to analyze X if possible." |
 | **Consistent Voice** | Pick a framing (you are X, your task is Y) and stick with it throughout. |
 
+## Anti-Patterns to Avoid
+
+**In prompts:**
+
+| Anti-Pattern | Looks Like | Instead |
+|--------------|------------|---------|
+| **Kitchen Sink** | Adding every possible instruction | Focus on 20% rules for 80% cases |
+| **Weak Language** | "Try to", "if possible", "maybe" | Direct: "Do X", "Never Y" |
+| **Contradictory Rules** | Instructions that conflict | Review holistically, resolve conflicts explicitly |
+| **Over-Specification** | Enumerating every possible case | Use principles that generalize |
+| **Buried Critical Info** | Important rules hidden in walls of text | Surface critical instructions prominently |
+| **Redundant Repetition** | Same instruction 5 times identically | Strategic variation: same concept, different angles |
+| **Missing Examples** | Abstract rules without grounding | Add 1-2 concrete examples for complex behaviors |
+| **Scope Creep** | Prompt tries to do everything | Define clear boundaries, defer out-of-scope items |
+
+**In optimization (don't do these when updating):**
+
+| Trap | Looks Like | Instead |
+|------|------------|---------|
+| **Feature Creep** | Adding layers just because the framework has 10 | Use only layers that add value |
+| **Excessive Structure** | XML tags for simple instructions | Match structure to complexity |
+| **Theoretical Perfection** | Optimizing working prompts to match ideal template | Respect functional solutions |
+| **Complexity Inflation** | Making simple prompts unnecessarily complex | Preserve elegant simplicity |
+
+### Specificity Sweet Spot
+
+| Too Vague | Appropriate | Over-Specified |
+|-----------|-------------|----------------|
+| "Be helpful" | "Provide actionable next steps" | "Always provide exactly 3 steps of 50-75 words each" |
+| "Be accurate" | "State confidence when <80%" | "Calculate Bayesian confidence scores" |
+| "Use examples" | "Include examples for complex concepts" | "Every response must have 2-3 examples" |
+
+**Sweet spot:** Specific enough to be consistent, flexible enough to be natural.
+
 ---
 
 ## The 10-Layer Architecture
@@ -198,37 +232,6 @@ IF confidence < 70% THEN add caveat
 ELSE IF confidence 70-90% THEN qualify statement
 ELSE provide direct answer
 ```
-
----
-
-## Anti-Patterns & Traps
-
-### Traps to Avoid
-
-| Trap | Looks Like | Instead |
-|------|------------|---------|
-| **Feature Creep** | Adding layers just because the framework has 10 | Use only layers that add value |
-| **Excessive Structure** | XML tags for simple instructions | Match structure to complexity |
-| **Theoretical Perfection** | Optimizing working prompts to match ideal template | Respect functional solutions |
-| **Complexity Inflation** | Making simple prompts unnecessarily complex | Preserve elegant simplicity |
-| **Kitchen Sink** | Adding every possible instruction | Focus on 20% rules for 80% cases |
-| **Weak Language** | "Try to", "if possible", "maybe" | Direct: "Do X", "Never Y" |
-| **Contradictory Rules** | Instructions that conflict with each other | Review holistically, resolve conflicts explicitly |
-| **Over-Specification** | Enumerating every possible case | Use principles that generalize |
-| **Buried Critical Info** | Important rules hidden in walls of text | Surface critical instructions prominently |
-| **Redundant Repetition** | Same instruction 5 times identically | Strategic variation: same concept, different angles |
-| **Missing Examples** | Abstract rules without grounding | Add 1-2 concrete examples for complex behaviors |
-| **Scope Creep** | Prompt tries to do everything | Define clear boundaries, defer out-of-scope items |
-
-### Specificity Sweet Spot
-
-| Too Vague | Appropriate | Over-Specified |
-|-----------|-------------|----------------|
-| "Be helpful" | "Provide actionable next steps" | "Always provide exactly 3 steps of 50-75 words each" |
-| "Be accurate" | "State confidence when <80%" | "Calculate Bayesian confidence scores" |
-| "Use examples" | "Include examples for complex concepts" | "Every response must have 2-3 examples" |
-
-**Sweet spot:** Specific enough to be consistent, flexible enough to be natural.
 
 ---
 
