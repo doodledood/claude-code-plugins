@@ -14,11 +14,12 @@ Perform a consultation using the consultant agent with multiple models in parall
 
 Only use different models if the user explicitly names them.
 
-## Implementation
+## Implementation Note
 
-Invoke the Task tool with `subagent_type='consultant:consultant'`. Pass along the user's request from $ARGUMENTS, specifying that this is a multi-model consultation with the default models listed above (unless user specified otherwise).
+Use the Task tool with `subagent_type='consultant:consultant'`. Pass the user's request below as the consultant prompt, specifying multi-model consultation with the default models above (unless user specified otherwise). The agent will handle parallel execution, polling, and output relay.
 
-The agent will handle parallel execution, polling, and output relay.
+---
 
-## User Request
+# Consultant Prompt
+
 $ARGUMENTS

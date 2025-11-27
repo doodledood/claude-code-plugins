@@ -2,7 +2,11 @@
 description: Create comprehensive execution plans using consultant agent for deep analysis and specification design.
 ---
 
-Create a comprehensive execution plan using the consultant agent.
+Create a comprehensive execution plan using the consultant agent with the following prompt:
+
+---
+
+# Execution Plan Prompt
 
 ## Planning Focus
 
@@ -22,6 +26,10 @@ Ensure the execution plan is:
 - **Practical**: Implementable with current codebase
 - **Risk-Aware**: Identifies potential issues and mitigations
 
-## Implementation
+---
 
-Invoke the Task tool with `subagent_type='consultant:consultant'` for an execution planning task. The agent will gather codebase context, construct the planning prompt, invoke the CLI, and report the detailed plan.
+*End of consultant prompt.*
+
+## Implementation Note
+
+Use the Task tool with `subagent_type='consultant:consultant'`. The agent will gather codebase context, append it to the prompt above, invoke the consultant CLI, and report the detailed plan.

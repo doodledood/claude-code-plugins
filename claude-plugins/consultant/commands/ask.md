@@ -10,9 +10,12 @@ If the user does NOT explicitly specify a model in $ARGUMENTS, use `gpt-5-pro`.
 
 Only use a different model if the user explicitly names one (e.g., "use claude-opus-4-5-20251101 to..." or "ask gemini/gemini-3-pro-preview about...").
 
-## Implementation
+## Implementation Note
 
-Invoke the Task tool with `subagent_type='consultant:consultant'`. Pass along the user's request from $ARGUMENTS, specifying that this is a single-model consultation defaulting to gpt-5-pro.
+Use the Task tool with `subagent_type='consultant:consultant'`. Pass the user's request below as the consultant prompt, specifying single-model consultation defaulting to gpt-5-pro.
 
-## User Request
+---
+
+# Consultant Prompt
+
 $ARGUMENTS

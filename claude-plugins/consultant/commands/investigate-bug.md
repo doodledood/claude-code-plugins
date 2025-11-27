@@ -2,7 +2,11 @@
 description: Deep bug investigation using consultant agent. Identifies root causes, traces execution flow, assesses blast radius, and provides fix suggestions.
 ---
 
-Perform deep bug investigation using the consultant agent.
+Perform deep bug investigation using the consultant agent with the following prompt:
+
+---
+
+# Bug Investigation Prompt
 
 ## Investigation Focus
 
@@ -20,6 +24,10 @@ Perform deep bug investigation using the consultant agent.
 - **LOW**: Minor issue, limited impact
 - **INFO**: Observation, potential issue, monitoring needed
 
-## Implementation
+---
 
-Invoke the Task tool with `subagent_type='consultant:consultant'` for a bug investigation task. The agent will gather symptoms, construct the investigation prompt, invoke the CLI, and report root cause analysis.
+*End of consultant prompt.*
+
+## Implementation Note
+
+Use the Task tool with `subagent_type='consultant:consultant'`. The agent will gather symptoms, append them to the prompt above, invoke the consultant CLI, and report root cause analysis.
