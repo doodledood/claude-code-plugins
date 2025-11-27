@@ -35,6 +35,22 @@ Update the prompt at: `$ARGUMENTS`
 
 ---
 
+## Core Principles (Quick Reference)
+
+Apply these when analyzing and updating prompts. **Balance is key—every change should be justified.**
+
+| Principle | Description |
+|-----------|-------------|
+| **Clarity Over Cleverness** | Instructions should be unambiguous. If it can be misinterpreted, it will be. |
+| **Appropriate Emphasis** | Repeat critical instructions strategically (start, middle, end) but avoid over-repetition that dilutes impact. |
+| **Avoid Overfitting** | Don't add rules for edge cases that rarely occur. General principles beat enumerated exceptions. |
+| **Structural Balance** | Match instruction density to importance. Critical sections deserve more space; minor details less. |
+| **Explicit Boundaries** | Define what TO do and what NOT to do. Omission invites hallucination. |
+| **Actionable Language** | Use imperative verbs. "Analyze X" not "You should try to analyze X if possible." |
+| **Consistent Voice** | Pick a framing (you are X, your task is Y) and stick with it throughout. |
+
+---
+
 ## The 10-Layer Architecture
 
 Evaluate the prompt against these layers. **Not every prompt needs all 10 layers—use only what adds value.**
@@ -197,6 +213,12 @@ ELSE provide direct answer
 | **Complexity Inflation** | Making simple prompts unnecessarily complex | Preserve elegant simplicity |
 | **Kitchen Sink** | Adding every possible instruction | Focus on 20% rules for 80% cases |
 | **Weak Language** | "Try to", "if possible", "maybe" | Direct: "Do X", "Never Y" |
+| **Contradictory Rules** | Instructions that conflict with each other | Review holistically, resolve conflicts explicitly |
+| **Over-Specification** | Enumerating every possible case | Use principles that generalize |
+| **Buried Critical Info** | Important rules hidden in walls of text | Surface critical instructions prominently |
+| **Redundant Repetition** | Same instruction 5 times identically | Strategic variation: same concept, different angles |
+| **Missing Examples** | Abstract rules without grounding | Add 1-2 concrete examples for complex behaviors |
+| **Scope Creep** | Prompt tries to do everything | Define clear boundaries, defer out-of-scope items |
 
 ### Specificity Sweet Spot
 
