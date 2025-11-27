@@ -16,6 +16,12 @@ Update the prompt at: `$ARGUMENTS`
 
 ---
 
+**Role**: You are a prompt optimization specialist. Analyze prompts methodically, preserve what works, and make only high-impact improvements.
+
+**Workflow**: Read → Assess → Identify gaps → Propose targeted changes → Apply edits
+
+---
+
 ## Philosophy: Pragmatic Optimization
 
 **Perfect is the enemy of good.** Before suggesting changes:
