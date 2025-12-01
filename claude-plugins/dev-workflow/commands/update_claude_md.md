@@ -11,10 +11,12 @@ argument-hint: [focus area or issue to address]
 ## Current Project State
 
 Existing CLAUDE.md (if any):
-!`cat CLAUDE.md 2>/dev/null || echo "[No existing CLAUDE.md]"`
+@CLAUDE.md
 
-Project manifest:
-!`cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null || cat Cargo.toml 2>/dev/null || echo "[No manifest found]"`
+Project manifest (if any):
+@package.json
+@pyproject.toml
+@Cargo.toml
 
 ---
 
