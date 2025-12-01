@@ -4,77 +4,46 @@ allowed-tools: ["Read", "Glob", "Grep", "Edit", "Write", "Bash"]
 argument-hint: [focus area or issue to address]
 ---
 
-Create or update my CLAUDE.md file. $ARGUMENTS
+Update my CLAUDE.md based on: $ARGUMENTS
 
-Here's my current CLAUDE.md (if it exists):
+Current CLAUDE.md:
 @CLAUDE.md
 
-And my project manifest:
+Project manifest:
 @package.json
 @pyproject.toml
 @Cargo.toml
 
 ---
 
-First, explore my codebase to understand the project structure, existing docs, CI config, and linter setup.
+If CLAUDE.md exists, make targeted updates based on my request above. Only explore the codebase if essential information is missing.
 
-If I already have a CLAUDE.md, preserve what works and enhance it. Don't do a wholesale rewrite unless it's really broken.
+If creating from scratch or missing critical sections, ensure it covers:
+- **WHAT**: Tech stack, project structure, key entry points
+- **WHY**: What the project does, domain context
+- **HOW**: Build/test/run commands, verification steps
 
-Keep it **brief**. Claude can only follow ~150-200 instructions reliably, and the system prompt already uses ~50. Aim for:
+**Constraints** (Claude follows ~150 instructions max, system uses ~50):
 - Simple projects: 30-60 lines
-- Standard projects: 60-150 lines
-- Complex/monorepos: 150-300 lines max
+- Standard: 60-150 lines
+- Complex/monorepo: 150-300 lines max
 
-Focus on three things:
-1. **WHAT** - Tech stack, project structure, key entry points
-2. **WHY** - What the project does, why components exist
-3. **HOW** - Build/test/run commands, verification steps
+**Do**: Imperative language | Verify commands work | Reference README (don't duplicate)
 
-**Do**:
-- Use imperative, concise language
-- Verify commands actually work before including them
-- Reference the README instead of duplicating it
+**Don't**: Style rules (use linters) | File enumeration (describe patterns) | Task-specific instructions | Boilerplate
 
-**Don't**:
-- Add style rules (that's what linters are for)
-- Enumerate every file or function (describe patterns instead)
-- Include task-specific instructions (keep it universal)
-- Generate boilerplate
+Bad: `Always use camelCase. Document with JSDoc.`
+Good: `npm test  # Required before PR`
 
-Here's what bad vs good looks like:
-
-Bad (style-focused):
-```
-Always use camelCase. Document with JSDoc. Keep files under 200 lines.
-```
-
-Good (actionable):
-```
-## Commands
-npm run dev    # Dev server
-npm test       # Required before PR
-
-## Architecture
-React + TypeScript in src/. API via src/api/client.ts.
-```
-
-Structure the output like this:
+Template:
 ```
 # CLAUDE.md
-
 [1-2 sentence description]
 
 ## Tech Stack
-- [Key technologies]
-
 ## Project Structure
-dir/    # Purpose
-
 ## Development Commands
-[Build, test, lint commands]
-
-## Architecture Notes
-[Only if genuinely helpful]
+## Architecture Notes (only if helpful)
 ```
 
-Before you finish, verify: under 300 lines, no style rules, all instructions are universal, commands are verified, no README duplication.
+Verify before finishing: <300 lines, no style rules, universal instructions, commands tested.
