@@ -9,11 +9,6 @@ Update my CLAUDE.md based on: $ARGUMENTS
 Current CLAUDE.md:
 @CLAUDE.md
 
-Project manifest:
-@package.json
-@pyproject.toml
-@Cargo.toml
-
 ---
 
 If CLAUDE.md exists, make targeted updates based on my request above. Only explore the codebase if essential information is missing.
