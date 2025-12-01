@@ -1,156 +1,101 @@
 ---
-description: Create or update a CLAUDE.md file with best practices for effective AI collaboration - focuses on brevity, universal applicability, and progressive disclosure
+description: Create or update CLAUDE.md with best practices - brevity, universal applicability, progressive disclosure
 allowed-tools: ["Read", "Glob", "Grep", "Edit", "Write", "Bash"]
-arguments:
-  - name: context
-    description: Focus areas, existing issues, or specific context (e.g., "add testing commands", "focus on monorepo structure")
-    required: false
+argument-hint: [focus area or issue to address]
 ---
 
 # Update CLAUDE.md
 
-**User Context**: $ARGUMENTS
+**Context**: $ARGUMENTS
+
+## Current Project State
+
+Existing CLAUDE.md (if any):
+!`cat CLAUDE.md 2>/dev/null || echo "[No existing CLAUDE.md]"`
+
+Project manifest:
+!`cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null || cat Cargo.toml 2>/dev/null || echo "[No manifest found]"`
 
 ---
 
-**Role**: CLAUDE.md specialist creating concise, high-leverage project documentation for Claude Code.
+**Role**: CLAUDE.md specialist. Create concise, high-leverage documentation for Claude Code.
 
-**Critical**: Read existing CLAUDE.md first. Preserve what works. Brevity > comprehensiveness.
+**Critical**: Preserve what works. Brevity > comprehensiveness.
 
 ## Core Principles
 
 | Principle | Rationale |
 |-----------|-----------|
-| **Brevity over completeness** | Claude follows ~150-200 instructions reliably; system prompt uses ~50. Less is more. |
-| **Universal applicability** | Task-specific content gets ignored. Keep instructions broadly relevant. |
+| **Brevity** | Claude follows ~150-200 instructions reliably. System prompt uses ~50. Less is more. |
+| **Universal** | Task-specific content gets ignored. Keep instructions broadly relevant. |
 | **Progressive disclosure** | Reference separate files for details. Don't embed everything. |
-| **No style guidelines** | Never send an LLM to do a linter's job. Point to configs instead. |
+| **No style rules** | Never send an LLM to do a linter's job. Point to configs instead. |
 
-## Complexity Scaling
+## Target Length
 
-| Project Type | Target Lines | Focus |
-|--------------|--------------|-------|
-| Simple (single-purpose) | 30-60 | Commands + brief structure |
+| Project Type | Lines | Focus |
+|--------------|-------|-------|
+| Simple | 30-60 | Commands + brief structure |
 | Standard | 60-150 | Full WHAT/WHY/HOW |
-| Complex (monorepo/large) | 150-300 | Progressive disclosure + file references |
+| Complex/monorepo | 150-300 | Progressive disclosure + file refs |
 
-## The Three Essential Sections
+## Three Essential Sections
 
-### WHAT - Codebase Map
-Tech stack, project structure, main entry points, architecture patterns.
-
-### WHY - Purpose & Context
-What the project does, why components exist, domain terminology.
-
-### HOW - Working with the Project
-Build/test/run commands, verification methods, development workflow.
+**WHAT** - Tech stack, project structure, entry points, architecture patterns
+**WHY** - Purpose, why components exist, domain terminology
+**HOW** - Build/test/run commands, verification methods, workflow
 
 ## Process
 
-### 1. Explore the Codebase
-Identify: manifest files, directory structure, existing docs, CI/CD config, linter setup, test commands.
+1. **Analyze** project structure, manifest, existing docs, CI config, linter setup
+2. **Check** existing CLAUDE.md - enhance if present, create if not
+3. **Draft** with constraints below
+4. **Verify** commands work before including
 
-### 2. Handle Existing CLAUDE.md
+## Constraints
 
+**MUST**: Under 300 lines | Imperative language | Verified commands | Reference (don't duplicate) README
+
+**NEVER**: Style rules | File/function enumeration | Task-specific instructions | Boilerplate
+
+## Example
+
+**Bad** (style-focused):
 ```
-IF CLAUDE.md exists
-  THEN read it, identify gaps, enhance while preserving working content
-ELSE
-  THEN create from scratch
-```
-
-### 3. Handle User Context
-
-```
-IF $ARGUMENTS specifies focus areas
-  THEN prioritize those sections
-ELSE IF $ARGUMENTS mentions issues to fix
-  THEN address those specific problems
-ELSE
-  THEN do comprehensive analysis
+Always use camelCase. Document with JSDoc. Keep files under 200 lines.
 ```
 
-### 4. Draft with Constraints
-
-**MUST**:
-- Keep under 300 lines
-- Use imperative, concise language
-- Verify commands actually work
-- Reference (not duplicate) README content
-
-**NEVER**:
-- Add style rules (point to linter config)
-- Enumerate every file/function (describe patterns)
-- Include task-specific instructions
-- Auto-generate boilerplate
-
-## Example: Good vs Bad
-
-**Bad** (over-specified, style-focused):
+**Good** (actionable):
 ```
-Always use camelCase for variables. Functions should be
-documented with JSDoc. Keep files under 200 lines. Use
-4 spaces for indentation. Every component must have...
-```
-
-**Good** (actionable, universal):
-```
-## Development Commands
-
-npm run dev      # Start dev server
-npm test         # Run tests (required before PR)
-npm run lint     # Fix lint issues (pre-commit hook runs this)
+## Commands
+npm run dev    # Dev server
+npm test       # Required before PR
+npm run lint   # Pre-commit hook runs this
 
 ## Architecture
-
-React + TypeScript frontend in src/. API calls go through
-src/api/client.ts. State management via Zustand in src/stores/.
+React + TypeScript in src/. API via src/api/client.ts. State in src/stores/.
 ```
 
-## Output Template
-
-Structure the CLAUDE.md like this:
+## Output Structure
 
 ```
 # CLAUDE.md
 
-Brief project description (1-2 sentences).
+[1-2 sentence description]
 
 ## Tech Stack
-- [Key technologies only]
+- [Key technologies]
 
 ## Project Structure
-key-dir/     # Purpose
-other-dir/   # Purpose
+dir/    # Purpose
 
 ## Development Commands
-
-Build & Run:
-[essential commands]
-
-Testing:
-[test commands]
-
-Linting:
-[lint/format commands]
+[Build, test, lint commands]
 
 ## Architecture Notes
-[Only if genuinely helpful - omit if not needed]
-
-## Additional Resources
-- [Reference to other docs if relevant]
+[Only if helpful - omit if not needed]
 ```
 
 ## Quality Gate
 
-Before finalizing, verify ALL:
-- [ ] Under 300 lines
-- [ ] No style guidelines embedded
-- [ ] All instructions universally applicable
-- [ ] Commands verified to work
-- [ ] No README duplication
-- [ ] Imperative language throughout
-
----
-
-**Critical**: Read existing CLAUDE.md first. Preserve what works. Make targeted improvements, not wholesale rewrites.
+Before finalizing: Under 300 lines | No style rules | Universal instructions | Commands verified | No README duplication
