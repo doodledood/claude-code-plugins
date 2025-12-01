@@ -4,82 +4,61 @@ allowed-tools: ["Read", "Glob", "Grep", "Edit", "Write", "Bash"]
 argument-hint: [focus area or issue to address]
 ---
 
-# Update CLAUDE.md
+Create or update my CLAUDE.md file. $ARGUMENTS
 
-**Context**: $ARGUMENTS
-
-## Current Project State
-
-Existing CLAUDE.md (if any):
+Here's my current CLAUDE.md (if it exists):
 @CLAUDE.md
 
-Project manifest (if any):
+And my project manifest:
 @package.json
 @pyproject.toml
 @Cargo.toml
 
 ---
 
-**Role**: CLAUDE.md specialist. Create concise, high-leverage documentation for Claude Code.
+First, explore my codebase to understand the project structure, existing docs, CI config, and linter setup.
 
-**Critical**: Preserve what works. Brevity > comprehensiveness.
+If I already have a CLAUDE.md, preserve what works and enhance it. Don't do a wholesale rewrite unless it's really broken.
 
-## Core Principles
+Keep it **brief**. Claude can only follow ~150-200 instructions reliably, and the system prompt already uses ~50. Aim for:
+- Simple projects: 30-60 lines
+- Standard projects: 60-150 lines
+- Complex/monorepos: 150-300 lines max
 
-| Principle | Rationale |
-|-----------|-----------|
-| **Brevity** | Claude follows ~150-200 instructions reliably. System prompt uses ~50. Less is more. |
-| **Universal** | Task-specific content gets ignored. Keep instructions broadly relevant. |
-| **Progressive disclosure** | Reference separate files for details. Don't embed everything. |
-| **No style rules** | Never send an LLM to do a linter's job. Point to configs instead. |
+Focus on three things:
+1. **WHAT** - Tech stack, project structure, key entry points
+2. **WHY** - What the project does, why components exist
+3. **HOW** - Build/test/run commands, verification steps
 
-## Target Length
+**Do**:
+- Use imperative, concise language
+- Verify commands actually work before including them
+- Reference the README instead of duplicating it
 
-| Project Type | Lines | Focus |
-|--------------|-------|-------|
-| Simple | 30-60 | Commands + brief structure |
-| Standard | 60-150 | Full WHAT/WHY/HOW |
-| Complex/monorepo | 150-300 | Progressive disclosure + file refs |
+**Don't**:
+- Add style rules (that's what linters are for)
+- Enumerate every file or function (describe patterns instead)
+- Include task-specific instructions (keep it universal)
+- Generate boilerplate
 
-## Three Essential Sections
+Here's what bad vs good looks like:
 
-**WHAT** - Tech stack, project structure, entry points, architecture patterns
-**WHY** - Purpose, why components exist, domain terminology
-**HOW** - Build/test/run commands, verification methods, workflow
-
-## Process
-
-1. **Analyze** project structure, manifest, existing docs, CI config, linter setup
-2. **Check** existing CLAUDE.md - enhance if present, create if not
-3. **Draft** with constraints below
-4. **Verify** commands work before including
-
-## Constraints
-
-**MUST**: Under 300 lines | Imperative language | Verified commands | Reference (don't duplicate) README
-
-**NEVER**: Style rules | File/function enumeration | Task-specific instructions | Boilerplate
-
-## Example
-
-**Bad** (style-focused):
+Bad (style-focused):
 ```
 Always use camelCase. Document with JSDoc. Keep files under 200 lines.
 ```
 
-**Good** (actionable):
+Good (actionable):
 ```
 ## Commands
 npm run dev    # Dev server
 npm test       # Required before PR
-npm run lint   # Pre-commit hook runs this
 
 ## Architecture
-React + TypeScript in src/. API via src/api/client.ts. State in src/stores/.
+React + TypeScript in src/. API via src/api/client.ts.
 ```
 
-## Output Structure
-
+Structure the output like this:
 ```
 # CLAUDE.md
 
@@ -95,9 +74,7 @@ dir/    # Purpose
 [Build, test, lint commands]
 
 ## Architecture Notes
-[Only if helpful - omit if not needed]
+[Only if genuinely helpful]
 ```
 
-## Quality Gate
-
-Before finalizing: Under 300 lines | No style rules | Universal instructions | Commands verified | No README duplication
+Before you finish, verify: under 300 lines, no style rules, all instructions are universal, commands are verified, no README duplication.
