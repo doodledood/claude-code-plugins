@@ -1,21 +1,17 @@
 ---
-description: Single-model consultation. Sends a prompt to the consultant agent using one model. Defaults to gpt-5-pro if no model is specified.
+description: Single-model consultation using consultant agent. Defaults to gpt-5-pro.
+allowed-tools: ["Task"]
+argument-hint: [question or topic to consult about]
 ---
 
-Perform a consultation using the consultant agent with a single model.
-
-## Default Model
-
-If the user does NOT explicitly specify a model in $ARGUMENTS, use `gpt-5-pro`.
-
-Only use a different model if the user explicitly names one (e.g., "use claude-opus-4-5-20251101 to..." or "ask gemini/gemini-3-pro-preview about...").
-
-## Implementation Note
-
-Use the Task tool with `subagent_type='consultant:consultant'`. Pass the user's request below as the consultant prompt, specifying single-model consultation defaulting to gpt-5-pro.
+Consult an external model about: $ARGUMENTS
 
 ---
 
-# Consultant Prompt
+Use the Task tool with `subagent_type='consultant:consultant'`. Pass the question/topic above as the consultant prompt.
 
-$ARGUMENTS
+**Defaults**:
+- Model: `gpt-5-pro` (unless user specifies another, e.g., "use claude-opus-4-5-20251101 to...")
+- Single-model mode
+
+The agent handles context gathering, CLI invocation, and response relay.

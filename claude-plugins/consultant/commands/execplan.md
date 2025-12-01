@@ -1,35 +1,25 @@
 ---
-description: Create comprehensive execution plans using consultant agent for deep analysis and specification design.
+description: Create comprehensive execution plans using consultant agent for deep analysis.
+allowed-tools: ["Task"]
+argument-hint: [feature or task to plan]
 ---
 
-Create a comprehensive execution plan using the consultant agent with the following prompt:
+Create an execution plan for: $ARGUMENTS
 
 ---
 
-# Execution Plan Prompt
+Use the Task tool with `subagent_type='consultant:consultant'`. The agent gathers codebase context, invokes the consultant CLI, and reports the plan.
 
-## Planning Focus
-
-1. **Architecture**: How to integrate with existing systems
-2. **Implementation**: Step-by-step breakdown of work
-3. **Validation**: How to verify correctness at each step
+**Planning focus**:
+1. **Architecture**: Integration with existing systems
+2. **Implementation**: Step-by-step breakdown with dependencies
+3. **Validation**: Verification criteria at each step
 4. **Testing**: Comprehensive test strategy
-5. **Risk Mitigation**: Edge cases, rollback plan
+5. **Risks**: Edge cases, rollback plan
 
-## Plan Quality
-
-Ensure the execution plan is:
-
-- **Detailed**: Specific files, functions, and code patterns
-- **Ordered**: Clear dependencies and sequencing
-- **Testable**: Each step has validation criteria
-- **Practical**: Implementable with current codebase
-- **Risk-Aware**: Identifies potential issues and mitigations
-
----
-
-*End of consultant prompt.*
-
-## Implementation Note
-
-Use the Task tool with `subagent_type='consultant:consultant'`. The agent will gather codebase context, append it to the prompt above, invoke the consultant CLI, and report the detailed plan.
+**Plan quality requirements**:
+- Specific files, functions, and code patterns
+- Clear dependencies and sequencing
+- Each step has validation criteria
+- Practical with current codebase
+- Identifies potential issues and mitigations
