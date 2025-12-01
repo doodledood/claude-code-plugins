@@ -38,7 +38,7 @@
       "name": "dev-workflow",
       "source": "./claude-plugins/dev-workflow",
       "description": "Developer workflow tools for maintaining project documentation - includes update_claude_md command for creating and maintaining effective CLAUDE.md files with best practices",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "development",
       "keywords": ["workflow", "claude-md", "documentation", "project-setup", "developer-tools"]
     }
