@@ -52,12 +52,6 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
 - Intelligent model selection with scoring algorithm
 - Token counting with pre-flight validation
 - Async execution with session management
-- OPENAI_BASE_URL environment variable support
-
-**Requirements:**
-```bash
-pip install litellm requests
-```
 
 **Category:** development
 **Keywords:** consultant, code-review, analysis, architecture, bug-investigation, ai-analysis, litellm, multi-provider, local-models
@@ -74,6 +68,40 @@ Comprehensive planning tools with automatic keyword detection via hooks.
 
 **Category:** development
 **Keywords:** planning, execplan, implementation-plan, methodology, hooks
+
+---
+
+### prompt-engineering (v1.2.0)
+Tools for crafting, refining, and improving LLM prompts using the 10-Layer Architecture methodology.
+
+**Features:**
+- `/update-prompt` command - Refine and improve prompts with balanced optimization
+
+**Key Capabilities:**
+- 10-Layer Architecture analysis (Identity, Capabilities, Decision Architecture, etc.)
+- High-impact improvements only (>20% improvement threshold)
+- Preserves what already works well
+- Avoids over-engineering and complexity inflation
+
+**Category:** development
+**Keywords:** prompt-engineering, prompts, llm, optimization, prompt-design
+
+---
+
+### dev-workflow (v1.2.0)
+Developer workflow tools for maintaining project documentation and setup.
+
+**Features:**
+- `/update_claude_md` command - Create or update CLAUDE.md with best practices
+
+**Key Capabilities:**
+- Brevity-focused (30-300 lines based on project complexity)
+- Progressive disclosure for complex projects
+- Universal instructions over task-specific ones
+- Verified, tested commands
+
+**Category:** development
+**Keywords:** workflow, claude-md, documentation, project-setup, developer-tools
 
 ---
 
