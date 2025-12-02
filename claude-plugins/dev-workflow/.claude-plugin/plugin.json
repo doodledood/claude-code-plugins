@@ -7,11 +7,7 @@
     "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/doodledood/claude-code-plugins.git"
-  },
+  "repository": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["workflow", "claude-md", "documentation", "project-setup", "developer-tools"],
-  "category": "development"
+  "keywords": ["workflow", "claude-md", "documentation", "project-setup", "developer-tools"]
 }
