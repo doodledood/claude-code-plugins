@@ -1,12 +1,23 @@
 # Dev Workflow Plugin
 
-Developer workflow tools for maintaining project documentation and setup.
+Autonomous feature development workflow for Claude Code.
 
 ## Overview
 
-This plugin helps maintain high-quality CLAUDE.md files - the highest-leverage configuration point for Claude Code projects. It follows best practices for brevity, universal applicability, and progressive disclosure.
+This plugin enables Claude to develop features as autonomously as possible - from planning through implementation to review.
 
 ## Components
+
+### Agents
+
+#### `code-implementor`
+Implements well-defined coding tasks using a strict incremental workflow. Makes small changes (5-30 lines), runs quality gates (Typecheck → Tests → Lint) after every change, and proceeds only when green.
+
+#### `code-maintainability-reviewer`
+Performs comprehensive maintainability audits identifying DRY violations, dead code, YAGNI violations, unnecessary complexity, and consistency issues. Use after implementing features or before PRs.
+
+#### `test-coverage-auditor`
+Analyzes diffs between your branch and main to ensure all new/modified logic has adequate test coverage. Provides specific test recommendations for coverage gaps.
 
 ### Command: `/update_claude_md`
 
