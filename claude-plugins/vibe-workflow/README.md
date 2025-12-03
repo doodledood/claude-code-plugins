@@ -1,4 +1,4 @@
-# Dev Workflow Plugin
+# Vibe Workflow Plugin
 
 Autonomous feature development workflow for Claude Code.
 
@@ -91,7 +91,7 @@ npm test  # Required before PR
 
 ```bash
 /plugin marketplace add https://github.com/doodledood/claude-code-plugins
-/plugin install dev-workflow@claude-code-plugins-marketplace
+/plugin install vibe-workflow@claude-code-plugins-marketplace
 ```
 
 ## License
