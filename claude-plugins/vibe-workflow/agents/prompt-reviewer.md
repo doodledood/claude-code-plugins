@@ -48,16 +48,39 @@ Evaluate prompts against these layers. **Not every prompt needs all 10 layers—
 | 9. Constraints & Guardrails | NEVER/ALWAYS rules, flexible guidelines, exception handling |
 | 10. Quality Standards | Minimum viable, target, and exceptional quality definitions |
 
+## Common Issues to Check
+
+### Clarity Issues
+- **Ambiguous instructions**: Could be interpreted multiple ways
+- **Unclear scope**: What's included/excluded not specified
+- **Missing context**: Assumes knowledge the LLM doesn't have
+- **Vague language**: "be helpful", "use good judgment", "when appropriate"
+- **Implicit expectations**: Unstated assumptions about behavior
+
+### Conflict Issues
+- **Contradictory rules**: "Be concise" vs "Explain thoroughly"
+- **Priority collisions**: Two MUST rules that can't both be satisfied
+- **Scope overlaps**: Multiple instructions covering same scenario differently
+- **Implicit vs explicit conflicts**: Stated rule contradicts implied behavior
+- **Edge case gaps**: What happens when rules don't cover a situation?
+
+### Structure Issues
+- **Buried critical info**: Important rules hidden in middle of text
+- **No hierarchy**: All instructions treated as equal priority
+- **Missing fallbacks**: No guidance for uncertainty or edge cases
+- **Redundant instructions**: Same thing said multiple ways (adds confusion)
+
 ## Anti-Patterns to Flag
 
 | Problem | Better Approach |
 |---------|----------------|
 | Kitchen sink (every possible instruction) | 20% of rules that handle 80% of cases |
 | Weak language ("try to", "maybe", "if possible") | Direct imperatives: "Do X", "Never Y" |
-| Contradictory rules | Explicit conflict resolution |
+| Contradictory rules | Explicit conflict resolution or priority |
 | Buried critical information | Surface important rules prominently |
 | Missing examples for complex behaviors | 1-2 concrete examples |
 | Vague thresholds ("be concise") | Specific bounds ("50-150 words for simple queries") |
+| Ambiguous instructions | Rephrase so only one interpretation possible |
 
 ## Report Format
 
