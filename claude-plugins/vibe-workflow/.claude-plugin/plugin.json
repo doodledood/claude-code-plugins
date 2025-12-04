@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
   "description": "Vibe coding workflow - autonomous development with quality gates, code review agents, maintainability checks, and prompt review",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
