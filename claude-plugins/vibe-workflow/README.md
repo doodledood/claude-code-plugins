@@ -22,6 +22,9 @@ Analyzes diffs between your branch and main to ensure all new/modified logic has
 #### `bug-fixer`
 Investigates and fixes bugs with deep root cause analysis. Creates tests to reproduce issues, implements fixes, and verifies through a test-driven loop.
 
+#### `prompt-reviewer`
+Analyzes LLM prompts against the 10-Layer Architecture framework. Provides detailed assessment reports with strengths, problem areas, and prioritized recommendations. Review-only—does not modify files.
+
 ### Commands
 
 | Command | Description |

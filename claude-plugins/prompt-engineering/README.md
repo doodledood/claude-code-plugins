@@ -1,35 +1,32 @@
 # Prompt Engineering Plugin
 
-Tools for crafting, refining, and improving LLM prompts using the 10-Layer Architecture methodology.
+Tools for reviewing and analyzing LLM prompts using the 10-Layer Architecture methodology.
 
 ## Overview
 
-This plugin provides systematic prompt optimization that balances improvement with simplicity. It analyzes prompts against a comprehensive framework while avoiding over-engineering.
+This plugin provides systematic prompt review that identifies genuine improvement opportunities while respecting what already works. It analyzes prompts against a comprehensive framework without over-engineering.
 
 ## Components
 
-### Command: `/update-prompt`
+### Command: `/review_prompt`
 
-Refine and improve LLM prompts with balanced optimization.
+Review and analyze LLM prompts (does not modify files).
 
 **Usage:**
 ```bash
-# Optimize a prompt file
-/update-prompt path/to/prompt.md
+# Review a prompt file
+/review_prompt path/to/prompt.md
 
-# Optimize inline text
-/update-prompt "Your prompt text here"
-
-# With additional context
-/update-prompt path/to/prompt.md context="Focus on clarity"
+# Review inline text
+/review_prompt "Your prompt text here"
 ```
 
 **What it does:**
 - Analyzes prompts against the 10-Layer Architecture
 - Identifies genuine gaps (not theoretical imperfections)
-- Proposes only high-impact improvements (>20% improvement threshold)
-- Preserves what already works well
-- Avoids over-engineering and complexity inflation
+- Provides detailed assessment with strengths and problem areas
+- Prioritizes recommendations by severity and impact
+- Reports only—does not modify files
 
 ## Philosophy
 
