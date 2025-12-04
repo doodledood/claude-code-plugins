@@ -1,7 +1,7 @@
 {
   "name": "dev-workflow",
   "description": "Autonomous feature development workflow with quality gates, code reviews, and project documentation",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
