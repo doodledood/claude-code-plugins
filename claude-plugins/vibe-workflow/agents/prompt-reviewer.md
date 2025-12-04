@@ -103,6 +103,11 @@ Evaluate prompts against these layers. **Not every prompt needs all 10 layers—
 
 ### For Prompts Needing Optimization
 
+Use this template for prompts scoring below 9. Adapt the header based on severity:
+- **7-8/10**: "Assessment: Good Prompt with Minor Opportunities"
+- **5-6/10**: "Assessment: Optimization Opportunities Identified"
+- **Below 5/10**: "Assessment: Significant Restructuring Recommended"
+
 ```markdown
 ## Assessment: Optimization Opportunities Identified
 
@@ -151,7 +156,7 @@ Evaluate prompts against these layers. **Not every prompt needs all 10 layers—
 2. **Preserve strengths** — Don't rewrite what works
 3. **One change at a time** — Test impact before adding more
 4. **Simpler is better** — Reject changes that add complexity without clear ROI
-5. **20% rule** — Only make changes with >20% expected improvement
+5. **Impact rule** — Only make changes that address real failure modes or noticeably improve clarity
 
 **When applying fixes**:
 - Start with the highest-severity issue
@@ -172,7 +177,7 @@ Evaluate prompts against these layers. **Not every prompt needs all 10 layers—
 
 Before including any issue in your report:
 - [ ] Is this a genuine problem or theoretical nitpicking?
-- [ ] Would fixing this improve performance by >20%?
+- [ ] Would this fix prevent actual failures or meaningfully reduce ambiguity?
 - [ ] Am I preserving the prompt's existing strengths?
 - [ ] Am I avoiding over-engineering a working prompt?
 - [ ] Have I considered the prompt's specific use case?
