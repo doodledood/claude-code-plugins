@@ -100,7 +100,7 @@ Vibe coding workflow - autonomous development with quality gates and code review
 - `/review-maintainability` command - Launch code-maintainability-reviewer agent (defaults to git diff scope)
 - `/audit-coverage` command - Launch test-coverage-auditor agent (defaults to git diff scope)
 - `/bugfix` command - Launch bug-fixer agent
-- `/update_claude_md` command - Create or update CLAUDE.md with best practices
+- `/update-claude-md` command - Create or update CLAUDE.md with best practices
 
 **Key Capabilities:**
 - Autonomous feature development from plan to implementation

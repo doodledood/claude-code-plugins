@@ -32,6 +32,8 @@ Each plugin can contain:
 - `skills/` - Contextual skills with `SKILL.md` files
 - `hooks/` - Event handlers for Claude Code events
 
+**Naming convention**: Use kebab-case (`-`) for all file, command, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
+
 See each plugin's README for architecture details.
 
 ## Plugin Versioning

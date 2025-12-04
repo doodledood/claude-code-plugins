@@ -25,6 +25,9 @@ Investigates and fixes bugs with deep root cause analysis. Creates tests to repr
 #### `prompt-reviewer`
 Analyzes LLM prompts against the 10-Layer Architecture framework. Provides detailed assessment reports with strengths, problem areas, and prioritized recommendations. Review-only—does not modify files.
 
+#### `slop-cleaner`
+Finds and removes AI-generated code slop: useless comments, verbose patterns, unnecessary abstractions, and filler phrases. Conservative by default—only removes clearly unnecessary content.
+
 ### Commands
 
 | Command | Description |
@@ -33,22 +36,23 @@ Analyzes LLM prompts against the 10-Layer Architecture framework. Provides detai
 | `/review-maintainability` | Launch code-maintainability-reviewer agent (defaults to git diff scope) |
 | `/audit-coverage` | Launch test-coverage-auditor agent (defaults to git diff scope) |
 | `/bugfix` | Launch bug-fixer agent |
-| `/update_claude_md` | Create or update CLAUDE.md with best practices |
+| `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
+| `/update-claude-md` | Create or update CLAUDE.md with best practices |
 
-### Command: `/update_claude_md`
+### Command: `/update-claude-md`
 
 Create or update CLAUDE.md with best practices.
 
 **Usage:**
 ```bash
 # Create or update CLAUDE.md
-/update_claude_md
+/update-claude-md
 
 # Focus on specific area
-/update_claude_md add testing commands
+/update-claude-md add testing commands
 
 # Address specific issue
-/update_claude_md fix outdated build instructions
+/update-claude-md fix outdated build instructions
 ```
 
 **What it does:**
