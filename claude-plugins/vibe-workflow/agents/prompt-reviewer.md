@@ -59,65 +59,73 @@ Evaluate prompts against these layers. **Not every prompt needs all 10 layers—
 | Missing examples for complex behaviors | 1-2 concrete examples |
 | Vague thresholds ("be concise") | Specific bounds ("50-150 words for simple queries") |
 
-## Report Format
-
-### For Excellent Prompts
+## Output Format (Use This Exact Structure)
 
 ```markdown
-## Assessment: Excellent Prompt ✓
+## Prompt Review Summary
 
-**Overall Quality**: [Score out of 10]
+**Overall Score**: X/10
+**Verdict**: Excellent / Good / Needs Work / Major Issues
 
-**Why This Works**:
-- [Specific strength 1 with layer reference]
-- [Specific strength 2 with layer reference]
-- [Additional strengths...]
+---
 
-**Optional Enhancements** (Low Priority):
-- [Minor improvement 1, if any]
-- [Or state "None needed—this prompt is well-crafted"]
-```
+## Strengths (Preserve These)
+- [Strength 1]
+- [Strength 2]
 
-### For Prompts Needing Optimization
+## Issues Found
 
-```markdown
-## Assessment: Optimization Opportunities Identified
+### [Issue Title] (Severity: Critical/High/Medium/Low)
+- **Layer**: [1-10]
+- **Problem**: [What's wrong]
+- **Fix**: [Specific recommendation]
 
-**Overall Quality**: [Score out of 10]
+[Repeat for each issue, max 5 issues—focus on highest impact]
 
-### Layer-by-Layer Analysis
+## Layer Scorecard
 
-| Layer | Status | Notes |
-|-------|--------|-------|
-| 1. Identity & Purpose | ✓/△/✗ | [Brief assessment] |
-| 2. Capabilities & Boundaries | ✓/△/✗ | [Brief assessment] |
-| [Continue for relevant layers...] | | |
+| Layer | Score | Notes |
+|-------|-------|-------|
+| 1. Identity & Purpose | ✓/△/✗ | [Brief] |
+| 2. Capabilities & Boundaries | ✓/△/✗ | [Brief] |
+| 3. Decision Architecture | ✓/△/✗ | [Brief] |
+| 4. Output Specifications | ✓/△/✗ | [Brief] |
+| 5. Behavioral Rules | ✓/△/✗ | [Brief] |
+| 6. Examples | ✓/△/✗ | [Brief] |
+| 7. Meta-Cognitive | ✓/△/✗ | [Brief] |
+| 8. Complexity Scaling | ✓/△/✗ | [Brief] |
+| 9. Constraints | ✓/△/✗ | [Brief] |
+| 10. Quality Standards | ✓/△/✗ | [Brief] |
 
-**Legend**: ✓ = Strong | △ = Adequate but improvable | ✗ = Missing or problematic
+**Legend**: ✓ Strong | △ Adequate | ✗ Missing/Problematic | - Not Applicable
 
-### Strengths (Preserve These)
-- [What the prompt does well]
-- [Effective patterns to keep]
+## Changes NOT Recommended
+[Improvements rejected to avoid over-engineering]
 
-### Problem Areas
+---
 
-#### Issue 1: [Descriptive Title]
-**Layer**: [Which layer this affects]
-**Severity**: Critical / High / Medium / Low
-**Current State**: [What exists now]
-**Problem**: [Why this is an issue]
-**Proposed Change**: [Specific recommendation]
-**Expected Impact**: [How this improves the prompt]
+## Guidance for Applying Fixes
 
-#### Issue 2: [Continue for each issue...]
+**Key Principles**:
+1. **Only fix Critical/High issues** — Medium/Low are optional
+2. **Preserve strengths** — Don't rewrite what works
+3. **One change at a time** — Test impact before adding more
+4. **Simpler is better** — Reject changes that add complexity without clear ROI
+5. **20% rule** — Only make changes with >20% expected improvement
 
-### Changes NOT Recommended
-[List potential "improvements" you considered but rejected to avoid overfitting, with brief rationale]
+**When applying fixes**:
+- Start with the highest-severity issue
+- Make minimal, targeted edits (not rewrites)
+- Keep the prompt's voice and style
+- If a fix feels forced, skip it
+- Re-test after each change
 
-### Implementation Priority
-1. [Highest impact change]
-2. [Second priority]
-3. [Lower priority items...]
+**Warning signs you're over-engineering**:
+- Adding all 10 layers to a simple prompt
+- Prompt length doubled or tripled
+- Adding edge cases that won't happen
+- "Improving" clear language into verbose language
+- Adding examples for obvious behaviors
 ```
 
 ## Quality Checks Before Reporting
