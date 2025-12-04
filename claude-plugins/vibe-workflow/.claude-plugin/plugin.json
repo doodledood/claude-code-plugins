@@ -1,0 +1,13 @@
+{
+  "name": "vibe-workflow",
+  "description": "Vibe coding workflow - autonomous development with quality gates, code review agents, and maintainability checks",
+  "version": "1.5.0",
+  "author": {
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "repository": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["vibe-coding", "workflow", "autonomous", "quality-gates", "code-review", "maintainability"]
+}

@@ -88,20 +88,29 @@ Tools for crafting, refining, and improving LLM prompts using the 10-Layer Archi
 
 ---
 
-### dev-workflow (v1.2.0)
-Developer workflow tools for maintaining project documentation and setup.
+### vibe-workflow (v1.5.0)
+Vibe coding workflow - autonomous development with quality gates and code review agents.
 
 **Features:**
+- `code-implementor` agent - Incremental implementation with quality gates (5-30 lines per change)
+- `code-maintainability-reviewer` agent - DRY, YAGNI, dead code, and consistency audits
+- `test-coverage-auditor` agent - Ensures new code has adequate test coverage
+- `bug-fixer` agent - Deep bug investigation with root cause analysis and fix verification
+- `/implement` command - Launch code-implementor agent
+- `/review-maintainability` command - Launch code-maintainability-reviewer agent (defaults to git diff scope)
+- `/audit-coverage` command - Launch test-coverage-auditor agent (defaults to git diff scope)
+- `/bugfix` command - Launch bug-fixer agent
 - `/update_claude_md` command - Create or update CLAUDE.md with best practices
 
 **Key Capabilities:**
-- Brevity-focused (30-300 lines based on project complexity)
-- Progressive disclosure for complex projects
-- Universal instructions over task-specific ones
-- Verified, tested commands
+- Autonomous feature development from plan to implementation
+- Quality gates after every change (Typecheck → Tests → Lint)
+- Maintainability reviews before PRs
+- Test coverage verification for changed files
+- Bug investigation with test-driven fixes
 
 **Category:** development
-**Keywords:** workflow, claude-md, documentation, project-setup, developer-tools
+**Keywords:** vibe-coding, workflow, autonomous, quality-gates, code-review, maintainability
 
 ---
 

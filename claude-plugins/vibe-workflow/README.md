@@ -1,4 +1,4 @@
-# Dev Workflow Plugin
+# Vibe Workflow Plugin
 
 Autonomous feature development workflow for Claude Code.
 
@@ -18,6 +18,19 @@ Performs comprehensive maintainability audits identifying DRY violations, dead c
 
 #### `test-coverage-auditor`
 Analyzes diffs between your branch and main to ensure all new/modified logic has adequate test coverage. Provides specific test recommendations for coverage gaps.
+
+#### `bug-fixer`
+Investigates and fixes bugs with deep root cause analysis. Creates tests to reproduce issues, implements fixes, and verifies through a test-driven loop.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/implement` | Launch code-implementor agent |
+| `/review-maintainability` | Launch code-maintainability-reviewer agent (defaults to git diff scope) |
+| `/audit-coverage` | Launch test-coverage-auditor agent (defaults to git diff scope) |
+| `/bugfix` | Launch bug-fixer agent |
+| `/update_claude_md` | Create or update CLAUDE.md with best practices |
 
 ### Command: `/update_claude_md`
 
@@ -91,7 +104,7 @@ npm test  # Required before PR
 
 ```bash
 /plugin marketplace add https://github.com/doodledood/claude-code-plugins
-/plugin install dev-workflow@claude-code-plugins-marketplace
+/plugin install vibe-workflow@claude-code-plugins-marketplace
 ```
 
 ## License
