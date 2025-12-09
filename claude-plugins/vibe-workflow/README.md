@@ -38,6 +38,7 @@ Finds and removes AI-generated code slop: useless comments, verbose patterns, un
 | `/bugfix` | Launch bug-fixer agent |
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
+| `/rebase-on-main` | Update main/master, rebase current branch, resolve conflicts, and push |
 
 ### Command: `/update-claude-md`
 
@@ -60,6 +61,23 @@ Create or update CLAUDE.md with best practices.
 - Creates/updates CLAUDE.md following best practices
 - Ensures brevity (LLMs follow ~150 instructions reliably)
 - Uses progressive disclosure for complex projects
+
+### Command: `/rebase-on-main`
+
+Update main/master from origin, rebase current branch, resolve conflicts, and push.
+
+**Usage:**
+```bash
+# Rebase current branch on latest main/master
+/rebase-on-main
+```
+
+**What it does:**
+- Detects whether `main` or `master` is the default branch
+- Fetches and updates the main branch from origin
+- Rebases current feature branch on top of it
+- Resolves merge conflicts intelligently by analyzing code context
+- Pushes with `--force-with-lease` for safety
 
 ## Best Practices Applied
 

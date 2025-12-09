@@ -45,6 +45,14 @@ When updating plugin files, bump version in `.claude-plugin/plugin.json`:
 
 README-only changes don't require version bumps.
 
+## Adding New Components
+
+When adding commands, agents, skills, or hooks:
+1. Create the component file in the appropriate directory
+2. Bump plugin version (minor for new features)
+3. Update plugin's `README.md` (add to tables, add usage section if needed)
+4. Update `plugin.json` description/keywords if the new component adds significant capability
+
 ## Before PR
 
 ```bash
