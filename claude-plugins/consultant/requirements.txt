@@ -1,8 +1,0 @@
-# Consultant Plugin Python Dependencies
-# Install with: pip install -r requirements.txt
-
-# Core LLM integration
-litellm>=1.0.0
-
-# HTTP requests for model discovery
-requests>=2.31.0

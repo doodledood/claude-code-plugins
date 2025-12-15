@@ -29,11 +29,9 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ## Getting Started
 
-**IMPORTANT: Always run `uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --help` first to understand current capabilities.**
+**IMPORTANT: Always run `uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli --help` first to understand current capabilities.**
 
 Where `{CONSULTANT_SCRIPTS_PATH}` is the path to `claude-plugins/consultant/skills/consultant/scripts/`
-
-**Note:** Always use `uvx --upgrade` to ensure `litellm` is at the latest version. This is important because LiteLLM frequently adds support for new models.
 
 ## Basic Usage
 
@@ -44,7 +42,7 @@ The consultant script runs synchronously (blocking until completion). For long-r
 **Example: Running in background via Bash tool**
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Analyze this code for security vulnerabilities" \
   --file src/**/*.py \
   --slug "security-audit"
@@ -67,7 +65,7 @@ When calling via the Bash tool:
 ### Check Session Status
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session security-audit
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli session security-audit
 ```
 
 This returns JSON with:
@@ -78,7 +76,7 @@ This returns JSON with:
 ### List All Sessions
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py list
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli list
 ```
 
 Shows all sessions with status, timestamps, and models used.
@@ -89,7 +87,7 @@ Shows all sessions with status, timestamps, and models used.
 
 ```bash
 # Use custom LiteLLM endpoint
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Review this PR" \
   --file src/**/*.ts \
   --slug "pr-review" \
@@ -104,7 +102,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 Query models from a custom LiteLLM endpoint:
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli models \
   --base-url "http://localhost:8000"
 ```
 
@@ -125,7 +123,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
 Query known models from major providers:
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli models
 ```
 
 **What happens:**
@@ -145,7 +143,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 #### Scenario 1: With Base URL (custom provider)
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Architectural review" \
   --file "**/*.py" \
   --slug "arch-review" \
@@ -162,7 +160,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 2: Without Base URL (default providers)
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Code review" \
   --file src/*.py \
   --slug "review"
@@ -178,7 +176,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 3: Explicit Model (no auto-selection)
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Bug analysis" \
   --file src/*.py \
   --slug "bug" \
@@ -194,7 +192,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Specify API Key
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "..." \
   --file ... \
   --slug "..." \
@@ -225,7 +223,7 @@ export LITELLM_API_KEY="your-key-here"
 export OPENAI_BASE_URL="http://localhost:8000"
 
 # Now consultant will use the base URL automatically
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --prompt "..." --file ... --slug "..."
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli --prompt "..." --file ... --slug "..."
 ```
 
 ## When to Use Consultant
@@ -262,7 +260,7 @@ Sessions are stored in `~/.consultant/sessions/{session-id}/` with:
 Query status anytime:
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session <slug>
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli session <slug>
 ```
 
 The most recent session with that slug will be returned.
@@ -412,7 +410,7 @@ uv cache clean
 ### Security Audit
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Identify SQL injection vulnerabilities in the authentication module. For each finding, provide: vulnerable code location, attack vector, and recommended fix." \
   --file "apps/*/src/**/*.{service,controller}.ts" \
   --slug "security-audit" \
@@ -422,7 +420,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Architectural Review
 
 ```bash
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Identify the top 5 highest-impact architectural issues causing tight coupling. For each: explain the problem, show affected components, and recommend a solution." \
   --file "apps/*/src/**/*.ts" \
   --slug "arch-review"
@@ -434,7 +432,7 @@ uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 # Generate diff first
 git diff origin/main...HEAD > /tmp/pr-diff.txt
 
-uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --from {CONSULTANT_SCRIPTS_PATH} consultant-cli \
   --prompt "Review this PR for production deployment. Flag blockers, high-risk changes, and suggest regression tests." \
   --file /tmp/pr-diff.txt \
   --slug "pr-review"

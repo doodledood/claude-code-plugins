@@ -6,6 +6,8 @@
 #     "requests>=2.31.0",
 #     "tenacity",
 #     "markitdown>=0.1.0",
+#     "fastapi",
+#     "orjson",
 # ]
 # ///
 """
