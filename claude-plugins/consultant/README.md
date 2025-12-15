@@ -106,7 +106,7 @@ Contextual skill providing consultant CLI knowledge and best practices.
 
 ## Installation
 
-The CLI uses [uv](https://docs.astral.sh/uv/) for automatic dependency management via PEP 723 inline script metadata. No manual `pip install` needed.
+The CLI uses [uvx](https://docs.astral.sh/uv/guides/tools/) for automatic dependency management via PEP 723 inline script metadata. No manual `pip install` needed - just run the script directly.
 
 If `uv` is not installed:
 ```bash
@@ -116,7 +116,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ## Requirements
 
 - Python 3.9+
-- uv (installs litellm and requests automatically on first run)
+- uv/uvx (installs litellm and requests automatically on first run)
 - API key for your chosen provider (or custom base URL)
 
 ## Quick Start
@@ -191,7 +191,7 @@ export CONSULTANT_BASE_URL="http://localhost:8000"
 
 # For direct Python CLI usage
 export OPENAI_BASE_URL="http://localhost:8000"
-uv run {consultant_scripts}/consultant_cli.py --prompt "..." --file ...
+uvx {consultant_scripts}/consultant_cli.py --prompt "..." --file ...
 ```
 
 Or specify per-command/invocation:
@@ -201,7 +201,7 @@ Or specify per-command/invocation:
 /consultant-review BASE_URL=http://localhost:8000
 
 # Python CLI
-uv run {consultant_scripts}/consultant_cli.py --base-url "http://localhost:8000" ...
+uvx {consultant_scripts}/consultant_cli.py --base-url "http://localhost:8000" ...
 ```
 
 ### Model Selection
@@ -291,13 +291,13 @@ Sessions are stored in `~/.consultant/sessions/{session-id}/` with:
 Query status anytime:
 
 ```bash
-uv run {consultant_scripts_path}/consultant_cli.py session <slug>
+uvx {consultant_scripts_path}/consultant_cli.py session <slug>
 ```
 
 ### List Sessions
 
 ```bash
-uv run {consultant_scripts_path}/consultant_cli.py list
+uvx {consultant_scripts_path}/consultant_cli.py list
 ```
 
 ## Examples
@@ -351,7 +351,7 @@ export CONSULTANT_BASE_URL="http://localhost:8000"
 You can also use the consultant Python CLI directly:
 
 ```bash
-uv run {consultant_scripts_path}/consultant_cli.py \
+uvx {consultant_scripts_path}/consultant_cli.py \
   --prompt "Analyze this code for performance issues" \
   --file src/**/*.py \
   --slug "perf-analysis" \
@@ -362,21 +362,21 @@ uv run {consultant_scripts_path}/consultant_cli.py \
 ### List Available Models
 
 ```bash
-uv run {consultant_scripts_path}/consultant_cli.py models \
+uvx {consultant_scripts_path}/consultant_cli.py models \
   --base-url "http://localhost:8000"
 ```
 
 ### Check Session Status
 
 ```bash
-uv run {consultant_scripts_path}/consultant_cli.py session <slug>
+uvx {consultant_scripts_path}/consultant_cli.py session <slug>
 ```
 
 ## Troubleshooting
 
-### Missing uv
+### Missing uvx
 
-**Issue**: `uv: command not found`
+**Issue**: `uvx: command not found`
 
 **Solution**:
 ```bash
@@ -387,7 +387,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 **Issue**: `ImportError: No module named 'litellm'`
 
-**Solution**: This shouldn't happen with `uv run`, but if it does, clear uv cache:
+**Solution**: This shouldn't happen with `uvx`, but if it does, clear uv cache:
 ```bash
 uv cache clean
 ```

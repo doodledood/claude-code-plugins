@@ -15,7 +15,7 @@ ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
 /plugin install consultant@claude-code-plugins-marketplace
 
 # Run consultant CLI (always use --upgrade for latest litellm)
-uv run --upgrade claude-plugins/consultant/skills/consultant/scripts/consultant_cli.py --help
+uvx --upgrade claude-plugins/consultant/skills/consultant/scripts/consultant_cli.py --help
 ```
 
 ## Repository Structure

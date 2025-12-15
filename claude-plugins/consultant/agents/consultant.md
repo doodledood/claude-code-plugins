@@ -90,9 +90,9 @@ This is essential because:
    # In a SINGLE message, send multiple Bash calls with run_in_background: true
    # Example: 3 models = 3 parallel Bash calls in one message
 
-   Bash(command="uv run ... --model gpt-5.2 ...", run_in_background=true)
-   Bash(command="uv run ... --model claude-opus-4-5 ...", run_in_background=true)
-   Bash(command="uv run ... --model gemini/gemini-3-pro-preview ...", run_in_background=true)
+   Bash(command="uvx ... --model gpt-5.2 ...", run_in_background=true)
+   Bash(command="uvx ... --model claude-opus-4-5 ...", run_in_background=true)
+   Bash(command="uvx ... --model gemini/gemini-3-pro-preview ...", run_in_background=true)
    ```
 4. **Monitor all sessions every 30 seconds:**
    - Use BashOutput with each shell_id to check progress
@@ -161,7 +161,7 @@ Relay each model's output verbatim—let the user draw conclusions.
 # The scripts are located relative to this plugin's installation
 # Find the consultant_cli.py in the consultant plugin's skills/consultant/scripts/ directory
 CONSULTANT_SCRIPTS_PATH="$(dirname "$(dirname "$(dirname "$0")")")/skills/consultant/scripts"
-uv run --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --help
+uvx --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --help
 ```
 
 **Note**: The exact path depends on where the plugin is installed. Use `find` or check the plugin installation directory if needed.
@@ -183,7 +183,7 @@ uv run --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --help
 
 ```bash
 # Example (check --help for actual command):
-uv run --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --models
+uvx --upgrade "$CONSULTANT_SCRIPTS_PATH/consultant_cli.py" --models
 ```
 
 **Skip this step only if:**

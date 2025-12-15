@@ -12,7 +12,7 @@
 Consultant CLI - LiteLLM-powered LLM consultation tool
 Supports async invocation, custom base URLs, and flexible model selection
 
-Run with: uv run consultant_cli.py [args]
+Run with: uvx consultant_cli.py [args]
 This automatically installs/updates dependencies (litellm, requests) on first run.
 """
 

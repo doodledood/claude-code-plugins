@@ -20,7 +20,7 @@ Consultant is a Python-based tool using LiteLLM to provide access to powerful AI
 
 ## Requirements
 
-The CLI uses [uv](https://docs.astral.sh/uv/) for automatic dependency management. Dependencies (litellm, requests) are installed automatically on first run via PEP 723 inline script metadata.
+The CLI uses [uvx](https://docs.astral.sh/uv/guides/tools/) for automatic dependency management. Dependencies (litellm, requests) are installed automatically on first run via PEP 723 inline script metadata - no explicit installation needed.
 
 If `uv` is not installed:
 ```bash
@@ -29,11 +29,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ## Getting Started
 
-**IMPORTANT: Always run `uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --help` first to understand current capabilities.**
+**IMPORTANT: Always run `uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --help` first to understand current capabilities.**
 
 Where `{CONSULTANT_SCRIPTS_PATH}` is the path to `claude-plugins/consultant/skills/consultant/scripts/`
 
-**Note:** Always use `uv run --upgrade` to ensure `litellm` is at the latest version. This is important because LiteLLM frequently adds support for new models.
+**Note:** Always use `uvx --upgrade` to ensure `litellm` is at the latest version. This is important because LiteLLM frequently adds support for new models.
 
 ## Basic Usage
 
@@ -44,7 +44,7 @@ The consultant script runs synchronously (blocking until completion). For long-r
 **Example: Running in background via Bash tool**
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Analyze this code for security vulnerabilities" \
   --file src/**/*.py \
   --slug "security-audit"
@@ -67,7 +67,7 @@ When calling via the Bash tool:
 ### Check Session Status
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session security-audit
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session security-audit
 ```
 
 This returns JSON with:
@@ -78,7 +78,7 @@ This returns JSON with:
 ### List All Sessions
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py list
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py list
 ```
 
 Shows all sessions with status, timestamps, and models used.
@@ -89,7 +89,7 @@ Shows all sessions with status, timestamps, and models used.
 
 ```bash
 # Use custom LiteLLM endpoint
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Review this PR" \
   --file src/**/*.ts \
   --slug "pr-review" \
@@ -104,7 +104,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 Query models from a custom LiteLLM endpoint:
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
   --base-url "http://localhost:8000"
 ```
 
@@ -125,7 +125,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
 Query known models from major providers:
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 ```
 
 **What happens:**
@@ -145,7 +145,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 #### Scenario 1: With Base URL (custom provider)
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Architectural review" \
   --file "**/*.py" \
   --slug "arch-review" \
@@ -162,7 +162,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 2: Without Base URL (default providers)
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Code review" \
   --file src/*.py \
   --slug "review"
@@ -178,7 +178,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 #### Scenario 3: Explicit Model (no auto-selection)
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Bug analysis" \
   --file src/*.py \
   --slug "bug" \
@@ -194,7 +194,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Specify API Key
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "..." \
   --file ... \
   --slug "..." \
@@ -225,7 +225,7 @@ export LITELLM_API_KEY="your-key-here"
 export OPENAI_BASE_URL="http://localhost:8000"
 
 # Now consultant will use the base URL automatically
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --prompt "..." --file ... --slug "..."
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py --prompt "..." --file ... --slug "..."
 ```
 
 ## When to Use Consultant
@@ -262,7 +262,7 @@ Sessions are stored in `~/.consultant/sessions/{session-id}/` with:
 Query status anytime:
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session <slug>
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py session <slug>
 ```
 
 The most recent session with that slug will be returned.
@@ -371,7 +371,7 @@ Retrying in 5 seconds... (attempt 2/3)
 
 ## Troubleshooting
 
-**Issue**: `uv: command not found`
+**Issue**: `uvx: command not found`
 
 **Solution**:
 ```bash
@@ -380,7 +380,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 **Issue**: `ImportError: No module named 'litellm'`
 
-**Solution**: This shouldn't happen with `uv run`, but if it does, clear uv cache:
+**Solution**: This shouldn't happen with `uvx`, but if it does, clear uv cache:
 ```bash
 uv cache clean
 ```
@@ -412,7 +412,7 @@ uv cache clean
 ### Security Audit
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify SQL injection vulnerabilities in the authentication module. For each finding, provide: vulnerable code location, attack vector, and recommended fix." \
   --file "apps/*/src/**/*.{service,controller}.ts" \
   --slug "security-audit" \
@@ -422,7 +422,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 ### Architectural Review
 
 ```bash
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify the top 5 highest-impact architectural issues causing tight coupling. For each: explain the problem, show affected components, and recommend a solution." \
   --file "apps/*/src/**/*.ts" \
   --slug "arch-review"
@@ -434,7 +434,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 # Generate diff first
 git diff origin/main...HEAD > /tmp/pr-diff.txt
 
-uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
+uvx --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Review this PR for production deployment. Flag blockers, high-risk changes, and suggest regression tests." \
   --file /tmp/pr-diff.txt \
   --slug "pr-review"
