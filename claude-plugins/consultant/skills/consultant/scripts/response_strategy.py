@@ -34,7 +34,7 @@ def _is_responses_api_model(model_name: str) -> bool:
     import re
 
     # GPT-4 and above (gpt-4, gpt-5, gpt-6, etc. but not gpt-3.5)
-    # Matches: gpt-4, gpt4, gpt-4-turbo, gpt-5.1, gpt-6-turbo, etc.
+    # Matches: gpt-4, gpt4, gpt-4-turbo, gpt-5.2, gpt-6-turbo, etc.
     gpt_match = re.search(r"gpt-?(\d+)", model_name)
     if gpt_match:
         version = int(gpt_match.group(1))

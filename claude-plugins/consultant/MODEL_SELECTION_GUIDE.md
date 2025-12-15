@@ -16,13 +16,13 @@ Quick reference for how consultant queries and selects models.
 ```bash
 # No --base-url flag
 ```
-→ Uses known models list → Scores → Picks best (claude-sonnet-4-5 or gpt-5.1)
+→ Uses known models list → Scores → Picks best (claude-opus-4-5 or gpt-5.2)
 
 ### With Explicit Model
 ```bash
---model gpt-5.1
+--model gpt-5.2
 ```
-→ Uses `gpt-5.1` directly → No querying or scoring
+→ Uses `gpt-5.2` directly → No querying or scoring
 
 ---
 
@@ -43,8 +43,8 @@ python3 consultant_cli.py models --base-url "http://localhost:8000"
 **Response format:**
 ```json
 [
-  {"id": "gpt-5.1", "created": 1234567890, "owned_by": "openai"},
-  {"id": "claude-sonnet-4-5", "created": 1234567890, "owned_by": "anthropic"}
+  {"id": "gpt-5.2", "created": 1234567890, "owned_by": "openai"},
+  {"id": "claude-opus-4-5", "created": 1234567890, "owned_by": "anthropic"}
 ]
 ```
 
@@ -73,9 +73,9 @@ python3 consultant_cli.py models
 **Response format:**
 ```json
 [
-  {"id": "gpt-5.1", "provider": "openai"},
-  {"id": "gpt-5-pro", "provider": "openai"},
-  {"id": "claude-sonnet-4-5", "provider": "anthropic"},
+  {"id": "gpt-5.2", "provider": "openai"},
+  {"id": "gpt-5.2-pro", "provider": "openai"},
+  {"id": "claude-opus-4-5", "provider": "anthropic"},
   {"id": "claude-opus-4", "provider": "anthropic"},
   {"id": "gemini/gemini-2.5-flash", "provider": "google"}
 ]
@@ -87,8 +87,8 @@ python3 consultant_cli.py models
 - Want to see default providers
 
 **Known providers:**
-- OpenAI: gpt-5.1, gpt-5-pro, o1, o3
-- Anthropic: claude-sonnet-4-5, claude-opus-4, claude-sonnet-4-5-5
+- OpenAI: gpt-5.2, gpt-5.2-pro, o1, o3
+- Anthropic: claude-opus-4-5, claude-opus-4, claude-opus-4-5-5
 - Google: gemini/gemini-2.5-flash, gemini/gemini-3-pro-preview
 
 ---
@@ -142,9 +142,9 @@ best_model = max(models, key=score_model)
 ```
 
 **Typical winners:**
-- `claude-sonnet-4-5`: 48 + bonuses (high score)
+- `claude-opus-4-5`: 48 + bonuses (high score)
 - `claude-opus-4`: 50 + bonuses (highest for Anthropic)
-- `gpt-5.1`: 50 + bonuses (high for OpenAI)
+- `gpt-5.2`: 50 + bonuses (high for OpenAI)
 - `gemini/gemini-2.5-flash`: 45 + bonuses (high for Google)
 
 ---
@@ -162,8 +162,8 @@ best_model = max(models, key=score_model)
 1. Check `CONSULTANT_MODEL` env var → Not set
 2. Check `CONSULTANT_BASE_URL` env var → Not set
 3. Query known models (no API call)
-4. Score: claude-sonnet-4-5 (48) vs gpt-5.1 (50) vs others
-5. Select: `gpt-5.1` (highest score)
+4. Score: claude-opus-4-5 (48) vs gpt-5.2 (50) vs others
+5. Select: `gpt-5.2` (highest score)
 6. Use with Anthropic API (requires `ANTHROPIC_API_KEY`)
 
 ---
@@ -178,7 +178,7 @@ best_model = max(models, key=score_model)
 **Execution:**
 1. Check `CONSULTANT_MODEL` env var → Not set
 2. Query `http://localhost:8000/v1/models`
-3. Get available models: [gpt-5.1, llama-3-70b, mistral-large, ...]
+3. Get available models: [gpt-5.2, llama-3-70b, mistral-large, ...]
 4. Score each model
 5. Select highest score (maybe `mistral-large` if available)
 6. Report: `Selected model: mistral-large`
@@ -189,12 +189,12 @@ best_model = max(models, key=score_model)
 ### Scenario 3: Model Only
 
 ```bash
-/consultant-review MODEL=gpt-5.1
+/consultant-review MODEL=gpt-5.2
 # Has MODEL, no BASE_URL
 ```
 
 **Execution:**
-1. Use `gpt-5.1` directly (no querying)
+1. Use `gpt-5.2` directly (no querying)
 2. No base URL → Use OpenAI as provider
 3. Requires `OPENAI_API_KEY` env var
 4. No "Selected model" message (explicit choice)
@@ -234,18 +234,18 @@ Priority order for base URL:
 
 ```bash
 # Explicit flag wins
-export CONSULTANT_MODEL=gpt-5.1
+export CONSULTANT_MODEL=gpt-5.2
 python3 consultant_cli.py --model claude-opus-4 ...
 # Uses: claude-opus-4 (flag wins)
 
 # Env var as fallback
-export CONSULTANT_MODEL=gpt-5.1
+export CONSULTANT_MODEL=gpt-5.2
 python3 consultant_cli.py ...
-# Uses: gpt-5.1 (env var)
+# Uses: gpt-5.2 (env var)
 
 # Auto-select as last resort
 python3 consultant_cli.py ...
-# Uses: claude-sonnet-4-5 or gpt-5.1 (auto-selected)
+# Uses: claude-opus-4-5 or gpt-5.2 (auto-selected)
 ```
 
 ---

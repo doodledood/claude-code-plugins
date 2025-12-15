@@ -42,7 +42,7 @@ Production-level PR reviews with severity-tagged findings, regression test guida
 ```bash
 /consultant-review
 # Or with parameters:
-/consultant-review PR_REF=origin/main...feature-branch MODEL=claude-sonnet-4-5
+/consultant-review PR_REF=origin/main...feature-branch MODEL=claude-opus-4-5
 ```
 
 **What it does:**
@@ -209,7 +209,7 @@ uv run {consultant_scripts}/consultant_cli.py --base-url "http://localhost:8000"
 Specify a model explicitly:
 
 ```bash
-/consultant-review MODEL=claude-sonnet-4-5
+/consultant-review MODEL=claude-opus-4-5
 ```
 
 Or let consultant auto-select:
@@ -305,7 +305,7 @@ uv run {consultant_scripts_path}/consultant_cli.py list
 ### Security Audit
 
 ```bash
-/consultant-review MODEL=claude-sonnet-4-5
+/consultant-review MODEL=claude-opus-4-5
 ```
 
 With custom focus:
@@ -355,7 +355,7 @@ uv run {consultant_scripts_path}/consultant_cli.py \
   --prompt "Analyze this code for performance issues" \
   --file src/**/*.py \
   --slug "perf-analysis" \
-  --model "claude-sonnet-4-5" \
+  --model "claude-opus-4-5" \
   --wait
 ```
 

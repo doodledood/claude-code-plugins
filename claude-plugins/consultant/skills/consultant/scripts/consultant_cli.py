@@ -412,9 +412,9 @@ For more information, see the consultant plugin documentation.
         "-m",
         "--model",
         metavar="MODEL_ID",
-        default="gpt-5-pro",
-        help="""Specific LLM model to use. Default: gpt-5-pro. Examples:
-                "gpt-5.1", "claude-sonnet-4-5", "gemini/gemini-2.5-flash".
+        default="gpt-5.2-pro",
+        help="""Specific LLM model to use. Default: gpt-5.2-pro. Examples:
+                "gpt-5.2", "claude-opus-4-5", "gemini/gemini-2.5-flash".
                 Use the "models" subcommand to see available models.""",
     )
     parser.add_argument(

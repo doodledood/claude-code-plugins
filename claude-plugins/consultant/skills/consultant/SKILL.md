@@ -94,7 +94,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --file src/**/*.ts \
   --slug "pr-review" \
   --base-url "http://localhost:8000" \
-  --model "gpt-5.1"
+  --model "gpt-5.2"
 ```
 
 ### List Available Models
@@ -115,8 +115,8 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models \
 - Example output:
   ```json
   [
-    {"id": "gpt-5.1", "created": 1234567890, "owned_by": "openai"},
-    {"id": "claude-sonnet-4-5", "created": 1234567890, "owned_by": "anthropic"}
+    {"id": "gpt-5.2", "created": 1234567890, "owned_by": "openai"},
+    {"id": "claude-opus-4-5", "created": 1234567890, "owned_by": "anthropic"}
   ]
   ```
 
@@ -134,8 +134,8 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py models
 - Example output:
   ```json
   [
-    {"id": "gpt-5.1", "provider": "openai"},
-    {"id": "claude-sonnet-4-5", "provider": "anthropic"},
+    {"id": "gpt-5.2", "provider": "openai"},
+    {"id": "claude-opus-4-5", "provider": "anthropic"},
     {"id": "gemini/gemini-2.5-flash", "provider": "google"}
   ]
   ```
@@ -173,7 +173,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
 1. Use known models list (OpenAI, Anthropic, Google)
 2. Select a model based on task requirements
 
-**For model selection guidance:** Check https://artificialanalysis.ai for up-to-date model benchmarks and rankings. Recommended defaults: `gpt-5-pro`, `claude-opus-4-5-20251101`, `gemini/gemini-3-pro-preview`.
+**For model selection guidance:** Check https://artificialanalysis.ai for up-to-date model benchmarks and rankings. Recommended defaults: `gpt-5.2-pro`, `claude-opus-4-5-20251101`, `gemini/gemini-3-pro-preview`.
 
 #### Scenario 3: Explicit Model (no auto-selection)
 
@@ -182,12 +182,12 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Bug analysis" \
   --file src/*.py \
   --slug "bug" \
-  --model "gpt-5.1"
+  --model "gpt-5.2"
 ```
 
 **Consultant will:**
 1. Skip model querying and scoring
-2. Use `gpt-5.1` directly
+2. Use `gpt-5.2` directly
 3. Use default provider for GPT-5 (OpenAI)
 4. No "Selected model" message
 
@@ -416,7 +416,7 @@ uv run --upgrade {CONSULTANT_SCRIPTS_PATH}/consultant_cli.py \
   --prompt "Identify SQL injection vulnerabilities in the authentication module. For each finding, provide: vulnerable code location, attack vector, and recommended fix." \
   --file "apps/*/src/**/*.{service,controller}.ts" \
   --slug "security-audit" \
-  --model "claude-sonnet-4-5"
+  --model "claude-opus-4-5"
 ```
 
 ### Architectural Review

@@ -218,9 +218,9 @@ def validate_vision_support(model: str, has_images: bool) -> None:
         )
         print("\nSuggestions:", file=sys.stderr)
         print("  1. Use a vision-capable model:", file=sys.stderr)
-        print("     - gpt-5.1, gpt-5-vision (OpenAI)", file=sys.stderr)
+        print("     - gpt-5.2, gpt-5-vision (OpenAI)", file=sys.stderr)
         print(
-            "     - claude-sonnet-4-5, claude-opus-4 (Anthropic)",
+            "     - claude-opus-4-5, claude-opus-4 (Anthropic)",
             file=sys.stderr,
         )
         print(
