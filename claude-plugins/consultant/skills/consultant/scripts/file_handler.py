@@ -224,7 +224,8 @@ def validate_vision_support(model: str, has_images: bool) -> None:
             file=sys.stderr,
         )
         print(
-            "     - gemini/gemini-2.5-flash, gemini/gemini-3-pro-preview (Google)", file=sys.stderr
+            "     - gemini/gemini-2.5-flash, gemini/gemini-3-pro-preview (Google)",
+            file=sys.stderr,
         )
         print("  2. Remove image files from the request", file=sys.stderr)
         print("  3. Convert images to text descriptions first\n", file=sys.stderr)

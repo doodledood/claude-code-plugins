@@ -436,12 +436,12 @@ For more information, see the consultant plugin documentation.
     )
     parser.add_argument(
         "--reasoning-effort",
-        choices=["low", "medium", "high"],
-        default="high",
+        choices=["low", "medium", "high", "xhigh"],
+        default="xhigh",
         metavar="LEVEL",
         help="""Reasoning effort level for the LLM. Higher effort = more thorough
-                analysis but slower and more expensive. Choices: low, medium, high.
-                Default: high. Use "low" for quick checks, "high" for thorough reviews.""",
+                analysis but slower and more expensive. Choices: low, medium, high, xhigh.
+                Default: xhigh. Use "low" for quick checks, "xhigh" for most thorough analysis.""",
     )
 
     # Session status subcommand

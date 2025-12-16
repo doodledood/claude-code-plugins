@@ -37,7 +37,7 @@ class LiteLLMClient:
         model: str,
         prompt: str,
         session_dir: Path | None = None,
-        reasoning_effort: str = "high",
+        reasoning_effort: str = "xhigh",
         multimodal_content: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
@@ -52,7 +52,7 @@ class LiteLLMClient:
             model: Model identifier
             prompt: Full prompt text
             session_dir: Optional session directory for state persistence (enables resumability)
-            reasoning_effort: Reasoning effort level (low, medium, high) - default high
+            reasoning_effort: Reasoning effort level (low, medium, high, xhigh) - default xhigh
             multimodal_content: Optional multimodal content array for images
             **kwargs: Additional args passed to litellm.responses()
 

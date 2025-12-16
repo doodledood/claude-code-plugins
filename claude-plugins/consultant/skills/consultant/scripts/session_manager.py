@@ -29,7 +29,7 @@ class SessionManager:
         model: str,
         base_url: str | None = None,
         api_key: str | None = None,
-        reasoning_effort: str = "high",
+        reasoning_effort: str = "xhigh",
         multimodal_content: list[dict[str, Any]] | None = None,
     ) -> str:
         """Create a new session and start background execution"""
@@ -85,7 +85,7 @@ class SessionManager:
         model: str,
         base_url: str | None,
         api_key: str | None,
-        reasoning_effort: str = "high",
+        reasoning_effort: str = "xhigh",
         multimodal_content: list[dict[str, Any]] | None = None,
     ) -> None:
         """Background execution of LLM consultation"""
