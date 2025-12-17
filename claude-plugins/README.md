@@ -88,26 +88,30 @@ Tools for crafting, refining, and improving LLM prompts using the 10-Layer Archi
 
 ---
 
-### vibe-workflow (v1.5.0)
+### vibe-workflow (v1.12.0)
 Vibe coding workflow - autonomous development with quality gates and code review agents.
 
 **Features:**
-- `code-implementor` agent - Incremental implementation with quality gates (5-30 lines per change)
 - `code-maintainability-reviewer` agent - DRY, YAGNI, dead code, and consistency audits
-- `test-coverage-auditor` agent - Ensures new code has adequate test coverage
+- `code-bugs-reviewer` agent - Logical bugs, race conditions, edge cases, error handling
+- `code-coverage-reviewer` agent - Ensures new code has adequate test coverage
 - `bug-fixer` agent - Deep bug investigation with root cause analysis and fix verification
-- `/implement` command - Launch code-implementor agent
-- `/review-maintainability` command - Launch code-maintainability-reviewer agent (defaults to git diff scope)
-- `/audit-coverage` command - Launch test-coverage-auditor agent (defaults to git diff scope)
+- `prompt-reviewer` agent - LLM prompt analysis against 10-Layer Architecture framework
+- `slop-cleaner` agent - Removes AI-generated slop (useless comments, verbose patterns)
+- `/review-maintainability` command - Launch code-maintainability-reviewer agent
+- `/review-bugs` command - Launch code-bugs-reviewer agent
+- `/review-coverage` command - Launch code-coverage-reviewer agent
 - `/bugfix` command - Launch bug-fixer agent
+- `/clean-slop` command - Remove AI-generated slop
 - `/update-claude-md` command - Create or update CLAUDE.md with best practices
+- `/rebase-on-main` command - Update main, rebase current branch, resolve conflicts, push
 
 **Key Capabilities:**
-- Autonomous feature development from plan to implementation
+- Comprehensive code review suite (maintainability, bugs, coverage)
 - Quality gates after every change (Typecheck → Tests → Lint)
-- Maintainability reviews before PRs
-- Test coverage verification for changed files
 - Bug investigation with test-driven fixes
+- LLM prompt optimization
+- AI slop cleanup
 
 **Category:** development
 **Keywords:** vibe-coding, workflow, autonomous, quality-gates, code-review, maintainability

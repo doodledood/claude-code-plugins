@@ -1,9 +1,9 @@
 ---
-description: Verify test coverage for code changes. Analyzes diff against main and reports coverage gaps.
+description: Audit code for logical bugs, race conditions, edge cases, and error handling issues.
 allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 
-Use the test-coverage-auditor agent to check test coverage for: $ARGUMENTS
+Use the code-bugs-reviewer agent to perform a bug audit on: $ARGUMENTS
 
 If no arguments provided, analyze the git diff between the current branch and main/master branch.

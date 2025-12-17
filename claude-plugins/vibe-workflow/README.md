@@ -13,7 +13,7 @@ This plugin enables Claude to develop features as autonomously as possible - fro
 #### `code-maintainability-reviewer`
 Performs comprehensive maintainability audits identifying DRY violations, dead code, YAGNI violations, unnecessary complexity, and consistency issues. Use after implementing features or before PRs.
 
-#### `test-coverage-auditor`
+#### `code-coverage-reviewer`
 Analyzes diffs between your branch and main to ensure all new/modified logic has adequate test coverage. Provides specific test recommendations for coverage gaps.
 
 #### `bug-fixer`
@@ -25,12 +25,16 @@ Analyzes LLM prompts against the 10-Layer Architecture framework. Provides detai
 #### `slop-cleaner`
 Finds and removes AI-generated code slop: useless comments, verbose patterns, unnecessary abstractions, and filler phrases. Conservative by default—only removes clearly unnecessary content.
 
+#### `code-bugs-reviewer`
+Audits code changes for logical bugs, race conditions, edge cases, and error handling issues. Performs deep analysis with prioritized bug detection (race conditions, data loss, edge cases, logic errors, etc.). Generates detailed bug reports with severity, impact, and fix recommendations.
+
 ### Commands
 
 | Command | Description |
 |---------|-------------|
 | `/review-maintainability` | Launch code-maintainability-reviewer agent (defaults to git diff scope) |
-| `/audit-coverage` | Launch test-coverage-auditor agent (defaults to git diff scope) |
+| `/review-bugs` | Launch code-bugs-reviewer agent for logical bug detection (defaults to git diff scope) |
+| `/review-coverage` | Launch code-coverage-reviewer agent (defaults to git diff scope) |
 | `/bugfix` | Launch bug-fixer agent |
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
