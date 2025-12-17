@@ -10,9 +10,6 @@ This plugin enables Claude to develop features as autonomously as possible - fro
 
 ### Agents
 
-#### `code-implementor`
-Implements well-defined coding tasks using a strict incremental workflow. Makes small changes (5-30 lines), runs quality gates (Typecheck → Tests → Lint) after every change, and proceeds only when green.
-
 #### `code-maintainability-reviewer`
 Performs comprehensive maintainability audits identifying DRY violations, dead code, YAGNI violations, unnecessary complexity, and consistency issues. Use after implementing features or before PRs.
 
@@ -32,7 +29,6 @@ Finds and removes AI-generated code slop: useless comments, verbose patterns, un
 
 | Command | Description |
 |---------|-------------|
-| `/implement` | Launch code-implementor agent |
 | `/review-maintainability` | Launch code-maintainability-reviewer agent (defaults to git diff scope) |
 | `/audit-coverage` | Launch test-coverage-auditor agent (defaults to git diff scope) |
 | `/bugfix` | Launch bug-fixer agent |
