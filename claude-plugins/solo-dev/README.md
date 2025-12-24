@@ -8,11 +8,55 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 
 ## Components
 
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| [/craft-voice](#craft-voice) | Start the iterative process to create your AUTHOR_VOICE.md |
+| [/write-as-me](#write-as-me) | Generate content in your voice using your AUTHOR_VOICE.md |
+
 ### Skills
 
 | Skill | Description |
 |-------|-------------|
 | [author-voice](#author-voice) | Iteratively craft an AUTHOR_VOICE.md that captures your unique writing style for AI replication |
+
+## Commands
+
+### /craft-voice
+
+Start the iterative process to craft your AUTHOR_VOICE.md document for AI-powered content generation in your unique style.
+
+**Usage:**
+```bash
+/craft-voice
+```
+
+**What happens:**
+1. Asks 9 multi-choice questions about your voice (content type, personality, vocabulary, etc.)
+2. Generates initial AUTHOR_VOICE.md based on your answers
+3. Launches sonnet agent to generate 3 sample texts
+4. Collects your ratings and feedback on each sample
+5. Updates the document based on feedback
+6. Repeats until all samples are perfect or you say it's done
+
+### /write-as-me
+
+Generate content in your authentic voice using your existing AUTHOR_VOICE.md document.
+
+**Usage:**
+```bash
+/write-as-me a tweet about why most productivity advice is wrong
+/write-as-me blog intro on the future of AI coding
+/write-as-me  # will ask for topic
+```
+
+**What happens:**
+1. Locates your AUTHOR_VOICE.md (cwd, home, or searches)
+2. Reads and internalizes your voice parameters
+3. Clarifies format and length if needed
+4. Generates content matching your voice
+5. Iterates based on your feedback until perfect
 
 ## Skills
 
