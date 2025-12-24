@@ -15,11 +15,21 @@ This skill guides you through:
 3. **Refinement Cycles** - Generate sample texts, collect your ratings/feedback, update the doc
 4. **Completion** - Final honed document ready for AI content generation
 
+## Tool Requirements
+
+**AskUserQuestion Tool**: This skill REQUIRES the AskUserQuestion tool to minimize user cognitive load. Before starting:
+
+1. **Check availability**: Verify `AskUserQuestion` is in your available tools list
+2. **If available**: Use it for ALL questions - present options as multiple choice to reduce typing and thinking effort
+3. **If NOT available**: Inform the user that the experience will be degraded (they'll need to type responses), then present numbered options they can respond to by number
+
+The goal is to make this as low-effort as possible for the user - clicking/selecting options is far easier than formulating responses.
+
 ## Workflow
 
 ### Phase 1: Discovery
 
-Use AskUserQuestion tool with multi-choice options for EVERY question to minimize cognitive load.
+Use AskUserQuestion tool with multi-choice options for EVERY question to minimize cognitive load. If AskUserQuestion is unavailable, present numbered options and ask the user to reply with the number(s).
 
 **Question 1: Primary Content Type**
 
@@ -262,7 +272,7 @@ The agent will read the voice doc and output 3 samples:
 
 **Step 3.2: Collect Feedback Per Sample**
 
-For EACH of the 3 generated samples, use AskUserQuestion:
+For EACH of the 3 generated samples, use AskUserQuestion tool (or numbered options if unavailable):
 
 ```
 header: "Sample [N]"
@@ -341,10 +351,11 @@ When user indicates completion:
 - Track what changes between versions
 
 ### Reduce Cognitive Load
-- ALWAYS use multi-choice questions
+- ALWAYS use AskUserQuestion tool when available - this is critical for UX
+- Present multi-choice questions to minimize user typing/thinking
 - Limit options to 6-8 max per question
 - Use multiSelect for non-exclusive choices
-- Only use free-text for examples/samples
+- Only use free-text for examples/samples or when AskUserQuestion unavailable
 
 ## Output Location
 
