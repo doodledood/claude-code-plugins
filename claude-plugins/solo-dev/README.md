@@ -15,6 +15,12 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/craft-voice](#craft-voice) | Start the iterative process to create your AUTHOR_VOICE.md |
 | [/write-as-me](#write-as-me) | Generate content in your voice using your AUTHOR_VOICE.md |
 
+### Agents
+
+| Agent | Description |
+|-------|-------------|
+| [voice-writer](#voice-writer) | Generate content in your voice using AUTHOR_VOICE.md |
+
 ### Skills
 
 | Skill | Description |
@@ -35,7 +41,7 @@ Start the iterative process to craft your AUTHOR_VOICE.md document for AI-powere
 **What happens:**
 1. Asks 9 multi-choice questions about your voice (content type, personality, vocabulary, etc.)
 2. Generates initial AUTHOR_VOICE.md based on your answers
-3. Launches sonnet agent to generate 3 sample texts
+3. Launches voice-writer agent to generate 3 sample texts
 4. Collects your ratings and feedback on each sample
 5. Updates the document based on feedback
 6. Repeats until all samples are perfect or you say it's done
@@ -53,10 +59,17 @@ Generate content in your authentic voice using your existing AUTHOR_VOICE.md doc
 
 **What happens:**
 1. Locates your AUTHOR_VOICE.md (cwd, home, or searches)
-2. Reads and internalizes your voice parameters
-3. Clarifies format and length if needed
-4. Generates content matching your voice
-5. Iterates based on your feedback until perfect
+2. Clarifies format if needed
+3. Launches voice-writer agent to generate content
+4. Iterates based on your feedback until perfect
+
+## Agents
+
+### voice-writer
+
+Generates content in your authentic voice using your AUTHOR_VOICE.md specification. Used by both `/craft-voice` (for sample generation during calibration) and `/write-as-me` (for content creation).
+
+The agent reads your voice doc and produces content matching your tone, vocabulary, structure, and signature moves.
 
 ## Skills
 
@@ -96,7 +109,7 @@ Read my AUTHOR_VOICE.md, then write a Twitter thread about [topic]
 
 **Key features:**
 - Multi-choice questions throughout to minimize cognitive load
-- Sonnet agent generates sample texts for calibration
+- voice-writer agent generates sample texts for calibration
 - Iterative refinement until samples match your voice
 - Information-dense output optimized for LLM consumption
 

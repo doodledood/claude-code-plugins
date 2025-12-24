@@ -46,7 +46,7 @@
       "name": "solo-dev",
       "source": "./claude-plugins/solo-dev",
       "description": "Toolkit for solo developers to build, manage, and grow their business - content creation, personal branding, productivity, and more",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "category": "productivity",
       "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "productivity", "business"]
     }

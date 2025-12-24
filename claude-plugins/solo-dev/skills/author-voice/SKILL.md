@@ -247,22 +247,18 @@ After generating the initial document, begin iterative refinement:
 
 **Step 3.1: Generate Sample Texts**
 
-Use the Task tool to launch a **sonnet** agent with this prompt:
+Use the **voice-writer** agent to generate samples:
 
 ```
-Read the AUTHOR_VOICE.md document at [path].
-
-Generate exactly 3 different sample texts in the author's voice:
-
-1. A short-form post (Twitter/LinkedIn length, ~280 chars)
-2. A medium post opening (first 2-3 paragraphs of a blog/newsletter)
-3. A response to a hypothetical comment/question in the author's domain
-
-Each sample should demonstrate the voice characteristics defined in the document.
-Do NOT explain the samples - just output them with clear numbering.
-
-Topic suggestions based on the document's domain: [inferred topics]
+Use the voice-writer agent to generate 3 sample texts.
+Voice doc path: [path to AUTHOR_VOICE.md]
+Mode: Sample generation
 ```
+
+The agent will read the voice doc and output 3 samples:
+1. Short-form (~280 chars)
+2. Medium-form (2-3 paragraphs)
+3. Conversational reply
 
 **Step 3.2: Collect Feedback Per Sample**
 
