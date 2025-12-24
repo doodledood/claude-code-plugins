@@ -9,11 +9,26 @@ Create a maximally information-dense AUTHOR_VOICE.md document through iterative 
 
 ## Overview
 
+This skill supports both **creating a new voice doc** and **refining an existing one**. Users often come back multiple times to adjust their doc as their voice evolves or as they notice issues in generated content.
+
 This skill guides you through:
+0. **Check Existing** - Look for existing AUTHOR_VOICE.md; let user choose to refine or start fresh
 1. **Discovery** - Clarifying questions about your voice characteristics and goals
-2. **Initial Draft** - Generate first AUTHOR_VOICE.md based on your inputs
-3. **Refinement Cycles** - Generate sample texts, collect your ratings/feedback, update the doc
+2. **Initial Draft** - Generate first AUTHOR_VOICE.md based on your inputs (good enough to start!)
+3. **Refinement Cycles** - Generate sample texts, collect your ratings/feedback, update the doc ⬅️ **THE REAL MAGIC**
 4. **Completion** - Final honed document ready for AI content generation
+
+**Returning users** can skip straight to Phase 3 to run more feedback cycles on their existing doc.
+
+### Where the Value Comes From
+
+The discovery questions give you a solid starting point - but **the real magic happens in Phase 3**. That's where you:
+- See actual generated samples in your "voice"
+- Judge them ("this doesn't sound like me")
+- Give specific feedback ("too formal", "wrong words")
+- Watch the voice doc evolve until it truly captures YOU
+
+Each feedback cycle sharpens the doc. Most users need 3-5 cycles to get from "this is okay" to "this is actually me."
 
 ## Tool Requirements
 
@@ -26,6 +41,30 @@ This skill guides you through:
 The goal is to make this as low-effort as possible for the user - clicking/selecting options is far easier than formulating responses.
 
 ## Workflow
+
+### Phase 0: Check for Existing Document
+
+Before starting discovery, check if the user already has an AUTHOR_VOICE.md:
+
+1. **Search for existing doc**: Use Glob to search for `**/AUTHOR_VOICE.md` in the current directory and common locations
+2. **If found**: Read it and ask the user what they want to do
+
+```
+header: "Existing Voice Doc Found"
+question: "I found an existing AUTHOR_VOICE.md. What would you like to do?"
+options:
+  - "Refine it - run feedback cycles to improve accuracy"
+  - "Start fresh - create a new voice doc from scratch"
+  - "Review it - just read through what's there"
+```
+
+**If "Refine it"**: Skip to Phase 3 (Refinement Cycles) - the user is coming back to improve their existing doc.
+
+**If "Start fresh"**: Proceed to Phase 1 (Discovery) - will overwrite the existing doc.
+
+**If "Review it"**: Read and display the doc, then ask what they want to do next.
+
+3. **If NOT found**: Proceed directly to Phase 1 (Discovery)
 
 ### Phase 1: Discovery
 
@@ -164,7 +203,9 @@ question: "List 2-3 topics you frequently write about (or paste examples of your
 
 ### Phase 2: Initial Document Generation
 
-After discovery, generate the first AUTHOR_VOICE.md using this structure:
+After discovery, generate the first AUTHOR_VOICE.md. This draft is intentionally a "good enough" starting point - not perfect, but solid enough to generate samples and start the feedback loop.
+
+Use this structure:
 
 ```markdown
 # AUTHOR_VOICE.md
@@ -251,13 +292,15 @@ NEVER:
 
 Write this file to the current working directory as `AUTHOR_VOICE.md`.
 
-### Phase 3: Refinement Cycles
+### Phase 3: Refinement Cycles (Where the Magic Happens)
+
+**This is the most important phase.** The initial doc from Phase 2 captures the basics, but YOUR feedback on generated samples is what transforms it from generic to authentic. Don't skip this.
 
 After generating the initial document, begin iterative refinement:
 
 **Step 3.1: Generate Sample Texts**
 
-Use the **voice-writer** agent to generate samples:
+**IMPORTANT**: Do NOT generate samples yourself. You MUST use the **voice-writer** agent to generate samples. The agent is specifically designed to read the voice doc and produce authentic samples - attempting to generate them inline will produce inferior results.
 
 ```
 Use the voice-writer agent to generate 3 sample texts.
