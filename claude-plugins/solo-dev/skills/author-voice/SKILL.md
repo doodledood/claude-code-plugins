@@ -1,6 +1,6 @@
 ---
 name: author-voice
-description: 'Iteratively craft an AUTHOR_VOICE.md document that captures your unique writing style for AI replication. Use when you want to: (1) Create a voice profile for consistent content generation, (2) Train AI to write in your style, (3) Document your writing preferences for future use. Interactive multi-choice workflow with feedback cycles.'
+description: 'Craft and use an AUTHOR_VOICE.md document for AI-powered content generation. Use when: (1) Creating a voice profile (/craft-voice), (2) Writing content in your style (/write-as-me), (3) Documenting writing preferences. Interactive multi-choice workflow with feedback cycles.'
 ---
 
 # Author Voice Skill
@@ -354,13 +354,58 @@ When user indicates completion:
 
 Write `AUTHOR_VOICE.md` to the current working directory (or user-specified path).
 
-## Example Usage
+## Writing Content Using the Voice Doc
 
-After this skill completes, user can:
+When asked to write content using an existing AUTHOR_VOICE.md:
+
+### Step 1: Locate Voice Document
+
+Search in order:
+1. Current working directory: `./AUTHOR_VOICE.md`
+2. Home directory: `~/AUTHOR_VOICE.md`
+3. Search with Glob: `**/AUTHOR_VOICE.md`
+
+If not found: "No AUTHOR_VOICE.md found. Run `/craft-voice` first to create your voice profile."
+
+### Step 2: Clarify Request
+
+If topic/format unclear, use AskUserQuestion:
 
 ```
-# In any new Claude session:
-Read my AUTHOR_VOICE.md, then write a Twitter thread about [topic]
+header: "Format"
+question: "What format should this be?"
+options:
+  - "Twitter/X post (single)"
+  - "Twitter/X thread"
+  - "LinkedIn post"
+  - "Blog intro"
+  - "Full blog section"
+  - "Newsletter segment"
+  - "Email"
+  - "Comment/reply"
 ```
 
-The LLM will have the dense voice specification to match the author's style.
+### Step 3: Generate Content
+
+Read the voice doc and generate content that:
+- Opens with the documented opening style
+- Matches tone parameters exactly
+- Uses vocabulary from the USE list
+- Avoids vocabulary from the AVOID list
+- Incorporates at least one signature move
+- Follows structural patterns
+
+### Step 4: Iterate
+
+Use AskUserQuestion:
+```
+header: "Result"
+question: "How's this?"
+options:
+  - "Perfect - use as is"
+  - "Good - minor edits"
+  - "Needs adjustment"
+  - "Try again"
+```
+
+If not perfect, ask what to adjust and regenerate.
