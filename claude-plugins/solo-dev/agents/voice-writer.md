@@ -15,7 +15,6 @@ description: |
   assistant: "I'll use the voice-writer agent to write this in your style."
   </example>
 tools: Read, Glob
-model: sonnet
 ---
 
 # Voice Writer Agent
