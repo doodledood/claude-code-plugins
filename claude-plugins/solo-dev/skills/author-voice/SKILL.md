@@ -271,7 +271,7 @@ After generating the initial document, begin iterative refinement:
 
 **Step 3.1: Generate Sample Texts**
 
-Use the **voice-writer** agent to generate samples:
+**IMPORTANT**: Do NOT generate samples yourself. You MUST use the **voice-writer** agent to generate samples. The agent is specifically designed to read the voice doc and produce authentic samples - attempting to generate them inline will produce inferior results.
 
 ```
 Use the voice-writer agent to generate 3 sample texts.
