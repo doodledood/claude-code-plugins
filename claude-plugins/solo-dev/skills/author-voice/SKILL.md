@@ -11,9 +11,19 @@ Create a maximally information-dense AUTHOR_VOICE.md document through iterative 
 
 This skill guides you through:
 1. **Discovery** - Clarifying questions about your voice characteristics and goals
-2. **Initial Draft** - Generate first AUTHOR_VOICE.md based on your inputs
-3. **Refinement Cycles** - Generate sample texts, collect your ratings/feedback, update the doc
+2. **Initial Draft** - Generate first AUTHOR_VOICE.md based on your inputs (good enough to start!)
+3. **Refinement Cycles** - Generate sample texts, collect your ratings/feedback, update the doc ⬅️ **THE REAL MAGIC**
 4. **Completion** - Final honed document ready for AI content generation
+
+### Where the Value Comes From
+
+The discovery questions give you a solid starting point - but **the real magic happens in Phase 3**. That's where you:
+- See actual generated samples in your "voice"
+- Judge them ("this doesn't sound like me")
+- Give specific feedback ("too formal", "wrong words")
+- Watch the voice doc evolve until it truly captures YOU
+
+Each feedback cycle sharpens the doc. Most users need 3-5 cycles to get from "this is okay" to "this is actually me."
 
 ## Tool Requirements
 
@@ -164,7 +174,9 @@ question: "List 2-3 topics you frequently write about (or paste examples of your
 
 ### Phase 2: Initial Document Generation
 
-After discovery, generate the first AUTHOR_VOICE.md using this structure:
+After discovery, generate the first AUTHOR_VOICE.md. This draft is intentionally a "good enough" starting point - not perfect, but solid enough to generate samples and start the feedback loop.
+
+Use this structure:
 
 ```markdown
 # AUTHOR_VOICE.md
@@ -251,7 +263,9 @@ NEVER:
 
 Write this file to the current working directory as `AUTHOR_VOICE.md`.
 
-### Phase 3: Refinement Cycles
+### Phase 3: Refinement Cycles (Where the Magic Happens)
+
+**This is the most important phase.** The initial doc from Phase 2 captures the basics, but YOUR feedback on generated samples is what transforms it from generic to authentic. Don't skip this.
 
 After generating the initial document, begin iterative refinement:
 
