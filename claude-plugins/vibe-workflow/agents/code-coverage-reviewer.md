@@ -22,8 +22,10 @@ Analyze the diff between the current branch and main to ensure all new and modif
 Determine what to review using this priority:
 
 1. **User specifies files/directories** → review those exact paths
-2. **User mentions recent work** → check `git diff` for unstaged changes, then `git diff main...HEAD` for branch changes
-3. **Ambiguous scope** → ask user to clarify before proceeding
+2. **Otherwise** → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD && git diff`
+3. **Ambiguous or no changes found** → ask user to clarify scope before proceeding
+
+**IMPORTANT: Stay within scope.** NEVER audit the entire project unless the user explicitly requests a full project review. Your review is strictly constrained to the files/changes identified above.
 
 **Scope boundaries**: Focus on application logic. Skip generated files, lock files, and vendored dependencies.
 
