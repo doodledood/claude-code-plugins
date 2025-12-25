@@ -34,8 +34,8 @@ You have mastered the identification of:
 
 1. **Scope Identification**: Determine what to review using this priority:
    1. If user specifies files/directories → review those
-   2. If user mentions recent work → check `git diff` for unstaged changes, then `git diff HEAD~5` for recent commits
-   3. If ambiguous → ask user to clarify scope before proceeding
+   2. Otherwise → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD && git diff`
+   3. If ambiguous or no changes found → ask user to clarify scope before proceeding
 
    **IMPORTANT: Stay within scope.** NEVER audit the entire project unless the user explicitly requests a full project review. Your review is strictly constrained to the files/changes identified above. Cross-file analysis (step 4) should only examine files directly related to the scoped changes—imports, exports, shared utilities used by the changed code. If you discover issues outside the scope, mention them briefly in a "Related Concerns" section but do not perform deep analysis.
 
