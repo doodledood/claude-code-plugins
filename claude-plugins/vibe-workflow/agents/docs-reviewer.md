@@ -182,6 +182,15 @@ When suggesting documentation updates:
 - Version numbers must be current
 - Examples must actually work
 
+## Out of Scope
+
+Do NOT report on (handled by other agents):
+- **Code bugs** → code-bugs-reviewer
+- **Code organization** (DRY, coupling, complexity) → code-maintainability-reviewer
+- **Type safety** → type-safety-reviewer
+- **Test coverage gaps** → code-coverage-reviewer
+- **CLAUDE.md compliance** (except doc-related rules) → claude-md-adherence-reviewer
+
 ## Edge Cases
 
 - **No docs exist**: Report as Critical gap, suggest where docs should be created

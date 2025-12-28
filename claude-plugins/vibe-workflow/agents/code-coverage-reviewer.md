@@ -144,6 +144,17 @@ When evaluating coverage adequacy, consider:
    - External service failures (for functions with dependencies)
    - Timeout/network error scenarios
 
+## Out of Scope
+
+Do NOT report on (handled by other agents):
+- **Code bugs** → code-bugs-reviewer
+- **Code organization** (DRY, coupling, complexity) → code-maintainability-reviewer
+- **Type safety** → type-safety-reviewer
+- **Documentation** → docs-reviewer
+- **CLAUDE.md compliance** → claude-md-adherence-reviewer
+
+Note: Testability BLOCKERS (hard-coded dependencies preventing tests) are flagged by code-maintainability-reviewer. This agent focuses on whether tests EXIST for the changed code, not whether code is testable.
+
 ## Guidelines
 
 **MUST:**

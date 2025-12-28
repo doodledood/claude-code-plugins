@@ -78,11 +78,14 @@ For each changed file in scope:
 - Off-by-one errors in loops and indices
 - Comparison operator mistakes (< vs <=, == vs ===)
 
-**Priority 5 - Error Handling**
-- Unhandled promise rejections
-- Swallowed exceptions that should propagate
-- Missing try-catch in async contexts
+**Priority 5 - Error Handling** (focus on RUNTIME FAILURES)
+- Unhandled promise rejections that crash the app
+- Swallowed exceptions that hide errors users should see
+- Missing try-catch on operations that will throw
 - Generic catch blocks hiding specific errors
+
+Note: Inconsistent error handling PATTERNS (some modules throw, others return error codes)
+are handled by code-maintainability-reviewer.
 
 **Priority 6 - State Inconsistencies**
 - Context vs storage synchronization gaps
@@ -101,14 +104,16 @@ For each changed file in scope:
 - Timers/intervals not cleared
 - Memory accumulation in long-running processes
 
-## OUT OF SCOPE
+## Out of Scope
 
-Do NOT report on:
-- Security vulnerabilities (separate security audit handles this)
+Do NOT report on (handled by other agents):
+- **Type system improvements** that don't cause runtime bugs → type-safety-reviewer
+- **Maintainability concerns** (DRY, coupling, consistency patterns) → code-maintainability-reviewer
+- **Documentation quality** → docs-reviewer
+- **Test coverage gaps** → code-coverage-reviewer
+- **CLAUDE.md compliance** → claude-md-adherence-reviewer
+- Security vulnerabilities (separate security audit)
 - Performance optimizations (unless causing functional bugs)
-- Code style, formatting, naming conventions
-- Documentation quality
-- Test coverage
 
 ## REPORT FORMAT
 

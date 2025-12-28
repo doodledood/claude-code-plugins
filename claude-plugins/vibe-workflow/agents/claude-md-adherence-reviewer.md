@@ -114,6 +114,17 @@ Effort levels:
 - Issues explicitly silenced via comments (e.g., lint ignores)
 - Violations where you cannot quote the exact rule being broken
 
+## Out of Scope
+
+Do NOT report on (handled by other agents):
+- **Code bugs** → code-bugs-reviewer
+- **General maintainability** (not specified in CLAUDE.md) → code-maintainability-reviewer
+- **Type safety** → type-safety-reviewer
+- **Documentation accuracy** (not specified in CLAUDE.md) → docs-reviewer
+- **Test coverage** → code-coverage-reviewer
+
+Note: Only flag naming conventions, patterns, or documentation requirements that are EXPLICITLY specified in CLAUDE.md. General best practices belong to other agents.
+
 ## Guidelines
 
 - **Zero false positives**: If you're uncertain, don't flag it
