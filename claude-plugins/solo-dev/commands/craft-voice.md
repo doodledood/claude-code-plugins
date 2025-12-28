@@ -4,5 +4,3 @@ allowed-tools: ["Read", "Write", "Edit", "Task", "AskUserQuestion", "Glob", "Ski
 ---
 
 Use the author-voice skill to craft an AUTHOR_VOICE.md document for the user.
-
-Start with Phase 0: Check for existing document.
