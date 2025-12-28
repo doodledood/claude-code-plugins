@@ -8,17 +8,17 @@ This plugin provides systematic prompt review that identifies genuine improvemen
 
 ## Components
 
-### Command: `/review_prompt`
+### Command: `/review-prompt`
 
 Review and analyze LLM prompts (does not modify files).
 
 **Usage:**
 ```bash
 # Review a prompt file
-/review_prompt path/to/prompt.md
+/review-prompt path/to/prompt.md
 
 # Review inline text
-/review_prompt "Your prompt text here"
+/review-prompt "Your prompt text here"
 ```
 
 **What it does:**
