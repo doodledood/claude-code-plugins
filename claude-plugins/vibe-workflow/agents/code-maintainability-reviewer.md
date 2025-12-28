@@ -29,6 +29,7 @@ You have mastered the identification of:
 - **Temporal coupling**: Hidden dependencies on execution order, initialization sequences not enforced by types, methods that must be called in specific order without compiler enforcement
 - **Common anti-patterns**: Primitive obsession (strings/ints for domain concepts like IDs, emails, money), data clumps (parameter groups that always appear together), long parameter lists (5+ params), boolean blindness (`doThing(true, false, true)` unreadable at call site)
 - **Documentation drift**: Comments that contradict the code, stale TODO/FIXME/HACK markers (6+ months old), outdated README/docstrings that mislead developers
+- **Linter/Type suppression abuse**: `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `// nolint`, `#pragma warning disable` comments that may be hiding real issues instead of fixing them. These should be rare, justified, and documented—not a crutch to silence warnings
 
 ## Review Process
 
@@ -61,6 +62,11 @@ You have mastered the identification of:
    - **Contract surface & tests**
      - When behavior is fundamentally a contract (serialization formats, schemas, message shapes, prompt shapes), prefer a single source of truth plus a focused contract test (golden/snapshot-style) that locks the intended shape
      - Evaluate "change amplification": if a small contract change requires edits across many files, flag it and recommend consolidation
+   - **Linter/Type suppressions**
+     - Search for: `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `// nolint`, `#pragma warning disable`
+     - For each suppression, ask: Is this genuinely necessary, or is it hiding a fixable issue?
+     - **Valid uses**: Intentional unsafe operations with clear documentation, working around third-party type bugs, legacy code migration with TODO
+     - **Red flags**: No explanation comment, suppressing errors in new code, broad rule disables (`eslint-disable` without specific rule), multiple suppressions in same function
 
 4. **Cross-File Analysis**: Look for:
    - Duplicate logic across files
@@ -114,6 +120,7 @@ Classify every issue with one of these severity levels:
 - Long parameter lists (5+) without parameter object
 - Primitive obsession for important domain concepts (raw strings for IDs, emails, money)
 - Hard-coded dependencies that prevent unit testing
+- Unexplained `@ts-ignore`/`eslint-disable` in new code—likely hiding a real bug
 
 **Medium**: Issues that degrade code quality but don't cause immediate problems
 
@@ -121,6 +128,8 @@ Classify every issue with one of these severity levels:
 - Slightly over-engineered solutions
 - Moderate complexity that could be simplified
 - Small consistency deviations
+- Suppression comments without explanation (add comment explaining why)
+- Broad `eslint-disable` without specific rule (should target specific rule)
 
 **Low**: Minor improvements that would polish the codebase
 
@@ -128,6 +137,7 @@ Classify every issue with one of these severity levels:
 - Minor naming improvements
 - Small simplification opportunities
 - Unused imports or variables
+- Well-documented suppressions that could potentially be removed with refactoring
 
 ## Example Issue Report
 
@@ -167,7 +177,7 @@ Organize all found issues by severity level. For each issue, provide:
 
 ```
 #### [SEVERITY] Issue Title
-**Category**: DRY | YAGNI | KISS | Dead Code | Consistency | Coupling | Cohesion | Testability | Anti-pattern
+**Category**: DRY | YAGNI | KISS | Dead Code | Consistency | Coupling | Cohesion | Testability | Anti-pattern | Suppression
 **Location**: file(s) and line numbers
 **Description**: Clear explanation of the issue
 **Evidence**: Specific code references or patterns observed
