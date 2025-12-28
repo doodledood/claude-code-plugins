@@ -17,6 +17,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/define-customer](#define-customer) | Create or refine your CUSTOMER.md ideal customer profile |
 | [/define-brand](#define-brand) | Create or refine your BRAND_GUIDELINES.md (requires CUSTOMER.md) |
 | [/define-design](#define-design) | Create or refine your DESIGN_GUIDELINES.md (requires CUSTOMER.md) |
+| [/audit-ux](#audit-ux) | Audit UI/UX changes in a focus area against design guidelines |
 
 ### Agents
 
@@ -25,6 +26,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [voice-writer](#voice-writer) | Generate content in your voice using AUTHOR_VOICE.md |
 | [design-research](#design-research) | Analyze customer profile to determine ideal UI/UX design direction |
 | [design-quality-auditor](#design-quality-auditor) | Audit DESIGN_GUIDELINES.md for alignment with CUSTOMER.md and BRAND_GUIDELINES.md |
+| [ux-auditor](#ux-auditor) | Audit UI/UX changes in a focus area for accessibility, consistency, and usability |
 
 ### Skills
 
@@ -124,6 +126,24 @@ Create or refine your DESIGN_GUIDELINES.md that defines how to design UI/UX for 
 6. Generates DESIGN_GUIDELINES.md with full design system tokens
 7. Automatic alignment audit (opus agent verifies alignment, fixes issues, repeats until perfect)
 
+### /audit-ux
+
+Audit UI/UX changes in a specific focus area (e.g., checkout, navigation, forms) against your design guidelines. Checks for accessibility, design system compliance, and usability issues.
+
+**Usage:**
+```bash
+/audit-ux checkout
+/audit-ux navigation
+/audit-ux  # will ask for focus area
+```
+
+**What happens:**
+1. Launches ux-auditor agent with your specified focus area
+2. Agent reads DESIGN_GUIDELINES.md and BRAND_GUIDELINES.md
+3. Runs `git diff main...HEAD` to identify UI changes in that area
+4. Systematically audits each changed file for accessibility, consistency, interaction, layout, and visual issues
+5. Produces structured report with prioritized issues (Critical → Low) and recommendations
+
 ## Agents
 
 ### voice-writer
@@ -159,6 +179,21 @@ The agent performs systematic checks across 4 categories:
 - **Completeness** - Concrete examples, no gaps
 
 Reports `✅ AUDIT PASSED` or `⚠️ ISSUES FOUND` with specific, actionable fixes prioritized by impact.
+
+### ux-auditor
+
+Audits UI/UX changes in a specific focus area against design guidelines. Used by `/audit-ux` for pre-merge UX reviews, accessibility audits, and design system compliance checks.
+
+The agent performs systematic review across 5 categories:
+- **Layout** - Spacing, alignment, grid compliance, responsive breakpoints
+- **Accessibility** - WCAG violations, keyboard navigation, ARIA labels, color contrast, focus management
+- **Consistency** - Deviations from design system, inconsistent patterns, component misuse
+- **Interaction** - Confusing flows, missing feedback, unclear affordances, error handling
+- **Visual** - Typography issues, color usage, iconography, visual hierarchy problems
+
+Issues are prioritized as Critical (blocks users), High (significant UX degradation), Medium (noticeable but has workarounds), or Low (polish items).
+
+Read-only operation: produces reports with file:line references and specific recommendations. Does not modify code.
 
 ## Skills
 
