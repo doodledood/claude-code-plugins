@@ -690,6 +690,12 @@ This is your **foundational document**. Use it to:
 - Before moving to next phase, verify: "Do I know enough to generate something specific?"
 - User's time spent answering questions upfront saves iteration time later
 
+### Ground in Reality, Not Wishes
+- **Define the ICP you HAVE, not the one you WISH you had**
+- Base the profile on actual customers, real conversations, observable patterns
+- Aspirational ICPs (big logos, impressive titles) lead to products nobody buys
+- If pre-launch with no customers: define hypotheses, but mark them as unvalidated
+
 ## Output Location
 
 Write `CUSTOMER.md` to the current working directory (or user-specified path).
