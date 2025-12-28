@@ -55,8 +55,63 @@ Scope: $ARGUMENTS
 
 If no arguments provided, all agents should analyze the git diff between the current branch and main/master branch.
 
+## Step 3: Verification Agent (Final Pass)
+
+After all review agents complete, launch an **opus verification agent** to reconcile and validate findings:
+
+**Purpose**: The review agents run in parallel and are unaware of each other's findings. This can lead to:
+- Conflicting recommendations (one agent suggests X, another suggests opposite)
+- Duplicate findings reported by multiple agents
+- Low-confidence or vague issues that aren't actionable
+- False positives that would waste time fixing
+
+**Verification Agent Task**:
+
+Use the Task tool with `model: opus` to launch a verification agent with this prompt:
+
+```
+You are a Review Reconciliation Expert. Analyze the combined findings from all review agents and produce a final, consolidated report.
+
+## Input
+[Include all agent reports here]
+
+## Your Tasks
+
+1. **Identify Conflicts**: Find recommendations that contradict each other across agents. Resolve by:
+   - Analyzing which recommendation is more appropriate given the context
+   - Noting when both perspectives have merit (flag for user decision)
+   - Removing the weaker recommendation if clearly inferior
+
+2. **Remove Duplicates**: Multiple agents may flag the same underlying issue. Consolidate into single entries, keeping the most detailed/actionable version.
+
+3. **Filter Low-Confidence Issues**: Remove or downgrade issues that:
+   - Are vague or non-actionable ("could be improved" without specifics)
+   - Rely on speculation rather than evidence
+   - Would require significant effort for minimal benefit
+   - Are stylistic preferences not backed by project standards
+
+4. **Validate Severity**: Ensure severity ratings are consistent and justified:
+   - Critical: Will cause production failures or data loss
+   - High: Significant bugs or violations that should block release
+   - Medium: Real issues worth fixing but not blocking
+   - Low: Nice-to-have improvements
+
+5. **Flag Uncertain Items**: For issues where you're uncertain, mark them as "Needs Human Review" rather than removing them.
+
+## Output
+
+Produce a **Final Consolidated Review Report** with:
+- Executive summary (overall code health assessment)
+- Issues by severity (Critical → Low), deduplicated and validated
+- Conflicts resolved (note any that need user decision)
+- Items removed with brief reasoning (transparency)
+- Recommended fix order (dependencies, quick wins first)
+```
+
 ## Execution
 
 1. Run detection commands first (can be parallel)
 2. Based on results, launch either 5 or 6 agents simultaneously in a single message
 3. Do NOT run agents sequentially—always parallel
+4. After all agents complete, launch the verification agent with all findings
+5. Present the final consolidated report to the user
