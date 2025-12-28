@@ -33,7 +33,7 @@ If the review was run in this conversation, use those results. Otherwise, ask th
 
 ### Step 2: Create Fix Plan with Plan Agent
 
-**Use the Plan agent (Task tool with subagent_type=Plan)** to design an implementation plan for fixing the issues. The plan should:
+**Use the Plan agent (Task tool with subagent_type=Plan, model=opus)** to design an implementation plan for fixing the issues. The plan should:
 
 1. Analyze all issues from the review within the filter scope
 2. Group related fixes (same file, same module, interdependent changes)
