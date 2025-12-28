@@ -28,18 +28,22 @@ Finds and removes AI-generated code slop: useless comments, verbose patterns, un
 #### `code-bugs-reviewer`
 Audits code changes for logical bugs, race conditions, edge cases, and error handling issues. Performs deep analysis with prioritized bug detection (race conditions, data loss, edge cases, logic errors, etc.). Generates detailed bug reports with severity, impact, and fix recommendations.
 
-#### `claude-md-adherence`
+#### `claude-md-adherence-reviewer`
 Verifies that code changes comply with CLAUDE.md instructions and project standards. Audits pull requests and code for violations of project-specific rules. Issues are categorized by severity (CRITICAL, HIGH, MEDIUM, LOW) with exact CLAUDE.md rule citations.
+
+#### `docs-reviewer`
+Audits documentation and code comments accuracy against code changes. Identifies stale docs, missing documentation for new features, incorrect examples, version mismatches, outdated JSDoc/docstrings, and stale TODO/FIXME comments. Produces actionable reports with specific update recommendations. Read-only—does not modify files.
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
-| `/review` | Run all review agents in parallel (bugs, coverage, maintainability, CLAUDE.md) |
+| `/review` | Run all review agents in parallel (bugs, coverage, maintainability, CLAUDE.md, docs) |
 | `/review-maintainability` | Launch code-maintainability-reviewer agent (defaults to git diff scope) |
 | `/review-bugs` | Launch code-bugs-reviewer agent for logical bug detection (defaults to git diff scope) |
 | `/review-coverage` | Launch code-coverage-reviewer agent (defaults to git diff scope) |
-| `/review-claude-md` | Launch claude-md-adherence agent for CLAUDE.md compliance (defaults to git diff scope) |
+| `/review-claude-md-adherence` | Launch claude-md-adherence-reviewer agent for CLAUDE.md compliance (defaults to git diff scope) |
+| `/review-docs` | Launch docs-reviewer agent for documentation accuracy (defaults to git diff scope) |
 | `/bugfix` | Launch bug-fixer agent |
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
