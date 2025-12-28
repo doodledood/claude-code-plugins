@@ -1,12 +1,12 @@
 {
   "name": "solo-dev",
-  "description": "Toolkit for solo developers to build, manage, and grow their business - customer profiling, brand guidelines, content creation, and more",
-  "version": "1.4.0",
+  "description": "Toolkit for solo developers to build, manage, and grow their business - customer profiling, brand guidelines, design system, content creation, and more",
+  "version": "1.5.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "customer-profile", "brand-guidelines", "icp", "productivity", "business"]
+  "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "customer-profile", "brand-guidelines", "design-guidelines", "design-system", "icp", "productivity", "business"]
 }

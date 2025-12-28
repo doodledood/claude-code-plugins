@@ -16,12 +16,15 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/write-as-me](#write-as-me) | Generate content in your voice using your AUTHOR_VOICE.md |
 | [/define-customer](#define-customer) | Create or refine your CUSTOMER.md ideal customer profile |
 | [/define-brand](#define-brand) | Create or refine your BRAND_GUIDELINES.md (requires CUSTOMER.md) |
+| [/define-design](#define-design) | Create or refine your DESIGN_GUIDELINES.md (requires CUSTOMER.md) |
 
 ### Agents
 
 | Agent | Description |
 |-------|-------------|
 | [voice-writer](#voice-writer) | Generate content in your voice using AUTHOR_VOICE.md |
+| [design-research](#design-research) | Analyze customer profile to determine ideal UI/UX design direction |
+| [design-quality-auditor](#design-quality-auditor) | Audit DESIGN_GUIDELINES.md for alignment with CUSTOMER.md and BRAND_GUIDELINES.md |
 
 ### Skills
 
@@ -30,6 +33,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [author-voice](#author-voice) | Iteratively craft an AUTHOR_VOICE.md that captures your unique writing style for AI replication |
 | [customer-profile](#customer-profile) | Iteratively craft a CUSTOMER.md that precisely defines your ideal customer profile |
 | [brand-guidelines](#brand-guidelines) | Create BRAND_GUIDELINES.md for voice, tone, and messaging (requires CUSTOMER.md) |
+| [design-guidelines](#design-guidelines) | Create DESIGN_GUIDELINES.md for UI/UX design system (requires CUSTOMER.md) |
 
 ## Commands
 
@@ -102,6 +106,24 @@ Create or refine your BRAND_GUIDELINES.md that defines how to communicate with y
 5. Tests with sample copy, collects feedback
 6. Iterates until the voice feels right
 
+### /define-design
+
+Create or refine your DESIGN_GUIDELINES.md that defines how to design UI/UX for your customer. **Requires CUSTOMER.md to exist first.** Bakes in the frontend-design skill principles to avoid generic AI aesthetics.
+
+**Usage:**
+```bash
+/define-design
+```
+
+**What happens:**
+1. Checks for CUSTOMER.md (stops if not found)
+2. Launches design-research agent to analyze CUSTOMER.md and BRAND_GUIDELINES.md (if exists)
+3. Agent researches industry design patterns and competitors
+4. Presents design direction summary for confirmation
+5. Asks targeted questions with agent-informed recommendations pre-filled
+6. Generates DESIGN_GUIDELINES.md with full design system tokens
+7. Automatic alignment audit (opus agent verifies alignment, fixes issues, repeats until perfect)
+
 ## Agents
 
 ### voice-writer
@@ -109,6 +131,34 @@ Create or refine your BRAND_GUIDELINES.md that defines how to communicate with y
 Generates content in your authentic voice using your AUTHOR_VOICE.md specification. Used by both `/craft-voice` (for sample generation during calibration) and `/write-as-me` (for content creation).
 
 The agent reads your voice doc and produces content matching your tone, vocabulary, structure, and signature moves.
+
+### design-research
+
+Analyzes CUSTOMER.md and BRAND_GUIDELINES.md to determine the ideal UI/UX design direction. Used by `/define-design` in Phase 1 (Deep Analysis).
+
+The agent provides comprehensive analysis across 8 areas:
+1. **Customer Design Psychology** - Visual preferences, emotional response, frustrations
+2. **Recommended Aesthetic Direction** - One decisive pick from 11 aesthetic options with rationale
+3. **Typography Recommendation** - Font character, specific suggestions, data vs body treatment
+4. **Color Direction** - Theme, accent colors, colors to avoid
+5. **Geometry & Motion** - Corners, animation philosophy, information density
+6. **Signature Elements** - 2-3 distinctive visual elements
+7. **Anti-Patterns** - Design choices that would alienate the ICP
+8. **Design Reference Products** - 2-3 products whose aesthetic would resonate
+
+Also performs web research on industry patterns and competitors when applicable.
+
+### design-quality-auditor
+
+Audits DESIGN_GUIDELINES.md for perfect alignment with CUSTOMER.md and BRAND_GUIDELINES.md. Used by `/define-design` for automatic quality verification.
+
+The agent performs systematic checks across 4 categories:
+- **Customer Alignment** - Aesthetic direction, information density, motion philosophy match ICP values
+- **Brand Alignment** - UI tone, colors, formality match brand guidelines
+- **Internal Consistency** - No contradictions, all tokens serve the aesthetic
+- **Completeness** - Concrete examples, no gaps
+
+Reports `✅ AUDIT PASSED` or `⚠️ ISSUES FOUND` with specific, actionable fixes prioritized by impact.
 
 ## Skills
 
@@ -241,6 +291,56 @@ A `BRAND_GUIDELINES.md` file containing:
 - Tests guidelines with real sample copy
 - Tone guidance for different contexts
 - Actionable examples, not abstract theory
+
+### design-guidelines
+
+Create the DESIGN_GUIDELINES.md document that defines HOW to design interfaces for your customer. Drives all UI/UX: components, layouts, animations, colors, typography—everything visual. **Bakes in the frontend-design skill to avoid generic AI aesthetics.**
+
+**Prerequisite**: CUSTOMER.md must exist. Run `/define-customer` first.
+
+**Use when you want to:**
+- Define your product's visual identity and design system
+- Create consistent UI across all screens
+- Establish design tokens (colors, typography, spacing, motion)
+- Build a component library foundation
+- Avoid generic "AI slop" aesthetics
+
+**How it works:**
+
+1. **Prerequisite Check** - Verifies CUSTOMER.md exists (stops if not)
+2. **Deep Analysis** - Launches design-research agent to read CUSTOMER.md/BRAND_GUIDELINES.md and research industry patterns
+3. **Discovery** - Targeted questions with agent-informed recommendations pre-filled
+4. **Generate Document** - Creates DESIGN_GUIDELINES.md with full design system
+5. **Automatic Audit** - Opus agent verifies alignment with customer/brand docs, fixes issues, repeats until perfect
+
+**Usage:**
+
+The skill activates when you mention design guidelines, design system, UI guidelines, or visual identity. Example prompts:
+
+```
+Help me define my product's design system
+Create design guidelines for my app
+What should my UI look like?
+```
+
+**Output:**
+
+A `DESIGN_GUIDELINES.md` file containing:
+- Identity (user, problem, aesthetic direction, signature elements)
+- Design tokens (colors, typography, spacing, geometry, shadows, animation)
+- Voice & copy in UI context
+- Component specifications (cards, buttons, inputs, toasts)
+- Layout patterns and visual hierarchy
+- Motion philosophy and loading states
+- Anti-patterns (what to NEVER do)
+- Ship checklist
+
+**Key features:**
+- Requires CUSTOMER.md (design must resonate with WHO you're building for)
+- Bakes in anti-AI-slop principles (no Inter/Roboto, no purple gradients, no template look)
+- Pre-fills recommendations from CUSTOMER.md (speed-focused ICP → terminal aesthetic)
+- Tests with sample components before finalizing
+- Distinctive design, not generic templates
 
 ## Installation
 
