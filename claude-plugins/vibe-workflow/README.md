@@ -49,6 +49,7 @@ Audits TypeScript code to catch bugs through the type system—the cheapest, mos
 | `/review-docs` | Launch docs-reviewer agent for documentation accuracy (defaults to git diff scope) |
 | `/review-type-safety` | Launch type-safety-reviewer agent for TypeScript type safety (defaults to git diff scope) |
 | `/bugfix` | Launch bug-fixer agent |
+| `/fix-review-issues` | Address issues found by /review (filter by severity/category/file) |
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
 | `/rebase-on-main` | Update main/master, rebase current branch, resolve conflicts, and push |
