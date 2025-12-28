@@ -67,7 +67,12 @@ options:
 
 ### Phase 1: Discovery
 
-Use AskUserQuestion tool with multi-choice options for EVERY question. Goal: understand the product, market, and user's current customer understanding.
+Use AskUserQuestion tool with multi-choice options for EVERY question. **Put the recommended option FIRST** with "(Recommended)" suffix to reduce cognitive load.
+
+**Recommendation Strategy**: Since there's no prior document, recommendations are based on:
+- Most common patterns for solo devs/indie hackers
+- Product type (once selected, informs subsequent recommendations)
+- Sensible defaults that apply to most cases
 
 **Question 1: Product Stage**
 
@@ -75,11 +80,13 @@ Use AskUserQuestion tool with multi-choice options for EVERY question. Goal: und
 header: "Product Stage"
 question: "Where is your product in its lifecycle?"
 options:
+  - "Early stage - have some users, finding PMF (Recommended)"
   - "Pre-launch - still building, no customers yet"
-  - "Early stage - have some users, finding PMF"
   - "Growth stage - PMF found, scaling acquisition"
   - "Mature - established product, optimizing"
 ```
+
+Recommendation: "Early stage" is most common for solo devs using this tool.
 
 **Question 2: Product Type**
 
@@ -87,13 +94,15 @@ options:
 header: "Product Type"
 question: "What type of product are you building?"
 options:
-  - "B2B SaaS - software for businesses"
-  - "B2C app - consumer application"
+  - "B2B SaaS - software for businesses (Recommended)"
   - "Developer tool - for engineers/developers"
+  - "B2C app - consumer application"
   - "Marketplace/Platform - connecting buyers and sellers"
   - "Content/Media - newsletter, course, community"
   - "Physical product - hardware or tangible goods"
 ```
+
+Recommendation: "B2B SaaS" is most common. Use selected type to inform later recommendations.
 
 **Question 3: Problem Space** (Free text)
 
@@ -112,11 +121,13 @@ This is essential context that's hard to multiple-choice. Get 1-2 sentences.
 header: "Current Understanding"
 question: "How well do you know your ideal customer today?"
 options:
+  - "Somewhat - have some customers, seeing some patterns (Recommended)"
   - "Very well - I've talked to many, have clear patterns"
-  - "Somewhat - have some customers, seeing some patterns"
   - "Vaguely - have hypotheses but not validated"
   - "Not at all - need to figure this out from scratch"
 ```
+
+Recommendation: "Somewhat" - most users have some signal but need help structuring it.
 
 **Question 5: Primary Value Proposition**
 
@@ -124,7 +135,7 @@ options:
 header: "Value Prop"
 question: "What's the PRIMARY value you deliver?"
 options:
-  - "Save time - automation, efficiency"
+  - "Save time - automation, efficiency (Recommended)"
   - "Save money - cost reduction, better ROI"
   - "Make money - revenue generation, growth"
   - "Reduce risk - security, compliance, reliability"
@@ -133,14 +144,22 @@ options:
   - "Provide enjoyment - entertainment, satisfaction"
 ```
 
+Recommendation: "Save time" is the most common value prop for SaaS products.
+
 **Question 6: Purchase Decision**
+
+Recommendation based on product type:
+- B2B SaaS → "Team lead" or "Individual user"
+- Developer tool → "Individual user"
+- B2C → "Individual user"
+- Enterprise → "Multiple stakeholders"
 
 ```
 header: "Buyer Type"
 question: "Who makes the purchase decision?"
 options:
-  - "Individual user - they buy for themselves"
-  - "Team lead - buys for their team"
+  - "Individual user - they buy for themselves (Recommended for B2C/dev tools)"
+  - "Team lead - buys for their team (Recommended for B2B SaaS)"
   - "Executive/C-suite - strategic purchase"
   - "Procurement/IT - goes through formal process"
   - "Multiple stakeholders - committee decision"
@@ -153,15 +172,17 @@ options:
 header: "Customer Traits"
 question: "What do you know about your best customers? (Select all that apply)"
 options:
-  - "Specific job title or role"
+  - "Pain intensity (desperate vs nice-to-have) (Recommended)"
+  - "Specific job title or role (Recommended)"
+  - "Behavioral patterns (power users, specific workflows)"
   - "Company size or type"
   - "Technical skill level"
   - "Specific industry or vertical"
   - "Geographic location"
-  - "Behavioral patterns (power users, specific workflows)"
-  - "Pain intensity (desperate vs nice-to-have)"
 multiSelect: true
 ```
+
+Recommendation: "Pain intensity" and "Job title/role" are the most actionable traits for targeting.
 
 **Question 7b: Trait Details (Follow-up)**
 
@@ -181,19 +202,26 @@ Use free-text for these follow-ups - the specifics matter and are hard to predic
 
 **Question 8: What They're NOT**
 
+Recommendation based on product type:
+- B2B SaaS (small team) → Recommend "Enterprise" as anti-persona
+- Developer tool → Recommend "Beginners" as anti-persona
+- B2C consumer → Recommend "Enterprise" as anti-persona
+
 ```
 header: "Anti-Personas"
 question: "Who is explicitly NOT your customer? (Select all that apply)"
 options:
-  - "Enterprise (too slow, complex sales)"
-  - "SMB (can't afford, high churn)"
+  - "Enterprise (too slow, complex sales) (Recommended for solo devs)"
+  - "Price-sensitive buyers (race to bottom) (Recommended)"
   - "Beginners (need too much hand-holding)"
+  - "SMB (can't afford, high churn)"
   - "Experts (don't need the product)"
-  - "Price-sensitive buyers (race to bottom)"
   - "Specific industry (bad fit)"
   - "Not sure yet - need to figure this out"
 multiSelect: true
 ```
+
+Recommendation: Most solo devs should avoid "Enterprise" (sales cycle too long) and "Price-sensitive" (race to bottom).
 
 **Question 8b: Anti-Persona Details (Follow-up)**
 
@@ -212,14 +240,21 @@ Use free-text - understanding the WHY behind anti-personas is critical.
 
 **Question 9: Research Needs**
 
+Recommendation based on customer knowledge (Q4):
+- "Not at all" or "Vaguely" → Recommend "Full research"
+- "Somewhat" → Recommend "Light research"
+- "Very well" → Recommend "No research"
+
 ```
 header: "Research"
 question: "Do you want me to research your market and competitors to inform the ICP?"
 options:
+  - "Light research - just validate my assumptions (Recommended)"
   - "Yes, full research - ICP patterns, competitors, market data (takes longer)"
-  - "Light research - just validate my assumptions"
   - "No research - I have enough context, just help me structure it"
 ```
+
+Default recommendation: "Light research" balances speed with validation.
 
 **Question 10: Additional Context** (Free text)
 
@@ -678,6 +713,8 @@ This is your **foundational document**. Use it to:
 
 ### Reduce Cognitive Load
 - ALWAYS use AskUserQuestion tool when available
+- **Put recommended option FIRST** with "(Recommended)" suffix
+- User should be able to accept all defaults and get a solid result
 - Present multi-choice questions to minimize typing
 - Limit options to 6-8 max per question
 - Use multiSelect for non-exclusive choices

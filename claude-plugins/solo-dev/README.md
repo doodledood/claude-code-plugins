@@ -15,6 +15,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/craft-voice](#craft-voice) | Start the iterative process to create your AUTHOR_VOICE.md |
 | [/write-as-me](#write-as-me) | Generate content in your voice using your AUTHOR_VOICE.md |
 | [/define-customer](#define-customer) | Create or refine your CUSTOMER.md ideal customer profile |
+| [/define-brand](#define-brand) | Create or refine your BRAND_GUIDELINES.md (requires CUSTOMER.md) |
 
 ### Agents
 
@@ -28,6 +29,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 |-------|-------------|
 | [author-voice](#author-voice) | Iteratively craft an AUTHOR_VOICE.md that captures your unique writing style for AI replication |
 | [customer-profile](#customer-profile) | Iteratively craft a CUSTOMER.md that precisely defines your ideal customer profile |
+| [brand-guidelines](#brand-guidelines) | Create BRAND_GUIDELINES.md for voice, tone, and messaging (requires CUSTOMER.md) |
 
 ## Commands
 
@@ -82,6 +84,23 @@ Create or refine your CUSTOMER.md document that precisely defines your ideal cus
 5. Validates each section with you (ICP definition, pain points, anti-personas)
 6. Updates the document based on feedback
 7. Repeats until the profile is accurate
+
+### /define-brand
+
+Create or refine your BRAND_GUIDELINES.md that defines how to communicate with your customer. **Requires CUSTOMER.md to exist first.**
+
+**Usage:**
+```bash
+/define-brand
+```
+
+**What happens:**
+1. Checks for CUSTOMER.md (stops if not found)
+2. Reads CUSTOMER.md to understand who you're talking to
+3. Asks questions about brand personality, voice dimensions, language preferences
+4. Generates BRAND_GUIDELINES.md with voice, tone, messaging framework, copy patterns
+5. Tests with sample copy, collects feedback
+6. Iterates until the voice feels right
 
 ## Agents
 
@@ -176,6 +195,52 @@ A `CUSTOMER.md` file in your working directory containing:
 - Optional parallel research agents for market data
 - Section-by-section validation
 - Pure customer definition (no pricing/messaging - save those for downstream docs)
+
+### brand-guidelines
+
+Create the BRAND_GUIDELINES.md document that defines HOW to communicate with your customer. Drives all copy: app UI, marketing, support, emails, everything.
+
+**Prerequisite**: CUSTOMER.md must exist. Run `/define-customer` first.
+
+**Use when you want to:**
+- Define your brand's voice and personality
+- Create consistent messaging across all touchpoints
+- Establish language rules (what to say, what to avoid)
+- Build a copy pattern library for different contexts
+
+**How it works:**
+
+1. **Prerequisite Check** - Verifies CUSTOMER.md exists (stops if not)
+2. **Discovery** - Questions about brand personality, voice dimensions, language preferences
+3. **Draft Generation** - Creates BRAND_GUIDELINES.md
+4. **Refinement** - Tests with sample copy, iterates until voice feels right
+
+**Usage:**
+
+The skill activates when you mention brand voice, brand guidelines, messaging, or copy guidelines. Example prompts:
+
+```
+Help me define my brand voice
+Create brand guidelines for my app
+How should my product communicate?
+```
+
+**Output:**
+
+A `BRAND_GUIDELINES.md` file containing:
+- Voice identity and characteristics
+- "We Are / We Are NOT" table
+- Tone by context (marketing, UI, errors, support)
+- Language rules (USE/AVOID word lists)
+- Messaging framework (value props, the hook)
+- Copy patterns (headlines, CTAs, errors, empty states)
+- Before/after transformations
+
+**Key features:**
+- Requires CUSTOMER.md (voice must resonate with WHO you're talking to)
+- Tests guidelines with real sample copy
+- Tone guidance for different contexts
+- Actionable examples, not abstract theory
 
 ## Installation
 
