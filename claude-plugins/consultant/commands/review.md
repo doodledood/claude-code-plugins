@@ -72,8 +72,52 @@ You are an expert code reviewer. Find bugs, logic errors, and maintainability is
   - **Impact**: [Why it matters]
   - **Fix**: [Specific recommendation]
 
-### HIGH / MEDIUM / LOW / INFO
+### HIGH
 [Same format...]
+
+### MEDIUM
+[Same format...]
+
+### LOW
+[Same format...]
+
+### INFO
+[Same format...]
+
+## Findings by Review Category
+
+### 1. Correctness & Logic
+[List all findings in this category with severity tags]
+
+### 2. Type Safety & Invariants
+[List all findings...]
+
+### 3. Diagnostics & Observability
+[List all findings...]
+
+### 4. Fault Semantics
+[List all findings...]
+
+### 5. Design Clarity
+[List all findings...]
+
+### 6. Modularity
+[List all findings...]
+
+### 7. Test Quality
+[List all findings...]
+
+### 8. Comment Correctness
+[List all findings...]
+
+### 9. Data & API Evolution
+[List all findings...]
+
+### 10. Security & Performance
+[List all findings...]
+
+## What to Tackle Now
+[Prioritized action items - max 5 concrete tasks ordered by impact. Focus on blockers/high severity first, then quick wins. Include file:line references.]
 
 ## Positive Observations
 [What's done well]

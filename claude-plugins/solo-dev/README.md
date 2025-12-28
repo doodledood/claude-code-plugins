@@ -14,6 +14,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 |---------|-------------|
 | [/craft-voice](#craft-voice) | Start the iterative process to create your AUTHOR_VOICE.md |
 | [/write-as-me](#write-as-me) | Generate content in your voice using your AUTHOR_VOICE.md |
+| [/define-customer](#define-customer) | Create or refine your CUSTOMER.md ideal customer profile |
 
 ### Agents
 
@@ -26,6 +27,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | Skill | Description |
 |-------|-------------|
 | [author-voice](#author-voice) | Iteratively craft an AUTHOR_VOICE.md that captures your unique writing style for AI replication |
+| [customer-profile](#customer-profile) | Iteratively craft a CUSTOMER.md that precisely defines your ideal customer profile |
 
 ## Commands
 
@@ -62,6 +64,24 @@ Generate content in your authentic voice using your existing AUTHOR_VOICE.md doc
 2. Clarifies format if needed
 3. Launches voice-writer agent to generate content
 4. Iterates based on your feedback until perfect
+
+### /define-customer
+
+Create or refine your CUSTOMER.md document that precisely defines your ideal customer profile (ICP) for product and marketing decisions.
+
+**Usage:**
+```bash
+/define-customer
+```
+
+**What happens:**
+1. Checks for existing CUSTOMER.md (refine or start fresh)
+2. Asks 10 multi-choice questions about your product, market, and customers
+3. Optionally launches parallel research agents to gather ICP data, competitor analysis, and market insights
+4. Generates initial CUSTOMER.md based on your answers + research
+5. Validates each section with you (ICP definition, pain points, anti-personas)
+6. Updates the document based on feedback
+7. Repeats until the profile is accurate
 
 ## Agents
 
@@ -112,6 +132,50 @@ Read my AUTHOR_VOICE.md, then write a Twitter thread about [topic]
 - voice-writer agent generates sample texts for calibration
 - Iterative refinement until samples match your voice
 - Information-dense output optimized for LLM consumption
+
+### customer-profile
+
+Create the **foundational** CUSTOMER.md document that precisely defines WHO your customer is. This is the most important document your product will ever have - everything else (features, brand, pricing) derives from it.
+
+**Use when you want to:**
+- Define who your ideal customer is (and isn't) from first principles
+- Create the foundational doc that all product decisions flow from
+- Understand customer problems, behaviors, and what they value
+- Build a clear picture before writing code or marketing
+
+**How it works:**
+
+1. **Discovery** - Multi-choice questions about your product and customer understanding (keeps asking until confident)
+2. **Research** (optional) - Parallel agents research ICP patterns and competitor positioning
+3. **Initial Draft** - Generate first CUSTOMER.md based on inputs + research
+4. **Refinement & Completion** - Validate each section, update until accurate
+
+**Usage:**
+
+The skill activates when you mention defining customers, ICP, customer profile, or target audience. Example prompts:
+
+```
+Help me define my ideal customer
+Create a customer profile for my app
+Who should I build this product for?
+```
+
+**Output:**
+
+A `CUSTOMER.md` file in your working directory containing:
+- ICP definition with specific characteristics
+- Anti-personas (who to avoid and why)
+- Current state & triggers (what they do today, what makes them seek a solution)
+- Pain points in customer voice
+- What the ICP values in a solution
+- Behavioral and cognitive signals
+
+**Key features:**
+- Multi-choice questions throughout to minimize cognitive load
+- Keeps asking until gaps are filled (no ambiguity)
+- Optional parallel research agents for market data
+- Section-by-section validation
+- Pure customer definition (no pricing/messaging - save those for downstream docs)
 
 ## Installation
 
