@@ -1,7 +1,7 @@
 {
   "name": "planning",
   "description": "Comprehensive planning tools including plan and execplan skills with automatic keyword detection via hooks. Creates implementation plans and execution plans following proven methodologies.",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"

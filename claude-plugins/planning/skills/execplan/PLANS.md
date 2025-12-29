@@ -77,6 +77,42 @@ Each milestone must be independently verifiable and incrementally implement the 
 - If you change course mid-implementation, document why in the `Decision Log` and reflect the implications in the affected chunk’s status line and task checklist. Plans are guides for the next contributor as much as checklists for you.
 - At completion of a major task or the full plan, write an `Outcomes & Retrospective` entry summarizing what was achieved, what remains, and lessons learned.
 
+## Failure recovery
+
+When a chunk fails or a plan goes off-track, classify the failure and respond accordingly:
+
+| Failure Type | Definition | Recovery Action |
+|--------------|------------|-----------------|
+| **Blocking** | Missing dependency, unavailable API, environment issue | Pause current chunk. Add a prerequisite chunk or document the blocker. Update dependencies. Resume when unblocked. |
+| **Invalidating** | Core assumption proven wrong (API doesn't exist, approach unworkable) | Stop. Re-research the problem space. Update Context and Orientation with new findings. Revise or replace affected chunks. Log the pivot in Decision Log. |
+| **Scope change** | User changes requirements mid-implementation | Archive completed work in Outcomes section. Create new chunks for changed scope. Do not delete history—annotate what changed and why. |
+| **Terminal** | Fundamental approach is unworkable after multiple attempts | Document learnings thoroughly in Surprises & Discoveries. Present alternative approaches to user with trade-offs. Do not proceed without user input. |
+
+**Escalation triggers** (stop and reassess the plan):
+
+- Same chunk fails 3+ attempts
+- Discovery contradicts a core assumption in Context and Orientation
+- Scope has grown >50% beyond original plan
+- Chunks are consistently taking 3x longer than similar prior chunks
+
+When recovering, always update the Decision Log with what failed and why the new approach is better.
+
+## Parallel execution
+
+When chunks are marked as parallel (no true dependencies between them), follow these rules:
+
+1. **Complete shared foundations first.** If chunks A and B are parallel but both depend on chunk 0, finish chunk 0 before starting either.
+
+2. **No file conflicts.** Parallel chunks MUST NOT modify the same files. If two chunks need to touch the same file, they are not truly parallel—sequence them instead.
+
+3. **Independent verification.** Each parallel chunk must pass its own quality gates independently. Do not batch gate-checking across parallel chunks.
+
+4. **Explicit merge point.** After all parallel chunks complete, run the full gate sequence (Typecheck → Tests → Lint) on the combined result before proceeding to dependent chunks.
+
+5. **Isolation for sub-agents.** If using multiple agents, each parallel chunk should be assignable to an independent agent with its own context. The chunk must contain all information needed—do not rely on shared state between agents.
+
+Mark parallel opportunities in the plan but convert to sequential if file conflicts emerge during implementation.
+
 ## Prototyping milestones and parallel implementations
 
 It is acceptable—and often encouraged—to include explicit prototyping milestones when they de-risk a larger change. Examples: adding a low-level operator to a dependency to validate feasibility, or exploring two composition orders while measuring optimizer effects. Keep prototypes additive and testable. Clearly label the scope as “prototyping”; describe how to run and observe results; and state the criteria for promoting or discarding the prototype.
@@ -127,9 +163,9 @@ Organize the plan into numbered chunks that each ship an independently verifiabl
 
 ### Chunk N – <Short title>
 
-Status: In progress as of 2025-11-02 19:20Z
-Depends on: <prior chunks or `-`>
-Parallel: <other chunks or `-`>
+Status: pending | active | blocked | done
+Depends on: <prior chunk numbers or `-`>
+Parallel: <other chunk numbers or `-`>
 
 Outcome:
 Describe in 1–2 sentences what behavior exists after this chunk lands.
@@ -148,9 +184,9 @@ Related files for context:
 
 Chunk tasks:
 
-- [ ] (2025-11-02 19:25Z | Pending) Implement `functionName` to ...
-- [ ] (2025-11-02 19:40Z | Pending) Add tests covering ...
-- [ ] (2025-11-02 19:55Z | Pending) Run gates (Typecheck → Tests → Lint)
+- [ ] Implement `functionName` to ...
+- [ ] Add tests covering ...
+- [ ] Run gates (Typecheck → Tests → Lint)
 
 Keep each chunk ≤200 lines of code (roughly 1–3 functions). When discoveries require new work, add or split chunks and update their status lines and associated checkboxes so the plan stays accurate.
 

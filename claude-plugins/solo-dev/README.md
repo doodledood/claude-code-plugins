@@ -18,6 +18,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/define-brand](#define-brand) | Create or refine your BRAND_GUIDELINES.md (requires CUSTOMER.md) |
 | [/define-design](#define-design) | Create or refine your DESIGN_GUIDELINES.md (requires CUSTOMER.md) |
 | [/audit-ux](#audit-ux) | Audit UI/UX changes in a focus area against design guidelines |
+| [/research](#research) | Systematic research with hypothesis tracking for complex investigations |
 
 ### Agents
 
@@ -27,6 +28,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [design-research](#design-research) | Analyze customer profile to determine ideal UI/UX design direction |
 | [design-quality-auditor](#design-quality-auditor) | Audit DESIGN_GUIDELINES.md for alignment with CUSTOMER.md and BRAND_GUIDELINES.md |
 | [ux-auditor](#ux-auditor) | Audit UI/UX changes in a focus area for accessibility, consistency, and usability |
+| [structured-researcher](#structured-researcher) | Systematic research with hypothesis tracking and confidence calibration |
 
 ### Skills
 
@@ -144,6 +146,26 @@ Audit UI/UX changes in a specific focus area (e.g., checkout, navigation, forms)
 4. Systematically audits each changed file for accessibility, consistency, interaction, layout, and visual issues
 5. Produces structured report with prioritized issues (Critical → Low) and recommendations
 
+### /research
+
+Conduct systematic research on complex topics using hypothesis-driven methodology.
+
+**Usage:**
+```bash
+/research why are our API response times 3x slower after last deployment
+/research options for real-time sync between mobile app and backend
+/research  # will ask for topic
+```
+
+**What happens:**
+1. Launches structured-researcher agent with your research question
+2. Agent decomposes problem into sub-questions
+3. Generates 3-5 competing hypotheses with confidence levels
+4. Gathers evidence from codebase, web, and tools
+5. Maintains research-notes.md tracking the full investigation
+6. Self-critiques at regular intervals to avoid confirmation bias
+7. Presents findings with explicit confidence levels and uncertainties
+
 ## Agents
 
 ### voice-writer
@@ -194,6 +216,24 @@ The agent performs systematic review across 5 categories:
 Issues are prioritized as Critical (blocks users), High (significant UX degradation), Medium (noticeable but has workarounds), or Low (polish items).
 
 Read-only operation: produces reports with file:line references and specific recommendations. Does not modify code.
+
+### structured-researcher
+
+Conducts systematic research using hypothesis-driven methodology. Used by `/research` for complex investigations, domain exploration, and debugging unclear issues.
+
+The agent maintains explicit hypothesis trees with confidence levels:
+- **Problem Decomposition** - Restates question, identifies sub-questions, defines success criteria
+- **Hypothesis Generation** - 3-5 competing hypotheses with initial confidence levels (including contrarian views)
+- **Evidence Gathering** - For each evidence: which hypothesis it supports/contradicts, quality assessment, confidence updates
+- **Self-Critique** - Regular bias checks, scope assessment, assumption audits
+
+Creates and maintains `research-notes.md` with:
+- Research question and hypothesis tree
+- Evidence log with confidence updates
+- Self-critique log
+- Current status, leading hypothesis, and next steps
+
+Confidence scale: 90-100% (near certain), 70-89% (strong belief), 50-69% (leaning), 30-49% (possible), 10-29% (unlikely), 0-9% (eliminated).
 
 ## Skills
 
