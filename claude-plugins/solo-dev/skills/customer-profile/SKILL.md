@@ -29,16 +29,6 @@ The discovery questions give you a solid starting point, but **the real magic ha
 - You validate whether the ICP resonates with your actual experience
 - Each cycle sharpens the doc until it truly captures YOUR ideal customer
 
-## Tool Requirements
-
-**AskUserQuestion Tool**: This skill REQUIRES the AskUserQuestion tool to minimize user cognitive load. Before starting:
-
-1. **Check availability**: Verify `AskUserQuestion` is in your available tools list
-2. **If available**: Use it for ALL questions - present options as multiple choice to reduce typing
-3. **If NOT available**: Inform the user that the experience will be degraded, then present numbered options
-
-**Task Tool**: Required for launching parallel research agents in Phase 2.
-
 ## Workflow
 
 ### Phase 0: Check for Existing Document

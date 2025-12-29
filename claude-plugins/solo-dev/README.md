@@ -18,6 +18,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [/define-brand](#define-brand) | Create or refine your BRAND_GUIDELINES.md (requires CUSTOMER.md) |
 | [/define-design](#define-design) | Create or refine your DESIGN_GUIDELINES.md (requires CUSTOMER.md) |
 | [/audit-ux](#audit-ux) | Audit UI/UX changes in a focus area against design guidelines |
+| [/define-seo-strategy](#define-seo-strategy) | Create or refine your SEO_STRATEGY.md covering traditional SEO and AI citations (requires CUSTOMER.md) |
 | [/research](#research) | Systematic research with hypothesis tracking for complex investigations |
 
 ### Agents
@@ -28,6 +29,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [design-research](#design-research) | Analyze customer profile to determine ideal UI/UX design direction |
 | [design-quality-auditor](#design-quality-auditor) | Audit DESIGN_GUIDELINES.md for alignment with CUSTOMER.md and BRAND_GUIDELINES.md |
 | [ux-auditor](#ux-auditor) | Audit UI/UX changes in a focus area for accessibility, consistency, and usability |
+| [seo-researcher](#seo-researcher) | Research SEO and GEO strategies, competitor patterns, and AI platform citation requirements |
 | [structured-researcher](#structured-researcher) | Systematic research with hypothesis tracking and confidence calibration |
 
 ### Skills
@@ -38,6 +40,7 @@ The solo-dev plugin provides tools tailored for indie hackers, solopreneurs, and
 | [customer-profile](#customer-profile) | Iteratively craft a CUSTOMER.md that precisely defines your ideal customer profile |
 | [brand-guidelines](#brand-guidelines) | Create BRAND_GUIDELINES.md for voice, tone, and messaging (requires CUSTOMER.md) |
 | [design-guidelines](#design-guidelines) | Create DESIGN_GUIDELINES.md for UI/UX design system (requires CUSTOMER.md) |
+| [seo-strategy](#seo-strategy) | Create SEO_STRATEGY.md covering traditional SEO and GEO for AI platforms (requires CUSTOMER.md) |
 
 ## Commands
 
@@ -128,6 +131,33 @@ Create or refine your DESIGN_GUIDELINES.md that defines how to design UI/UX for 
 6. Generates DESIGN_GUIDELINES.md with full design system tokens
 7. Automatic alignment audit (opus agent verifies alignment, fixes issues, repeats until perfect)
 
+### /define-seo-strategy
+
+Create or refine your SEO_STRATEGY.md that defines your complete search optimization strategy—covering both traditional SEO and Generative Engine Optimization (GEO) for AI platforms like ChatGPT, Perplexity, and Google AI Overviews. **Requires CUSTOMER.md to exist first.**
+
+**Usage:**
+```bash
+/define-seo-strategy
+```
+
+**What happens:**
+1. Checks for CUSTOMER.md (stops if not found)
+2. Checks for existing SEO_STRATEGY.md (update vs start fresh)
+3. Collects website URL and product description
+4. Launches parallel research agents for industry analysis, competitor structure, and platform requirements
+5. Presents research summary for validation
+6. Generates SEO_STRATEGY.md with platform-specific sections and effort/impact scoring
+7. Validates key sections with you before finalizing
+
+**Output includes:**
+- Executive summary with top priority actions
+- Customer-aligned strategy (how your ICP searches)
+- Traditional SEO foundation (technical, content, authority)
+- Platform-specific GEO for Google AI Overviews, ChatGPT, Perplexity, Claude, and Gemini
+- Content recommendations with effort/impact matrix
+- Implementation roadmap (Quick Wins → Strategic Investments)
+- Anti-patterns to avoid
+
 ### /audit-ux
 
 Audit UI/UX changes in a specific focus area (e.g., checkout, navigation, forms) against your design guidelines. Checks for accessibility, design system compliance, and usability issues.
@@ -216,6 +246,23 @@ The agent performs systematic review across 5 categories:
 Issues are prioritized as Critical (blocks users), High (significant UX degradation), Medium (noticeable but has workarounds), or Low (polish items).
 
 Read-only operation: produces reports with file:line references and specific recommendations. Does not modify code.
+
+### seo-researcher
+
+Researches SEO and GEO (Generative Engine Optimization) strategies with deep expertise in AI citation patterns. Used by `/define-seo-strategy` to gather current data on industry patterns, competitor structures, and platform requirements.
+
+The agent performs research across three dimensions:
+- **Industry Analysis** - SEO best practices specific to the vertical, content formats that perform well, authority signals
+- **Competitor Structure** - Content organization, schema markup usage, third-party presence, gaps and opportunities
+- **Platform Requirements** - How each AI platform (Google AI Overviews, ChatGPT, Perplexity, Claude, Gemini) selects sources to cite
+
+Key capabilities:
+- Uses WebSearch to gather 2025+ data (platforms evolve rapidly)
+- Analyzes competitor content structure without accessing private data
+- Provides platform-specific optimization tactics
+- Flags confidence levels and areas needing validation
+
+Output includes structured findings with specific, actionable recommendations rather than generic SEO advice.
 
 ### structured-researcher
 
@@ -416,6 +463,56 @@ A `DESIGN_GUIDELINES.md` file containing:
 - Pre-fills recommendations from CUSTOMER.md (speed-focused ICP → terminal aesthetic)
 - Tests with sample components before finalizing
 - Distinctive design, not generic templates
+
+### seo-strategy
+
+Create the SEO_STRATEGY.md document that defines your complete search optimization strategy—both traditional SEO and Generative Engine Optimization (GEO) for AI platforms.
+
+**Prerequisite**: CUSTOMER.md must exist. Run `/define-customer` first.
+
+**Use when you want to:**
+- Define a comprehensive SEO strategy aligned with your ICP
+- Optimize for AI citations (not just traditional search rankings)
+- Get platform-specific tactics for ChatGPT, Perplexity, Google AI Overviews, Claude, and Gemini
+- Prioritize SEO work by effort and impact
+
+**How it works:**
+
+1. **Prerequisite Check** - Verifies CUSTOMER.md exists (stops if not)
+2. **Existing Strategy Detection** - Checks for SEO_STRATEGY.md, asks update vs fresh
+3. **Input Collection** - Gathers website URL, product description, competitors
+4. **Parallel Research** - Launches 3 seo-researcher agents for industry, competitor, and platform analysis
+5. **Document Generation** - Creates SEO_STRATEGY.md with prioritized recommendations
+6. **Validation Loop** - Reviews sections with you, incorporates feedback
+
+**Usage:**
+
+The skill activates when you mention SEO strategy, GEO, AI citations, or search optimization. Example prompts:
+
+```
+Help me create an SEO strategy
+How do I get cited by AI platforms?
+Build a GEO strategy for my product
+```
+
+**Output:**
+
+An `SEO_STRATEGY.md` file containing:
+- Executive summary with top 5 priority actions
+- Customer-aligned strategy (how your ICP searches)
+- Traditional SEO foundation (technical, content, authority)
+- Platform-specific GEO sections for each AI platform
+- Content recommendations with effort/impact matrix
+- Third-party presence strategy
+- Implementation roadmap (Quick Wins, Strategic Investments, Maintenance)
+- Anti-patterns to avoid
+
+**Key features:**
+- Requires CUSTOMER.md (SEO must align with WHO you're targeting)
+- Parallel research agents gather current (2025+) data
+- Effort/impact scoring for every recommendation
+- Platform-specific tactics (each AI platform has different citation patterns)
+- Quarterly refresh recommended (platforms evolve rapidly)
 
 ## Installation
 

@@ -19,14 +19,6 @@ This skill guides you through:
 2. **Draft Generation** - Create BRAND_GUIDELINES.md based on inputs
 3. **Refinement** - Test with sample copy, iterate until voice feels right
 
-## Tool Requirements
-
-**AskUserQuestion Tool**: Required for discovery questions.
-
-**Read Tool**: Required to read CUSTOMER.md for context.
-
-**Glob Tool**: Required to find existing documents.
-
 ## Workflow
 
 ### Phase 0: Prerequisite Check

@@ -30,16 +30,6 @@ The discovery questions give you a solid starting point - but **the real magic h
 
 Each feedback cycle sharpens the doc. Most users need 3-5 cycles to get from "this is okay" to "this is actually me."
 
-## Tool Requirements
-
-**AskUserQuestion Tool**: This skill REQUIRES the AskUserQuestion tool to minimize user cognitive load. Before starting:
-
-1. **Check availability**: Verify `AskUserQuestion` is in your available tools list
-2. **If available**: Use it for ALL questions - present options as multiple choice to reduce typing and thinking effort
-3. **If NOT available**: Inform the user that the experience will be degraded (they'll need to type responses), then present numbered options they can respond to by number
-
-The goal is to make this as low-effort as possible for the user - clicking/selecting options is far easier than formulating responses.
-
 ## Workflow
 
 ### Phase 0: Check for Existing Document

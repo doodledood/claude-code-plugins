@@ -41,16 +41,6 @@ This skill guides you through:
 
 **The test**: Would someone mistake this for a generic template? If yes, it's wrong.
 
-## Tool Requirements
-
-**Task Tool**: Required for launching the opus analysis agent.
-
-**AskUserQuestion Tool**: Required for discovery questions.
-
-**Read Tool**: Required to read CUSTOMER.md for context.
-
-**Glob Tool**: Required to find existing documents.
-
 ## Workflow
 
 ### Phase 0: Prerequisite Check
