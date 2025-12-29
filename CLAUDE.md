@@ -50,8 +50,10 @@ README-only changes don't require version bumps.
 When adding commands, agents, skills, or hooks:
 1. Create the component file in the appropriate directory
 2. Bump plugin version (minor for new features)
-3. Update plugin's `README.md` (add to tables, add usage section if needed)
+3. Update affected plugin's `README.md` and repo root `README.md` if needed
 4. Update `plugin.json` description/keywords if the new component adds significant capability
+
+**README Guidelines**: Keep READMEs high-level (overview, what it does, how to use). Avoid implementation details that require frequent updates—readers can explore code for specifics.
 
 ## Before PR
 
