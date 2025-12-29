@@ -53,6 +53,7 @@ Audits TypeScript code to catch bugs through the type system—the cheapest, mos
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
 | `/rebase-on-main` | Update main/master, rebase current branch, resolve conflicts, and push |
+| `/spec-feature` | Interactive product requirements builder (PRD) with discovery interview |
 
 ### Command: `/update-claude-md`
 
@@ -92,6 +93,38 @@ Update main/master from origin, rebase current branch, resolve conflicts, and pu
 - Rebases current feature branch on top of it
 - Resolves merge conflicts intelligently by analyzing code context
 - Pushes with `--force-with-lease` for safety
+
+### Command: `/spec-feature`
+
+Interactive product requirements builder that interviews you to create a comprehensive PRD using EARS syntax.
+
+**Usage:**
+```bash
+# Start product spec interview
+/spec-feature user authentication
+
+# Any feature description works
+/spec-feature add dark mode toggle to settings
+```
+
+**What it does:**
+1. **Explores codebase** - Understands product context, existing UX patterns, terminology
+2. **Researches UX patterns** - Web searches to find how other products solve similar problems
+3. **Conducts discovery interview** - Smart questions focused on product decisions, not technical details
+4. **Reduces cognitive load** - Options with one marked "(Recommended)"; only asks when user adds value
+5. **Writes PRD with EARS syntax** - Outputs to `/tmp/feature-spec-{timestamp}-{name}.md`
+6. **Outputs summary** - Quick validation without reading the full spec
+
+**Interview topics (product-focused):**
+- Target users and problem statement
+- User stories and acceptance criteria
+- Happy path and edge cases (from user perspective)
+- Business rules and constraints
+- UX expectations and states
+- Success criteria
+- Explicit out-of-scope items
+
+**Not covered** (those come later): Technical architecture, APIs, data models, testing strategy.
 
 ## Best Practices Applied
 
