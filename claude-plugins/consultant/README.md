@@ -18,7 +18,7 @@ Consultant is a Claude Code plugin that provides access to powerful LLM models f
 
 ✅ **Async Execution**: Background sessions with status tracking and reattachment
 
-✅ **Full-Featured**: Includes consultant agent, review/bug-investigation/execplan commands
+✅ **Full-Featured**: Includes consultant agent, review/bug-investigation commands
 
 ## Components
 
@@ -30,7 +30,6 @@ Expert agent for leveraging powerful LLM analysis through Python/LiteLLM. Handle
 - Comprehensive PR reviews before production deployment
 - Deep architectural validation
 - Complex bug root cause analysis
-- Execution plan creation for features
 
 ### Commands
 
@@ -69,24 +68,6 @@ Deep bug investigation with root cause analysis and fix recommendations.
 - Assesses blast radius and impact
 - Provides concrete fix suggestions
 - Recommends regression tests to prevent recurrence
-
-#### `/consultant-execplan`
-
-Create comprehensive execution plans for features and changes.
-
-**Usage:**
-```bash
-/consultant-execplan
-# Or with feature:
-/consultant-execplan FEATURE="Add rate limiting" GOAL="Prevent API abuse"
-```
-
-**What it does:**
-- Gathers comprehensive codebase context
-- Analyzes existing patterns and architecture
-- Creates detailed implementation steps with validation
-- Breaks down work into shippable chunks
-- Provides testing strategies and deployment plans
 
 ### Skill: consultant
 
@@ -153,18 +134,6 @@ Provide bug details when prompted, or let it infer from:
 - Recent test failures
 - Error messages in conversation
 - Git history and recent changes
-
-### 4. Create an Execution Plan
-
-```bash
-/consultant-execplan FEATURE="Add caching layer" GOAL="Improve API performance"
-```
-
-Creates a comprehensive execution plan with:
-- Detailed implementation steps
-- Architecture analysis
-- Testing strategy
-- Validation criteria
 
 ## Configuration
 
@@ -325,12 +294,6 @@ export CONSULTANT_FOCUS="SQL injection vulnerabilities in auth module"
 
 ```bash
 /consultant-investigate-bug SYMPTOM="Race condition in order processing causing duplicate charges"
-```
-
-### Execution Planning
-
-```bash
-/consultant-execplan FEATURE="Implement real-time notifications" GOAL="Notify users of order status changes within 1 second"
 ```
 
 ### Local LLM Usage
