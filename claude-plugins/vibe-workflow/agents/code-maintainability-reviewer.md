@@ -92,6 +92,21 @@ Do NOT report on (handled by other agents):
    - High-churn files within the scope deserve extra scrutiny—issues there have outsized impact
    - If scoped files always change together with other files, note this as a potential coupling concern
 
+6. **Actionability Filter**
+
+Before reporting an issue, it must pass ALL of these criteria:
+
+1. **In scope** - Two modes:
+   - **Diff-based review** (default, no paths specified): ONLY report issues introduced or meaningfully worsened by this change. Pre-existing tech debt is strictly out of scope—even if you notice it, do not report it. The goal is reviewing the change, not auditing the codebase.
+   - **Explicit path review** (user specified files/directories): Audit everything in scope. Pre-existing issues are valid findings since the user requested a full review of those paths.
+2. **Worth the churn** - Fix value must exceed refactor cost. A 50-line change to save 3 duplicate lines is not worth it. Ask: would a senior engineer approve this refactor?
+3. **Matches codebase patterns** - Don't demand abstractions absent elsewhere. If the codebase doesn't use dependency injection, don't flag its absence. If similar code exists without this pattern, the author likely knows.
+4. **Not an intentional tradeoff** - Some duplication is intentional (test isolation, avoiding coupling). Some complexity is necessary (performance, compatibility). If similar patterns exist elsewhere, assume intent.
+5. **Concrete impact** - "Could be cleaner" isn't a finding. You must articulate specific consequences: "Will cause shotgun surgery when X changes" or "Makes testing Y impossible."
+6. **Author would prioritize** - Ask yourself: given limited time, would a reasonable author fix this before shipping, or defer it? If defer, it's Low severity at best.
+
+If a finding fails any criterion, either drop it or demote to "Minor Observations" with a note on which criterion it fails.
+
 ## Context Adaptation
 
 Before applying rules rigidly, consider:
@@ -145,6 +160,8 @@ Classify every issue with one of these severity levels:
 - Small simplification opportunities
 - Unused imports or variables
 - Well-documented suppressions that could potentially be removed with refactoring
+
+**Calibration check**: Maintainability reviews should rarely have Critical issues. If you're marking more than one issue as Critical, recalibrate—Critical means "this will cause serious maintenance pain within weeks, not months." Most maintainability issues are High or Medium.
 
 ## Example Issue Report
 

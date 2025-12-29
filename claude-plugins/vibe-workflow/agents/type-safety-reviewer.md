@@ -235,6 +235,20 @@ This agent is optimized for **TypeScript** but the core principles apply to all 
    - Inconsistent type patterns across modules
    - Type definitions that have drifted from usage
 
+5. **Actionability Filter**
+
+Before reporting a type safety issue, it must pass ALL of these criteria:
+
+1. **In scope** - Two modes:
+   - **Diff-based review** (default, no paths specified): ONLY report type issues introduced by this change. Pre-existing `any` or type holes are strictly out of scope—even if you notice them, do not report them. The goal is reviewing the change, not auditing the codebase.
+   - **Explicit path review** (user specified files/directories): Audit everything in scope. Pre-existing type issues are valid findings since the user requested a full review of those paths.
+2. **Worth the complexity** - Type-level gymnastics that hurt readability may not be worth it. A 20-line conditional type to catch one edge case is often worse than a runtime check.
+3. **Matches codebase strictness** - If `strict` mode is off, don't demand strict-mode patterns. If `any` is used liberally elsewhere, flagging one more is low value.
+4. **Provably enables bugs** - "This could theoretically be wrong" isn't a finding. Identify the specific code path where the type hole causes a real problem.
+5. **Author would adopt** - Would a reasonable author say "good catch, let me fix that type" or "that's over-engineering for our use case"?
+
+If a finding fails any criterion, either drop it or demote to "Type Hygiene Suggestions" with a note on which criterion it fails.
+
 ## Practical Balance
 
 **Don't flag these as issues:**
@@ -295,6 +309,8 @@ Do NOT report on (handled by other agents):
 - Over-annotation of obvious types
 - Inconsistent interface vs type alias usage
 - Minor discriminant naming inconsistencies
+
+**Calibration check**: Critical type issues are rare outside of security-sensitive code. If you're marking more than one issue as Critical, recalibrate—Critical means "this type hole WILL cause a production bug, not might."
 
 ## Example Issue Report
 

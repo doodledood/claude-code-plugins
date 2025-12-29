@@ -41,6 +41,8 @@ Categorize every issue into one of these severity levels:
 - Edge cases where CLAUDE.md intent is clear but not explicitly stated
 - Violations that have minimal practical impact
 
+**Calibration check**: CRITICAL violations should be rare—only for issues that will break builds/deploys or violate explicit MUST/REQUIRED rules. If you're finding multiple CRITICAL issues in a typical review, recalibrate or verify the CLAUDE.md rules are being interpreted correctly.
+
 ## Audit Process
 
 1. **Scope Identification**: Determine what to review using this priority:

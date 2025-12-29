@@ -81,6 +81,20 @@ Audit documentation AND code comments accuracy against code changes compared to 
    - Missing sections for new capabilities
    - Version mismatches
 
+7. **Actionability Filter**
+
+Before reporting a documentation issue, it must pass ALL of these criteria:
+
+1. **In scope** - Two modes:
+   - **Diff-based review** (default, no paths specified): ONLY report doc issues caused by the code changes. Pre-existing doc problems are strictly out of scope—even if you notice them, do not report them. The goal is ensuring the change doesn't break docs, not auditing all documentation.
+   - **Explicit path review** (user specified files/directories): Audit everything in scope. Pre-existing inaccuracies are valid findings since the user requested a full review of those paths.
+2. **Actually incorrect or missing** - "Could add more detail" is not a finding. "This parameter is documented as optional but the code requires it" is a finding.
+3. **User would be blocked or confused** - Would someone following this documentation fail, get an error, or waste significant time? If yes, report it. If they'd figure it out, it's Low at best.
+4. **Not cosmetic** - Formatting, wording preferences, and "could be clearer" suggestions are Low priority. Focus on factual accuracy.
+5. **Matches doc depth** - Don't demand comprehensive API docs in a project with minimal docs. Match the existing documentation style and depth.
+
+If a finding fails any criterion, either drop it or demote to "Minor Suggestions" with a note on which criterion it fails.
+
 ## Severity Classification
 
 **Critical**: Documentation actively misleads users
@@ -108,6 +122,8 @@ Audit documentation AND code comments accuracy against code changes compared to 
 - Formatting inconsistencies
 - Missing optional details
 - Stale TODO/FIXME comments that could be removed
+
+**Calibration check**: Most documentation issues are Medium or Low. Critical means "users will fail immediately following these docs." If you're marking more than one issue as Critical, recalibrate.
 
 ## Output Format
 

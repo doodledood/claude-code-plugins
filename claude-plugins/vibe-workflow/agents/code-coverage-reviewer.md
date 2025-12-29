@@ -79,7 +79,21 @@ For each file with logic changes:
    - **Edge cases**: Are boundary conditions tested (empty arrays, null values, limits)?
    - **Error cases**: Are error paths and exception handling tested?
 
-### Step 5: Generate Report
+### Step 5: Actionability Filter
+
+Before reporting a coverage gap, it must pass ALL of these criteria:
+
+1. **In scope** - Two modes:
+   - **Diff-based review** (default, no paths specified): ONLY report coverage gaps for code introduced by this change. Pre-existing untested code is strictly out of scope—even if you notice it, do not report it. The goal is ensuring new code has tests, not auditing all coverage.
+   - **Explicit path review** (user specified files/directories): Audit everything in scope. Pre-existing coverage gaps are valid findings since the user requested a full review of those paths.
+2. **Worth testing** - Trivial code (simple getters, pass-through functions, obvious delegations) may not need tests. Focus on logic that can break.
+3. **Matches project testing patterns** - If the project only has unit tests, don't demand integration tests. If tests are sparse, don't demand 100% coverage.
+4. **Risk-proportional** - High-risk code (auth, payments, data mutations) deserves more coverage scrutiny than low-risk utilities.
+5. **Testable** - If the code is hard to test due to design (not your concern—that's maintainability-reviewer), note it as context but don't demand tests that would require major refactoring.
+
+If a finding fails any criterion, either drop it or note it as "Nice to Have" rather than a gap.
+
+### Step 6: Generate Report
 
 Structure your report as follows:
 
@@ -127,6 +141,8 @@ IF function is:
 IF no test file exists for changed file:
   → Flag as CRITICAL gap, recommend test file creation first
 ```
+
+**Calibration check**: CRITICAL coverage gaps should be rare—reserved for completely untested business logic or missing test files for new modules. If you're marking multiple items as CRITICAL (🔴), recalibrate. Most coverage gaps are important but not critical.
 
 ## Quality Standards
 

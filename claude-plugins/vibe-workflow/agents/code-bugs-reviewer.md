@@ -108,7 +108,9 @@ are handled by code-maintainability-reviewer.
 
 Before reporting a bug, it must pass ALL of these criteria:
 
-1. **Introduced in this change** - Pre-existing bugs are out of scope. If the bug existed before this diff, don't report it.
+1. **In scope** - Two modes:
+   - **Diff-based review** (default, no paths specified): ONLY report bugs introduced by this change. Pre-existing bugs are strictly out of scope—even if you notice them, do not report them. The goal is reviewing the change, not auditing the codebase.
+   - **Explicit path review** (user specified files/directories): Audit everything in scope. Pre-existing bugs are valid findings since the user requested a full review of those paths.
 2. **Discrete and actionable** - One clear issue with one clear fix. Not "this whole approach is wrong."
 3. **Provably affects code** - You must identify the specific code path that breaks. Speculation that "this might break something somewhere" is not a bug report.
 4. **Matches codebase rigor** - Don't demand error handling patterns absent elsewhere. Don't flag missing validation if the codebase doesn't validate similar inputs.
