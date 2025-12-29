@@ -37,6 +37,14 @@ Audits documentation and code comments accuracy against code changes. Identifies
 #### `type-safety-reviewer`
 Audits TypeScript code to catch bugs through the type system—the cheapest, most consistent bug catcher. Identifies type holes that let bugs through, `any`/`unknown` abuse, opportunities to make invalid states unrepresentable, and ways to push runtime checks into compile-time guarantees. Every bug caught by the compiler never reaches production. Read-only—does not modify files.
 
+### Skills
+
+| Skill | Description |
+|-------|-------------|
+| `bugfix` | Systematic bug investigation workflow - gathers context, launches bug-fixer agent, and reports results |
+| `fix-review-issues` | Orchestrate fixing issues from /review with user confirmation, prioritized planning, and progress tracking |
+| `spec-feature` | Interactive product requirements builder - conducts discovery interview and generates PRD using EARS syntax |
+
 ### Commands
 
 | Command | Description |
@@ -48,12 +56,12 @@ Audits TypeScript code to catch bugs through the type system—the cheapest, mos
 | `/review-claude-md-adherence` | Launch claude-md-adherence-reviewer agent for CLAUDE.md compliance (defaults to git diff scope) |
 | `/review-docs` | Launch docs-reviewer agent for documentation accuracy (defaults to git diff scope) |
 | `/review-type-safety` | Launch type-safety-reviewer agent for TypeScript type safety (defaults to git diff scope) |
-| `/bugfix` | Launch bug-fixer agent |
-| `/fix-review-issues` | Address issues found by /review (filter by severity/category/file) |
+| `/bugfix` | Investigate and fix bugs (invokes bugfix skill) |
+| `/fix-review-issues` | Address issues found by /review (invokes fix-review-issues skill) |
 | `/clean-slop` | Remove AI-generated slop (useless comments, verbose patterns) |
 | `/update-claude-md` | Create or update CLAUDE.md with best practices |
 | `/rebase-on-main` | Update main/master, rebase current branch, resolve conflicts, and push |
-| `/spec-feature` | Interactive product requirements builder (PRD) with discovery interview |
+| `/spec-feature` | Interactive product requirements builder (invokes spec-feature skill) |
 
 ### Command: `/update-claude-md`
 

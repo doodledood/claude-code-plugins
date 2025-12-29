@@ -1,0 +1,268 @@
+---
+name: fix-review-issues
+description: 'Orchestrate fixing issues found by /review. Handles issue discovery, user confirmation, prioritized execution, and progress tracking. Works with review output from any category (bugs, maintainability, types, docs, coverage, claude-md).'
+---
+
+# Fix Review Issues Skill
+
+Systematically address issues found from `/review` runs. This skill orchestrates the multi-step workflow: discover issues, confirm scope with user, create fix plan, execute fixes, and verify.
+
+## Overview
+
+This skill supports fixing issues from any review category:
+- **bugs** - Logical bugs, race conditions, edge cases
+- **maintainability** - DRY violations, dead code, complexity
+- **types** - Type safety issues (any abuse, missing narrowing)
+- **docs** - Documentation and comment inaccuracies
+- **coverage** - Missing test coverage
+- **claude-md** - CLAUDE.md compliance violations
+
+## Workflow
+
+### Phase 0: Parse Arguments
+
+Parse `$ARGUMENTS` to determine scope:
+
+| Argument | Effect |
+|----------|--------|
+| (none) | Fix ALL issues from review |
+| `--severity <level>` | Filter by severity (critical, high, medium, low) |
+| `--category <type>` | Filter by category (bugs, maintainability, types, docs, coverage, claude-md) |
+| File paths | Focus on specific files only |
+
+Multiple filters combine: `--severity critical,high --category bugs,types`
+
+### Phase 1: Discover Review Results
+
+**Step 1**: Check if review results exist in the current conversation context.
+
+**Step 2**: If NO review results found, ask the user:
+
+```
+header: "No Review Results Found"
+question: "I couldn't find recent /review output in this conversation. What would you like to do?"
+options:
+  - "Run /review now - perform a fresh review first"
+  - "Paste review output - I'll provide the review results"
+  - "Cancel - I'll run /review myself first"
+```
+
+- If "Run /review now": Inform user to run `/review` first, then return to `/fix-review-issues`
+- If "Paste review output": Wait for user to provide the review results
+- If "Cancel": End the workflow
+
+**Step 3**: If review results ARE found, extract and categorize all issues:
+
+1. Parse each issue for: severity, category, file path, line number, description, suggested fix
+2. Group issues by category
+3. Count totals by severity
+
+### Phase 2: Confirm Scope with User
+
+Present a summary of discovered issues and confirm what to fix.
+
+**If arguments were provided** (user already specified scope):
+
+```
+header: "Fix Scope Confirmed"
+question: "Found {N} issues matching your filters. Ready to proceed?"
+[Display: Issue count by category/severity within filter scope]
+options:
+  - "Yes - create fix plan and proceed (Recommended)"
+  - "Show me the issues first - list them before fixing"
+  - "Adjust scope - I want to change the filters"
+```
+
+**If NO arguments** (fix all):
+
+```
+header: "Review Issues Summary"
+question: "Found {N} total issues from the review. What would you like to fix?"
+[Display: Issue breakdown by category and severity]
+options:
+  - "Fix all issues (Recommended)"
+  - "Only critical and high severity"
+  - "Only specific categories - let me choose"
+  - "Only specific files - let me specify"
+```
+
+**If "Only specific categories"**:
+
+```
+header: "Select Categories"
+question: "Which categories should I fix?"
+options:
+  - "bugs - Logical bugs, race conditions, edge cases"
+  - "maintainability - DRY violations, dead code, complexity"
+  - "types - Type safety issues"
+  - "docs - Documentation inaccuracies"
+  - "coverage - Missing test coverage"
+  - "claude-md - CLAUDE.md compliance violations"
+multiSelect: true
+```
+
+**If "Only specific files"**:
+
+```
+header: "Specify Files"
+question: "Which files or directories should I focus on?"
+freeText: true
+placeholder: "e.g., src/auth/ or src/utils.ts, src/helpers.ts"
+```
+
+### Phase 3: Create Fix Plan
+
+**Launch Plan Agent** to design the implementation strategy:
+
+```
+Launch Task agent (subagent_type: Plan, model: opus) with prompt:
+
+"Create an implementation plan for fixing these review issues:
+
+[List all issues within confirmed scope]
+
+The plan should:
+1. Analyze all issues and identify dependencies between fixes
+2. Group related fixes (same file, same module, interdependent changes)
+3. Determine optimal fix order considering:
+   - Higher severity first (critical > high > medium > low)
+   - File grouping (fix all issues in one file before moving to next)
+   - Dependency order (if fix A enables fix B, do A first)
+4. Flag any fixes that might conflict or need careful coordination
+5. Estimate effort for each group (quick win / moderate / significant)
+
+Output a numbered list of fix groups in execution order."
+```
+
+**After plan is ready**, present to user:
+
+```
+header: "Fix Plan Ready"
+question: "Here's the proposed fix order. Ready to proceed?"
+[Display: Numbered fix plan with effort estimates]
+options:
+  - "Approve - start fixing (Recommended)"
+  - "Modify - I want to change the order or skip some"
+  - "Cancel - I'll fix these manually"
+```
+
+If "Modify": Ask which fixes to skip or reorder, then regenerate plan.
+
+### Phase 4: Execute Fixes
+
+For each fix group in the approved plan:
+
+**Step 1: Mark Progress**
+- Update todo list with current fix group
+- Track: which issues fixed, which remaining
+
+**Step 2: Read Context**
+- Read the full file(s) involved
+- Understand surrounding code before making changes
+
+**Step 3: Apply Fix**
+- Follow the suggested fix from the review
+- Adapt as needed based on actual code context
+
+**Step 4: Verify**
+- Ensure the fix doesn't break surrounding code
+- Check for introduced issues (syntax errors, type errors)
+
+**Step 5: Confirm Significant Changes**
+
+For fixes marked as "significant" effort or that touch multiple files:
+
+```
+header: "Significant Change"
+question: "This fix involves substantial changes. Review before continuing?"
+[Display: Summary of changes made]
+options:
+  - "Continue - changes look good (Recommended)"
+  - "Undo - revert this fix"
+  - "Pause - I need to review more carefully"
+```
+
+### Category-Specific Guidance
+
+**Bugs** (`bugs`):
+- Fix the root cause, not just the symptom
+- Add defensive checks where appropriate
+- Consider edge cases the fix might introduce
+
+**Maintainability** (`maintainability`):
+- Extract duplicated code into shared utilities
+- Remove dead code completely (don't comment out)
+- Simplify complex conditionals
+
+**Types** (`types`):
+- Replace `any` with proper types
+- Add discriminated unions for state machines
+- Use branded types for IDs where suggested
+- Add exhaustiveness checks to switch statements
+
+**Docs** (`docs`):
+- Update documentation to match current code behavior
+- Fix or remove stale comments
+- Ensure examples are accurate and runnable
+
+**Coverage** (`coverage`):
+- Create test files if missing
+- Add test cases for uncovered scenarios
+- Follow existing test patterns in the codebase
+
+**CLAUDE.md** (`claude-md`):
+- Fix naming convention violations
+- Add missing version bumps
+- Follow project-specific patterns
+
+### Phase 5: Summary
+
+After all fixes complete, provide:
+
+```
+header: "Fix Summary"
+[Display:
+  - Count of issues fixed by category
+  - Any issues that couldn't be fixed (with explanation)
+  - Files modified
+]
+question: "Would you like to verify the fixes?"
+options:
+  - "Run /review again - verify fixes are complete (Recommended)"
+  - "Done - I'll verify manually"
+  - "Show diff - see all changes made"
+```
+
+## Key Principles
+
+### User Control
+- Always confirm scope before making changes
+- Present plan for approval before executing
+- Allow modification or cancellation at any step
+
+### Progress Tracking
+- Use todo list to track fix progress
+- Mark each fix group as in_progress/completed
+- Maintain visibility into remaining work
+
+### Reduce Cognitive Load
+- Use AskUserQuestion for all decisions
+- Put recommended option first with "(Recommended)" suffix
+- Group related fixes to minimize context switching
+
+### Safe Execution
+- Read full file context before editing
+- Verify each fix doesn't break surrounding code
+- Confirm significant changes before proceeding
+
+## Integration with /review
+
+This skill is designed to work with output from the `/review` command, which runs these agents:
+- `code-bugs-reviewer`
+- `code-maintainability-reviewer`
+- `type-safety-reviewer`
+- `docs-reviewer`
+- `code-coverage-reviewer`
+- `claude-md-adherence-reviewer`
+
+The review output follows a consistent format with severity levels and suggested fixes that this skill parses and acts upon.
