@@ -14,7 +14,7 @@ Planning is optional but recommended for complex tasks. Follow this workflow:
 1. Create plan using the structure template (chunks, dependencies, files)
 2. Present via ExitPlanMode tool (even if not in plan mode); if unavailable, present in text format
 3. Get explicit user approval
-4. Persist the approved plan (unchanged) to `ai-plans/<feature-name>.md` as permanent record
+4. Persist the approved plan (unchanged) to `/tmp/plan_{timestamp}_{feature-name}.md` (e.g., `/tmp/plan_20250129_143022_user-auth.md`)
 5. Create todos from plan chunks
 6. Execute via todo system (not file updates)
 
@@ -176,9 +176,9 @@ Types: TypeName
 - Do not include code in the plan; function names only
 - ALWAYS wait for explicit user approval before implementation
 - After plan iterations/feedback, still wait for user's explicit signal to start implementation (e.g., "proceed", "implement", "start coding")
-- After approval: persist the approved plan (unchanged) to `ai-plans/<descriptive-feature-name>.md` as permanent record
+- After approval: persist the approved plan (unchanged) to `/tmp/plan_{timestamp}_{feature-name}.md` (e.g., `/tmp/plan_20250129_143022_user-auth.md`)
 - Create todos from approved plan chunks (one todo per chunk minimum)
-- Do not commit ai-plans/ files unless explicitly requested
+- Plan files in /tmp are ephemeral; user can copy to repo if needed
 - Do not commit code chunks; the user will commit if approved
 - Track execution via todo system, not file updates
 

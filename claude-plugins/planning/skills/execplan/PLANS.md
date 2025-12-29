@@ -34,9 +34,9 @@ The agent executing your plan can list files, read files, search, run the projec
 
 ## Formatting
 
-Format and envelope are simple and strict. Each ExecPlan must be one single fenced code block labeled as `md` that begins and ends with triple backticks. Do not nest additional triple-backtick code fences inside; when you need to show commands, transcripts, diffs, or code, present them as indented blocks within that single fence. Use indentation for clarity rather than code fences inside an ExecPlan to avoid prematurely closing the ExecPlan's code fence. Use two newlines after every heading, use # and ## and so on, and correct syntax for ordered and unordered lists.
+ExecPlans are standard Markdown documents saved as `.md` files. Do **not** wrap the entire plan in an outer code fence.
 
-Use a single fenced code block labeled as `md` when embedding an ExecPlan within another document or chat. When writing an ExecPlan to a Markdown (.md) file where the content of the file _is only_ the single ExecPlan, omit the triple backticks.
+Use normal Markdown structure: headings (`#`, `##`, `###`), prose, lists, and checkboxes. Use fenced code blocks for commands, transcripts, diffs, or code snippets (for example, code blocks labeled `bash` or `ts`). Use two newlines after headings, and keep narrative sections prose-first.
 
 Write in plain prose for narrative sections. Bulleted lists and checkboxes are encouraged where this document explicitly calls for them (chunk manifests and chunk task checklists). Avoid tables and long enumerations elsewhere. Narrative sections should remain prose-first.
 
@@ -54,63 +54,7 @@ Be idempotent and safe. Write the steps so they can be run multiple times withou
 
 Validation is not optional. Include instructions to run tests, to start the system if applicable, and to observe it doing something useful. Describe comprehensive testing for any new features or capabilities. Include expected outputs and error messages so a novice can tell success from failure. Where possible, show how to prove that the change is effective beyond compilation (for example, through a small end-to-end scenario, a CLI invocation, or an HTTP request/response transcript). State the exact test commands appropriate to the project’s toolchain and how to interpret their results.
 
-Capture evidence. When your steps produce terminal output, short diffs, or logs, include them inside the single fenced block as indented examples. Keep them concise and focused on what proves success. If you need to include a patch, prefer file-scoped diffs or small excerpts that a reader can recreate by following your instructions rather than pasting large blobs.
-
-## Code Quality Principles
-
-Plans must produce code that passes rigorous review. Apply these principles when designing chunks. **All principles are guidelines, not laws—the user's explicit intent always takes precedence.** If the user deliberately requests an approach that violates a principle, respect that decision.
-
-| # | Principle | Planning Implication |
-|---|-----------|----------------------|
-| **P1** | **Correctness Above All** | Every chunk must demonstrably work. Include validation steps that prove correct behavior, not just compilation. |
-| **P2** | **Diagnostics & Observability** | Plan logging, error visibility, and traceability from the start. Silent failures are unacceptable—plan explicit error handling. |
-| **P3** | **Make Illegal States Unrepresentable** | Design types and interfaces that prevent bugs at compile-time. Plan type definitions before implementations. |
-| **P4** | **Single Responsibility** | Each chunk does ONE thing. If describing a chunk requires "and", split it. |
-| **P5** | **Explicit Over Implicit** | Plan clear, predictable APIs. No hidden behaviors or magic. Specify explicit configuration over convention. |
-| **P6** | **Minimal Surface Area** | Solve today's problem today. Don't plan for hypothetical futures. YAGNI. |
-| **P7** | **Prove It With Tests** | Every chunk includes specific test cases. Untested code is unverified code. |
-| **P8** | **Safe Evolution** | Public API/schema changes need migration paths. Internal changes can break freely. |
-| **P9** | **Fault Containment** | Plan for failure isolation. One bad input shouldn't crash the system. Include retry/fallback strategies. |
-| **P10** | **Comments Tell Why** | Plan documentation for complex logic—why, not what. |
-
-### Quality Checklist for Each Chunk
-
-Before marking a chunk complete, verify:
-
-- [ ] **Correctness**: Logic handles boundaries, null/empty, error paths (not just happy path)
-- [ ] **Type Safety**: Types prevent invalid states; validation at boundaries; no `any` escape hatches
-- [ ] **Observability**: Errors are logged with context; failures are visible, not silent
-- [ ] **Resilience**: External calls have timeouts; retries use backoff; resources are cleaned up
-- [ ] **Clarity**: Names are descriptive; no magic values; control flow is explicit
-- [ ] **Modularity**: Single responsibility; <200 LOC; minimal coupling
-- [ ] **Tests**: Critical paths tested; error paths tested; boundaries tested
-- [ ] **Evolution**: Public API/schema changes have migration paths; internal changes break freely
-
-### Test Coverage Priority
-
-Align test planning with review expectations:
-
-| Priority | What | Requirement |
-|----------|------|-------------|
-| 9-10 | Data mutations, money/finance, auth, state machines | MUST test |
-| 7-8 | Business logic branches, API contracts, error paths | SHOULD test |
-| 5-6 | Edge cases, boundaries, integration points | GOOD to test |
-| 1-4 | Trivial getters, simple pass-through | OPTIONAL |
-
-### Error Handling Requirements
-
-Every chunk touching external systems or user input must specify:
-
-1. **What can fail**: List failure modes explicitly
-2. **How failures surface**: Logging, metrics, user-facing messages
-3. **Recovery strategy**: Retry, fallback, fail-fast
-4. **Resource cleanup**: Connections, handles, locks released
-
-Anti-patterns to avoid in plans:
-- Empty catch blocks
-- Catch-and-return-null without logging
-- Optional chaining hiding bugs (`data?.user?.settings?.theme ?? 'dark'`)
-- Broad exception catching hiding unrelated errors
+Capture evidence. When your steps produce terminal output, short diffs, or logs, include them as concise fenced code blocks or indented examples. Keep them focused on what proves success. If you need to include a patch, prefer file-scoped diffs or small excerpts that a reader can recreate by following your instructions rather than pasting large blobs.
 
 ## Chunk sizing and dependency heuristics
 
@@ -140,6 +84,8 @@ It is acceptable—and often encouraged—to include explicit prototyping milest
 Prefer additive code changes followed by subtractions that keep tests passing. Parallel implementations (e.g., keeping an adapter alongside an older path during migration) are fine when they reduce risk or enable tests to continue passing during a large migration. Describe how to validate both paths and how to retire one safely with tests. When working with multiple new libraries or feature areas, consider creating spikes that evaluate the feasibility of these features _independently_ of one another, proving that the external library performs as expected and implements the features we need in isolation.
 
 ## Skeleton of a Good ExecPlan
+
+The skeleton below is shown in a code block for readability. When creating a new ExecPlan, copy the content into a new `.md` file and do not add any wrapping outer fence around the whole document.
 
 ```md
 # <Short, action-oriented description>

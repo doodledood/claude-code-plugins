@@ -42,7 +42,7 @@ Research exhaustively first (files, codebase, docs), then use `AskUserQuestion` 
 1. **Present via ExitPlanMode tool** (if available; otherwise present as text)
 2. **Wait for explicit user approval** before any implementation
 3. After approval:
-   - Persist the approved plan to `ai-plans/<descriptive-feature-name>.md`
+   - Persist the approved plan to `/tmp/plan_{timestamp}_{feature-name}.md` (e.g., `/tmp/plan_20250129_143022_user-auth.md`)
    - **The ExecPlan is a living document** - update it directly as work progresses
    - Track all progress, status changes, discoveries, and decisions within the plan file itself
    - Do NOT use Claude Code's separate todo system
