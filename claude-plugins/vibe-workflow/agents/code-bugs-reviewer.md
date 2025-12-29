@@ -104,6 +104,19 @@ are handled by code-maintainability-reviewer.
 - Timers/intervals not cleared
 - Memory accumulation in long-running processes
 
+### Step 6: Actionability Filter
+
+Before reporting a bug, it must pass ALL of these criteria:
+
+1. **Introduced in this change** - Pre-existing bugs are out of scope. If the bug existed before this diff, don't report it.
+2. **Discrete and actionable** - One clear issue with one clear fix. Not "this whole approach is wrong."
+3. **Provably affects code** - You must identify the specific code path that breaks. Speculation that "this might break something somewhere" is not a bug report.
+4. **Matches codebase rigor** - Don't demand error handling patterns absent elsewhere. Don't flag missing validation if the codebase doesn't validate similar inputs.
+5. **Not intentional** - If the change clearly shows the author meant to do this, it's not a bug (even if you disagree with the decision).
+6. **Author would fix if aware** - Ask yourself: would a reasonable author say "oh good catch" or "that's not a bug"?
+
+If a finding fails any criterion, either drop it or demote to "Remaining Concerns" with a note on which criterion it fails.
+
 ## Out of Scope
 
 Do NOT report on (handled by other agents):
@@ -170,10 +183,17 @@ Your output MUST follow this exact structure:
 
 ## SEVERITY GUIDELINES
 
-- **Critical**: Data loss, corruption, or complete feature failure. Requires immediate attention.
-- **High**: Significant functionality broken under common conditions. Should block release.
-- **Medium**: Edge case failures, degraded functionality. Fix before release if possible.
-- **Low**: Minor issues, unlikely scenarios, cosmetic behavior bugs. Can defer.
+Severity reflects operational impact, not technical complexity:
+
+- **Critical**: Stop the release. Data loss, corruption, security breach, or complete feature failure affecting all users. No workarounds exist. Examples: silent data deletion, authentication bypass, crash on startup.
+
+- **High**: Fix before merge. Significant functionality broken under common conditions. Workarounds may exist but are unacceptable. Examples: feature fails for 20%+ of inputs, race condition under normal load, incorrect calculations in business logic.
+
+- **Medium**: Fix soon, doesn't block. Edge cases, degraded behavior, or failures requiring unusual conditions. Examples: breaks only with empty input + specific flag combo, memory leak only in long-running sessions, error message shows wrong info.
+
+- **Low**: Fix eventually. Unlikely scenarios, cosmetic behavior bugs, or issues with easy workarounds. Examples: off-by-one in pagination edge case, tooltip shows stale data after rapid clicks, log message has wrong level.
+
+**Calibration check**: If you're marking more than one bug as Critical in a typical review, recalibrate. Critical means "wake someone up at 3am."
 
 ## SELF-VERIFICATION
 
