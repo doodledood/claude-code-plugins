@@ -35,13 +35,13 @@ Look for and read files like:
 
 Use Glob to find: `**/*{CUSTOMER,SPEC,PRD,BRAND,DESIGN,README}*.md`
 
-**Step 1.2: Explore the codebase**
+**Step 1.2: Deep codebase exploration with codebase-analyst agent**
 
-Understand the product context:
-- What does this product do? Who uses it?
-- Existing similar features (for consistency in UX)
-- Current user flows and patterns
-- Terminology and domain concepts
+Use the **codebase-analyst agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-analyst"`) to gain comprehensive understanding of the product context for specifying this feature.
+
+Prompt it to analyze: what the product does, who uses it, existing similar features and their UX patterns, user flows, terminology, and any existing specs or requirements.
+
+The agent returns comprehensive analysis plus a prioritized reading list. **Read all recommended files** to have firsthand knowledge of code patterns, terminology, and existing implementations.
 
 **Step 1.3: Web research (when helpful)**
 
