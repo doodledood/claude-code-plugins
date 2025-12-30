@@ -1,0 +1,12 @@
+[project]
+name = "vibe-workflow-hooks"
+version = "0.1.0"
+description = "Hooks for vibe-workflow plugin"
+requires-python = ">=3.10"
+
+[project.scripts]
+session-start-reminder = "session_start_reminder:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
