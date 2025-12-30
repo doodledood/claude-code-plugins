@@ -98,45 +98,52 @@ For each significant component:
 **Internal:**
 - Module name, import path, integration point
 
-### 7. Error Handling & Edge Cases
+### 7. Data Model & Schemas
+- Database tables/collections and their relationships
+- Key data structures with field explanations
+- API request/response shapes
+- State shape and structure (for stateful systems)
+- Invariants that must be maintained
+
+### 8. Error Handling & Edge Cases
 - Failure modes and how they're handled
 - Error propagation paths
 - Validation requirements and constraints
 - Timeout/retry behavior
 - Concurrency and race condition concerns
 
-### 8. Configuration & Runtime Behavior
+### 9. Configuration & Runtime Behavior
 - Feature flags that affect behavior
 - Environment variables
 - Config files
 - Runtime settings that can change behavior
 
-### 9. Test Coverage
+### 10. Test Coverage
 - Existing tests and what they cover
 - Test patterns and conventions
 - Notable gaps in coverage
 - Edge cases revealed by tests
 
-### 10. Known Limitations & Tech Debt
+### 11. Known Limitations & Tech Debt
 - TODOs, FIXMEs, HACKs found in code
 - Known issues or limitations
 - Technical debt that affects this area
 - Things that "smell" but work
 
-### 11. Documentation References
+### 12. Documentation References
 If relevant docs exist (README, docs/, ADRs, inline comments):
 - Quote relevant section headers
 - Summarize key constraints
 - Note discrepancies between docs and implementation
 
-### 12. Patterns & Conventions
+### 13. Patterns & Conventions
 Copy-paste ready code examples showing:
 - How to add similar functionality
 - Naming conventions in use
 - Error handling patterns
 - Test patterns
 
-### 13. Gotchas & Constraints
+### 14. Gotchas & Constraints
 Critical warnings about:
 - Things that WILL break if ignored
 - Non-obvious dependencies
@@ -144,8 +151,15 @@ Critical warnings about:
 - Timing-sensitive code
 - Security considerations
 
-### 14. Essential Files for Plan Agent
-**CRITICAL HANDOFF SECTION** - Ranked list of files the Plan agent should read:
+### 15. Change Impact Analysis
+- What depends on this code (consumers/callers)
+- What this code depends on (providers/dependencies)
+- What would break if key interfaces changed
+- Coupling hotspots where changes ripple widely
+- Safe modification points vs dangerous ones
+
+### 16. Essential Files for Handoff
+**CRITICAL SECTION** - Ranked list of files the consuming agent should read:
 
 ```
 1. [MUST READ] path/to/core.ext:LINE_START-LINE_END
@@ -161,12 +175,12 @@ Critical warnings about:
    WHY: Useful for type definitions but can be skimmed.
 ```
 
-Priority levels:
-- **MUST READ**: Cannot plan correctly without understanding this
-- **SHOULD READ**: Important context, significantly helps planning
-- **REFERENCE**: Useful for details, can be consulted as needed
+**Priority criteria:**
+- **MUST READ**: Core business logic, entry points, central abstractions, config that fundamentally changes behavior
+- **SHOULD READ**: Implementation details of key interfaces, related but not central files, tests revealing edge cases
+- **REFERENCE**: Type definitions, utility functions, boilerplate/infrastructure
 
-### 15. Open Questions & Uncertainties
+### 17. Open Questions & Uncertainties
 Be honest about what you couldn't determine:
 - Questions that need answering
 - Areas with low confidence
@@ -187,7 +201,7 @@ Be honest about what you couldn't determine:
 
 6. **Be Honest About Uncertainty**: State confidence levels. Flag what needs verification. Don't pretend to know what you don't.
 
-7. **Optimize for Handoff**: Your output feeds into a Plan agent. Structure information so it can plan confidently without re-exploring.
+7. **Optimize for Handoff**: Your output feeds into other agents (Plan, Q&A, debugging). Structure information so they can work confidently without re-exploring.
 
 ## Tool Usage
 
