@@ -5,7 +5,7 @@ Autonomous development workflow with code review agents and quality gates.
 ## What It Does
 
 - **Code Review** - Run `/review` to audit your changes for bugs, maintainability issues, type safety problems, documentation gaps, and test coverage
-- **Codebase Analysis** - The `codebase-analyst` agent gains MAX understanding of code areas before planning, providing comprehensive context with precise file:line references for handoff to the Plan agent
+- **Codebase Analysis** - The `codebase-analyst` agent gains MAX understanding of code areas for answering questions, planning, debugging, or onboarding - with precise file:line references so you can work confidently without re-exploring
 - **Bug Fixing** - Run `/bugfix` for systematic investigation with root cause analysis and test-driven verification
 - **Product Specs** - Run `/spec-feature` for interactive PRD building using EARS syntax
 - **Git Workflow** - Run `/rebase-on-main` for safe rebasing with conflict resolution

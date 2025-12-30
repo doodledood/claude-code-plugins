@@ -38,7 +38,7 @@ For local development:
 
 All plugins are located in `claude-plugins/`:
 
-#### consultant (v1.0.0)
+#### consultant
 Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-powered code analysis across 100+ models.
 
 **Components:**
@@ -56,7 +56,7 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
   - Token management with context validation
   - Async execution with session reattachment
 
-#### planning (v1.0.0)
+#### planning
 Comprehensive planning tools with automatic keyword detection via hooks.
 
 **Components:**
@@ -66,7 +66,23 @@ Comprehensive planning tools with automatic keyword detection via hooks.
 - **Hook:** `check-planning-keywords.py` - Auto-detects planning keywords and activates skills
 - **Category:** development
 
-> More plugins coming soon!
+#### vibe-workflow
+Autonomous development workflow with code review agents, codebase analysis, and quality gates.
+
+**Components:**
+- **Agents:**
+  - `codebase-analyst` - MAX understanding of code areas for questions, planning, debugging, onboarding
+  - `bug-fixer` - Systematic bug investigation with root cause analysis
+  - Code review agents (bugs, coverage, maintainability, type-safety, CLAUDE.md adherence)
+- **Commands:**
+  - `/review` - Run all code review agents in parallel
+  - `/bugfix` - Investigate and fix bugs with test-driven verification
+  - `/spec-feature` - Interactive PRD builder using EARS syntax
+  - `/rebase-on-main` - Safe git rebasing with conflict resolution
+  - `/clean-slop` - Remove AI-generated code noise
+  - `/update-claude-md` - Create or maintain CLAUDE.md
+- **Hook:** SessionStart reminder to prefer `codebase-analyst` for deep code understanding
+- **Category:** development
 
 ## 🛠️ Development
 
@@ -80,7 +96,8 @@ claude-code-plugins/
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
 │   ├── consultant/           # Consultant plugin (Python/LiteLLM)
-│   └── planning/             # Planning plugin
+│   ├── planning/             # Planning plugin
+│   └── vibe-workflow/        # Vibe workflow plugin (review, analysis, bugfix)
 ├── CONTRIBUTING.md            # Contributing guidelines
 └── README.md                  # This file
 ```
