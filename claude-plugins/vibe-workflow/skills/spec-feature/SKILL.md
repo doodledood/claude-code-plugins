@@ -51,12 +51,18 @@ After the researcher(s) complete, read every file from their recommended reading
 
 Do not skip any recommended files - the researchers identified them as important for specifying this feature.
 
-**Step 1.3: Web research (when helpful)**
+**Step 1.3: Launch web-researcher agent(s) for UX/product research (if needed)**
 
-Use WebSearch to:
-- Understand how other products solve similar problems
-- Find UX patterns and user expectations
-- Identify common pitfalls and edge cases users care about
+Use the **web-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:web-researcher"`) to research:
+- How other products solve similar problems
+- UX patterns and user expectations for this type of feature
+- Common pitfalls and edge cases users care about
+
+Launch one or more web researchers in parallel depending on scope:
+- **Single researcher**: For focused features with one main UX question
+- **Multiple researchers**: For features needing research on multiple aspects (e.g., one for UX patterns, one for competitor analysis, one for accessibility best practices)
+
+Each researcher returns all relevant findings in its response - no need to read additional files.
 
 This context lets you ask informed questions and suggest sensible defaults.
 
