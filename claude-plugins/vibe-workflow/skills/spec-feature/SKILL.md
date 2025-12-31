@@ -12,7 +12,7 @@ Build a product requirements document (PRD) through structured discovery intervi
 ## Overview
 
 This skill guides you through:
-1. **Context Gathering** - Read existing docs, explore codebase, research UX patterns
+1. **Context Gathering** - Launch researcher agents, read recommended files, research UX patterns
 2. **Discovery Interview** - Smart questions about product decisions, user needs, edge cases
 3. **Write Spec** - Generate PRD using EARS syntax, output summary for quick validation
 
@@ -24,24 +24,32 @@ The interviewer role is that of a senior product manager: asking smart, non-obvi
 
 Before asking any questions, gather context to ask informed questions and suggest sensible defaults.
 
-**Step 1.1: Read existing product docs**
-
-Look for and read files like:
-- `CUSTOMER.md`, `CUSTOMER_PROFILE.md` - Target user definitions
-- `SPEC.md`, `PRD.md`, `REQUIREMENTS.md` - Existing specs
-- `BRAND_GUIDELINES.md`, `DESIGN_GUIDELINES.md` - Brand/design context
-- `README.md` - Product overview
-- Any docs in `docs/`, `specs/`, or similar directories
-
-Use Glob to find: `**/*{CUSTOMER,SPEC,PRD,BRAND,DESIGN,README}*.md`
-
-**Step 1.2: Deep codebase exploration with codebase-researcher agent**
+**Step 1.1: Launch codebase-researcher agent(s) for overview**
 
 Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to gain comprehensive understanding of the product context for specifying this feature.
 
-Prompt it to analyze: what the product does, who uses it, existing similar features and their UX patterns, user flows, terminology, and any existing specs or requirements.
+Launch one or more researchers in parallel depending on scope:
+- **Single researcher**: For focused features touching one area
+- **Multiple researchers**: For cross-cutting features (e.g., one for auth, one for payments, one for notifications)
 
-The agent returns comprehensive analysis plus a prioritized reading list. **Read all recommended files** to have firsthand knowledge of code patterns, terminology, and existing implementations.
+Prompt each researcher to explore:
+- What the product does and who uses it
+- Existing similar features and their UX patterns
+- User flows and terminology
+- Product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md)
+- Any existing specs or requirements in `docs/`, `specs/`, or similar directories
+
+Each researcher returns comprehensive analysis plus a **prioritized reading list** of files you should read.
+
+**Step 1.2: Read all recommended files**
+
+After the researcher(s) complete, read every file from their recommended reading lists. This gives you firsthand knowledge of:
+- Code patterns and terminology
+- Existing implementations to build upon
+- Product context and user definitions
+- Design and brand guidelines
+
+Do not skip any recommended files - the researchers identified them as important for specifying this feature.
 
 **Step 1.3: Web research (when helpful)**
 
