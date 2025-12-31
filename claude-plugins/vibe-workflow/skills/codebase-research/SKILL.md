@@ -1,9 +1,9 @@
 ---
-name: codebase-analysis
-description: 'Comprehensive codebase analysis methodology for gaining deep understanding of code areas. Use this skill when you need to thoroughly understand a code area before planning, implementing, debugging, or answering questions. Returns structured analysis with prioritized reading list.'
+name: codebase-research
+description: 'Comprehensive codebase research methodology for gaining deep understanding of code areas. Use this skill when you need to thoroughly understand a code area before planning, implementing, debugging, or answering questions. Returns structured research with prioritized reading list.'
 ---
 
-# Codebase Analysis Skill
+# Codebase Research Skill
 
 Gain MAXIMUM understanding of a code area so you can work confidently without re-exploring the codebase.
 
