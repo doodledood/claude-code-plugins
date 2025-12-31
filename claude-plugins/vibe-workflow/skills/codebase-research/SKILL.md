@@ -228,13 +228,30 @@ For complex research, maintain internal notes in `/tmp/codebase-research-{topic-
 - Questions answered and remaining uncertainties
 - Recommended reading list being built
 
-These notes are for your internal tracking only. Your response is the deliverable - it must contain all relevant findings.
+These notes are for your internal tracking only. Your final response is the deliverable.
 
-## After Analysis
+## Final Response
 
-Once you complete the analysis:
-1. **Read all MUST READ files** yourself using the Read tool
-2. **Read SHOULD READ files** for additional context
-3. **Reference files** can be skimmed as needed
+Your response must be self-contained - the caller should be able to proceed confidently without re-exploring.
 
-Your comprehensive understanding enables confident planning and implementation.
+**Structure your response as:**
+
+1. **Executive Summary** (2-3 sentences) - What this code area does and its key characteristics
+
+2. **Key Findings** - The most important insights organized by the sections above (entry points, architecture, data model, error handling, etc.). Include `file:line` references throughout.
+
+3. **Recommended Reading List** - Prioritized files the caller should read for firsthand understanding:
+   ```
+   MUST READ:
+   - path/to/file.ext:LINE_START-LINE_END - Why this file matters
+
+   SHOULD READ:
+   - path/to/file.ext:LINE_START-LINE_END - What context this provides
+
+   REFERENCE:
+   - path/to/file.ext - For type definitions, etc.
+   ```
+
+4. **Open Questions** - Anything you couldn't determine that the caller should be aware of
+
+The caller will read the recommended files after receiving your response. Your job is to give them the map and highlights - they'll do the detailed reading.
