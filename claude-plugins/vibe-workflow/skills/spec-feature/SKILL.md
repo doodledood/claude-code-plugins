@@ -28,9 +28,9 @@ Before asking any questions, gather context to ask informed questions and sugges
 
 Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to gain comprehensive understanding of the product context for specifying this feature.
 
-Launch one or more researchers in parallel depending on scope:
+Launch one or more researchers depending on scope:
 - **Single researcher**: For focused features touching one area
-- **Multiple researchers**: For cross-cutting features (e.g., one for auth, one for payments, one for notifications)
+- **Multiple researchers in parallel**: For cross-cutting features (e.g., one for auth, one for payments, one for notifications) - launch all Task calls in a single message to run them concurrently
 
 Prompt each researcher to explore:
 - What the product does and who uses it
@@ -58,9 +58,9 @@ Use the **web-researcher agent** (via Task tool with `subagent_type: "vibe-workf
 - UX patterns and user expectations for this type of feature
 - Common pitfalls and edge cases users care about
 
-Launch one or more web researchers in parallel depending on scope:
+Launch one or more web researchers depending on scope:
 - **Single researcher**: For focused features with one main UX question
-- **Multiple researchers**: For features needing research on multiple aspects (e.g., one for UX patterns, one for competitor analysis, one for accessibility best practices)
+- **Multiple researchers in parallel**: For features needing research on multiple aspects (e.g., one for UX patterns, one for competitor analysis, one for accessibility best practices) - launch all Task calls in a single message to run them concurrently
 
 Each researcher returns all relevant findings in its response - no need to read additional files.
 
