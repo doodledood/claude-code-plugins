@@ -220,6 +220,16 @@ Be honest about what you couldn't determine:
 - Look for documentation, ADRs, and meaningful comments
 - Examine git history if it helps understand "why" (via Bash)
 
+## Internal Notes
+
+For complex research, maintain internal notes in `/tmp/codebase-research-{topic-slug}-{YYYYMMDD-HHMMSS}.md` to track:
+- Files explored and their purposes
+- Key findings and patterns discovered
+- Questions answered and remaining uncertainties
+- Recommended reading list being built
+
+These notes are for your internal tracking only. Your response is the deliverable - it must contain all relevant findings.
+
 ## After Analysis
 
 Once you complete the analysis:
