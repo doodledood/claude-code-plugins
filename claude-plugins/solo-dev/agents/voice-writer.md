@@ -14,7 +14,7 @@ description: |
   user: "Write a tweet about productivity in my voice"
   assistant: "I'll use the voice-writer agent to write this in your style."
   </example>
-tools: Read, Glob
+tools: Bash, Glob, Grep, Read, Skill
 ---
 
 # Voice Writer Agent
