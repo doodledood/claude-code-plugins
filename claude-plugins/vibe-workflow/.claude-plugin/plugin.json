@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
-  "description": "Vibe coding workflow - autonomous development with quality gates, code review agents, codebase analysis, maintainability checks, prompt review, AI slop cleaning, and git rebase workflow",
-  "version": "1.29.0",
+  "description": "Vibe coding workflow - autonomous development with quality gates, code review agents, codebase research, maintainability checks, prompt review, AI slop cleaning, and git rebase workflow",
+  "version": "1.30.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
@@ -13,7 +13,7 @@
   "hooks": {
     "SessionStart": [
       {
-        "description": "Remind Claude to prefer codebase-analyst over built-in Explore agent for deep code understanding (questions, planning, debugging, onboarding)",
+        "description": "Remind Claude to prefer codebase-researcher over built-in Explore agent for deep code understanding (questions, planning, debugging, onboarding)",
         "hooks": [
           {
             "type": "command",

@@ -67,11 +67,11 @@ Comprehensive planning tools with automatic keyword detection via hooks.
 - **Category:** development
 
 #### vibe-workflow
-Autonomous development workflow with code review agents, codebase analysis, and quality gates.
+Autonomous development workflow with code review agents, codebase research, and quality gates.
 
 **Components:**
 - **Agents:**
-  - `codebase-analyst` - MAX understanding of code areas for questions, planning, debugging, onboarding
+  - `codebase-researcher` - MAX understanding of code areas for questions, planning, debugging, onboarding
   - `bug-fixer` - Systematic bug investigation with root cause analysis
   - Code review agents (bugs, coverage, maintainability, type-safety, CLAUDE.md adherence)
 - **Commands:**
@@ -81,7 +81,7 @@ Autonomous development workflow with code review agents, codebase analysis, and 
   - `/rebase-on-main` - Safe git rebasing with conflict resolution
   - `/clean-slop` - Remove AI-generated code noise
   - `/update-claude-md` - Create or maintain CLAUDE.md
-- **Hook:** SessionStart reminder to prefer `codebase-analyst` for deep code understanding
+- **Hook:** SessionStart reminder to prefer `codebase-researcher` for deep code understanding
 - **Category:** development
 
 ## 🛠️ Development
