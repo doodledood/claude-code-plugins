@@ -56,32 +56,24 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
   - Token management with context validation
   - Async execution with session reattachment
 
-#### planning
-Comprehensive planning tools with automatic keyword detection via hooks.
-
-**Components:**
-- **Skills:**
-  - `plan` - Mini-PR based implementation plans
-  - `execplan` - Comprehensive execution plans following PLANS.md
-- **Hook:** `check-planning-keywords.py` - Auto-detects planning keywords and activates skills
-- **Category:** development
-
 #### vibe-workflow
-Autonomous development workflow with code review agents, codebase research, and quality gates.
+Autonomous development workflow with code review agents, codebase exploration, and quality gates.
 
 **Components:**
 - **Agents:**
-  - `codebase-researcher` - MAX understanding of code areas for questions, planning, debugging, onboarding
+  - `codebase-explorer` - Returns structural overview + prioritized file list (prefer over built-in Explore)
   - `bug-fixer` - Systematic bug investigation with root cause analysis
-  - Code review agents (bugs, coverage, maintainability, type-safety, CLAUDE.md adherence)
+  - Code review agents (bugs, coverage, maintainability, type-safety, docs, CLAUDE.md adherence)
 - **Commands:**
+  - `/spec` - Interactive PRD builder using EARS syntax
+  - `/plan` - Create mini-PR implementation plans from specs
   - `/review` - Run all code review agents in parallel
   - `/bugfix` - Investigate and fix bugs with test-driven verification
-  - `/spec-feature` - Interactive PRD builder using EARS syntax
+  - `/web-research` - Research external topics with hypothesis tracking
   - `/rebase-on-main` - Safe git rebasing with conflict resolution
   - `/clean-slop` - Remove AI-generated code noise
   - `/update-claude-md` - Create or maintain CLAUDE.md
-- **Hook:** SessionStart reminder to prefer `codebase-researcher` for deep code understanding
+- **Hook:** SessionStart reminder to prefer `codebase-explorer` for context gathering
 - **Category:** development
 
 ## 🛠️ Development
@@ -96,8 +88,7 @@ claude-code-plugins/
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
 │   ├── consultant/           # Consultant plugin (Python/LiteLLM)
-│   ├── planning/             # Planning plugin
-│   └── vibe-workflow/        # Vibe workflow plugin (review, analysis, bugfix)
+│   └── vibe-workflow/        # Vibe workflow plugin (spec, plan, review, bugfix)
 ├── CONTRIBUTING.md            # Contributing guidelines
 └── README.md                  # This file
 ```

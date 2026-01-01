@@ -6,8 +6,9 @@ Autonomous development workflow with code review agents and quality gates.
 
 - **Spec → Plan Workflow** - Run `/spec` to build requirements through interactive interview, then `/plan` to create mini-PR implementation plans with iterative codebase research
 - **Code Review** - Run `/review` to audit your changes for bugs, maintainability issues, type safety problems, documentation gaps, and test coverage
-- **Codebase Explorer** - The `codebase-explorer` agent finds relevant files for any task - returns a prioritized file list with precise line ranges so you read exactly what matters
+- **Codebase Explorer** - The `codebase-explorer` agent returns a structural overview + prioritized file list with line ranges - prefer over built-in Explore for context gathering
 - **Bug Fixing** - Run `/bugfix` for systematic investigation with root cause analysis and test-driven verification
+- **Web Research** - Run `/web-research` to research external topics with structured hypothesis tracking
 - **Git Workflow** - Run `/rebase-on-main` for safe rebasing with conflict resolution
 - **Code Cleanup** - Run `/clean-slop` to remove AI-generated noise
 - **CLAUDE.md Management** - Run `/update-claude-md` to create or maintain project instructions
