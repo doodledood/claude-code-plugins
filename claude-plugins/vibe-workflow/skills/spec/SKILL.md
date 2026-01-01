@@ -1,9 +1,9 @@
 ---
-name: spec-feature
+name: spec
 description: 'Interactive product requirements builder that interviews you to create a comprehensive PRD using EARS syntax. Guides through context gathering, discovery interview, and spec generation.'
 ---
 
-# Product Spec Feature Skill
+# Product Spec Skill
 
 Build a product requirements document (PRD) through structured discovery interview. This skill conducts a product-focused interview to understand WHAT to build and WHY - not technical implementation details.
 

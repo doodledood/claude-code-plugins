@@ -4,4 +4,4 @@ allowed-tools: ["AskUserQuestion", "Task", "Read", "Glob", "Grep", "WebSearch", 
 argument-hint: [feature name or description]
 ---
 
-Use the spec-feature skill to build a product requirements document for: $ARGUMENTS
+Use the spec skill to build a product requirements document for: $ARGUMENTS
