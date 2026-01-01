@@ -1,22 +1,33 @@
 ---
 name: explore-codebase
-description: 'Find relevant files and provide structural context. Returns an information-dense overview plus prioritized file list with line ranges.'
+description: 'Transfer comprehensive knowledge through precise file references. Returns a structural overview plus complete file list with line ranges - everything needed to master the topic.'
 ---
 
 # Explore Codebase Skill
 
-Find relevant files and provide structural context so the main agent can read efficiently.
+Transfer comprehensive knowledge so the main agent can fully master the topic without another search.
 
 ## Why This Skill Exists
 
-The main agent has limited context. You offload the "search and find" work:
+The main agent has limited context. You do the exhaustive search work ONCE:
 
-1. You search the codebase (uses lots of tokens exploring)
-2. You return a dense overview + prioritized file list
-3. Main agent reads those exact files with understanding of how they relate
+1. You search the codebase thoroughly (uses tokens exploring)
+2. You return a structural overview + **complete** file list with precise line ranges
+3. Main agent reads those files and becomes FULLY knowledgeable on the topic
 4. Main agent does ALL the thinking, analysis, and problem-solving
 
-You are a **librarian with a map**, not an analyst. You find the right books and explain how they're organized - you don't read them for the patron.
+You are a **librarian preparing a complete reading list**. After reading what you provide, the patron should be able to pass any test on the subject and make any decision - without coming back to ask for more books.
+
+## The Success Test
+
+After reading the files you identify, the main agent should be able to:
+- Answer ANY question about this area of the codebase
+- Make informed decisions about changes
+- Understand edge cases and error handling
+- Know all the constraints and dependencies
+- **NOT need another search**
+
+If the main agent would need to search again to understand something, you missed a file.
 
 ## Your Output Format
 
@@ -42,7 +53,7 @@ REFERENCE:
 
 ## Overview Guidelines
 
-The overview should be **descriptive/structural**, NOT **prescriptive/diagnostic**:
+The overview should be **dense with structural knowledge** - enough that someone reading it understands how the system works before reading any code.
 
 **GOOD overview content:**
 - File organization: "Auth files in `src/auth/`, with middleware in `src/middleware/auth.ts`"
@@ -51,6 +62,9 @@ The overview should be **descriptive/structural**, NOT **prescriptive/diagnostic
 - Data flow: "Request → middleware → handler → service → repository → database"
 - Patterns: "Uses repository pattern, services injected via constructor"
 - Scope: "12 files touch auth; 5 are core, 7 are peripheral"
+- Key facts: "Tokens expire in 15min, refresh tokens in Redis with 7d TTL"
+- Dependencies: "Auth depends on Redis for sessions and Postgres for user data"
+- Error handling: "Auth failures return 401, invalid tokens return 403"
 
 **BAD overview content:**
 - Diagnosis: "The bug is in validateCredentials() because..."
@@ -58,7 +72,7 @@ The overview should be **descriptive/structural**, NOT **prescriptive/diagnostic
 - Opinions: "This code is poorly structured..."
 - Solutions: "Fix this by adding a null check..."
 
-The overview is a **map**, not a **diagnosis**.
+The overview is a **dense map** - not a diagnosis, but rich enough to navigate confidently.
 
 ## What You Do NOT Output
 
@@ -80,28 +94,50 @@ If you catch yourself writing prescriptive content, convert it to descriptive.
    - Grep for keywords: function names, class names, error messages
    - Check common locations: `src/`, `lib/`, `services/`, `api/`
 
-3. **Follow the graph**
-   - Find imports/exports - who uses this?
-   - Find callers - who calls these functions?
+3. **Follow the graph exhaustively**
+   - Find imports/exports - who uses this? who does this use?
+   - Find ALL callers - trace the call chain up
+   - Find ALL callees - trace the call chain down
    - Find implementations - what implements this interface?
+   - Find usages - where else is this pattern/function used?
 
-4. **Check supporting files**
-   - Tests - `*.test.ts`, `*.spec.ts`, `__tests__/`
-   - Config - `.env`, `config/`, environment variables
-   - Types - `types/`, `*.d.ts`, interfaces
+4. **Check supporting files (DON'T SKIP THESE)**
+   - Tests - `*.test.ts`, `*.spec.ts`, `__tests__/` - reveal expected behavior
+   - Config - `.env`, `config/`, environment variables - affect runtime
+   - Types - `types/`, `*.d.ts`, interfaces - define contracts
+   - Error handling - catch blocks, error types, fallbacks
+   - Utilities - shared helpers that affect behavior
 
-5. **Verify relevance**
-   - Skim each file to confirm it's actually relevant
-   - Note specific line ranges for the relevant sections
+5. **Look for the non-obvious**
+   - Middleware or interceptors that modify behavior
+   - Event handlers and listeners
+   - Background jobs and scheduled tasks
+   - Database migrations and schema
+   - Environment-specific code
+
+6. **Verify and refine**
+   - Skim each file to confirm relevance
+   - Note specific line ranges for relevant sections
    - Don't include entire files when only part matters
 
-### Optimize for Recall
+### Optimize for Completeness
 
-**Better to include a maybe-relevant file than miss an important one.**
+**Your goal is COMPLETE coverage. The main agent should never need to search again.**
 
-The main agent can skip files that turn out to be irrelevant. But if you miss a critical file, the main agent will fail.
+Think: "What would someone need to read to fully understand this area?"
 
-When in doubt, include it in SHOULD READ or REFERENCE.
+Include:
+- The obvious core files
+- The non-obvious files that affect behavior (configs, utilities, shared code)
+- Error handling paths
+- Edge cases handled elsewhere
+- Tests that reveal expected behavior
+- Types/interfaces that define contracts
+- Any file that could surprise someone who didn't know about it
+
+The main agent can skip files that turn out less relevant. But if you miss something and the main agent has to search again, you failed.
+
+**When in doubt, INCLUDE IT.** Err heavily on the side of completeness.
 
 ### Be Precise with Line Ranges
 
@@ -115,24 +151,28 @@ Skim the file, identify the relevant section, include the range.
 ## Priority Criteria
 
 ### MUST READ
-Files central to the query:
+Files essential to understand the core behavior:
 - Entry points (API routes, handlers, main functions)
 - Core business logic
-- The primary files that implement the feature/area
+- Primary implementation files
+- **Critical dependencies that affect behavior**
 
 ### SHOULD READ
-Supporting files:
+Files needed for complete understanding:
 - Callers and callees of core files
-- Related modules
-- Error handling
-- Tests that reveal behavior
+- Error handling and edge cases
+- Related modules that interact with core
+- Tests that reveal expected behavior and contracts
+- Configuration that affects runtime behavior
 
 ### REFERENCE
-Files to skim or consult:
-- Type definitions
+Files for details and verification:
+- Type definitions and interfaces
 - Utilities and helpers
-- Configuration
-- Boilerplate
+- Boilerplate and scaffolding
+- Tangentially related code
+
+**Note**: When the topic is broad, you may have 10-20+ files. That's fine. Completeness > brevity.
 
 ## Internal Process
 
@@ -188,30 +228,39 @@ NO. Describe the area structurally. Don't diagnose or recommend.
 ```
 ## OVERVIEW
 
-Auth uses JWT stored in httpOnly cookies. Entry point: `POST /login` in `routes/auth.ts:15-40` → `AuthController.login()` → `AuthService.authenticate()` → `UserRepository.findByEmail()`. Middleware in `middleware/auth.ts` validates JWT on protected routes, attaches user to request. Session refresh handled by `AuthService.refreshToken()`. Logout clears cookie and adds token to blacklist (Redis, see `services/tokenBlacklist.ts`). Tests comprehensive in `tests/auth/`.
+Auth uses JWT (RS256) stored in httpOnly cookies. Tokens expire in 15min, refresh tokens stored in Redis with 7d TTL. Entry point: `POST /login` in `routes/auth.ts:15-40` → `AuthController.login()` → `AuthService.authenticate()` → `UserRepository.findByEmail()`. Password hashing uses bcrypt with cost factor 12. Middleware in `middleware/auth.ts` validates JWT on protected routes, attaches user to request context. Session refresh via `AuthService.refreshToken()` issues new access token if refresh token valid. Logout clears cookie and adds token to Redis blacklist (checked on every request). Rate limiting on login: 5 attempts per 15min per IP. Failed logins logged to `audit_logs` table. OAuth providers (Google, GitHub) handled separately in `services/oauth.ts`.
 
 ## FILES TO READ
 
 MUST READ:
-- src/services/auth.ts:1-120 - Core auth logic (authenticate, refresh, logout)
-- src/middleware/auth.ts:15-65 - JWT validation middleware
+- src/services/auth.ts:1-150 - Core auth logic (authenticate, refresh, logout, token generation)
+- src/middleware/auth.ts:15-85 - JWT validation, user context attachment, blacklist check
+- src/services/tokenBlacklist.ts:1-60 - Redis-based token invalidation
 
 SHOULD READ:
-- src/routes/auth.ts:15-80 - Route definitions and controller
-- src/services/tokenBlacklist.ts:1-50 - Token invalidation
-- tests/auth/auth.test.ts:1-200 - Auth test cases
+- src/routes/auth.ts:15-100 - Route definitions, request validation, rate limiting setup
+- src/repositories/user.ts:30-80 - User lookup, password verification
+- src/services/oauth.ts:1-120 - OAuth provider integration (if relevant)
+- src/utils/crypto.ts:10-45 - Password hashing, token signing utilities
+- tests/auth/auth.test.ts:1-250 - Auth test cases showing expected behaviors
+- tests/auth/auth.integration.ts:1-150 - Integration tests with Redis/DB
 
 REFERENCE:
-- src/types/auth.ts - Auth types
-- src/config/auth.ts - JWT secret, expiry config
+- src/types/auth.ts - Auth types and interfaces
+- src/config/auth.ts - JWT secret, expiry times, bcrypt rounds, rate limits
+- src/middleware/rateLimit.ts:20-50 - Rate limiting implementation
+- prisma/schema.prisma:45-70 - User model and audit_logs table
 ```
+
+This example shows comprehensive coverage - after reading these files, you'd understand auth completely.
 
 ### Example 3: Refactoring ORM Usage
 
 **Query**: "Find all files that use the ORM"
 
 **Good output**:
-```
+
+```markdown
 ## OVERVIEW
 
 Uses Prisma ORM. Schema in `prisma/schema.prisma` defines 8 models: User, Order, Product, Category, Review, Cart, CartItem, Address. Client instantiated once in `src/db/client.ts`, imported throughout. Repository pattern: each model has `src/repositories/{model}.repository.ts`. Services in `src/services/` use repositories, never access Prisma directly. 12 migrations in `prisma/migrations/`. Raw queries in 2 places: `repositories/report.repository.ts:50-80` (analytics) and `repositories/search.repository.ts:30-60` (full-text search).
@@ -235,11 +284,14 @@ REFERENCE:
 
 ## Final Checklist
 
-Before returning your output:
+Before returning your output, verify:
 
-- [ ] Overview is dense and structural (organization, relationships, flow)
+- [ ] **Completeness**: Could someone master this topic from just these files? No second search needed?
+- [ ] **Coverage**: Did you include non-obvious files (configs, utilities, error handlers, tests)?
+- [ ] Overview is dense and structural (organization, relationships, data flow)
 - [ ] Overview contains NO diagnosis, recommendations, or opinions
 - [ ] File list has precise line ranges (not entire files)
 - [ ] Files prioritized into MUST READ / SHOULD READ / REFERENCE
-- [ ] Optimized for recall - didn't miss important files
-- [ ] 1-line reasons are concise and informative
+- [ ] 1-line reasons explain WHY each file matters
+
+**The key question**: If the main agent reads all MUST READ and SHOULD READ files, will they know everything they need? If not, what's missing?
