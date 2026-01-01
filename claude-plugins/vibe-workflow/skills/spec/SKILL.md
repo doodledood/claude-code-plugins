@@ -72,31 +72,63 @@ This context lets you ask informed questions and suggest sensible defaults.
 
 #### Interview Rules
 
-1. **Always mark one option as "(Recommended)"** - Put it first with reasoning in the description
+1. **Prioritize by information gain** - Ask questions that split the decision space most. Before each question, ask: *"Does the answer change what other questions I need to ask?"* If yes, ask it early.
 
-2. **Reduce cognitive load**:
+   **Discovery and questions are an iteration loop** - Don't just research upfront and then ask all questions. Interleave them:
+   - User answer reveals new area? → Launch codebase-researcher to understand it
+   - Need to know existing patterns before asking about approach? → Research first
+   - Unsure if codebase already handles something? → Discover before asking
+   - Need UX patterns or industry best practices? → Launch web-researcher
+   - User mentions competitor or external product? → Web research before asking follow-ups
+
+   Only ask the user when:
+   - The answer requires a business/product decision
+   - The codebase doesn't have the answer
+   - Multiple valid interpretations exist and the user must choose
+
+   **Priority 1: Scope Eliminators** (ask first)
+   Answers eliminate large chunks of work entirely:
+   - "Is this v1/MVP or mature feature?" → If v1, skip 50%+ of edge cases
+   - "All users or specific segment?" → May eliminate permission considerations
+   - "Core flow only or full feature?" → Dramatically narrows scope
+
+   **Priority 2: Branching Questions**
+   Answers open/close entire lines of inquiry:
+   - "User-initiated or system-triggered?" → Different interaction models
+   - "Real-time or async?" → Different UX paradigms
+   - "Single item or batch?" → Different complexity levels
+
+   **Priority 3: Hard Constraints**
+   Non-negotiable limits that constrain options:
+   - "Regulatory/compliance requirements?" → May dictate behaviors
+   - "Must integrate with existing system X?" → Constrains design
+   - "Performance/scale requirements?" → Affects feasibility
+
+   **Priority 4: Differentiating Questions**
+   Choose between remaining viable approaches:
+   - "Pattern A vs B for this use case?"
+   - "Which UX model fits better?"
+
+   **Priority 5: Detail Refinement** (ask last)
+   Fine-grained questions that don't affect other decisions:
+   - Exact copy/messaging
+   - Specific error handling
+   - Edge case behavior details
+
+2. **Always mark one option as "(Recommended)"** - Put it first with reasoning in the description
+
+3. **Reduce cognitive load**:
    - Provide concrete options, not open-ended questions
    - Batch related questions together (up to 4 per call)
    - **Only ask when the user adds value** - Make reasonable decisions yourself based on research/context. User reviews the final spec.
    - Focus on business/product decisions, not implementation details
 
-3. **Ask non-obvious questions** - Focus on:
+4. **Ask non-obvious questions** - Focus on:
    - User motivations and jobs-to-be-done
    - Edge cases that affect user experience
    - Business rules and constraints
    - What users expect vs. what we'll actually deliver
    - Tradeoffs that affect the user
-
-4. **Cover product dimensions** (as relevant):
-   - **Users**: Who is this for? Primary vs. secondary users?
-   - **Problem**: What pain are we solving? Why now?
-   - **User stories**: What does the user want to accomplish?
-   - **Happy path**: What's the ideal experience?
-   - **Edge cases**: What happens when things go wrong (from user's view)?
-   - **Business rules**: Constraints, limits, permissions?
-   - **UX expectations**: What do users expect based on similar products?
-   - **Success**: How do we know this worked?
-   - **Scope**: What are we explicitly NOT doing?
 
 5. **Iterate until complete** - Keep interviewing until:
    - All product decisions are made
@@ -104,9 +136,18 @@ This context lets you ask informed questions and suggest sensible defaults.
    - Scope is crystal clear
    - Every requirement can be written definitively
 
-#### Sample Interview Questions
+#### Sample Interview Questions (ordered by priority)
 
-**Question: Target User**
+**Priority 1: Scope Eliminators**
+
+```
+header: "Feature Scope"
+question: "What's the scope for this feature?"
+options:
+  - "V1/MVP - core flow only, minimal edge cases (Recommended)"
+  - "Full feature - comprehensive coverage"
+  - "Let me describe the scope"
+```
 
 ```
 header: "Target User"
@@ -118,7 +159,31 @@ options:
   - "Admin/power users only"
 ```
 
-**Question: Problem Validation**
+**Priority 2: Branching Questions**
+
+```
+header: "Interaction Model"
+question: "How is this feature triggered?"
+options:
+  - "User-initiated - user explicitly triggers it (Recommended)"
+  - "System-triggered - happens automatically based on conditions"
+  - "Both - user can trigger, system can also auto-trigger"
+```
+
+**Priority 3: Hard Constraints**
+
+```
+header: "Constraints"
+question: "Are there hard constraints we must respect?"
+options:
+  - "No special constraints (Recommended)"
+  - "Must integrate with existing system - let me specify"
+  - "Regulatory/compliance requirements - let me specify"
+  - "Performance/scale requirements - let me specify"
+multiSelect: true
+```
+
+**Priority 4-5: Refinement Questions**
 
 ```
 header: "Problem Statement"
@@ -126,8 +191,6 @@ question: "What problem are we solving?"
 freeText: true
 placeholder: "Describe the pain point this feature addresses"
 ```
-
-**Question: Success Criteria**
 
 ```
 header: "Success Criteria"
@@ -140,17 +203,6 @@ options:
   - "Custom metrics - let me specify"
 multiSelect: true
 ```
-
-**Question: Scope Boundaries**
-
-```
-header: "Scope"
-question: "What should this feature explicitly NOT do?"
-freeText: true
-placeholder: "List things that might be expected but are out of scope (e.g., 'No mobile support in v1', 'No batch operations')"
-```
-
-**Question: Edge Case Handling**
 
 ```
 header: "Edge Cases"
@@ -321,10 +373,16 @@ Review the full spec and let me know if you'd like to adjust anything.
 - Limit options to 6-8 max per question
 - Only use free-text for essential context
 
+### Maximize Information Gain
+- Ask questions that split the decision space most effectively
+- Scope eliminators first → branching questions → constraints → details last
+- If an answer changes what other questions you'd ask, ask it early
+
 ### Make Decisions When You Can
 - Use research and context to make reasonable defaults
+- Interleave discovery and questions - launch codebase-researcher or web-researcher whenever needed
 - User reviews the final spec and can request changes
-- Don't ask about everything - ask about what matters
+- Only ask when user input is actually required (decisions, preferences, ambiguity)
 
 ### Iterate Until Complete
 - Keep asking until all product decisions are made
