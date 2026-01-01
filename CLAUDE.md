@@ -34,6 +34,22 @@ Each plugin can contain:
 
 **Naming convention**: Use kebab-case (`-`) for all file, command, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
 
+### Tool Definitions
+
+**Skills/Commands**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
+
+**Agents**: MUST explicitly declare all needed tools in frontmatter—agents run in isolation and won't inherit tools.
+
+**Common agent patterns**:
+- Has `Bash` → add `BashOutput` (for long-running commands)
+- Uses todo tracking → add `TodoWrite`
+- Writes files (logs, notes) → add `Write`
+- Invokes other skills → add `Skill`
+- Spawns sub-agents → add `Task`
+- Searches files → add `Glob`, `Grep`
+
+**Agent audit**: Read the skill/prompt the agent follows, identify every tool mentioned (explicit or implicit), verify all are in frontmatter.
+
 See each plugin's README for architecture details.
 
 ## Plugin Versioning
