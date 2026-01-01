@@ -57,7 +57,7 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
   - Async execution with session reattachment
 
 #### vibe-workflow
-Autonomous development workflow with code review agents, codebase exploration, and quality gates.
+Autonomous development workflow with spec→plan→implement pipeline, code review agents, and quality gates.
 
 **Components:**
 - **Agents:**
@@ -68,6 +68,7 @@ Autonomous development workflow with code review agents, codebase exploration, a
 - **Commands:**
   - `/spec` - Interactive PRD builder using EARS syntax
   - `/plan` - Create mini-PR implementation plans from specs
+  - `/implement` - Execute plans autonomously with auto-fix quality gates
   - `/review` - Run all code review agents in parallel
   - `/bugfix` - Investigate and fix bugs with test-driven verification
   - `/web-research` - Research external topics with hypothesis tracking
@@ -90,7 +91,7 @@ claude-code-plugins/
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
 │   ├── consultant/           # Consultant plugin (Python/LiteLLM)
-│   └── vibe-workflow/        # Vibe workflow plugin (spec, plan, review, bugfix)
+│   └── vibe-workflow/        # Vibe workflow plugin (spec→plan→implement, review, bugfix)
 ├── CONTRIBUTING.md            # Contributing guidelines
 └── README.md                  # This file
 ```
