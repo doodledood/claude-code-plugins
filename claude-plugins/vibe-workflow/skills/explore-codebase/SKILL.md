@@ -7,6 +7,10 @@ description: 'Transfer comprehensive knowledge through precise file references. 
 
 Transfer comprehensive knowledge so the main agent can fully master the topic without another search.
 
+**Core loop**: Search → Expand todos → Write findings → Repeat until exhaustive → Compress into output
+
+**Research file**: `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md` - updated after each exploration step.
+
 ## Why This Skill Exists
 
 The main agent has limited context. You do the exhaustive search work ONCE:
@@ -29,12 +33,156 @@ After reading the files you identify, the main agent should be able to:
 
 If the main agent would need to search again to understand something, you missed a file.
 
-## Your Output Format
+## Phase 1: Initial Scoping
+
+### 1.1 Create initial todo list
+
+Use TodoWrite immediately with exploration areas based on the query:
+
+```
+- [ ] Search for {primary keyword} in file names
+- [ ] Search for {primary keyword} in file contents
+- [ ] Check common locations (src/, lib/, services/, api/)
+- [ ] Write initial findings to research file
+- [ ] (expand as discoveries reveal new areas to explore)
+- [ ] Compile final output (OVERVIEW + FILES TO READ with line ranges)
+```
+
+### 1.2 Create research file
+
+Write initial research file at `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md`:
+
+```markdown
+# Research: {topic}
+
+Started: {timestamp}
+Query: {original query}
+
+## Search Log
+
+### {timestamp} - Initial scoping
+- Searching for: {keywords}
+- Areas to explore: {list}
+
+## Findings
+
+(populated as you go)
+
+## Files Found
+
+(populated as you go)
+```
+
+Use this SAME file path for ALL updates throughout exploration.
+
+## Phase 2: Iterative Exploration
+
+**CRITICAL**: This is an unbounded loop. Keep exploring until ALL relevant areas are exhausted.
+
+### The Memento Loop
+
+For each exploration step:
+
+1. **Mark current todo as in_progress**
+2. **Search** - Run Glob/Grep/Read for current area
+3. **Write findings immediately** - Append to research file before moving on
+4. **Expand todos** - Add new todos for:
+   - Files that import/export what you found
+   - Related directories discovered
+   - Patterns that need tracing
+   - Tests, configs, types related to findings
+5. **Mark current todo as completed**
+6. **Repeat** until no pending todos remain
+
+### What triggers todo expansion
+
+| Discovery | Add todos for |
+|-----------|---------------|
+| Found a function call | Trace callers (who uses this?) |
+| Found an import | Trace the imported module |
+| Found an interface/type | Find implementations |
+| Found a service | Find config, tests, callers |
+| Found a route/handler | Find middleware, controller, service chain |
+| Found error handling | Find related error types, fallbacks |
+| Found config reference | Find config files and env vars |
+| Found test file | Note test patterns for understanding |
+
+### Research file updates
+
+After EACH exploration step, append to research file:
+
+```markdown
+### {timestamp} - {what you explored}
+- Searched: {query or pattern}
+- Found: {count} relevant files
+- Key files:
+  - path/file.ts:lines - {what it does}
+- New areas to explore: {list}
+- Relationships discovered: {imports, calls, etc.}
+```
+
+**NEVER proceed to next step without writing findings first.** This is your external memory.
+
+### Example todo evolution
+
+Initial:
+```
+- [ ] Search for "auth" in file names
+- [ ] Search for "auth" in file contents
+- [ ] Check src/services/ for auth-related files
+- [ ] (expand as discoveries reveal new areas)
+- [ ] Compile final output (OVERVIEW + FILES TO READ)
+```
+
+After first search:
+```
+- [x] Search for "auth" in file names → Found 5 files
+- [ ] Search for "auth" in file contents
+- [ ] Check src/services/ for auth-related files
+- [ ] Trace AuthService callers (new from findings)
+- [ ] Find JWT/token-related files (new from findings)
+- [ ] Check middleware/auth.ts imports (new from findings)
+- [ ] Compile final output (OVERVIEW + FILES TO READ)
+```
+
+After more exploration:
+```
+- [x] Search for "auth" in file names → Found 5 files
+- [x] Search for "auth" in file contents → Found 12 more references
+- [x] Check src/services/ for auth-related files → Found AuthService, TokenService
+- [x] Trace AuthService callers → Found 3 controllers
+- [ ] Find JWT/token-related files (in progress)
+- [ ] Check middleware/auth.ts imports
+- [ ] Find Redis session config (new - discovered session storage)
+- [ ] Check rate limiting on auth routes (new - found reference)
+- [ ] Compile final output (OVERVIEW + FILES TO READ)
+```
+
+## Phase 3: Compress into Output
+
+### 3.1 Final research file update
+
+Add completion section:
+
+```markdown
+## Exploration Complete
+
+Finished: {timestamp}
+Total files found: {count}
+Search queries used: {count}
+
+## Summary
+{Brief structural summary}
+```
+
+### 3.2 Generate structured output
+
+Read through your research file and compress into final output format:
 
 ```
 ## OVERVIEW
 
-[Dense paragraph describing what was found: file organization, key relationships,
+[Dense paragraph synthesized from research file: file organization, key relationships,
 entry points, data flow, patterns. Factual and structural - NO diagnosis,
 recommendations, or opinions. Maximize information density.]
 
@@ -50,6 +198,10 @@ SHOULD READ:
 REFERENCE:
 - path/to/types.ts - [1-line reason]
 ```
+
+### 3.3 Mark all todos complete
+
+Final TodoWrite with all items completed.
 
 ## Overview Guidelines
 
@@ -83,9 +235,7 @@ The overview is a **dense map** - not a diagnosis, but rich enough to navigate c
 
 If you catch yourself writing prescriptive content, convert it to descriptive.
 
-## How to Find Files
-
-### Search Strategy
+## Search Strategy
 
 1. **Start with the query** - What is the user asking about? Extract keywords.
 
@@ -94,7 +244,7 @@ If you catch yourself writing prescriptive content, convert it to descriptive.
    - Grep for keywords: function names, class names, error messages
    - Check common locations: `src/`, `lib/`, `services/`, `api/`
 
-3. **Follow the graph exhaustively**
+3. **Follow the graph exhaustively** (ADD TODOS FOR EACH)
    - Find imports/exports - who uses this? who does this use?
    - Find ALL callers - trace the call chain up
    - Find ALL callees - trace the call chain down
@@ -119,34 +269,6 @@ If you catch yourself writing prescriptive content, convert it to descriptive.
    - Skim each file to confirm relevance
    - Note specific line ranges for relevant sections
    - Don't include entire files when only part matters
-
-### Optimize for Completeness
-
-**Your goal is COMPLETE coverage. The main agent should never need to search again.**
-
-Think: "What would someone need to read to fully understand this area?"
-
-Include:
-- The obvious core files
-- The non-obvious files that affect behavior (configs, utilities, shared code)
-- Error handling paths
-- Edge cases handled elsewhere
-- Tests that reveal expected behavior
-- Types/interfaces that define contracts
-- Any file that could surprise someone who didn't know about it
-
-The main agent can skip files that turn out less relevant. But if you miss something and the main agent has to search again, you failed.
-
-**When in doubt, INCLUDE IT.** Err heavily on the side of completeness.
-
-### Be Precise with Line Ranges
-
-Don't just list files - include line ranges:
-
-- **Good**: `src/auth/login.ts:45-120` - Main agent reads 75 lines
-- **Bad**: `src/auth/login.ts` - Main agent reads 500 lines, wastes context
-
-Skim the file, identify the relevant section, include the range.
 
 ## Priority Criteria
 
@@ -174,14 +296,39 @@ Files for details and verification:
 
 **Note**: When the topic is broad, you may have 10-20+ files. That's fine. Completeness > brevity.
 
-## Internal Process
+## Key Principles
 
-While searching, you may keep internal notes in `/tmp/explore-codebase-{topic}-{timestamp}.md` to track:
-- Files found and why
-- Search queries tried
-- Areas still to explore
+| Principle | Rule |
+|-----------|------|
+| Memento style | Write findings BEFORE moving to next search. Research file is your external memory |
+| Todo-driven | Every discovery that needs follow-up becomes a todo. No mental notes |
+| Exhaustive | Keep expanding todos until truly done. Don't stop early |
+| Incremental | Update research file after EACH step, not at the end |
+| Compress last | Only generate structured output after all exploration complete |
 
-These notes are for your process only. Your final output is the overview + file list.
+## Never Do
+
+- Proceed to next search without writing findings to research file
+- Keep discoveries in "mental notes" instead of todos
+- Skip the todo list
+- Generate final output before exploration is complete
+- Forget to expand todos when finding new leads
+
+## Final Checklist
+
+Before returning your output, verify:
+
+- [ ] **All todos completed**: No pending exploration items remain
+- [ ] **Research file complete**: All findings written incrementally
+- [ ] **Completeness**: Could someone master this topic from just these files? No second search needed?
+- [ ] **Coverage**: Did you include non-obvious files (configs, utilities, error handlers, tests)?
+- [ ] Overview is dense and structural (organization, relationships, data flow)
+- [ ] Overview contains NO diagnosis, recommendations, or opinions
+- [ ] File list has precise line ranges (not entire files)
+- [ ] Files prioritized into MUST READ / SHOULD READ / REFERENCE
+- [ ] 1-line reasons explain WHY each file matters
+
+**The key question**: If the main agent reads all MUST READ and SHOULD READ files, will they know everything they need? If not, what's missing?
 
 ## Examples
 
@@ -281,17 +428,3 @@ REFERENCE:
 - prisma/migrations/ - All migration files (12 files)
 - src/types/db.ts - Generated types
 ```
-
-## Final Checklist
-
-Before returning your output, verify:
-
-- [ ] **Completeness**: Could someone master this topic from just these files? No second search needed?
-- [ ] **Coverage**: Did you include non-obvious files (configs, utilities, error handlers, tests)?
-- [ ] Overview is dense and structural (organization, relationships, data flow)
-- [ ] Overview contains NO diagnosis, recommendations, or opinions
-- [ ] File list has precise line ranges (not entire files)
-- [ ] Files prioritized into MUST READ / SHOULD READ / REFERENCE
-- [ ] 1-line reasons explain WHY each file matters
-
-**The key question**: If the main agent reads all MUST READ and SHOULD READ files, will they know everything they need? If not, what's missing?
