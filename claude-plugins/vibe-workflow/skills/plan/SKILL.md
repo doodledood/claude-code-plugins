@@ -16,6 +16,14 @@ This skill guides you through an **iterative loop** of:
 2. **Interview** - Ask strategic questions about approach, trade-offs, constraints
 3. **Write** - Update the plan incrementally after each iteration
 
+## Boundaries
+
+This skill plans **HOW** to implement, not **WHAT** to implement:
+- The spec defines requirements; this skill defines architecture, files, chunks, and tests
+- Do not modify the spec; if gaps exist, flag them for the user to decide
+- If research reveals the spec is infeasible, surface this to the user before proceeding
+- Stay focused on planning; do not start implementation until plan is approved
+
 ## Workflow
 
 ### Phase 0: Enter Plan Mode
@@ -69,7 +77,7 @@ After initial research, write the first draft to `/tmp/plan-{YYYYMMDD-HHMMSS}-{n
 
 ### Phase 2: Iterative Discovery Interview
 
-**IMPORTANT: Use AskUserQuestion tool for ALL questions.** Never ask questions in plain text - always use the tool so the user gets structured options to choose from.
+**IMPORTANT: Use AskUserQuestion tool for ALL questions when available.** If the tool is unavailable, ask in chat text but clearly mark questions as requiring user input before proceeding.
 
 #### Interview Rules
 
@@ -290,6 +298,60 @@ Key functions: functionName(), helper()
 Types: TypeName
 ```
 
+### Good Chunk Example
+
+```markdown
+## 2. Add User Validation Service
+
+Depends on: 1 (User types) | Parallel: 3
+
+Implements email/password validation with rate limiting before user creation.
+
+Files to modify:
+- src/services/user.ts - Add validateUserInput() function
+
+Files to create:
+- src/services/validation.ts - Validation logic with rate limiter
+
+Related files for context:
+- src/services/auth.ts:45-80 - Existing validation patterns to follow
+- src/types/user.ts - User type definitions from chunk 1
+
+Implementation tasks:
+- Implement validateEmail() - RFC 5322 format check
+- Implement validatePassword() - Min 8 chars, 1 number, 1 special
+- Implement rateLimit() - 5 attempts per minute per IP
+- Tests: valid email, invalid formats, password edge cases, rate limit trigger
+- Run gates
+
+Key functions: validateUserInput(), validateEmail(), rateLimit()
+Types: ValidationResult, RateLimitConfig
+```
+
+### Bad Chunk Anti-Example
+
+```markdown
+## 2. User Stuff
+
+Add validation for users.
+
+Files:
+- user.ts
+
+Tasks:
+- Add validation
+- Add tests
+```
+
+**Why this is bad:**
+- No dependency info (what does it depend on? what can run in parallel?)
+- Vague description ("user stuff", "add validation")
+- Missing file paths (which `user.ts`?)
+- No context files (where are existing patterns?)
+- Generic tasks (what validation? what tests?)
+- No function names or types
+- Can't be executed without asking clarifying questions
+
 ## 9. File Manifest & Context Selection
 
 - List every file to modify/create; specify what changes and purpose
@@ -305,13 +367,16 @@ Types: TypeName
 
 Before finalizing a chunk in the plan, verify it addresses:
 
+**MUST verify (critical):**
 - [ ] **Correctness**: Handles boundaries, null/empty, error paths (not just happy path)
 - [ ] **Type Safety**: Types prevent invalid states; validation at boundaries
+- [ ] **Tests**: Critical paths tested; error paths tested; boundaries tested
+
+**SHOULD verify:**
 - [ ] **Observability**: Errors logged with context; failures visible, not silent
 - [ ] **Resilience**: External calls have timeouts; retries with backoff; resource cleanup
 - [ ] **Clarity**: Names descriptive; no magic values; explicit control flow
 - [ ] **Modularity**: Single responsibility; <200 LOC; minimal coupling
-- [ ] **Tests**: Critical paths tested; error paths tested; boundaries tested
 - [ ] **Evolution**: Public API/schema changes have migration paths; internal changes break freely
 
 ### Test Coverage Priority
@@ -387,18 +452,21 @@ Avoid planning for:
 
 ## Planning Mantras
 
-Before finalizing:
+Before finalizing, ask yourself:
 
+**Primary (always check):**
 1. What's the smallest shippable increment?
 2. Does it pass all quality gates?
-3. Can we ship with less?
-4. Is this explicitly required?
-5. Do dependencies determine order?
-6. Have I researched first, then asked strategically?
-7. Does this reduce or increase cognitive load?
-8. Does each chunk satisfy P1-P10? (Correctness, Observability, Types, SRP, Explicit, Minimal, Tests, Evolution, Faults, Comments)
-9. Are error paths planned, not afterthoughts?
-10. Will this pass code review on first submission?
+3. Is this explicitly required?
+4. Will this pass code review on first submission?
+
+**Secondary:**
+5. Can we ship with less?
+6. Do dependencies determine order?
+7. Have I researched first, then asked strategically?
+8. Does this reduce or increase cognitive load?
+9. Does each chunk satisfy P1-P10?
+10. Are error paths planned, not afterthoughts?
 
 ## Recognize & Adjust
 
@@ -407,37 +475,3 @@ Before finalizing:
 - Dependencies unclear? Make explicit and number
 - Context missing? Add related files with line numbers
 
----
-
-## Key Principles
-
-### Research First, Ask Strategically
-- Exhaust codebase research before asking questions
-- Use codebase-explorer for internal patterns
-- Only ask when multiple valid approaches exist with different trade-offs
-- Make reasonable decisions when research provides clear answers
-
-### Iterative Discovery
-- Research and questions are an iteration loop, not sequential phases
-- Launch researchers after getting answers that reveal new areas
-- Update the plan after each iteration
-- Use `[TBD]` markers for unresolved items, replace as decisions are made
-
-### Reduce Cognitive Load (Without Leaving Gaps)
-- **Be thorough** - cover every relevant architectural decision; don't skip questions to save time
-- Reduce burden through HOW you ask: concrete options, batching, good defaults
-- **Put recommended option FIRST** with "(Recommended)" suffix
-- Present multi-choice questions to minimize typing
-- Batch related questions together (up to 4 per call)
-- User should be able to accept most defaults and get a solid plan
-- ALWAYS use AskUserQuestion tool - never plain text questions
-- **No stone left unturned**: A complete plan with easy questions beats an incomplete plan with fewer questions
-
-### Maximize Information Gain
-- Ask questions that split the decision space most effectively
-- Scope eliminators first → architectural choices → constraints → details last
-- If an answer changes what other questions you'd ask, ask it early
-
-## Output Location
-
-Write the plan to `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - create after initial research, update incrementally throughout the process.
