@@ -11,14 +11,6 @@
   },
   "plugins": [
     {
-      "name": "planning",
-      "source": "./claude-plugins/planning",
-      "description": "Comprehensive planning tools including plan and execplan skills with automatic keyword detection via hooks. Creates implementation plans and execution plans following proven methodologies.",
-      "version": "1.0.0",
-      "category": "development",
-      "keywords": ["planning", "execplan", "implementation-plan", "methodology", "hooks"]
-    },
-    {
       "name": "consultant",
       "source": "./claude-plugins/consultant",
       "description": "Flexible multi-provider LLM consultations using Python/LiteLLM - includes consultant agent, review/bug-investigation/execplan commands, and consultant skill for deep AI-powered code analysis across 100+ models with custom base URL support",
