@@ -1,7 +1,6 @@
 ---
 description: Generate text in your voice using your AUTHOR_VOICE.md document. Provide a topic or prompt as argument.
-allowed-tools: ["Read", "Glob", "Task", "AskUserQuestion", "Skill"]
-argument-hint: [topic or writing prompt, e.g., "a tweet about productivity" or "blog intro on AI tools"]
+argument-hint: Topic or writing prompt, e.g., "a tweet about productivity" or "blog intro on AI tools"
 ---
 
 Use the **voice-writer** agent to generate content in the user's voice.

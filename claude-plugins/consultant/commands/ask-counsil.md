@@ -1,7 +1,6 @@
 ---
 description: Multi-model ensemble consultation. Runs 3 models in parallel for diverse perspectives.
-allowed-tools: ["Task"]
-argument-hint: [question or topic for ensemble consultation]
+argument-hint: Question or topic for ensemble consultation
 ---
 
 Consult multiple models in parallel about: $ARGUMENTS

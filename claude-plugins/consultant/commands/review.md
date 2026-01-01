@@ -1,7 +1,6 @@
 ---
 description: Production-level PR review using consultant agent. 10-category framework focused on correctness.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
-argument-hint: [PR number, file paths, or diff to review]
+argument-hint: PR number, file paths, or diff to review
 ---
 
 Review code: $ARGUMENTS

@@ -1,7 +1,6 @@
 ---
 description: An example command showing the ideal structure
-allowed-tools: ["Read", "Glob", "Grep"]
-argument-hint: [optional focus area]
+argument-hint: Optional focus area
 ---
 
 Analyze the current project: $ARGUMENTS

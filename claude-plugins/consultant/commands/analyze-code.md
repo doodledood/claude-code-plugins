@@ -1,7 +1,6 @@
 ---
 description: Deep code analysis using consultant agent. Identifies technical debt, risks, and improvement opportunities.
-allowed-tools: ["Task"]
-argument-hint: [file paths, directories, or focus area to analyze]
+argument-hint: File paths, directories, or focus area to analyze
 ---
 
 Analyze code: $ARGUMENTS

@@ -1,7 +1,6 @@
 ---
 description: Deep bug investigation using consultant agent. Identifies root causes and fix suggestions.
-allowed-tools: ["Task"]
-argument-hint: [bug description, symptoms, or error message]
+argument-hint: Bug description, symptoms, or error message
 ---
 
 Investigate bug: $ARGUMENTS

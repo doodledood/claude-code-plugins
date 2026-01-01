@@ -1,7 +1,6 @@
 ---
 description: Single-model consultation using consultant agent. Defaults to gpt-5.2-pro.
-allowed-tools: ["Task"]
-argument-hint: [question or topic to consult about]
+argument-hint: Question or topic to consult about
 ---
 
 Consult an external model about: $ARGUMENTS
