@@ -12,6 +12,7 @@ Autonomous development workflow with code review agents and quality gates.
 - **Git Workflow** - Run `/rebase-on-main` for safe rebasing with conflict resolution
 - **Code Cleanup** - Run `/clean-slop` to remove AI-generated noise
 - **CLAUDE.md Management** - Run `/update-claude-md` to create or maintain project instructions
+- **Information Density** - Run `/maximize-information-density` to compress docs/prompts losslessly for reduced token consumption
 
 Use `/help` after installation to see all available commands.
 

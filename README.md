@@ -63,6 +63,7 @@ Autonomous development workflow with code review agents, codebase exploration, a
 - **Agents:**
   - `codebase-explorer` - Returns structural overview + prioritized file list (prefer over built-in Explore)
   - `bug-fixer` - Systematic bug investigation with root cause analysis
+  - `density-verifier` - Opus-based semantic verification for lossless compression
   - Code review agents (bugs, coverage, maintainability, type-safety, docs, CLAUDE.md adherence)
 - **Commands:**
   - `/spec` - Interactive PRD builder using EARS syntax
@@ -73,6 +74,7 @@ Autonomous development workflow with code review agents, codebase exploration, a
   - `/rebase-on-main` - Safe git rebasing with conflict resolution
   - `/clean-slop` - Remove AI-generated code noise
   - `/update-claude-md` - Create or maintain CLAUDE.md
+  - `/maximize-information-density` - Compress docs/prompts losslessly for reduced tokens
 - **Hook:** SessionStart reminder to prefer `codebase-explorer` for context gathering
 - **Category:** development
 
