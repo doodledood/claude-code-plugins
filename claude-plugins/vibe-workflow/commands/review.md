@@ -1,6 +1,6 @@
 ---
 description: Run all code review agents in parallel (bugs, coverage, maintainability, type-safety if typed, CLAUDE.md adherence, docs).
-argument-hint: [file paths, or empty for branch diff]
+argument-hint: Optional - specific files or directories to review. Leave empty to review all changes on current branch
 ---
 
 Run a comprehensive code review. First detect the codebase type, then launch appropriate agents.

@@ -1,6 +1,6 @@
 ---
 description: Create or update CLAUDE.md with best practices - brevity, universal applicability, progressive disclosure
-argument-hint: [focus area or issue to address]
+argument-hint: What to add or update - a focus area, specific instruction, or issue to address
 ---
 
 Update my CLAUDE.md based on: $ARGUMENTS

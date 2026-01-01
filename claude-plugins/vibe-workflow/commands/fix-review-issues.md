@@ -1,6 +1,6 @@
 ---
 description: Address issues found by /review. Fixes all issues by default, or filter by severity/category/file.
-argument-hint: [--severity critical|high, --category bugs|maintainability|types|docs|coverage|claude-md, file paths]
+argument-hint: Optional filters - severity level (critical, high, medium, low), category (bugs, maintainability, types, docs, coverage, claude-md), or specific file paths
 ---
 
 Address issues found from a recent `/review` run. This command systematically fixes identified problems.

@@ -1,6 +1,6 @@
 ---
 description: Verify test coverage for code changes. Analyzes diff against main and reports coverage gaps.
-argument-hint: [file paths, or empty for branch diff]
+argument-hint: Optional - specific files to check coverage for. Leave empty to check all changes on current branch
 ---
 
 Use the code-coverage-reviewer agent to check test coverage for: $ARGUMENTS

@@ -1,6 +1,6 @@
 ---
 description: Audit TypeScript code for type safety issues—any/unknown abuse, invalid states, missing narrowing.
-argument-hint: [file paths, or empty for branch diff]
+argument-hint: Optional - specific files to audit. Leave empty to audit all changes on current branch
 ---
 
 Use the type-safety-reviewer agent to audit type safety: $ARGUMENTS
