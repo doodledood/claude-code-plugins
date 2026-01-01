@@ -426,10 +426,17 @@ Review the full spec and let me know if you'd like to adjust anything.
 - Defer technical decisions to the implementation planning phase
 
 ### Iterate Until Complete
-- Keep asking until all decisions are made - leave no stone unturned
-- Don't rush to finalize with gaps
-- Better to ask one more question than produce an incomplete spec
-- Thoroughness matters more than speed
+
+Interview is complete when ALL of these are true:
+- [ ] Work type and scope defined (v1/MVP vs full)
+- [ ] Target users identified
+- [ ] Success criteria specified
+- [ ] Core requirements (3+ for features) documented
+- [ ] Edge cases for core flow addressed
+- [ ] Out of scope explicitly listed
+- [ ] No `[TBD]` markers remain
+
+Don't rush to finalize with gaps. Better to ask one more question than produce an incomplete spec.
 
 ### Incremental Updates
 - Write spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` after initial research
@@ -441,6 +448,20 @@ Review the full spec and let me know if you'd like to adjust anything.
 - Lets user validate quickly without reading the full spec
 - Highlights key decisions for confirmation
 - Invites iteration - the spec is a draft
+
+### Never Do These
+- NEVER ask about technical implementation (architecture, APIs, data models, libraries, code patterns)
+- NEVER finalize spec with unresolved `[TBD]` markers
+- NEVER skip the summary output
+- NEVER ask questions in plain text (always use AskUserQuestion tool when available)
+- NEVER proceed past Phase 1 without writing the initial spec draft
+
+### Edge Cases & Fallbacks
+- **User declines to answer**: Note the gap with `[USER SKIPPED: reason]` and proceed; flag in summary
+- **Research returns insufficient info**: Ask user directly; note uncertainty in spec
+- **Contradictory requirements**: Surface the conflict explicitly to user before proceeding
+- **Interview interrupted**: Spec-in-progress is already saved; note `[INCOMPLETE]` status at top
+- **User says "just build it"**: Push back once with top 2-3 critical questions; if declined, document assumptions
 
 ## Output Location
 
