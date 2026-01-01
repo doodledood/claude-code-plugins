@@ -1,6 +1,5 @@
 ---
 description: Audit TypeScript code for type safety issues—any/unknown abuse, invalid states, missing narrowing.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 

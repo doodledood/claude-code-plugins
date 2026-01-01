@@ -1,6 +1,5 @@
 ---
 description: Address issues found by /review. Fixes all issues by default, or filter by severity/category/file.
-allowed-tools: ["Task", "Read", "Edit", "Write", "Glob", "Grep", "Bash", "TodoWrite", "AskUserQuestion"]
 argument-hint: [--severity critical|high, --category bugs|maintainability|types|docs|coverage|claude-md, file paths]
 ---
 

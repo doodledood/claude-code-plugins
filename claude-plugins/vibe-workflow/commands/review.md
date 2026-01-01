@@ -1,6 +1,5 @@
 ---
 description: Run all code review agents in parallel (bugs, coverage, maintainability, type-safety if typed, CLAUDE.md adherence, docs).
-allowed-tools: ["Task", "Read", "Glob", "Grep", "Bash"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 

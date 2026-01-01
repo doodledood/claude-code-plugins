@@ -1,6 +1,5 @@
 ---
 description: Create or update CLAUDE.md with best practices - brevity, universal applicability, progressive disclosure
-allowed-tools: ["Read", "Glob", "Grep", "Edit", "Write", "Bash"]
 argument-hint: [focus area or issue to address]
 ---
 

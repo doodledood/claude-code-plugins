@@ -1,6 +1,5 @@
 ---
 description: Create implementation plans from a spec. Iteratively researches codebase and asks strategic questions to produce a mini-PR based plan.
-allowed-tools: ["EnterPlanMode", "AskUserQuestion", "Task", "Read", "Glob", "Grep", "Write", "Skill", "Bash", "ExitPlanMode"]
 argument-hint: [path to spec.md or describe what to plan]
 ---
 

@@ -1,6 +1,5 @@
 ---
 description: Audit code for DRY violations, dead code, complexity, and consistency issues.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 

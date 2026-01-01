@@ -1,6 +1,5 @@
 ---
 description: Audit code for logical bugs, race conditions, edge cases, and error handling issues.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 

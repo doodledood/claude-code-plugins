@@ -1,6 +1,5 @@
 ---
 description: Update main/master from origin, rebase current branch on it, resolve conflicts, and push.
-allowed-tools: ["Bash", "Read", "Edit", "Write", "Glob", "Grep"]
 ---
 
 Perform a rebase workflow for the current branch:

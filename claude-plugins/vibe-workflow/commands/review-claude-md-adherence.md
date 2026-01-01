@@ -1,6 +1,5 @@
 ---
 description: Verify code changes comply with CLAUDE.md instructions and project standards.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 

@@ -112,41 +112,14 @@ placeholder: "e.g., src/auth/ or src/utils.ts, src/helpers.ts"
 
 ### Phase 3: Create Fix Plan
 
-**Launch Plan Agent** to design the implementation strategy:
+**Invoke the plan skill** to design the implementation strategy. The issues from the review become the "spec" for planning:
 
 ```
-Launch Task agent (subagent_type: Plan, model: opus) with prompt:
-
-"Create an implementation plan for fixing these review issues:
-
-[List all issues within confirmed scope]
-
-The plan should:
-1. Analyze all issues and identify dependencies between fixes
-2. Group related fixes (same file, same module, interdependent changes)
-3. Determine optimal fix order considering:
-   - Higher severity first (critical > high > medium > low)
-   - File grouping (fix all issues in one file before moving to next)
-   - Dependency order (if fix A enables fix B, do A first)
-4. Flag any fixes that might conflict or need careful coordination
-5. Estimate effort for each group (quick win / moderate / significant)
-
-Output a numbered list of fix groups in execution order."
+Use Skill tool: skill: "vibe-workflow:plan"
+args: "Fix these review issues: [summary of issues within confirmed scope]"
 ```
 
-**After plan is ready**, present to user:
-
-```
-header: "Fix Plan Ready"
-question: "Here's the proposed fix order. Ready to proceed?"
-[Display: Numbered fix plan with effort estimates]
-options:
-  - "Approve - start fixing (Recommended)"
-  - "Modify - I want to change the order or skip some"
-  - "Cancel - I'll fix these manually"
-```
-
-If "Modify": Ask which fixes to skip or reorder, then regenerate plan.
+Once the plan is approved, proceed to execution.
 
 ### Phase 4: Execute Fixes
 

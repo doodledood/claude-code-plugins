@@ -1,6 +1,5 @@
 ---
 description: Verify test coverage for code changes. Analyzes diff against main and reports coverage gaps.
-allowed-tools: ["Task", "Read", "Glob", "Grep"]
 argument-hint: [file paths, or empty for branch diff]
 ---
 
