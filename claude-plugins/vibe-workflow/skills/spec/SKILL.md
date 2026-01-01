@@ -7,35 +7,168 @@ description: 'Interactive requirements builder - interviews you to create EARS-s
 
 Build requirements spec through structured discovery interview. Defines WHAT and WHY - not technical implementation (architecture, APIs, data models come in planning phase).
 
-**Core loop**: Discovery (codebase-explorer, web-researcher) → Interview (smart questions) → Write (update spec incrementally)
+**Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
 **Role**: Senior PM - smart, non-obvious questions that reduce ambiguity and cognitive load.
 
-**Output**: `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
+**Spec file**: `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
 
-## Phase 1: Initial Context Gathering
+**Interview log**: `/tmp/spec-interview-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` - external memory.
 
-### 1.1 Launch codebase-explorer
+## Phase 1: Initial Setup
+
+### 1.1 Create todo list (TodoWrite immediately)
+
+Todos = **areas to discover**, not interview steps. Each todo reminds you what conceptual area needs resolution. List is **never fixed** - continuously expands as user answers reveal new areas.
+
+**Starter todos** (just seeds - actual list grows organically):
+
+```
+- [ ] Initial context research
+- [ ] Scope & target users
+- [ ] Core requirements
+- [ ] (expand continuously as answers reveal new areas)
+- [ ] Finalize spec
+```
+
+### Todo Evolution Example
+
+Query: "Add user notifications feature"
+
+Initial:
+```
+- [ ] Initial context research
+- [ ] Scope & target users
+- [ ] Core requirements
+- [ ] Finalize spec
+```
+
+After user says "needs to work across mobile and web":
+```
+- [x] Initial context research → found existing notification system for admin alerts
+- [ ] Scope & target users
+- [ ] Core requirements
+- [ ] Mobile notification delivery (push vs in-app)
+- [ ] Web notification delivery (browser vs in-app)
+- [ ] Cross-platform sync behavior
+- [ ] Finalize spec
+```
+
+After user mentions "also needs email digest option":
+```
+- [x] Initial context research
+- [x] Scope & target users → all active users, v1 MVP
+- [ ] Core requirements
+- [x] Mobile notification delivery → push + in-app
+- [ ] Web notification delivery
+- [ ] Cross-platform sync behavior
+- [ ] Email digest frequency options
+- [ ] Email vs real-time preferences
+- [ ] Finalize spec
+```
+
+**Key**: Todos grow as user reveals complexity. Never prune prematurely.
+
+### 1.2 Create interview log
+
+Path: `/tmp/spec-interview-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` (use SAME path for ALL updates)
+
+```markdown
+# Interview Log: {work name}
+Started: {timestamp} | Type: {Feature | Bug Fix | Doc Update | Refactor}
+
+## Research Phase
+(populated incrementally)
+
+## Interview Rounds
+(populated incrementally)
+
+## Decisions Made
+(populated incrementally)
+
+## Unresolved Items
+(populated incrementally)
+```
+
+## Phase 2: Initial Context Gathering
+
+### 2.1 Launch codebase-explorer
 
 Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work.
 
 Explore: product purpose, existing patterns, user flows, terminology, product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md), existing specs in `docs/` or `specs/`. For bug fixes: also explore bug context, related code, potential causes.
 
-### 1.2 Read recommended files
+### 2.2 Read recommended files
 
 Read ALL files from researcher prioritized reading lists - no skipping.
 
-### 1.3 Launch web-researcher (if needed)
+### 2.3 Launch web-researcher (if needed)
 
 Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` for knowledge gaps: domain concepts, user expectations, industry standards, compliance requirements, competitor approaches (UX perspective). Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
 
-### 1.4 Write initial draft
+### 2.4 Update interview log
+
+After EACH research step, append to interview log:
+
+```markdown
+### {timestamp} - {what researched}
+- Explored: {areas/topics}
+- Key findings: {list}
+- New areas identified: {list}
+- Questions to ask: {list}
+```
+
+### 2.5 Write initial draft
 
 Write first draft with `[TBD]` markers for unresolved items. Use same file path for all updates.
 
-## Phase 2: Iterative Discovery Interview
+## Phase 3: Iterative Discovery Interview
 
 **CRITICAL**: Use AskUserQuestion tool for ALL questions - never plain text.
+
+### Memento Loop
+
+For each step:
+1. Mark todo `in_progress`
+2. Research OR ask question (AskUserQuestion)
+3. **Write findings immediately** to interview log
+4. Expand todos for: new areas revealed, follow-up questions, dependencies discovered
+5. Update spec file (replace `[TBD]` markers)
+6. Mark todo `completed`
+7. Repeat until no pending todos
+
+**NEVER proceed without writing findings first** — interview log is external memory.
+
+### Interview Log Update Format
+
+After EACH question/answer, append:
+
+```markdown
+### Round {N} - {timestamp}
+**Todo**: {which todo this addresses}
+**Question asked**: {question}
+**User answer**: {answer}
+**Impact**: {what this revealed/decided}
+**New areas**: {list or "none"}
+```
+
+After EACH decision (even implicit), append to Decisions Made:
+
+```markdown
+- {Decision area}: {choice} — {rationale}
+```
+
+### Todo Expansion Triggers
+
+| User Answer Reveals | Add Todos For |
+|---------------------|---------------|
+| New user segment | Target user requirements |
+| Integration need | Integration constraints |
+| Compliance/regulatory | Compliance requirements |
+| Multiple flows | Each flow's UX |
+| Error scenarios | Error handling approach |
+| Performance concern | Performance constraints |
+| Existing feature dependency | Dependency investigation |
 
 ### Interview Rules
 
@@ -82,9 +215,18 @@ Write first draft with `[TBD]` markers for unresolved items. Use same file path 
 | 4 | Edge Cases | How handle [edge case]? | Best practice default; Alternative 1; Alternative 2; Skip in v1 |
 | 5 | Success | How measure success? (multiSelect) | Faster task completion; Adoption increase; Fewer tickets; NPS; Custom |
 
-## Phase 3: Finalize & Summarize
+## Phase 4: Finalize & Summarize
 
-### 3.1 Finalize specification
+### 4.1 Final interview log update
+
+```markdown
+## Interview Complete
+Finished: {timestamp} | Questions: {count} | Decisions: {count}
+## Summary
+{Brief summary of discovery process}
+```
+
+### 4.2 Finalize specification
 
 Final pass: remove `[TBD]` markers, ensure consistency. Use EARS format adapted to work type:
 
@@ -136,7 +278,9 @@ As a {user}, I want to {action} so that {benefit}.
 
 Adapt by work type: bug fixes include root cause/verification; doc updates list affected docs.
 
-### 3.2 Output summary
+### 4.3 Mark all todos complete
+
+### 4.4 Output summary
 
 ```
 ## Spec Summary
@@ -165,12 +309,14 @@ Review full spec and let me know adjustments.
 
 | Principle | Rule |
 |-----------|------|
+| Memento style | Write findings BEFORE next question (interview log = external memory) |
+| Todo-driven | Every discovery needing follow-up → todo (no mental notes) |
 | WHAT not HOW | Requirements only - no architecture, APIs, data models, code patterns. Self-check: if thinking "how to implement," refocus on "what should happen" |
 | User perspective | Observable behavior, user experience, outcomes. Ask "what does user see?" not "how does system work?" Edge cases = UX/business impact |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
 | Reduce cognitive load | Recommended option first, multi-choice over free-text (free-text only when necessary), batch up to 4, max 6-8 options. User accepting defaults should yield solid result |
 | Make decisions | Use research for defaults; only ask when user input required. Defer technical decisions to planning phase |
-| Incremental updates | Write after research, update after each iteration |
+| Incremental updates | Update interview log after EACH step (not at end) |
 
 ### Completion Checklist
 
@@ -187,12 +333,16 @@ Don't rush - one more question beats incomplete spec.
 
 ### Never Do
 
+- Proceed without writing findings to interview log
+- Keep discoveries as mental notes instead of todos
+- Skip todo list
 - Write specs to project directories (always `/tmp/`)
 - Ask about technical implementation
 - Finalize with unresolved `[TBD]`
 - Skip summary output
 - Ask questions without AskUserQuestion tool
-- Proceed past Phase 1 without initial draft
+- Proceed past Phase 2 without initial draft
+- Forget to expand todos on new areas revealed
 
 ### Edge Cases
 
