@@ -143,11 +143,13 @@ After initial research, write the first draft to `/tmp/spec-{YYYYMMDD-HHMMSS}-{n
 
 2. **Always mark one option as "(Recommended)"** - Put it first with reasoning in the description
 
-3. **Reduce cognitive load**:
-   - Provide concrete options, not open-ended questions
+3. **Be thorough, reduce cognitive load through technique**:
+   - **Cover everything relevant** - don't skip questions to save time
+   - Reduce burden through HOW you ask: concrete options, batching, good defaults
    - Batch related questions together (up to 4 per call)
-   - **Only ask when the user adds value** - Make reasonable decisions yourself based on research/context. User reviews the final spec.
+   - Make reasonable decisions yourself when research/context is sufficient
    - Focus on business/product decisions, not implementation details
+   - A complete spec with easy questions > incomplete spec with fewer questions
 
 4. **Ask non-obvious questions** - Focus on:
    - User motivations and jobs-to-be-done
@@ -398,13 +400,17 @@ Review the full spec and let me know if you'd like to adjust anything.
 - No TBDs or placeholders in the final spec
 - If something is unclear, ask during the interview
 
-### Reduce Cognitive Load
-- ALWAYS use AskUserQuestion tool when available
-- **Put recommended option FIRST** with "(Recommended)" suffix
+### Reduce Cognitive Load (Without Leaving Gaps)
+- **Be thorough** - cover every relevant aspect; don't skip questions to save time
+- Reduce cognitive load through HOW you ask, not by asking less:
+  - **Put recommended option FIRST** with "(Recommended)" suffix
+  - Present multi-choice questions to minimize typing
+  - Batch related questions together (up to 4 per call)
+  - Limit options to 6-8 max per question
+  - Only use free-text when truly necessary
 - User should be able to accept most defaults and get a solid result
-- Present multi-choice questions to minimize typing
-- Limit options to 6-8 max per question
-- Only use free-text for essential context
+- ALWAYS use AskUserQuestion tool - never plain text questions
+- **No stone left unturned**: A complete spec with easy questions beats an incomplete spec with fewer questions
 
 ### Maximize Information Gain
 - Ask questions that split the decision space most effectively
@@ -420,9 +426,10 @@ Review the full spec and let me know if you'd like to adjust anything.
 - Defer technical decisions to the implementation planning phase
 
 ### Iterate Until Complete
-- Keep asking until all decisions are made
+- Keep asking until all decisions are made - leave no stone unturned
 - Don't rush to finalize with gaps
 - Better to ask one more question than produce an incomplete spec
+- Thoroughness matters more than speed
 
 ### Incremental Updates
 - Write spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` after initial research
