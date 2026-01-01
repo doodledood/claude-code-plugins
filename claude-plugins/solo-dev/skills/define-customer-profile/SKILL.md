@@ -1,5 +1,5 @@
 ---
-name: customer-profile
+name: define-customer-profile
 description: 'Iteratively craft a CUSTOMER.md document that precisely defines your ideal customer profile (ICP). This is the foundational document from which everything else (product, features, brand) derives. Uses parallel research agents and multi-choice workflow with feedback cycles.'
 ---
 

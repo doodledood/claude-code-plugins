@@ -34,6 +34,18 @@ Each plugin can contain:
 
 **Naming convention**: Use kebab-case (`-`) for all file, command, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
 
+### Commands vs Skills
+
+**Skills are auto-invoked** by Claude based on semantic matching with the description. **Commands require explicit `/command` invocation.**
+
+**Anti-pattern**: Don't create thin command wrappers that just invoke a skill:
+```markdown
+# BAD: commands/my-feature.md that only does:
+Use the Skill tool: Skill("plugin:my-feature", "$ARGUMENTS")
+```
+
+**Instead**: Create skills directly. Claude will auto-invoke them when relevant. Only create commands for workflows that genuinely need explicit user invocation (e.g., `/review`, `/commit`).
+
 ### Tool Definitions
 
 **Skills/Commands**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
@@ -50,7 +62,7 @@ Use the Skill tool to <action>: Skill("<plugin>:<skill>", "$ARGUMENTS")
 
 Examples:
 - `Use the Skill tool to build a requirements spec: Skill("vibe-workflow:spec", "$ARGUMENTS")`
-- `Use the Skill tool to craft a CUSTOMER.md document: Skill("solo-dev:customer-profile")`
+- `Use the Skill tool to craft a CUSTOMER.md document: Skill("solo-dev:define-customer-profile")`
 
 **Why**: Natural language like "Use the X skill" is ambiguous—Claude may just read the skill file instead of invoking it. The explicit `Skill(...)` pattern ensures the Skill tool is actually called.
 

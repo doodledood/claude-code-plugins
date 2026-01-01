@@ -1,12 +1,12 @@
 ---
-name: density-verifier
+name: information-density-verifier
 description: |
   Post-compression verification agent. Compares original and compressed files, identifies semantic gaps, and suggests dense restorations to achieve lossless compression.
 tools: Read, Glob, Grep
 model: opus
 ---
 
-# Density Verifier
+# Information Density Verifier
 
 Post-compression verification: compare original vs compressed, identify gaps, suggest dense restorations for lossless compression.
 

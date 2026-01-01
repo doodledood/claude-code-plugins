@@ -4,14 +4,20 @@ Autonomous development workflow with code review agents and quality gates.
 
 ## What It Does
 
-- **Spec → Plan → Implement Pipeline** - Full autonomous development workflow:
-  - `/spec` - Build requirements through interactive interview (EARS syntax)
-  - `/plan` - Create mini-PR implementation plans with iterative codebase research
-  - `/implement` - Execute plans autonomously chunk by chunk with auto-fix quality gates
-- **Code Review** - Run `/review` to audit your changes for bugs, maintainability issues, type safety problems, documentation gaps, and test coverage
-- **Codebase Explorer** - The `codebase-explorer` agent returns a structural overview + prioritized file list with line ranges - prefer over built-in Explore for context gathering
-- **Bug Fixing** - Run `/bugfix` for systematic investigation with root cause analysis and test-driven verification
-- **Web Research** - Run `/web-research` to research external topics with structured hypothesis tracking
+**Skills** (auto-invoked by Claude when relevant):
+- **spec** - Build requirements through interactive interview (EARS syntax)
+- **plan** - Create mini-PR implementation plans with iterative codebase research
+- **implement** - Execute plans autonomously chunk by chunk with auto-fix quality gates
+- **bugfix** - Systematic investigation with root cause analysis and test-driven verification
+- **fix-review-issues** - Address issues found by /review with prioritized execution
+- **explore-codebase** - Returns structural overview + prioritized file list with line ranges
+
+**Commands** (invoke explicitly):
+- `/review` - Audit changes for bugs, maintainability, type safety, docs, and coverage
+- `/web-research` - Research external topics with structured hypothesis tracking
+
+**Agents**:
+- **codebase-explorer** - Context-gathering agent, prefer over built-in Explore
 
 Use `/help` after installation to see all available commands.
 

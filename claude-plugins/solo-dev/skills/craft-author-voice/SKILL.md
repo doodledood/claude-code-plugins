@@ -1,6 +1,6 @@
 ---
-name: author-voice
-description: 'Iteratively craft an AUTHOR_VOICE.md document that captures your unique writing style for AI replication. Use when creating a voice profile via /craft-voice. Interactive multi-choice workflow with feedback cycles.'
+name: craft-author-voice
+description: 'Iteratively craft an AUTHOR_VOICE.md document that captures your unique writing style for AI replication. Interactive multi-choice workflow with feedback cycles.'
 ---
 
 # Author Voice Skill

@@ -1,5 +1,5 @@
 ---
-name: seo-strategy
+name: define-seo-strategy
 description: 'Create a comprehensive SEO_STRATEGY.md covering both traditional SEO and Generative Engine Optimization (GEO) for AI platforms. Requires CUSTOMER.md to exist first. Includes platform-specific tactics for Google AI Overviews, ChatGPT, Perplexity, Claude, and Gemini with effort/impact prioritization.'
 ---
 

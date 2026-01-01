@@ -4,10 +4,16 @@ Standalone utilities that complement the core development workflow.
 
 ## What It Does
 
-- **Git Workflow** - Run `/rebase-on-main` for safe rebasing with conflict resolution
-- **Code Cleanup** - Run `/clean-slop` to remove AI-generated noise (useless comments, verbose patterns)
-- **CLAUDE.md Management** - Run `/update-claude-md` to create or maintain project instructions
-- **Information Density** - Run `/maximize-information-density` to compress docs/prompts losslessly for reduced token consumption
+**Skills** (auto-invoked by Claude when relevant):
+- **maximize-information-density** - Compress docs/prompts losslessly for reduced token consumption
+
+**Commands** (invoke explicitly):
+- `/rebase-on-main` - Safe rebasing with conflict resolution
+- `/clean-slop` - Remove AI-generated noise (useless comments, verbose patterns)
+- `/update-claude-md` - Create or maintain project instructions
+
+**Agents**:
+- **information-density-verifier** - Verifies lossless compression (used by maximize-information-density skill)
 
 Use `/help` after installation to see all available commands.
 

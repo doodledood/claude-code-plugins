@@ -11,7 +11,7 @@ Rewrite documents to maximize information density while preserving all semantic 
 
 This skill transforms verbose documents into dense, information-rich versions through:
 1. **Compression** - Apply density techniques, write to `/tmp` (original untouched)
-2. **Verification** - density-verifier agent compares original vs compressed for losslessness
+2. **Verification** - information-density-verifier agent compares original vs compressed for losslessness
 3. **Iteration** - If issues found, re-compress with feedback (max 3x)
 4. **Output** - Atomic `mv` replaces original only after verification passes
 
@@ -99,7 +99,7 @@ Write compressed output to `/tmp/compressed-{timestamp}.{ext}` where:
 
 **Mark "Verification (iteration 1)" todo `in_progress`.**
 
-Launch the `vibe-extras:density-verifier` agent to verify lossless compression.
+Launch the `vibe-extras:information-density-verifier` agent to verify lossless compression.
 
 **Iteration Protocol**:
 
@@ -108,8 +108,8 @@ iteration = 1
 max_iterations = 3
 
 while iteration <= max_iterations:
-    1. Launch density-verifier agent via Task tool:
-       - subagent_type: "vibe-extras:density-verifier"
+    1. Launch information-density-verifier agent via Task tool:
+       - subagent_type: "vibe-extras:information-density-verifier"
        - prompt: "Verify compression is lossless.
          Original file: {original_file_path}
          Compressed file: {temp_file_path}
@@ -204,7 +204,7 @@ If verification failed after 3 iterations:
 | **Memento** | Use TodoWrite to track phases; expand todos when verification fails; mark progress immediately |
 | **Losslessness** | Never sacrifice semantic information for density; every fact must be preserved |
 | **Aggressive** | Full restructuring allowed; maximize density, not preserve original style |
-| **Verification** | Always run density-verifier; never skip; iterate with specific feedback |
+| **Verification** | Always run information-density-verifier; never skip; iterate with specific feedback |
 
 ## Example Usage
 

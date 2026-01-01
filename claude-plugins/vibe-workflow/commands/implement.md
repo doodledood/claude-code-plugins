@@ -1,6 +1,0 @@
----
-description: Execute implementation plans chunk by chunk with autonomous progress tracking and auto-fix. Completes the spec → plan → implement pipeline.
-argument-hint: Path to plan file (e.g., /tmp/plan-*.md), optionally with --spec for additional context
----
-
-Use the Skill tool to execute the implementation plan: Skill("vibe-workflow:implement", "$ARGUMENTS")

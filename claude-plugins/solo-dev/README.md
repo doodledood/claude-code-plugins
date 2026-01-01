@@ -4,13 +4,16 @@ Toolkit for solo developers to build, manage, and grow their business.
 
 ## What It Does
 
-- **Customer Profile** - Run `/define-customer` to create your foundational CUSTOMER.md that all other decisions flow from
-- **Brand Voice** - Run `/define-brand` to define how to communicate with your customer (requires CUSTOMER.md)
-- **Design System** - Run `/define-design` to create UI/UX guidelines that resonate with your customer (requires CUSTOMER.md)
-- **SEO Strategy** - Run `/define-seo-strategy` for traditional SEO + AI citation optimization (requires CUSTOMER.md)
-- **Author Voice** - Run `/craft-voice` to capture your writing style, then `/write-as-me` to generate content
-- **UX Audits** - Run `/audit-ux` to check UI changes against your design guidelines
-- **Research** - Run `/research` for systematic investigation with hypothesis tracking
+**Skills** (auto-invoked by Claude when relevant):
+- **define-customer-profile** - Create your foundational CUSTOMER.md that all other decisions flow from
+- **define-brand-guidelines** - Define how to communicate with your customer (requires CUSTOMER.md)
+- **define-design-guidelines** - Create UI/UX guidelines that resonate with your customer (requires CUSTOMER.md)
+- **define-seo-strategy** - Traditional SEO + AI citation optimization (requires CUSTOMER.md)
+- **craft-author-voice** - Capture your unique writing style for AI replication
+
+**Commands** (invoke explicitly):
+- `/write-as-me <topic>` - Generate content in your voice (requires AUTHOR_VOICE.md)
+- `/audit-ux <area>` - Check UI changes against design guidelines
 
 Use `/help` after installation to see all available commands.
 
