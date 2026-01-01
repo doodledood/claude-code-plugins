@@ -9,9 +9,11 @@ Build implementation plan through structured discovery. Takes spec (from `/spec`
 
 **Focus on HOW, not WHAT**: Spec defines what to build. This skill defines how - architecture, files, functions, chunks, dependencies, tests.
 
-**Core loop**: Research (codebase-explorer) → Interview (strategic questions) → Write (update plan incrementally)
+**Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
-**Output**: `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
+**Plan file**: `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
+
+**Research log**: `/tmp/plan-research-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` - external memory.
 
 ## Boundaries
 
@@ -20,9 +22,81 @@ Build implementation plan through structured discovery. Takes spec (from `/spec`
 - If research reveals infeasibility, surface to user before proceeding
 - Stay focused on planning; don't implement until approved
 
-## Phase 1: Initial Context Gathering
+## Phase 1: Initial Setup
 
-### 1.1 Read or infer spec
+### 1.1 Create todo list (TodoWrite immediately)
+
+Todos = **areas to research/decide**, not planning steps. Each todo reminds you what architectural question needs resolution. List is **never fixed** - continuously expands as research reveals complexity.
+
+**Starter todos** (just seeds - actual list grows organically):
+
+```
+- [ ] Read/infer spec requirements
+- [ ] Codebase research (existing patterns, files to modify)
+- [ ] Architecture decisions
+- [ ] (expand continuously as research reveals new areas)
+- [ ] Finalize chunks
+```
+
+### Todo Evolution Example
+
+Spec: "Add real-time notifications"
+
+Initial:
+```
+- [ ] Read spec requirements
+- [ ] Codebase research
+- [ ] Architecture decisions
+- [ ] Finalize chunks
+```
+
+After researching codebase, found existing WebSocket setup:
+```
+- [x] Read spec requirements → 3 notification types, mobile + web
+- [ ] Codebase research
+- [ ] WebSocket integration approach (extend existing vs new)
+- [ ] Architecture decisions
+- [ ] Finalize chunks
+```
+
+After user says "needs to work offline too":
+```
+- [x] Read spec requirements
+- [x] Codebase research → found ws.ts, notification-service.ts
+- [x] WebSocket integration approach → extend existing
+- [ ] Architecture decisions
+- [ ] Offline storage strategy (IndexedDB vs localStorage)
+- [ ] Sync conflict resolution
+- [ ] Service worker integration
+- [ ] Finalize chunks
+```
+
+**Key**: Todos grow as research reveals complexity. Never prune prematurely.
+
+### 1.2 Create research log
+
+Path: `/tmp/plan-research-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` (use SAME path for ALL updates)
+
+```markdown
+# Research Log: {feature name}
+Started: {timestamp} | Spec: {spec file path or "inline"}
+
+## Codebase Research
+(populated incrementally)
+
+## Architecture Decisions
+(populated incrementally)
+
+## Questions & Answers
+(populated incrementally)
+
+## Unresolved Items
+(populated incrementally)
+```
+
+## Phase 2: Context Gathering
+
+### 2.1 Read or infer spec
 
 Read spec file path if provided, or use inline spec content.
 
@@ -30,23 +104,78 @@ Read spec file path if provided, or use inline spec content.
 
 Extract: requirements, user stories, acceptance criteria, constraints, out of scope.
 
-### 1.2 Launch codebase-explorer
+### 2.2 Launch codebase-explorer
 
 Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to find exact files/patterns for THIS spec. Launch multiple in parallel (single message) for cross-cutting work.
 
 Explore: existing implementations, files to modify, patterns/conventions, integration points, test patterns.
 
-### 1.3 Read recommended files
+### 2.3 Read recommended files
 
 Read ALL files from researcher prioritized reading lists - no skipping. Gives firsthand knowledge of code patterns, architecture, integration points, test structure.
 
-### 1.4 Write initial draft
+### 2.4 Update research log
+
+After EACH research step, append to research log:
+
+```markdown
+### {timestamp} - {what researched}
+- Explored: {areas/topics}
+- Key findings: {files, patterns, integration points}
+- New areas identified: {list}
+- Architectural questions: {list}
+```
+
+### 2.5 Write initial draft
 
 Write first draft with `[TBD]` markers for unresolved items. Use same file path for all updates.
 
-## Phase 2: Iterative Discovery Interview
+## Phase 3: Iterative Discovery Interview
 
 **CRITICAL**: Use AskUserQuestion tool for ALL questions. If unavailable, ask in chat but mark as requiring user input.
+
+### Memento Loop
+
+For each step:
+1. Mark todo `in_progress`
+2. Research (codebase-explorer) OR ask question (AskUserQuestion)
+3. **Write findings immediately** to research log
+4. Expand todos for: new architectural questions, integration points, dependencies discovered
+5. Update plan file (replace `[TBD]` markers)
+6. Mark todo `completed`
+7. Repeat until no pending todos
+
+**NEVER proceed without writing findings first** — research log is external memory.
+
+### Research Log Update Format
+
+After EACH research or question, append:
+
+```markdown
+### {timestamp} - {what researched/asked}
+**Todo**: {which todo this addresses}
+**Finding/Answer**: {result}
+**Impact on plan**: {what this revealed/decided}
+**New areas**: {list or "none"}
+```
+
+After EACH architectural decision (even implicit), append to Architecture Decisions:
+
+```markdown
+- {Decision area}: {choice} — {rationale}
+```
+
+### Todo Expansion Triggers
+
+| Research Reveals | Add Todos For |
+|------------------|---------------|
+| Existing similar code | Integration approach |
+| Multiple valid patterns | Pattern selection |
+| External dependency | Dependency strategy |
+| Complex state management | State architecture |
+| Cross-cutting concern | Concern isolation |
+| Performance-sensitive area | Performance strategy |
+| Migration needed | Migration path |
 
 ### Interview Rules
 
@@ -87,13 +216,24 @@ Write first draft with `[TBD]` markers for unresolved items. Use same file path 
 
 6. **Iterate until complete** - Keep interviewing until architectural decisions made, chunks well-defined, file manifests complete, no `[TBD]` markers.
 
-## Phase 3: Finalize & Present
+## Phase 4: Finalize & Present
 
-### 3.1 Finalize plan
+### 4.1 Final research log update
+
+```markdown
+## Planning Complete
+Finished: {timestamp} | Research steps: {count} | Decisions: {count}
+## Summary
+{Brief summary of planning process and key decisions}
+```
+
+### 4.2 Finalize plan
 
 Final pass: remove `[TBD]` markers, ensure chunk consistency, verify dependency ordering, add line ranges for large files (>500 lines).
 
-### 3.2 Present summary
+### 4.3 Mark all todos complete
+
+### 4.4 Present summary
 
 ```
 ## Plan Summary
@@ -117,7 +257,7 @@ Final pass: remove `[TBD]` markers, ensure chunk consistency, verify dependency 
 Review full plan. Adjust anything, or approve to start implementation.
 ```
 
-### 3.3 Wait for approval
+### 4.5 Wait for approval
 
 Do NOT start implementation until user explicitly approves. After approval: create todos from chunks, execute via todo system.
 
@@ -346,19 +486,35 @@ Avoid: empty catch, catch-and-return-null, silent fallbacks, broad exception cat
 
 ## Planning Mantras
 
+**Memento (always do):**
+1. Write findings BEFORE next research/question (research log = external memory)
+2. Every discovery needing follow-up → todo (no mental notes)
+3. Update research log after EACH step (not at end)
+
 **Primary (always check):**
-1. What's the smallest shippable increment?
-2. Does it pass all quality gates?
-3. Is this explicitly required?
-4. Will this pass code review on first submission?
+4. What's the smallest shippable increment?
+5. Does it pass all quality gates?
+6. Is this explicitly required?
+7. Will this pass code review on first submission?
 
 **Secondary:**
-5. Can we ship with less?
-6. Do dependencies determine order?
-7. Have I researched first, then asked strategically?
-8. Does this reduce or increase cognitive load?
-9. Does each chunk satisfy P1-P10?
-10. Are error paths planned, not afterthoughts?
+8. Can we ship with less?
+9. Do dependencies determine order?
+10. Have I researched first, then asked strategically?
+11. Does this reduce or increase cognitive load?
+12. Does each chunk satisfy P1-P10?
+13. Are error paths planned, not afterthoughts?
+
+### Never Do
+
+- Proceed without writing findings to research log
+- Keep discoveries as mental notes instead of todos
+- Skip todo list
+- Write plans to project directories (always `/tmp/`)
+- Ask about scope/requirements (that's spec phase)
+- Finalize with unresolved `[TBD]`
+- Start implementation without explicit approval
+- Forget to expand todos on new architectural areas revealed
 
 ## Recognize & Adjust
 
