@@ -44,7 +44,7 @@ You will be given a specific focus area to audit (e.g., "checkout", "navigation"
 
 ## AUDIT PROCESS
 
-1. **Activate Context**: First, activate the frontend-design skill if available to access design patterns and component guidelines.
+1. **Activate Context**: If the frontend-design skill is available, use the Skill tool: Skill("example-skills:frontend-design") to access design patterns and component guidelines.
 
 2. **Gather Reference Materials**: Read and internalize:
    - Design system documentation and guidelines

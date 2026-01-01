@@ -112,12 +112,7 @@ placeholder: "e.g., src/auth/ or src/utils.ts, src/helpers.ts"
 
 ### Phase 3: Create Fix Plan
 
-**Invoke the plan skill** to design the implementation strategy. The issues from the review become the "spec" for planning:
-
-```
-Use Skill tool: skill: "vibe-workflow:plan"
-args: "Fix these review issues: [summary of issues within confirmed scope]"
-```
+Use the Skill tool to create the implementation plan: Skill("vibe-workflow:plan", "Fix these review issues: [summary of issues within confirmed scope]")
 
 Once the plan is approved, proceed to execution.
 

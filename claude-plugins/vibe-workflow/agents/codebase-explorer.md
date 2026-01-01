@@ -5,4 +5,4 @@ tools: Bash, BashOutput, Glob, Grep, Read, Write, TodoWrite, Skill
 model: sonnet
 ---
 
-**Follow the explore-codebase skill.**
+Use the Skill tool to explore the codebase: Skill("vibe-workflow:explore-codebase", "$ARGUMENTS")
