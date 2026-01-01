@@ -1,6 +1,6 @@
 ---
 name: consultant
-description: 'Consult with powerful AI models via Python/LiteLLM for complex analysis, architectural reviews, security audits, or comprehensive code understanding. Supports any LiteLLM-compatible model (100+ providers) with custom base URLs. Use when you need deeper insights: (1) Complex architectural decisions, (2) Security vulnerability analysis, (3) Comprehensive code reviews across large codebases, (4) Understanding intricate patterns in unfamiliar code, (5) Expert-level domain analysis. Runs asynchronously with session management.'
+description: 'Consults external AI models (100+ via LiteLLM) for complex analysis. Use for architectural review, security audit, deep code understanding, or when extended reasoning is needed. Runs async with session management.'
 ---
 
 # Consultant

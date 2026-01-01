@@ -1,6 +1,6 @@
 ---
 name: maximize-information-density
-description: 'Transform documents/prompts to maximize information density while preserving all semantic content losslessly. Reduces token consumption for AI-consumed content.'
+description: 'Compresses documents/prompts to maximize information density while preserving semantic content. Use when asked to make content concise, shorten, reduce tokens, tighten, or compress files like CLAUDE.md, skills, or specs.'
 ---
 
 # Maximize Information Density Skill

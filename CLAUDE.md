@@ -46,6 +46,28 @@ Use the Skill tool: Skill("plugin:my-feature", "$ARGUMENTS")
 
 **Instead**: Create skills directly. Claude will auto-invoke them when relevant. Only create commands for workflows that genuinely need explicit user invocation (e.g., `/review`, `/commit`).
 
+### Skill Description Best Practices
+
+Skill descriptions drive auto-invocation. Claude uses semantic matching to decide when to invoke a skill based on its description.
+
+**Pattern**: What it does + When to use it + Trigger terms
+
+| Do | Don't |
+|----|-------|
+| Third person: "Compresses documents..." | First/second person: "I can help you..." |
+| Include trigger terms users say: "debug, troubleshoot, fix bug" | Use jargon users won't say: "EARS-syntax" |
+| Specify when to use: "Use when asked to..." | Vague purpose: "Helps with documents" |
+| Keep under 1024 chars | Verbose implementation details |
+
+**Example**:
+```yaml
+# Bad - vague, no triggers
+description: 'Helps with bugs'
+
+# Good - specific + triggers + when to use
+description: 'Investigates and fixes bugs systematically. Use when asked to debug, troubleshoot, fix a bug, or find why something is broken.'
+```
+
 ### Tool Definitions
 
 **Skills/Commands**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).

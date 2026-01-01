@@ -1,6 +1,6 @@
 ---
 name: bugfix
-description: 'Systematic bug investigation and fixing workflow with root cause analysis, reproduction tests, and verified fixes. Orchestrates the multi-phase process: gather context, investigate, reproduce, fix, verify.'
+description: 'Investigates and fixes bugs systematically with root cause analysis. Use when asked to debug, troubleshoot, fix a bug, investigate an issue, or find why something is broken. Creates reproduction tests and verifies fixes.'
 ---
 
 # Bugfix Skill

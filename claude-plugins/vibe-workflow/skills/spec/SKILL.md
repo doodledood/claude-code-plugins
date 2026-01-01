@@ -1,6 +1,6 @@
 ---
 name: spec
-description: 'Interactive requirements builder - interviews you to create EARS-syntax spec for features, bugs, docs, refactors.'
+description: 'Builds requirements specification through structured discovery interview. Use when defining scope, gathering requirements, specifying what a feature should do, or creating a spec for features, bugs, docs, or refactors.'
 ---
 
 # Spec Skill

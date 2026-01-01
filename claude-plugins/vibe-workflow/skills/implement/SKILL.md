@@ -1,6 +1,6 @@
 ---
 name: implement
-description: 'Execute implementation plans autonomously chunk by chunk. Parses plan files, creates comprehensive todo lists (Memento pattern), auto-fixes gate failures, and provides completion summaries.'
+description: 'Executes implementation plans autonomously chunk by chunk. Use after /plan to build features, implement changes, or code solutions. Auto-fixes gate failures and tracks progress.'
 ---
 
 # Implement Skill

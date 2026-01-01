@@ -1,6 +1,6 @@
 ---
 name: craft-author-voice
-description: 'Iteratively craft an AUTHOR_VOICE.md document that captures your unique writing style for AI replication. Interactive multi-choice workflow with feedback cycles.'
+description: 'Captures writing style/voice into AUTHOR_VOICE.md so AI can write like the user. Use when asked to match tone, write like me, replicate voice, or capture writing style for content generation.'
 ---
 
 # Author Voice Skill
