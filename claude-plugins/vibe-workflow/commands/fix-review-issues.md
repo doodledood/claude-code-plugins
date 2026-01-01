@@ -3,7 +3,7 @@ description: Address issues found by /review. Fixes all issues by default, or fi
 argument-hint: Optional filters - severity level (critical, high, medium, low), category (bugs, maintainability, types, docs, coverage, claude-md), or specific file paths
 ---
 
-Use the fix-review-issues skill to address issues found from a recent `/review` run: $ARGUMENTS
+Use the Skill tool to fix issues from a recent /review run: Skill("vibe-workflow:fix-review-issues", "$ARGUMENTS")
 
 Examples:
 `/fix-review-issues` - Fix all issues

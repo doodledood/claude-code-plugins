@@ -40,6 +40,20 @@ Each plugin can contain:
 
 **Agents**: MUST explicitly declare all needed tools in frontmatter—agents run in isolation and won't inherit tools.
 
+### Invoking Skills from Commands/Skills
+
+When a command or skill needs to invoke another skill, use the explicit Skill tool pattern:
+
+```markdown
+Use the Skill tool to <action>: Skill("<plugin>:<skill>", "$ARGUMENTS")
+```
+
+Examples:
+- `Use the Skill tool to build a requirements spec: Skill("vibe-workflow:spec", "$ARGUMENTS")`
+- `Use the Skill tool to craft a CUSTOMER.md document: Skill("solo-dev:customer-profile")`
+
+**Why**: Natural language like "Use the X skill" is ambiguous—Claude may just read the skill file instead of invoking it. The explicit `Skill(...)` pattern ensures the Skill tool is actually called.
+
 **Common agent patterns**:
 - Has `Bash` → add `BashOutput` (for long-running commands)
 - Uses todo tracking → add `TodoWrite`

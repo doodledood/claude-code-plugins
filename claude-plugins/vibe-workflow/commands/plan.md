@@ -3,4 +3,4 @@ description: Create implementation plans from a spec. Iteratively researches cod
 argument-hint: Path to a spec file, or describe what you want to implement
 ---
 
-Use the plan skill to create an implementation plan for: $ARGUMENTS
+Use the Skill tool to create an implementation plan: Skill("vibe-workflow:plan", "$ARGUMENTS")

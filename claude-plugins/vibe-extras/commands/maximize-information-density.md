@@ -3,9 +3,4 @@ description: Compress documents/prompts to maximize information density while pr
 argument-hint: Path to file (e.g., CLAUDE.md, docs/README.md, skills/plan/SKILL.md)
 ---
 
-Use the maximize-information-density skill to compress: $ARGUMENTS
-
-Examples:
-`/maximize-information-density CLAUDE.md` - Compress project instructions
-`/maximize-information-density docs/README.md` - Compress documentation
-`/maximize-information-density skills/plan/SKILL.md` - Compress a skill file
+Use the Skill tool to compress the file: Skill("vibe-extras:maximize-information-density", "$ARGUMENTS")

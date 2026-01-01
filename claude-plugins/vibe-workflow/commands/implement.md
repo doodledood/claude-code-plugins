@@ -3,4 +3,4 @@ description: Execute implementation plans chunk by chunk with autonomous progres
 argument-hint: Path to plan file (e.g., /tmp/plan-*.md), optionally with --spec for additional context
 ---
 
-Use the implement skill to execute the plan: $ARGUMENTS
+Use the Skill tool to execute the implementation plan: Skill("vibe-workflow:implement", "$ARGUMENTS")
