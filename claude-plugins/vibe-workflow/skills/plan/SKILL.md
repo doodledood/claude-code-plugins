@@ -36,9 +36,18 @@ Do not read files, research, or ask questions before entering plan mode. EnterPl
 
 Before asking any questions, gather codebase context to inform the plan.
 
-**Step 1.1: Read the spec**
+**Step 1.1: Read or infer the spec**
 
-If the user provides a spec file path, read it first. If they provide spec content inline, use that. Extract:
+If the user provides a spec file path, read it first. If they provide spec content inline, use that.
+
+**If no formal spec exists**, infer requirements from the current context:
+- Conversation history (e.g., a review that identified improvements to make)
+- Previous tool/agent outputs (e.g., analysis results, audit findings)
+- The user's request itself (which may contain sufficient detail)
+
+This is common and valid - many planning sessions start from a review, bug report, or ad-hoc request rather than a formal spec document.
+
+Extract:
 - What needs to be built (requirements)
 - User stories and acceptance criteria
 - Constraints and business rules
