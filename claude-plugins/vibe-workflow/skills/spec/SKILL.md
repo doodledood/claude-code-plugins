@@ -450,6 +450,7 @@ Don't rush to finalize with gaps. Better to ask one more question than produce a
 - Invites iteration - the spec is a draft
 
 ### Never Do These
+- NEVER write spec files to project directories - always use `/tmp/` to avoid polluting the codebase
 - NEVER ask about technical implementation (architecture, APIs, data models, libraries, code patterns)
 - NEVER finalize spec with unresolved `[TBD]` markers
 - NEVER skip the summary output
@@ -465,4 +466,4 @@ Don't rush to finalize with gaps. Better to ask one more question than produce a
 
 ## Output Location
 
-Write the spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - create after initial research, update incrementally throughout the process.
+Write the spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - never to the project directory. Create after initial research, update incrementally throughout the process. Specs are working documents that don't belong in the codebase.

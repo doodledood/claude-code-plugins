@@ -76,7 +76,7 @@ Do not skip any recommended files - the researchers identified them as important
 
 **Step 1.4: Write initial plan draft**
 
-After initial research, write the first draft to `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` with what you know so far. Mark uncertain areas with `[TBD]` - these will be resolved during the interview. Use this same file path for all subsequent updates.
+After initial research, write the first draft to `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - never to the project directory. Mark uncertain areas with `[TBD]` - these will be resolved during the interview. Use this same file path for all subsequent updates. Plans are working documents that don't belong in the codebase.
 
 ### Phase 2: Iterative Discovery Interview
 
