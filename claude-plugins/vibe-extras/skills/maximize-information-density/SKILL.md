@@ -86,7 +86,7 @@ max_iterations = 3
 
 while iteration <= max_iterations:
     1. Launch density-verifier agent via Task tool:
-       - subagent_type: "vibe-workflow:density-verifier"
+       - subagent_type: "vibe-extras:density-verifier"
        - model: opus
        - prompt: "Verify compression is lossless.
          Original file: {original_file_path}

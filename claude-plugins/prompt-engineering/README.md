@@ -5,6 +5,7 @@ Tools for reviewing and analyzing LLM prompts.
 ## What It Does
 
 - **Prompt Review** - Run `/review-prompt` to analyze prompts against the 10-Layer Architecture framework
+- **Prompt Reviewer Agent** - Deep prompt analysis via the `prompt-reviewer` agent for automated reviews
 
 Identifies genuine improvement opportunities while respecting what already works. Reports only—does not modify files.
 

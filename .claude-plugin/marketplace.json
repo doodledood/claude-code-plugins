@@ -41,6 +41,14 @@
       "version": "1.2.0",
       "category": "productivity",
       "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "productivity", "business"]
+    },
+    {
+      "name": "vibe-extras",
+      "source": "./claude-plugins/vibe-extras",
+      "description": "Standalone utilities that complement the core development workflow - git operations, documentation management, and code cleanup",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["utilities", "git", "rebase", "documentation", "cleanup", "slop"]
     }
   ]
 }

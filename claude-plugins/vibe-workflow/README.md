@@ -12,10 +12,6 @@ Autonomous development workflow with code review agents and quality gates.
 - **Codebase Explorer** - The `codebase-explorer` agent returns a structural overview + prioritized file list with line ranges - prefer over built-in Explore for context gathering
 - **Bug Fixing** - Run `/bugfix` for systematic investigation with root cause analysis and test-driven verification
 - **Web Research** - Run `/web-research` to research external topics with structured hypothesis tracking
-- **Git Workflow** - Run `/rebase-on-main` for safe rebasing with conflict resolution
-- **Code Cleanup** - Run `/clean-slop` to remove AI-generated noise
-- **CLAUDE.md Management** - Run `/update-claude-md` to create or maintain project instructions
-- **Information Density** - Run `/maximize-information-density` to compress docs/prompts losslessly for reduced token consumption
 
 Use `/help` after installation to see all available commands.
 
