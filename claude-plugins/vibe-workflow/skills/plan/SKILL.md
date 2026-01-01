@@ -26,12 +26,6 @@ This skill plans **HOW** to implement, not **WHAT** to implement:
 
 ## Workflow
 
-### Phase 0: Enter Plan Mode
-
-**IMMEDIATELY use the EnterPlanMode tool as your very first action.** This ensures the user knows you're entering a planning phase and prevents any accidental code changes during the planning process.
-
-Do not read files, research, or ask questions before entering plan mode. EnterPlanMode first, then proceed with the rest of the workflow.
-
 ### Phase 1: Initial Context Gathering
 
 Before asking any questions, gather codebase context to inform the plan.
@@ -161,14 +155,37 @@ Do a final pass to:
 - Verify dependency ordering
 - Add line ranges for large files (>500 lines)
 
-**Step 3.2: Present via ExitPlanMode**
+**Step 3.2: Present summary for approval**
 
-Use the ExitPlanMode tool to present the plan for user approval. If ExitPlanMode is not available, present the plan in text format.
+Output a summary so the user can validate without reading the full plan file:
+
+```
+## Plan Summary
+
+**Plan file**: /tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md
+
+### What We're Building
+{1-2 sentence overview}
+
+### Chunks ({count})
+1. {Chunk 1 name} - {one-line description}
+2. {Chunk 2 name} - {one-line description}
+...
+
+### Key Decisions
+- {Decision 1}: {choice made}
+- {Decision 2}: {choice made}
+
+### Execution Order
+{Brief description of dependencies and what can run in parallel}
+
+---
+Review the full plan at the file path above. Let me know if you'd like to adjust anything, or approve to start implementation.
+```
 
 **Step 3.3: Wait for explicit approval**
 
 Do NOT start implementation until the user explicitly approves. After approval:
-- Persist the approved plan to the `/tmp/plan-{timestamp}-{name}.md` file (already done incrementally)
 - Create todos from plan chunks
 - Execute via todo system
 
