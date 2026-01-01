@@ -3,22 +3,10 @@ description: Address issues found by /review. Fixes all issues by default, or fi
 argument-hint: Optional filters - severity level (critical, high, medium, low), category (bugs, maintainability, types, docs, coverage, claude-md), or specific file paths
 ---
 
-Address issues found from a recent `/review` run. This command systematically fixes identified problems.
+Use the fix-review-issues skill to address issues found from a recent `/review` run: $ARGUMENTS
 
-**Invoke the `fix-review-issues` skill** with the provided arguments to orchestrate the fix workflow.
-
-## Arguments
-
-Pass these to the skill:
-- `$ARGUMENTS` - User-provided filters (severity, category, file paths)
-
-## Example Usage
-
-```
-/fix-review-issues                           # Fix everything
-/fix-review-issues --severity critical,high  # Only critical and high severity
-/fix-review-issues --category bugs           # Only bug fixes
-/fix-review-issues --category types,docs     # Types and docs only
-/fix-review-issues src/auth/                 # Only files in src/auth/
-/fix-review-issues --severity high --category maintainability src/utils.ts
-```
+Examples:
+`/fix-review-issues` - Fix all issues
+`/fix-review-issues only critical and high severity` - Filter by severity
+`/fix-review-issues just the bugs` - Filter by category
+`/fix-review-issues in src/auth/` - Filter by file path
