@@ -50,6 +50,17 @@ Each plugin can contain:
 
 **Agent audit**: Read the skill/prompt the agent follows, identify every tool mentioned (explicit or implicit), verify all are in frontmatter.
 
+### Memento Pattern for Non-Trivial Workflows
+
+Skills/commands/agents with multi-phase workflows MUST use the memento pattern:
+- **Create todo list immediately** (TodoWrite) - areas to discover, not fixed steps
+- **Include expansion placeholder** - e.g., `- [ ] (expand as discovery reveals new areas)`
+- **External memory file** - log file in `/tmp/` updated after EACH step
+- **Never proceed without writing findings** - log is external memory
+- **Expand todos dynamically** - as user answers or research reveals new areas
+
+See `vibe-workflow/skills/spec/SKILL.md` or `vibe-workflow/skills/plan/SKILL.md` for reference implementations.
+
 See each plugin's README for architecture details.
 
 ## Plugin Versioning

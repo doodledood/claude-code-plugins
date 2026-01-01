@@ -13,6 +13,8 @@ Create the foundational CUSTOMER.md document through iterative refinement. This 
 
 This skill supports both **creating a new customer doc** and **refining an existing one**. Users come back to adjust their ICP as they learn more about their market or pivot their product.
 
+**Loop**: Check existing → Discover → Research → Draft → Refine → Repeat until complete
+
 This skill guides you through:
 0. **Check Existing** - Look for existing CUSTOMER.md; let user choose to refine or start fresh
 1. **Discovery** - Clarifying questions about your product, market, and current understanding (keeps asking until confident)
@@ -29,9 +31,47 @@ The discovery questions give you a solid starting point, but **the real magic ha
 - You validate whether the ICP resonates with your actual experience
 - Each cycle sharpens the doc until it truly captures YOUR ideal customer
 
+**Discovery log**: `/tmp/customer-discovery-{YYYYMMDD-HHMMSS}.md` - external memory updated after each step.
+
 ## Workflow
 
+### Initial Setup (TodoWrite immediately)
+
+**Create todo list** - areas to discover, not steps. List expands as user answers reveal new areas.
+
+**Starter todos**:
+```
+- [ ] Check for existing CUSTOMER.md
+- [ ] Discovery questions (product, ICP, pain points)
+- [ ] Research (if requested)
+- [ ] (expand as discovery reveals complexity)
+- [ ] Generate initial draft
+- [ ] Refinement cycles
+- [ ] Finalize document
+```
+
+**Create discovery log** at `/tmp/customer-discovery-{YYYYMMDD-HHMMSS}.md`:
+
+```markdown
+# Discovery Log: Customer Profile
+Started: {timestamp}
+
+## Discovery Answers
+(populated incrementally)
+
+## Research Findings
+(populated incrementally)
+
+## Decisions Made
+(populated incrementally)
+
+## Refinement Notes
+(populated incrementally)
+```
+
 ### Phase 0: Check for Existing Document
+
+**Mark "Check for existing CUSTOMER.md" todo `in_progress`.**
 
 Before starting discovery, check if the user already has a CUSTOMER.md:
 
@@ -55,9 +95,21 @@ options:
 
 3. **If NOT found**: Proceed directly to Phase 1 (Discovery)
 
+**Mark "Check for existing CUSTOMER.md" todo `completed`.**
+
 ### Phase 1: Discovery
 
+**Mark "Discovery questions" todo `in_progress`.**
+
 Use AskUserQuestion tool with multi-choice options for EVERY question. **Put the recommended option FIRST** with "(Recommended)" suffix to reduce cognitive load.
+
+**After EACH question**, append to discovery log:
+```markdown
+### Q{N}: {question topic}
+**Answer**: {user's answer}
+**Impact**: {what this reveals about ICP}
+**New areas**: {any new todos to add}
+```
 
 **Recommendation Strategy**: Since there's no prior document, recommendations are based on:
 - Most common patterns for solo devs/indie hackers
@@ -291,9 +343,22 @@ After the core questions, assess whether you have enough clarity to proceed. If 
 5. What triggers them to seek a solution
 6. How research should be focused (if requested)
 
+**Todo Expansion Triggers** (add todos when user reveals):
+| User Answer Reveals | Add Todo For |
+|---------------------|--------------|
+| Multiple customer segments | Each segment's characteristics |
+| Complex buying process | Purchase journey mapping |
+| Industry-specific needs | Industry research |
+| Unclear anti-personas | Anti-persona validation |
+| New pain points | Pain point prioritization |
+
 Only proceed to Phase 2/3 when gaps are filled.
 
+**Mark "Discovery questions" todo `completed`.**
+
 ### Phase 2: Research Phase (If Requested)
+
+**If user requested research, mark "Research" todo `in_progress`.**
 
 If user requested research, launch 2-3 parallel opus agents to gather data. **Skip this phase if user said "No research"**.
 
@@ -381,7 +446,21 @@ After all agents complete, synthesize findings BEFORE generating the document:
 
 4. **Reconcile research with user knowledge** - user's direct experience trumps generic research. Note discrepancies in the doc as areas to validate.
 
+**After research synthesis, append to discovery log**:
+```markdown
+## Research Findings
+**ICP Patterns**: {summary from Agent 1}
+**Competitive Insights**: {summary from Agent 2}
+**Anti-Persona Signals**: {summary from Agent 3}
+**User validation**: {matches/differs from user experience}
+**Adjustments made**: {any changes based on user feedback}
+```
+
+**Mark "Research" todo `completed`.**
+
 ### Phase 3: Initial Document Generation
+
+**Mark "Generate initial draft" todo `in_progress`.**
 
 After discovery (and optional research), generate the first CUSTOMER.md.
 
@@ -567,11 +646,28 @@ The template above is a starting point. Customize based on the product:
 
 Write this file to the current working directory as `CUSTOMER.md`.
 
+**Mark "Generate initial draft" todo `completed`.**
+
 ### Phase 4: Refinement Cycles & Completion
+
+**Mark "Refinement cycles" todo `in_progress`.**
 
 After generating the initial document, begin iterative refinement.
 
 **Expected cycles**: Most users need **2-3 refinement cycles** to get from "this is okay" to "this captures my customer." Don't rush - each cycle sharpens the doc.
+
+### Memento Loop for Refinement
+
+For each refinement cycle:
+1. Mark current refinement todo `in_progress`
+2. Ask validation question (AskUserQuestion)
+3. **Write feedback immediately** to discovery log
+4. If not "Yes": add todo for that section's revision
+5. Update CUSTOMER.md
+6. Mark todo `completed`
+7. Repeat until user says "done"
+
+**NEVER proceed without writing feedback to log** — discovery log is external memory.
 
 **Step 4.1: Section-by-Section Review**
 
@@ -635,6 +731,14 @@ Based on ALL feedback:
 3. Add specific examples where needed
 4. Strengthen anti-persona definitions if issues keep appearing
 
+**After each section review, append to discovery log**:
+```markdown
+### Refinement: {section name}
+**Feedback**: {user's response}
+**Issues identified**: {what needed fixing}
+**Changes made**: {summary of updates}
+```
+
 **Step 4.5: Check Completion**
 
 ```
@@ -650,12 +754,24 @@ If "Yes" or "Almost done", return to Step 4.1.
 
 **Step 4.6: Completion** (When user says "No" to more refinement)
 
+**Mark "Refinement cycles" todo `completed`. Mark "Finalize document" todo `in_progress`.**
+
 When user indicates they're done:
 
 1. Add a "Version History" section noting when created/updated
 2. Add a "Usage Instructions" section for how to use the doc
 3. Display final document summary
 4. Remind user to keep CUSTOMER.md updated as they learn more
+
+**Append to discovery log**:
+```markdown
+## Completion
+Finished: {timestamp} | Questions: {count} | Refinement cycles: {count}
+## Summary
+{Brief summary of ICP definition process}
+```
+
+**Mark "Finalize document" todo `completed`. Mark all todos complete.**
 
 **Final additions to append:**
 
@@ -685,43 +801,25 @@ This is your **foundational document**. Use it to:
 
 ## Key Principles
 
-### Information Density
-- Every line must be actionable for decisions
-- No fluff, no explanations "for humans"
-- Concrete examples over abstract descriptions
-- Specific signals over vague guidelines
+| Principle | Rule |
+|-----------|------|
+| **Memento** | Write findings to discovery log BEFORE next question; every discovery needing follow-up → todo; update log after EACH step |
+| **Todo-driven** | Create todos for areas to discover; expand when user reveals complexity; never keep mental notes |
+| **Information density** | Every line actionable; concrete examples over abstractions; specific signals over vague guidelines |
+| **Research-backed** | Parallel agents gather real market data; validate against competitive landscape |
+| **Iterative refinement** | Section-by-section validation; track changes; real customer conversations surface issues |
+| **Reduce cognitive load** | Recommended option first; multi-choice over free-text; 6-8 options max; accept defaults → solid result |
+| **Question until confident** | Never proceed with ambiguity; gaps → generic output; verify before phase transitions |
+| **Ground in reality** | Define ICP you HAVE, not WISH; base on actual customers; mark hypotheses as unvalidated |
 
-### Research-Backed (Initially & When Requested)
-- Parallel agents gather real market data
-- Validate assumptions against competitive landscape
-- Find patterns the user might not see
+### Never Do
 
-### Iterative Refinement
-- Section-by-section validation catches errors
-- Real customer conversations surface issues
-- Track what changes between versions
-
-### Reduce Cognitive Load
-- ALWAYS use AskUserQuestion tool when available
-- **Put recommended option FIRST** with "(Recommended)" suffix
-- User should be able to accept all defaults and get a solid result
-- Present multi-choice questions to minimize typing
-- Limit options to 6-8 max per question
-- Use multiSelect for non-exclusive choices
-- Only use free-text for essential context
-
-### Question Until Confident
-- **Never proceed with ambiguity** - if something is unclear, ask
-- Keep asking follow-up questions until you have specific, actionable answers
-- Gaps in understanding lead to generic, useless output
-- Before moving to next phase, verify: "Do I know enough to generate something specific?"
-- User's time spent answering questions upfront saves iteration time later
-
-### Ground in Reality, Not Wishes
-- **Define the ICP you HAVE, not the one you WISH you had**
-- Base the profile on actual customers, real conversations, observable patterns
-- Aspirational ICPs (big logos, impressive titles) lead to products nobody buys
-- If pre-launch with no customers: define hypotheses, but mark them as unvalidated
+- Proceed without writing findings to discovery log
+- Keep discoveries as mental notes instead of todos
+- Skip todo list
+- Finalize with unresolved sections
+- Ask questions without AskUserQuestion tool
+- Forget to expand todos when user reveals complexity
 
 ## Output Location
 

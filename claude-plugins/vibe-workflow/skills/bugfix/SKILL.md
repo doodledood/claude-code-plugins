@@ -11,6 +11,8 @@ Investigate and fix bugs with systematic root cause analysis. This skill orchest
 
 ## Overview
 
+**Loop**: Prerequisites → Gather context → Investigate/Fix → Verify → Report
+
 This skill guides you through:
 0. **Prerequisite Check** - Verify git repo, gather project context
 1. **Bug Context Gathering** - Understand the bug through targeted questions (if not provided)
@@ -19,7 +21,21 @@ This skill guides you through:
 
 ## Workflow
 
+### Initial Setup (TodoWrite immediately)
+
+**Create todo list** - phases to complete.
+
+**Starter todos**:
+```
+- [ ] Prerequisite check (git, test config)
+- [ ] Bug context gathering (if needed)
+- [ ] Investigation and fix (bug-fixer agent)
+- [ ] Verification summary
+```
+
 ### Phase 0: Prerequisite Check
+
+**Mark "Prerequisite check" todo `in_progress`.**
 
 **CRITICAL**: Before anything else, verify the environment:
 
@@ -48,7 +64,11 @@ options:
    - Identify the test command if possible (check package.json scripts, pyproject.toml, etc.)
    - Note the project language/framework for context
 
+**Mark "Prerequisite check" todo `completed`.**
+
 ### Phase 1: Bug Context Gathering
+
+**Mark "Bug context gathering" todo `in_progress`.**
 
 **If the user provided detailed bug information** (error message, reproduction steps, or clear description), skip directly to Phase 2.
 
@@ -126,7 +146,11 @@ After gathering context, summarize:
 - Location hints (if any)
 - Recent change context
 
+**Mark "Bug context gathering" todo `completed`.**
+
 ### Phase 2: Investigation and Fix
+
+**Mark "Investigation and fix" todo `in_progress`.**
 
 Launch the bug-fixer agent to perform the actual investigation and fix work.
 
@@ -161,7 +185,11 @@ The bug-fixer agent will:
 
 **IMPORTANT**: Let the agent work autonomously. Do not interrupt unless it asks for input or gets stuck.
 
+**Mark "Investigation and fix" todo `completed`.**
+
 ### Phase 3: Verification Summary
+
+**Mark "Verification summary" todo `in_progress`.**
 
 After the bug-fixer agent completes, summarize the results:
 
@@ -190,32 +218,18 @@ Recommended next steps:
 - [Specific suggestions based on findings]
 ```
 
+**Mark "Verification summary" todo `completed`. Mark all todos complete.**
+
 ## Key Principles
 
-### Systematic Over Random
-- Form hypotheses before making changes
-- Test each hypothesis methodically
-- Document findings for future reference
-
-### Test-Driven Bug Fixing
-- Always create a test that reproduces the bug BEFORE fixing
-- A passing test proves the fix works
-- The test prevents future regressions
-
-### Root Cause Focus
-- Fix the underlying cause, not just symptoms
-- Consider why the bug wasn't caught earlier
-- Look for similar patterns that might have the same issue
-
-### Minimal Changes
-- Make the smallest fix that addresses the root cause
-- Avoid refactoring while bug fixing
-- Keep fixes focused and reviewable
-
-### Reduce Cognitive Load
-- Use AskUserQuestion for all clarifying questions
-- Provide reasonable defaults when possible
-- Don't ask questions if the answer was already provided
+| Principle | Rule |
+|-----------|------|
+| **Memento** | Use TodoWrite to track phases; mark progress immediately; visible state at all times |
+| **Systematic** | Form hypotheses before changes; test methodically; document findings |
+| **Test-driven** | Create reproduction test BEFORE fixing; test proves fix works; prevents regression |
+| **Root cause** | Fix underlying cause, not symptoms; consider why bug wasn't caught; look for patterns |
+| **Minimal changes** | Smallest fix for root cause; avoid refactoring while bug fixing; keep focused |
+| **Reduce cognitive load** | AskUserQuestion for clarification; reasonable defaults; don't repeat questions |
 
 ## Edge Cases
 

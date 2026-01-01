@@ -11,11 +11,26 @@ Rewrite documents to maximize information density while preserving all semantic 
 
 This skill transforms verbose documents into dense, information-rich versions through:
 1. **Compression** - Apply density techniques, write to `/tmp` (original untouched)
-2. **Verification** - Opus agent compares original vs compressed for losslessness
+2. **Verification** - density-verifier agent compares original vs compressed for losslessness
 3. **Iteration** - If issues found, re-compress with feedback (max 3x)
 4. **Output** - Atomic `mv` replaces original only after verification passes
 
+**Loop**: Validate → Compress → Verify → (Iterate if issues) → Output
+
 ## Workflow
+
+### Phase 0: Create Todo List (TodoWrite immediately)
+
+Create todos tracking workflow phases. List reflects areas of work, not fixed steps.
+
+**Starter todos**:
+```
+- [ ] Input validation
+- [ ] Initial compression
+- [ ] Verification (iteration 1)
+- [ ] (expand if verification fails: iteration 2, 3)
+- [ ] Output and replace original
+```
 
 ### Phase 1: Input Validation
 
@@ -35,7 +50,11 @@ Extract file path from `$ARGUMENTS`. If no path provided, error with usage instr
 - Estimate token count: `Math.ceil(content.length / 4)` (approximate)
 - Store original content and token count for comparison
 
+**Mark "Input validation" todo `in_progress`**, then `completed` when Phase 1 done.
+
 ### Phase 2: Transformation
+
+**Mark "Initial compression" todo `in_progress`.**
 
 Apply ALL compression techniques aggressively. Full restructuring is allowed.
 
@@ -74,9 +93,13 @@ Write compressed output to `/tmp/compressed-{timestamp}.{ext}` where:
 - `{timestamp}` = current time for uniqueness
 - `{ext}` = original file extension
 
+**Mark "Initial compression" todo `completed`.**
+
 ### Phase 3: Verification Loop
 
-Launch the `density-verifier` agent (Opus) to verify lossless compression.
+**Mark "Verification (iteration 1)" todo `in_progress`.**
+
+Launch the `vibe-extras:density-verifier` agent to verify lossless compression.
 
 **Iteration Protocol**:
 
@@ -87,7 +110,6 @@ max_iterations = 3
 while iteration <= max_iterations:
     1. Launch density-verifier agent via Task tool:
        - subagent_type: "vibe-extras:density-verifier"
-       - model: opus
        - prompt: "Verify compression is lossless.
          Original file: {original_file_path}
          Compressed file: {temp_file_path}
@@ -95,10 +117,12 @@ while iteration <= max_iterations:
          Compare semantic content. Report VERIFIED if lossless, or ISSUES with specific missing/altered information."
 
     2. Parse agent response:
-       - If "VERIFIED" → exit loop, proceed to Phase 4
+       - If "VERIFIED" → mark current verification todo `completed`, exit loop, proceed to Phase 4
        - If "ISSUES" → continue to step 3
 
     3. If iteration < max_iterations:
+       - Mark current verification todo `completed`
+       - **Add new todo**: "Verification (iteration {iteration+1})" and mark `in_progress`
        - Read the specific issues reported
        - Re-run Phase 2 transformation with explicit feedback:
          "The following information was lost/altered: {issues}.
@@ -107,10 +131,13 @@ while iteration <= max_iterations:
        - iteration += 1
 
     4. If iteration == max_iterations and still has issues:
+       - Mark todo `completed` with note about unresolved issues
        - Proceed to Phase 4 with warning flag
 ```
 
 ### Phase 4: Output
+
+**Mark "Output and replace original" todo `in_progress`.**
 
 **Step 4.1: Calculate metrics**
 
@@ -155,6 +182,8 @@ If verification failed after 3 iterations:
   Review the changes manually to ensure no critical information was lost.
 ```
 
+**Mark "Output and replace original" todo `completed`. Mark all todos complete.**
+
 ## Edge Cases
 
 | Scenario | Handling |
@@ -170,17 +199,12 @@ If verification failed after 3 iterations:
 
 ## Key Principles
 
-### Losslessness is Paramount
-Never sacrifice semantic information for density. Every fact, instruction, constraint, and example from the original must be preserved in the compressed version.
-
-### Aggressive Transformation
-Be bold with restructuring. The goal is maximum density, not preserving original style or structure. Tables, lists, and compact notation are preferred over prose.
-
-### Verification is Non-Negotiable
-Always run the Opus verification agent. Do not skip verification even if you're confident the compression is lossless.
-
-### Iterate on Feedback
-When verification finds issues, use the specific feedback to guide the next transformation. Don't just retry blindly.
+| Principle | Rule |
+|-----------|------|
+| **Memento** | Use TodoWrite to track phases; expand todos when verification fails; mark progress immediately |
+| **Losslessness** | Never sacrifice semantic information for density; every fact must be preserved |
+| **Aggressive** | Full restructuring allowed; maximize density, not preserve original style |
+| **Verification** | Always run density-verifier; never skip; iterate with specific feedback |
 
 ## Example Usage
 

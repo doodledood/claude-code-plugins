@@ -13,6 +13,8 @@ Create the SEO_STRATEGY.md document that defines your complete search optimizati
 
 This skill supports both **creating a new SEO strategy** and **updating an existing one** as platforms evolve.
 
+**Loop**: Prerequisites → Input → Research → Draft → Validate → Repeat until approved
+
 This skill guides you through:
 0. **Prerequisite Check** - Verify CUSTOMER.md exists; stop if not
 1. **Existing Strategy Detection** - Check for SEO_STRATEGY.md; ask update vs fresh
@@ -21,6 +23,8 @@ This skill guides you through:
 4. **Document Generation** - Create SEO_STRATEGY.md with prioritized recommendations
 5. **Validation Loop** - Review sections with user, incorporate feedback
 6. **Finalization** - Add version history once approved
+
+**Research log**: `/tmp/seo-research-{YYYYMMDD-HHMMSS}.md` - external memory updated after each step.
 
 ## Core Concepts
 
@@ -44,7 +48,43 @@ This skill guides you through:
 
 ## Workflow
 
+### Initial Setup (TodoWrite immediately)
+
+**Create todo list** - areas to research/validate, not fixed steps.
+
+**Starter todos**:
+```
+- [ ] Prerequisite check (CUSTOMER.md)
+- [ ] Existing strategy detection
+- [ ] Input collection
+- [ ] Research (industry, competitors, platforms)
+- [ ] Generate initial draft
+- [ ] Validation (executive summary, platforms, roadmap)
+- [ ] Finalize document
+```
+
+**Create research log** at `/tmp/seo-research-{YYYYMMDD-HHMMSS}.md`:
+
+```markdown
+# SEO Research Log
+Started: {timestamp}
+
+## Customer Context
+(from CUSTOMER.md)
+
+## Research Findings
+(populated by agents)
+
+## Validation Feedback
+(populated during review)
+
+## Decisions Made
+(populated incrementally)
+```
+
 ### Phase 0: Prerequisite Check
+
+**Mark "Prerequisite check" todo `in_progress`.**
 
 **CRITICAL**: Before anything else, check for CUSTOMER.md:
 
@@ -72,7 +112,20 @@ Also check for BRAND_GUIDELINES.md:
 - Use Glob to search for `**/BRAND_GUIDELINES.md`
 - If found, read it for voice/tone context to align content recommendations
 
+**Append to research log**:
+```markdown
+## Customer Context
+**ICP**: {summary from CUSTOMER.md}
+**Pain points**: {key pain points}
+**Triggers**: {what makes them search}
+**Brand voice**: {from BRAND_GUIDELINES.md if found}
+```
+
+**Mark "Prerequisite check" todo `completed`.**
+
 ### Phase 1: Existing Strategy Detection
+
+**Mark "Existing strategy detection" todo `in_progress`.**
 
 Check for existing SEO_STRATEGY.md:
 
@@ -96,7 +149,11 @@ options:
 
 3. **If NOT found**: Proceed directly to Phase 2.
 
+**Mark "Existing strategy detection" todo `completed`.**
+
 ### Phase 2: Input Collection
+
+**Mark "Input collection" todo `in_progress`.**
 
 Collect required inputs via AskUserQuestion.
 
@@ -139,7 +196,20 @@ options:
   - "Advanced - strong SEO, need cutting-edge GEO tactics"
 ```
 
+**After input collection, append to research log**:
+```markdown
+## Inputs Collected
+**Website**: {URL}
+**Product**: {description}
+**Competitors**: {list}
+**Current status**: {level}
+```
+
+**Mark "Input collection" todo `completed`.**
+
 ### Phase 3: Parallel Research
+
+**Mark "Research" todo `in_progress`.**
 
 Launch 3 seo-researcher agents in parallel using the Task tool. Send all three Task calls in a single message.
 
@@ -229,7 +299,27 @@ options:
 
 If "Mostly" or "No": Ask what's different and incorporate adjustments.
 
+**Append to research log**:
+```markdown
+## Research Findings
+### Industry Analysis
+{summary from Agent 1}
+
+### Competitor Analysis
+{summary from Agent 2}
+
+### Platform Requirements
+{summary from Agent 3}
+
+### User validation
+{matches/differs from user understanding}
+```
+
+**Mark "Research" todo `completed`.**
+
 ### Phase 4: Document Generation
+
+**Mark "Generate initial draft" todo `in_progress`.**
 
 Generate SEO_STRATEGY.md based on research and user context.
 
@@ -563,9 +653,26 @@ AI platforms evolve rapidly. This strategy should be refreshed quarterly.
 
 Write the document to the current working directory as `SEO_STRATEGY.md`.
 
+**Mark "Generate initial draft" todo `completed`.**
+
 ### Phase 5: Validation Loop
 
+**Mark "Validation" todo `in_progress`.**
+
 After generating the initial document, validate major sections with the user.
+
+### Memento Loop for Validation
+
+For each validation section:
+1. Mark current section validation `in_progress`
+2. Ask validation question (AskUserQuestion)
+3. **Write feedback immediately** to research log
+4. If not "Yes": add todo for that section's revision
+5. Update SEO_STRATEGY.md
+6. Mark section `completed`
+7. Repeat until user approves
+
+**NEVER proceed without writing feedback to log** — research log is external memory.
 
 **Section 1: Executive Summary**
 
@@ -621,7 +728,19 @@ options:
 
 If "No": Return to relevant section review.
 
+**After each section validation, append to research log**:
+```markdown
+### Validation: {section name}
+**Feedback**: {user's response}
+**Adjustments requested**: {if any}
+**Changes made**: {summary}
+```
+
+**Mark "Validation" todo `completed`.**
+
 ### Phase 6: Finalization
+
+**Mark "Finalize document" todo `in_progress`.**
 
 When user approves:
 
@@ -647,33 +766,36 @@ Your SEO_STRATEGY.md has been created with:
 Run /define-seo-strategy again to update the strategy as platforms evolve.
 ```
 
+**Append to research log**:
+```markdown
+## Completion
+Finished: {timestamp} | Research agents: 3 | Validation cycles: {count}
+## Summary
+{Brief summary of SEO strategy creation}
+```
+
+**Mark "Finalize document" todo `completed`. Mark all todos complete.**
+
 ## Key Principles
 
-### Customer-Aligned
-- Every recommendation ties back to how the ICP searches
-- Content topics match ICP pain points
-- Authority signals reflect what the ICP trusts
+| Principle | Rule |
+|-----------|------|
+| **Memento** | Write findings to research log BEFORE next step; every validation feedback → log; update after EACH phase |
+| **Todo-driven** | Create todos for phases; expand when validation reveals issues; never keep mental notes |
+| **Customer-aligned** | Every recommendation ties to ICP searches; content matches pain points; authority signals ICP trusts |
+| **Actionable** | No generic advice; every tactic has implementation details; effort/impact scoring |
+| **Platform-aware** | Each AI platform has unique patterns; tactics tailored per platform; anti-patterns explicit |
+| **Current data** | 2025+ research only; platforms evolve rapidly; strategy includes refresh cadence |
+| **Reduce cognitive load** | Recommended option first; multi-choice over free-text; limit questions to essentials |
 
-### Actionable Over Generic
-- No "create quality content" advice
-- Every tactic has specific implementation details
-- Effort/impact scoring enables prioritization
+### Never Do
 
-### Platform-Aware
-- Each AI platform has unique citation patterns
-- Tactics are tailored per platform
-- Anti-patterns called out explicitly
-
-### Current Data Only
-- 2025+ research only
-- Platforms evolve rapidly
-- Strategy includes refresh cadence
-
-### Reduce Cognitive Load
-- ALWAYS use AskUserQuestion when available
-- Put recommended option FIRST with "(Recommended)"
-- Multi-choice over free text where possible
-- Limit questions to what's truly needed
+- Proceed without writing findings to research log
+- Keep discoveries as mental notes instead of todos
+- Skip todo list
+- Finalize with unvalidated sections
+- Skip research phase (it's the core value)
+- Forget to expand todos when validation reveals issues
 
 ## Output Location
 
