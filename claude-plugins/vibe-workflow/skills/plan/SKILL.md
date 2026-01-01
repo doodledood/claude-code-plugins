@@ -12,7 +12,7 @@ Build an implementation plan through structured discovery. This skill takes a sp
 ## Overview
 
 This skill guides you through an **iterative loop** of:
-1. **Research** - Launch codebase-researcher agents to find exact files/patterns for the spec
+1. **Research** - Launch codebase-explorer agents to find exact files/patterns for the spec
 2. **Interview** - Ask strategic questions about approach, trade-offs, constraints
 3. **Write** - Update the plan incrementally after each iteration
 
@@ -36,9 +36,9 @@ If the user provides a spec file path, read it first. If they provide spec conte
 - Constraints and business rules
 - Out of scope items
 
-**Step 1.2: Launch codebase-researcher agent(s) for focused research**
+**Step 1.2: Launch codebase-explorer agent(s) for focused research**
 
-Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to find the exact files and patterns needed for THIS spec.
+Use the **codebase-explorer agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-explorer"`) to find the exact files and patterns needed for THIS spec.
 
 Launch one or more researchers depending on scope:
 - **Single researcher**: For focused work touching one area
@@ -81,7 +81,7 @@ After initial research, write the first draft to `/tmp/plan-{YYYYMMDD-HHMMSS}-{n
    - User preferences are ambiguous (approach, patterns, constraints)
 
    **Discovery and questions are an iteration loop** - Don't just research upfront and then ask all questions. Interleave them:
-   - User answer reveals new area? → Launch codebase-researcher to understand existing patterns
+   - User answer reveals new area? → Launch codebase-explorer to understand existing patterns
    - Need to understand how something is implemented? → Research first, then ask
    - Unsure if codebase already has a pattern? → Discover before asking
 
@@ -413,7 +413,7 @@ Before finalizing:
 
 ### Research First, Ask Strategically
 - Exhaust codebase research before asking questions
-- Use codebase-researcher for internal patterns
+- Use codebase-explorer for internal patterns
 - Only ask when multiple valid approaches exist with different trade-offs
 - Make reasonable decisions when research provides clear answers
 

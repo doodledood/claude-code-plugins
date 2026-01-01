@@ -19,7 +19,7 @@ Works for any type of work:
 ## Overview
 
 This skill guides you through an **iterative loop** of:
-1. **Discovery** - Launch codebase-researcher and web-researcher agents as needed
+1. **Discovery** - Launch codebase-explorer and web-researcher agents as needed
 2. **Interview** - Ask smart questions about decisions, needs, edge cases
 3. **Write** - Update the spec incrementally after each iteration
 
@@ -33,9 +33,9 @@ The interviewer role is that of a senior product manager: asking smart, non-obvi
 
 Before asking any questions, gather context to ask informed questions and suggest sensible defaults.
 
-**Step 1.1: Launch codebase-researcher agent(s) for overview**
+**Step 1.1: Launch codebase-explorer agent(s) for overview**
 
-Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to gain comprehensive understanding of the context for this work.
+Use the **codebase-explorer agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-explorer"`) to gain comprehensive understanding of the context for this work.
 
 Launch one or more researchers depending on scope:
 - **Single researcher**: For focused work touching one area
@@ -94,7 +94,7 @@ After initial research, write the first draft to `/tmp/spec-{YYYYMMDD-HHMMSS}-{n
 1. **Prioritize by information gain** - Ask questions that split the decision space most. Before each question, ask: *"Does the answer change what other questions I need to ask?"* If yes, ask it early.
 
    **Discovery and questions are an iteration loop** - Don't just research upfront and then ask all questions. Interleave them:
-   - User answer reveals new area? → Launch codebase-researcher to understand existing behavior
+   - User answer reveals new area? → Launch codebase-explorer to understand existing behavior
    - Need to understand current product behavior? → Research first, then ask
    - Unsure if codebase already handles something? → Discover before asking
    - **Launch web-researcher whenever you lack knowledge** to define requirements:
@@ -420,7 +420,7 @@ Review the full spec and let me know if you'd like to adjust anything.
 ### Make Decisions When You Can
 - Use research and context to make reasonable defaults
 - Interleave discovery and questions throughout the interview
-- Launch codebase-researcher for existing behavior, web-researcher for domain knowledge
+- Launch codebase-explorer for existing behavior, web-researcher for domain knowledge
 - User reviews the final spec and can request changes
 - Only ask when user input is actually required (decisions, preferences, ambiguity)
 - Defer technical decisions to the implementation planning phase
