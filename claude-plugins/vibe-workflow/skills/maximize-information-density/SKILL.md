@@ -10,10 +10,10 @@ Rewrite documents to maximize information density while preserving all semantic 
 ## Overview
 
 This skill transforms verbose documents into dense, information-rich versions through:
-1. **Compression** - Apply density techniques to rewrite content
-2. **Verification** - Launch Opus agent to verify losslessness
-3. **Iteration** - If verification finds issues, re-compress with feedback (max 3x)
-4. **Output** - Overwrite original with compressed version, display metrics
+1. **Compression** - Apply density techniques, write to `/tmp` (original untouched)
+2. **Verification** - Opus agent compares original vs compressed for losslessness
+3. **Iteration** - If issues found, re-compress with feedback (max 3x)
+4. **Output** - Atomic `mv` replaces original only after verification passes
 
 ## Workflow
 
@@ -118,9 +118,13 @@ while iteration <= max_iterations:
 - Compressed token count: `Math.ceil(compressed_content.length / 4)`
 - Reduction percentage: `((original - compressed) / original * 100).toFixed(0)`
 
-**Step 4.2: Apply changes**
+**Step 4.2: Apply changes (atomic replacement)**
 
-Read compressed content from temp file, then overwrite original file using Write tool.
+Original file remains untouched until verification passes. Replace atomically:
+```bash
+mv /tmp/compressed-{timestamp}.{ext} {original_file_path}
+```
+This ensures original is preserved if verification fails or process is interrupted.
 
 **Step 4.3: Display results**
 
@@ -162,6 +166,7 @@ If verification failed after 3 iterations:
 | Very large file (>50KB) | Process as single unit |
 | 0% reduction | Report: "Content already maximally dense" |
 | Verification fails 3x | Output best attempt with warning about potential loss |
+| mv fails | Error with temp file path; user can manually review/apply |
 
 ## Key Principles
 
