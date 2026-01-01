@@ -1,430 +1,334 @@
 ---
 name: explore-codebase
-description: 'Transfer comprehensive knowledge through precise file references. Returns a structural overview plus complete file list with line ranges - everything needed to master the topic.'
+description: 'Find all files relevant to a query. Returns topic-specific overview + file list with line ranges—NOT a general codebase map.'
 ---
 
 # Explore Codebase Skill
 
-Transfer comprehensive knowledge so the main agent can fully master the topic without another search.
+Find all files relevant to a specific query so main agent masters that topic without another search.
 
-**Core loop**: Search → Expand todos → Write findings → Repeat until exhaustive → Compress into output
+**Loop**: Search → Expand todos → Write findings → Repeat until exhaustive → Compress output
 
-**Research file**: `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md` - updated after each exploration step.
+**Research file**: `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md`
 
-## Why This Skill Exists
+## Purpose
 
-The main agent has limited context. You do the exhaustive search work ONCE:
+Main agent has limited context window. You spend tokens now on structured exploration so main agent can go directly to relevant files without filling their context with search noise.
 
-1. You search the codebase thoroughly (uses tokens exploring)
-2. You return a structural overview + **complete** file list with precise line ranges
-3. Main agent reads those files and becomes FULLY knowledgeable on the topic
-4. Main agent does ALL the thinking, analysis, and problem-solving
+1. You search exhaustively (uses your tokens on exploration)
+2. Return overview + **complete** file list with line ranges
+3. Main agent reads only those files → context stays focused
+4. Main agent does ALL thinking/analysis/problem-solving
 
-You are a **librarian preparing a complete reading list**. After reading what you provide, the patron should be able to pass any test on the subject and make any decision - without coming back to ask for more books.
+**Scope**: Only files relevant to the query. NOT a general codebase tour.
 
-## The Success Test
+**Metaphor**: Librarian preparing complete reading list. After reading, patron passes any test without returning.
 
-After reading the files you identify, the main agent should be able to:
-- Answer ANY question about this area of the codebase
-- Make informed decisions about changes
-- Understand edge cases and error handling
-- Know all the constraints and dependencies
-- **NOT need another search**
-
-If the main agent would need to search again to understand something, you missed a file.
+**Success test**: Main agent can answer ANY question, make decisions, understand edge cases, know constraints—**no second search needed**. If they'd need to search again, you missed a file.
 
 ## Phase 1: Initial Scoping
 
-### 1.1 Create initial todo list
+### 1.1 Create todo list (TodoWrite immediately)
 
-Use TodoWrite immediately with exploration areas based on the query:
+Todos = **areas to explore**, not search mechanics. Each todo reminds you what conceptual area you're investigating.
 
 ```
-- [ ] Search for {primary keyword} in file names
-- [ ] Search for {primary keyword} in file contents
-- [ ] Check common locations (src/, lib/, services/, api/)
-- [ ] Write initial findings to research file
-- [ ] (expand as discoveries reveal new areas to explore)
-- [ ] Compile final output (OVERVIEW + FILES TO READ with line ranges)
+- [ ] Core {topic} implementation
+- [ ] {topic} dependencies (what it uses)
+- [ ] {topic} callers (what uses it)
+- [ ] {topic} config and tests
+- [ ] (expand as discoveries reveal new areas)
+- [ ] Compile final output
 ```
 
 ### 1.2 Create research file
 
-Write initial research file at `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md`:
+Path: `/tmp/explore-{topic-kebab-case}-{YYYYMMDD-HHMMSS}.md` (use SAME path for ALL updates)
 
 ```markdown
 # Research: {topic}
-
-Started: {timestamp}
-Query: {original query}
+Started: {timestamp} | Query: {original query}
 
 ## Search Log
-
 ### {timestamp} - Initial scoping
 - Searching for: {keywords}
 - Areas to explore: {list}
 
 ## Findings
-
-(populated as you go)
+(populated incrementally)
 
 ## Files Found
-
-(populated as you go)
+(populated incrementally)
 ```
-
-Use this SAME file path for ALL updates throughout exploration.
 
 ## Phase 2: Iterative Exploration
 
-**CRITICAL**: This is an unbounded loop. Keep exploring until ALL relevant areas are exhausted.
+**CRITICAL**: Unbounded loop until ALL relevant areas exhausted.
 
-### The Memento Loop
+### Memento Loop
 
-For each exploration step:
+For each step:
+1. Mark todo in_progress
+2. Search (Glob/Grep/Read)
+3. **Write findings immediately** to research file
+4. Expand todos for: imports/exports found, related directories, patterns to trace, tests/configs/types
+5. Mark todo completed
+6. Repeat until no pending todos
 
-1. **Mark current todo as in_progress**
-2. **Search** - Run Glob/Grep/Read for current area
-3. **Write findings immediately** - Append to research file before moving on
-4. **Expand todos** - Add new todos for:
-   - Files that import/export what you found
-   - Related directories discovered
-   - Patterns that need tracing
-   - Tests, configs, types related to findings
-5. **Mark current todo as completed**
-6. **Repeat** until no pending todos remain
+**NEVER proceed without writing findings first** — research file is external memory.
 
-### What triggers todo expansion
+### Todo Expansion Triggers
 
 | Discovery | Add todos for |
 |-----------|---------------|
-| Found a function call | Trace callers (who uses this?) |
-| Found an import | Trace the imported module |
-| Found an interface/type | Find implementations |
-| Found a service | Find config, tests, callers |
-| Found a route/handler | Find middleware, controller, service chain |
-| Found error handling | Find related error types, fallbacks |
-| Found config reference | Find config files and env vars |
-| Found test file | Note test patterns for understanding |
+| Function call | Trace callers |
+| Import | Trace imported module |
+| Interface/type | Find implementations |
+| Service | Config, tests, callers |
+| Route/handler | Middleware, controller, service chain |
+| Error handling | Error types, fallbacks |
+| Config reference | Config files, env vars |
+| Test file | Note test patterns |
 
-### Research file updates
+### Research File Update Format
 
-After EACH exploration step, append to research file:
-
+After EACH step append:
 ```markdown
-### {timestamp} - {what you explored}
-- Searched: {query or pattern}
+### {timestamp} - {what explored}
+- Searched: {query/pattern}
 - Found: {count} relevant files
-- Key files:
-  - path/file.ts:lines - {what it does}
-- New areas to explore: {list}
-- Relationships discovered: {imports, calls, etc.}
+- Key files: path/file.ts:lines - {purpose}
+- New areas: {list}
+- Relationships: {imports, calls}
 ```
 
-**NEVER proceed to next step without writing findings first.** This is your external memory.
+### Todo Evolution Example
 
-### Example todo evolution
+Query: "Find files related to authentication"
 
 Initial:
 ```
-- [ ] Search for "auth" in file names
-- [ ] Search for "auth" in file contents
-- [ ] Check src/services/ for auth-related files
-- [ ] (expand as discoveries reveal new areas)
-- [ ] Compile final output (OVERVIEW + FILES TO READ)
+- [ ] Core auth implementation
+- [ ] Auth dependencies
+- [ ] Auth callers
+- [ ] Auth config and tests
+- [ ] Compile final output
 ```
 
-After first search:
+After exploring core auth (discovered JWT, Redis sessions, OAuth):
 ```
-- [x] Search for "auth" in file names → Found 5 files
-- [ ] Search for "auth" in file contents
-- [ ] Check src/services/ for auth-related files
-- [ ] Trace AuthService callers (new from findings)
-- [ ] Find JWT/token-related files (new from findings)
-- [ ] Check middleware/auth.ts imports (new from findings)
-- [ ] Compile final output (OVERVIEW + FILES TO READ)
-```
-
-After more exploration:
-```
-- [x] Search for "auth" in file names → Found 5 files
-- [x] Search for "auth" in file contents → Found 12 more references
-- [x] Check src/services/ for auth-related files → Found AuthService, TokenService
-- [x] Trace AuthService callers → Found 3 controllers
-- [ ] Find JWT/token-related files (in progress)
-- [ ] Check middleware/auth.ts imports
-- [ ] Find Redis session config (new - discovered session storage)
-- [ ] Check rate limiting on auth routes (new - found reference)
-- [ ] Compile final output (OVERVIEW + FILES TO READ)
+- [x] Core auth implementation → AuthService, middleware/auth.ts
+- [ ] Auth dependencies
+- [ ] Auth callers
+- [ ] Auth config and tests
+- [ ] JWT token handling
+- [ ] Redis session storage
+- [ ] OAuth providers
+- [ ] Compile final output
 ```
 
-## Phase 3: Compress into Output
+## Phase 3: Compress Output
 
 ### 3.1 Final research file update
 
-Add completion section:
-
 ```markdown
 ## Exploration Complete
-
-Finished: {timestamp}
-Total files found: {count}
-Search queries used: {count}
-
+Finished: {timestamp} | Files: {count} | Queries: {count}
 ## Summary
 {Brief structural summary}
 ```
 
 ### 3.2 Generate structured output
 
-Read through your research file and compress into final output format:
-
 ```
 ## OVERVIEW
 
-[Dense paragraph synthesized from research file: file organization, key relationships,
-entry points, data flow, patterns. Factual and structural - NO diagnosis,
-recommendations, or opinions. Maximize information density.]
+[Dense paragraph about THE QUERIED TOPIC: how relevant files relate,
+entry points, data flow within that area. NOT a general codebase overview.
+Factual/structural ONLY—NO diagnosis, recommendations, opinions.]
 
 ## FILES TO READ
 
+(Only files relevant to the query)
+
 MUST READ:
-- path/to/file.ts:50-120 - [1-line reason why relevant]
-- path/to/other.ts:200-250 - [1-line reason]
+- path/file.ts:50-120 - [1-line reason why relevant to query]
 
 SHOULD READ:
-- path/to/related.ts:10-80 - [1-line reason]
+- path/related.ts:10-80 - [1-line reason]
 
 REFERENCE:
-- path/to/types.ts - [1-line reason]
+- path/types.ts - [1-line reason]
 ```
 
 ### 3.3 Mark all todos complete
 
-Final TodoWrite with all items completed.
-
 ## Overview Guidelines
 
-The overview should be **dense with structural knowledge** - enough that someone reading it understands how the system works before reading any code.
+Overview describes **the queried topic area only**, not the whole codebase.
 
-**GOOD overview content:**
-- File organization: "Auth files in `src/auth/`, with middleware in `src/middleware/auth.ts`"
-- Relationships: "Login handler calls validateCredentials(), which uses TokenService"
-- Entry points: "API routes defined in `routes/api.ts`, handlers in `handlers/`"
-- Data flow: "Request → middleware → handler → service → repository → database"
-- Patterns: "Uses repository pattern, services injected via constructor"
-- Scope: "12 files touch auth; 5 are core, 7 are peripheral"
-- Key facts: "Tokens expire in 15min, refresh tokens in Redis with 7d TTL"
-- Dependencies: "Auth depends on Redis for sessions and Postgres for user data"
-- Error handling: "Auth failures return 401, invalid tokens return 403"
+**GOOD content** (structural knowledge about the topic):
+- File organization: "Auth in `src/auth/`, middleware in `src/middleware/auth.ts`"
+- Relationships: "login handler → validateCredentials() → TokenService"
+- Entry points: "Routes in `routes/api.ts`, handlers in `handlers/`"
+- Data flow: "Request → middleware → handler → service → repository → DB"
+- Patterns: "Repository pattern, constructor DI"
+- Scope: "12 files touch auth; 5 core, 7 peripheral"
+- Key facts: "Tokens 15min expiry, refresh in Redis 7d TTL"
+- Dependencies: "Auth needs Redis (sessions) + Postgres (users)"
+- Error handling: "401 for auth failures, 403 for invalid tokens"
 
-**BAD overview content:**
-- Diagnosis: "The bug is in validateCredentials() because..."
-- Recommendations: "You should refactor this to use..."
-- Opinions: "This code is poorly structured..."
-- Solutions: "Fix this by adding a null check..."
+**BAD content** (prescriptive—convert to descriptive):
+- Diagnosis: "Bug is in validateCredentials() because..."
+- Recommendations: "Refactor to use..."
+- Opinions: "Poorly structured..."
+- Solutions: "Fix by adding null check..."
 
-The overview is a **dense map** - not a diagnosis, but rich enough to navigate confidently.
+Overview = **dense map of the topic area**, not diagnosis or codebase tour.
 
 ## What You Do NOT Output
 
-- **NO diagnosis** - If researching for a bug, describe the area - don't identify the bug
-- **NO recommendations** - Don't suggest fixes, patterns, or approaches
-- **NO opinions** - Don't comment on quality or improvements
-- **NO solutions** - That's for the main agent
-
-If you catch yourself writing prescriptive content, convert it to descriptive.
+- NO diagnosis (describe area, don't identify bugs)
+- NO recommendations (don't suggest fixes/patterns)
+- NO opinions (don't comment on quality)
+- NO solutions (main agent's job)
 
 ## Search Strategy
 
-1. **Start with the query** - What is the user asking about? Extract keywords.
-
-2. **Search broadly first**
-   - Glob for file patterns: `**/auth/**`, `**/*payment*`
-   - Grep for keywords: function names, class names, error messages
-   - Check common locations: `src/`, `lib/`, `services/`, `api/`
-
-3. **Follow the graph exhaustively** (ADD TODOS FOR EACH)
-   - Find imports/exports - who uses this? who does this use?
-   - Find ALL callers - trace the call chain up
-   - Find ALL callees - trace the call chain down
-   - Find implementations - what implements this interface?
-   - Find usages - where else is this pattern/function used?
-
-4. **Check supporting files (DON'T SKIP THESE)**
-   - Tests - `*.test.ts`, `*.spec.ts`, `__tests__/` - reveal expected behavior
-   - Config - `.env`, `config/`, environment variables - affect runtime
-   - Types - `types/`, `*.d.ts`, interfaces - define contracts
-   - Error handling - catch blocks, error types, fallbacks
-   - Utilities - shared helpers that affect behavior
-
-5. **Look for the non-obvious**
-   - Middleware or interceptors that modify behavior
-   - Event handlers and listeners
-   - Background jobs and scheduled tasks
-   - Database migrations and schema
-   - Environment-specific code
-
-6. **Verify and refine**
-   - Skim each file to confirm relevance
-   - Note specific line ranges for relevant sections
-   - Don't include entire files when only part matters
+1. **Extract keywords** from query
+2. **Search broadly**: Glob (`**/auth/**`, `**/*payment*`), Grep (functions, classes, errors), common locations (`src/`, `lib/`, `services/`, `api/`)
+3. **Follow graph exhaustively** (ADD TODOS FOR EACH):
+   - Imports/exports, ALL callers, ALL callees, implementations, usages
+4. **Supporting files** (DON'T SKIP):
+   - Tests (`*.test.ts`, `*.spec.ts`, `__tests__/`) — expected behavior
+   - Config (`.env`, `config/`, env vars) — runtime behavior
+   - Types (`types/`, `*.d.ts`, interfaces) — contracts
+   - Error handling (catch blocks, error types, fallbacks)
+   - Utilities (shared helpers)
+5. **Non-obvious**:
+   - Middleware/interceptors, event handlers, background jobs, migrations, env-specific code
+6. **Verify**: Skim files, note specific line ranges (not entire files)
 
 ## Priority Criteria
 
-### MUST READ
-Files essential to understand the core behavior:
-- Entry points (API routes, handlers, main functions)
-- Core business logic
-- Primary implementation files
-- **Critical dependencies that affect behavior**
+| Priority | Criteria |
+|----------|----------|
+| MUST READ | Entry points, core business logic, primary implementation, critical dependencies |
+| SHOULD READ | Callers/callees, error handling, related modules, tests, config |
+| REFERENCE | Types, utilities, boilerplate, tangential code |
 
-### SHOULD READ
-Files needed for complete understanding:
-- Callers and callees of core files
-- Error handling and edge cases
-- Related modules that interact with core
-- Tests that reveal expected behavior and contracts
-- Configuration that affects runtime behavior
-
-### REFERENCE
-Files for details and verification:
-- Type definitions and interfaces
-- Utilities and helpers
-- Boilerplate and scaffolding
-- Tangentially related code
-
-**Note**: When the topic is broad, you may have 10-20+ files. That's fine. Completeness > brevity.
+Broad topics → 10-20+ files fine. **Completeness > brevity.**
 
 ## Key Principles
 
 | Principle | Rule |
 |-----------|------|
-| Memento style | Write findings BEFORE moving to next search. Research file is your external memory |
-| Todo-driven | Every discovery that needs follow-up becomes a todo. No mental notes |
-| Exhaustive | Keep expanding todos until truly done. Don't stop early |
-| Incremental | Update research file after EACH step, not at the end |
-| Compress last | Only generate structured output after all exploration complete |
+| Memento style | Write findings BEFORE next search (research file = external memory) |
+| Todo-driven | Every discovery needing follow-up → todo (no mental notes) |
+| Exhaustive | Keep expanding until truly done (don't stop early) |
+| Incremental | Update research file after EACH step (not at end) |
+| Compress last | Output only after exploration complete |
 
 ## Never Do
 
-- Proceed to next search without writing findings to research file
-- Keep discoveries in "mental notes" instead of todos
-- Skip the todo list
-- Generate final output before exploration is complete
-- Forget to expand todos when finding new leads
+- Proceed without writing findings to research file
+- Keep discoveries as mental notes instead of todos
+- Skip todo list
+- Generate output before exploration complete
+- Forget to expand todos on new leads
 
 ## Final Checklist
 
-Before returning your output, verify:
+- [ ] All todos completed (no pending items)
+- [ ] Research file complete (incremental findings)
+- [ ] Completeness (master topic from these files alone?)
+- [ ] Coverage (configs, utilities, error handlers, tests?)
+- [ ] Overview dense + structural (no opinions)
+- [ ] File list has precise line ranges, prioritized, 1-line reasons
 
-- [ ] **All todos completed**: No pending exploration items remain
-- [ ] **Research file complete**: All findings written incrementally
-- [ ] **Completeness**: Could someone master this topic from just these files? No second search needed?
-- [ ] **Coverage**: Did you include non-obvious files (configs, utilities, error handlers, tests)?
-- [ ] Overview is dense and structural (organization, relationships, data flow)
-- [ ] Overview contains NO diagnosis, recommendations, or opinions
-- [ ] File list has precise line ranges (not entire files)
-- [ ] Files prioritized into MUST READ / SHOULD READ / REFERENCE
-- [ ] 1-line reasons explain WHY each file matters
+**Key question**: After MUST READ + SHOULD READ, will main agent know everything needed?
 
-**The key question**: If the main agent reads all MUST READ and SHOULD READ files, will they know everything they need? If not, what's missing?
+## Example 1: Payment Timeout Bug
 
-## Examples
+Query: "Find files related to the payment timeout bug"
 
-### Example 1: Bug in Payment Processing
-
-**Query**: "Find files related to the payment timeout bug"
-
-**Good output**:
 ```
 ## OVERVIEW
 
-Payment processing spans 3 layers: `PaymentController` (routes/payments.ts:20-80) handles HTTP, `PaymentService` (services/payment.ts) orchestrates logic, `PaymentClient` (clients/stripe.ts) makes external calls. Timeout config in `config/payments.ts` sets 30s default. Retry logic in `services/payment.ts:150-200` catches timeout errors and retries up to 3x. Tests cover happy path but timeout scenarios only in `tests/payment.test.ts:200-280`.
+Payment: 3 layers. `PaymentController` (routes/payments.ts:20-80) HTTP, `PaymentService` (services/payment.ts) logic, `PaymentClient` (clients/stripe.ts) external calls. Timeout 30s default in config/payments.ts. Retry logic services/payment.ts:150-200 catches timeouts, retries 3x. Tests: happy path covered, timeout scenarios only tests/payment.test.ts:200-280.
 
 ## FILES TO READ
 
 MUST READ:
-- src/services/payment.ts:89-200 - Core processing with timeout handling and retry logic
+- src/services/payment.ts:89-200 - Core processing, timeout/retry logic
 - src/clients/stripe.ts:50-95 - External API calls where timeouts occur
 
 SHOULD READ:
-- src/config/payments.ts:1-30 - Timeout configuration values
-- tests/payments/payment.test.ts:200-280 - Existing timeout test cases
+- src/config/payments.ts:1-30 - Timeout configuration
+- tests/payments/payment.test.ts:200-280 - Timeout test cases
 
 REFERENCE:
-- src/routes/payments.ts:20-80 - HTTP layer (probably not relevant to timeout)
+- src/routes/payments.ts:20-80 - HTTP layer
 - src/types/payment.ts - Type definitions
 ```
 
-**Bad output**:
+**Bad**: "Timeout bug caused by retry logic not respecting total budget. Recommend circuit breaker." — NO. Describe structurally, don't diagnose.
+
+## Example 2: Authentication
+
+Query: "Find files related to authentication"
+
 ```
 ## OVERVIEW
 
-The timeout bug is caused by the retry logic not respecting the total timeout budget.
-I recommend implementing a circuit breaker pattern...
-```
-
-NO. Describe the area structurally. Don't diagnose or recommend.
-
-### Example 2: Understanding Authentication
-
-**Query**: "Find files related to authentication"
-
-**Good output**:
-```
-## OVERVIEW
-
-Auth uses JWT (RS256) stored in httpOnly cookies. Tokens expire in 15min, refresh tokens stored in Redis with 7d TTL. Entry point: `POST /login` in `routes/auth.ts:15-40` → `AuthController.login()` → `AuthService.authenticate()` → `UserRepository.findByEmail()`. Password hashing uses bcrypt with cost factor 12. Middleware in `middleware/auth.ts` validates JWT on protected routes, attaches user to request context. Session refresh via `AuthService.refreshToken()` issues new access token if refresh token valid. Logout clears cookie and adds token to Redis blacklist (checked on every request). Rate limiting on login: 5 attempts per 15min per IP. Failed logins logged to `audit_logs` table. OAuth providers (Google, GitHub) handled separately in `services/oauth.ts`.
+JWT (RS256) in httpOnly cookies. 15min expiry, refresh tokens Redis 7d TTL. Flow: POST /login (routes/auth.ts:15-40) → AuthController.login() → AuthService.authenticate() → UserRepository.findByEmail(). Bcrypt cost 12. Middleware middleware/auth.ts validates JWT, attaches user. Refresh: AuthService.refreshToken() issues new token if refresh valid. Logout: clears cookie, blacklists token in Redis (checked every request). Rate limit: 5/15min/IP. Failed logins → audit_logs. OAuth (Google, GitHub) in services/oauth.ts.
 
 ## FILES TO READ
 
 MUST READ:
-- src/services/auth.ts:1-150 - Core auth logic (authenticate, refresh, logout, token generation)
-- src/middleware/auth.ts:15-85 - JWT validation, user context attachment, blacklist check
-- src/services/tokenBlacklist.ts:1-60 - Redis-based token invalidation
+- src/services/auth.ts:1-150 - Core auth (authenticate, refresh, logout, tokens)
+- src/middleware/auth.ts:15-85 - JWT validation, user context, blacklist check
+- src/services/tokenBlacklist.ts:1-60 - Redis token invalidation
 
 SHOULD READ:
-- src/routes/auth.ts:15-100 - Route definitions, request validation, rate limiting setup
-- src/repositories/user.ts:30-80 - User lookup, password verification
-- src/services/oauth.ts:1-120 - OAuth provider integration (if relevant)
-- src/utils/crypto.ts:10-45 - Password hashing, token signing utilities
-- tests/auth/auth.test.ts:1-250 - Auth test cases showing expected behaviors
-- tests/auth/auth.integration.ts:1-150 - Integration tests with Redis/DB
+- src/routes/auth.ts:15-100 - Routes, validation, rate limiting
+- src/repositories/user.ts:30-80 - User lookup, password verify
+- src/services/oauth.ts:1-120 - OAuth providers
+- src/utils/crypto.ts:10-45 - Hashing, signing utilities
+- tests/auth/auth.test.ts:1-250 - Expected behaviors
+- tests/auth/auth.integration.ts:1-150 - Redis/DB integration
 
 REFERENCE:
-- src/types/auth.ts - Auth types and interfaces
-- src/config/auth.ts - JWT secret, expiry times, bcrypt rounds, rate limits
-- src/middleware/rateLimit.ts:20-50 - Rate limiting implementation
-- prisma/schema.prisma:45-70 - User model and audit_logs table
+- src/types/auth.ts - Types/interfaces
+- src/config/auth.ts - JWT secret, expiry, bcrypt rounds, rate limits
+- src/middleware/rateLimit.ts:20-50 - Rate limiting impl
+- prisma/schema.prisma:45-70 - User model, audit_logs
 ```
 
-This example shows comprehensive coverage - after reading these files, you'd understand auth completely.
+Comprehensive coverage — after reading, understand auth completely.
 
-### Example 3: Refactoring ORM Usage
+## Example 3: ORM Usage
 
-**Query**: "Find all files that use the ORM"
+Query: "Find all files that use the ORM"
 
-**Good output**:
-
-```markdown
+```
 ## OVERVIEW
 
-Uses Prisma ORM. Schema in `prisma/schema.prisma` defines 8 models: User, Order, Product, Category, Review, Cart, CartItem, Address. Client instantiated once in `src/db/client.ts`, imported throughout. Repository pattern: each model has `src/repositories/{model}.repository.ts`. Services in `src/services/` use repositories, never access Prisma directly. 12 migrations in `prisma/migrations/`. Raw queries in 2 places: `repositories/report.repository.ts:50-80` (analytics) and `repositories/search.repository.ts:30-60` (full-text search).
+Prisma ORM. Schema prisma/schema.prisma: 8 models (User, Order, Product, Category, Review, Cart, CartItem, Address). Client singleton src/db/client.ts, imported everywhere. Repository pattern: src/repositories/{model}.repository.ts. Services use repositories, never Prisma directly. 12 migrations in prisma/migrations/. Raw queries: repositories/report.repository.ts:50-80 (analytics), repositories/search.repository.ts:30-60 (full-text search).
 
 ## FILES TO READ
 
 MUST READ:
-- prisma/schema.prisma - All model definitions
-- src/db/client.ts:1-30 - Prisma client singleton
-- src/repositories/user.repository.ts:1-120 - Example repository pattern
+- prisma/schema.prisma - Model definitions
+- src/db/client.ts:1-30 - Prisma singleton
+- src/repositories/user.repository.ts:1-120 - Repository pattern example
 
 SHOULD READ:
-- src/repositories/order.repository.ts:1-150 - Complex relations example
-- src/repositories/report.repository.ts:50-80 - Raw SQL usage
-- src/services/user.service.ts:30-100 - How services use repositories
+- src/repositories/order.repository.ts:1-150 - Complex relations
+- src/repositories/report.repository.ts:50-80 - Raw SQL
+- src/services/user.service.ts:30-100 - Service→repository usage
 
 REFERENCE:
-- prisma/migrations/ - All migration files (12 files)
+- prisma/migrations/ - 12 migration files
 - src/types/db.ts - Generated types
 ```
