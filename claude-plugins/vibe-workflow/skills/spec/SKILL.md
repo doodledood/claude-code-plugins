@@ -1,43 +1,53 @@
 ---
 name: spec
-description: 'Interactive product requirements builder that interviews you to create a comprehensive PRD using EARS syntax. Guides through context gathering, discovery interview, and spec generation.'
+description: 'Interactive requirements builder that interviews you to create a comprehensive spec using EARS syntax. Works for features, bug fixes, doc updates, refactors - any work that needs clear definition.'
 ---
 
-# Product Spec Skill
+# Spec Skill
 
-Build a product requirements document (PRD) through structured discovery interview. This skill conducts a product-focused interview to understand WHAT to build and WHY - not technical implementation details.
+Build a requirements spec through structured discovery interview. This skill conducts an interview to understand WHAT needs to be done and WHY - not technical implementation details.
 
-> **Product Focus Only**: No technical architecture, APIs, data models, or testing strategy. Those come later from the implementation team.
+Works for any type of work:
+- **Features** - New functionality to build
+- **Bug fixes** - Problems to investigate and resolve
+- **Doc updates** - Documentation to create or improve
+- **Refactors** - Code improvements with clear goals
+- **Any request** - Anything that benefits from clear requirements
+
+> **Focus on WHAT, not HOW**: This skill defines requirements - what needs to be done and why. No technical architecture, APIs, data models, libraries, or implementation approach. Those come in the next phase (implementation planning).
 
 ## Overview
 
-This skill guides you through:
-1. **Context Gathering** - Launch researcher agents, read recommended files, research UX patterns
-2. **Discovery Interview** - Smart questions about product decisions, user needs, edge cases
-3. **Write Spec** - Generate PRD using EARS syntax, output summary for quick validation
+This skill guides you through an **iterative loop** of:
+1. **Discovery** - Launch codebase-researcher and web-researcher agents as needed
+2. **Interview** - Ask smart questions about decisions, needs, edge cases
+3. **Write** - Update the spec incrementally after each iteration
 
 The interviewer role is that of a senior product manager: asking smart, non-obvious questions that reduce ambiguity and cognitive load.
 
+**Incremental spec updates**: Write the current spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` after each research/interview iteration. This captures progress and allows the user to review at any point.
+
 ## Workflow
 
-### Phase 1: Context Gathering (Before Asking Questions)
+### Phase 1: Initial Context Gathering
 
 Before asking any questions, gather context to ask informed questions and suggest sensible defaults.
 
 **Step 1.1: Launch codebase-researcher agent(s) for overview**
 
-Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to gain comprehensive understanding of the product context for specifying this feature.
+Use the **codebase-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:codebase-researcher"`) to gain comprehensive understanding of the context for this work.
 
 Launch one or more researchers depending on scope:
-- **Single researcher**: For focused features touching one area
-- **Multiple researchers in parallel**: For cross-cutting features (e.g., one for auth, one for payments, one for notifications) - launch all Task calls in a single message to run them concurrently
+- **Single researcher**: For focused work touching one area
+- **Multiple researchers in parallel**: For cross-cutting work (e.g., one for auth, one for payments, one for notifications) - launch all Task calls in a single message to run them concurrently
 
 Prompt each researcher to explore:
 - What the product does and who uses it
-- Existing similar features and their UX patterns
+- Existing related code and patterns
 - User flows and terminology
 - Product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md)
 - Any existing specs or requirements in `docs/`, `specs/`, or similar directories
+- For bug fixes: the bug's context, related code, potential causes
 
 Each researcher returns comprehensive analysis plus a **prioritized reading list** of files you should read.
 
@@ -49,24 +59,33 @@ After the researcher(s) complete, read every file from their recommended reading
 - Product context and user definitions
 - Design and brand guidelines
 
-Do not skip any recommended files - the researchers identified them as important for specifying this feature.
+Do not skip any recommended files - the researchers identified them as important for specifying this work.
 
-**Step 1.3: Launch web-researcher agent(s) for UX/product research (if needed)**
+**Step 1.3: Launch web-researcher agent(s) for external research (if needed)**
 
-Use the **web-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:web-researcher"`) to research:
-- How other products solve similar problems
-- UX patterns and user expectations for this type of feature
-- Common pitfalls and edge cases users care about
+Use the **web-researcher agent** (via Task tool with `subagent_type: "vibe-workflow:web-researcher"`) whenever you lack sufficient knowledge to define WHAT needs to be built. Research:
+- Domain-specific concepts, terminology, or standards you're unfamiliar with
+- User expectations - what do users expect from this type of feature/solution?
+- How other products solve similar problems (from a user experience perspective)
+- Regulatory, compliance, or industry requirements that affect what we must build
+- Business context that shapes requirements
+- Any topic where your knowledge is insufficient to ask good questions or define clear requirements
+
+**Stay focused on WHAT**: Research to understand the problem domain and user needs, not technical implementation approaches.
 
 Launch one or more web researchers depending on scope:
-- **Single researcher**: For focused features with one main UX question
-- **Multiple researchers in parallel**: For features needing research on multiple aspects (e.g., one for UX patterns, one for competitor analysis, one for accessibility best practices) - launch all Task calls in a single message to run them concurrently
+- **Single researcher**: For focused questions
+- **Multiple researchers in parallel**: For work needing research on multiple topics - launch all Task calls in a single message to run them concurrently
 
 Each researcher returns all relevant findings in its response - no need to read additional files.
 
-This context lets you ask informed questions and suggest sensible defaults.
+This context lets you ask informed questions and suggest sensible defaults. Continue launching web researchers throughout the interview whenever knowledge gaps emerge.
 
-### Phase 2: Discovery Interview
+**Step 1.4: Write initial spec draft**
+
+After initial research, write the first draft to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` with what you know so far. Mark uncertain areas with `[TBD]` - these will be resolved during the interview. Use this same file path for all subsequent updates.
+
+### Phase 2: Iterative Discovery Interview
 
 **IMPORTANT: Use AskUserQuestion tool for ALL questions.** Never ask questions in plain text - always use the tool so the user gets structured options to choose from.
 
@@ -75,11 +94,18 @@ This context lets you ask informed questions and suggest sensible defaults.
 1. **Prioritize by information gain** - Ask questions that split the decision space most. Before each question, ask: *"Does the answer change what other questions I need to ask?"* If yes, ask it early.
 
    **Discovery and questions are an iteration loop** - Don't just research upfront and then ask all questions. Interleave them:
-   - User answer reveals new area? → Launch codebase-researcher to understand it
-   - Need to know existing patterns before asking about approach? → Research first
+   - User answer reveals new area? → Launch codebase-researcher to understand existing behavior
+   - Need to understand current product behavior? → Research first, then ask
    - Unsure if codebase already handles something? → Discover before asking
-   - Need UX patterns or industry best practices? → Launch web-researcher
-   - User mentions competitor or external product? → Web research before asking follow-ups
+   - **Launch web-researcher whenever you lack knowledge** to define requirements:
+     - Domain concepts or terminology you don't understand
+     - User expectations for this type of feature
+     - Regulatory or compliance requirements
+     - How similar products handle this (UX perspective, not technical)
+
+   **Remember: WHAT, not HOW** - Research to understand requirements, not implementation.
+
+   **Update spec after each iteration** - After each research/interview round, update the spec file with new information. Replace `[TBD]` markers as decisions are made. This keeps the spec current and lets the user review progress anytime.
 
    Only ask the user when:
    - The answer requires a business/product decision
@@ -214,31 +240,35 @@ options:
   - "Skip this edge case in v1"
 ```
 
-### Phase 3: Write the Spec & Summarize
+### Phase 3: Finalize the Spec & Summarize
 
-After the interview is complete:
+After the interview is complete and all `[TBD]` markers are resolved:
 
-**Step 3.1: Write the specification**
+**Step 3.1: Finalize the specification**
 
-Write the spec to: `/tmp/feature-spec-{YYYYMMDD-HHMMSS}-{feature-name-kebab-case}.md`
+The spec has been incrementally updated throughout the process. Do a final pass to:
+- Remove any remaining `[TBD]` markers
+- Ensure consistency across sections
+- Add any missing sections based on the work type
 
-Use the EARS (Easy Approach to Requirements Syntax) format:
+Use the EARS (Easy Approach to Requirements Syntax) format. Adapt sections based on work type (feature, bug fix, doc update, etc.):
 
 ```markdown
-# Product Requirements: {Feature Name}
+# Requirements: {Work Name}
 
 Generated: {date}
+Type: {Feature | Bug Fix | Doc Update | Refactor | Other}
 
 ## Overview
 
 ### Problem Statement
 What problem are we solving? Why does it matter?
 
-### Target Users
-Who is this for? What do they care about?
+### Target Users / Affected Areas
+Who is this for? What parts of the system are affected?
 
 ### Success Criteria
-How do we know this feature succeeded?
+How do we know this work succeeded?
 
 ## User Stories
 
@@ -316,19 +346,20 @@ Explicit non-goals - what we are NOT building (and why).
 - {Non-goal}: {brief reason}
 ```
 
-Adapt sections based on the feature. Skip irrelevant sections, add custom ones as needed.
+Adapt sections based on the work type. Skip irrelevant sections, add custom ones as needed. For bug fixes, include root cause and fix verification. For doc updates, include affected docs and changes.
 
 **Step 3.2: Output a summary**
 
-After writing the spec, output a summary so the user can validate without reading the full spec:
+After finalizing the spec, output a summary so the user can validate without reading the full spec:
 
 ```
 ## Spec Summary
 
-**Feature**: {name}
-**File**: /tmp/feature-spec-{timestamp}-{name}.md
+**Work**: {name}
+**Type**: {Feature | Bug Fix | Doc Update | Refactor | Other}
+**File**: /tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md
 
-### What We're Building
+### What We're Doing
 {1-2 sentence overview}
 
 ### Key Decisions Made
@@ -350,15 +381,17 @@ Review the full spec and let me know if you'd like to adjust anything.
 
 ## Key Principles
 
-### Product Focus Only
-- No technical implementation details (architecture, APIs, data models, testing)
-- Frame everything from what the user experiences, not how it's built
-- Those technical decisions come later from the implementation team
+### Focus on WHAT, not HOW
+- Define requirements: what needs to happen, what the user experiences, what success looks like
+- No technical implementation: architecture, APIs, data models, libraries, code patterns
+- Technical planning comes in the next phase after requirements are clear
+- If you catch yourself thinking about "how to implement," refocus on "what should happen"
 
-### User Perspective
-- Requirements describe user-visible behavior
-- Edge cases are about user experience, not system internals
-- Success is measured by user outcomes
+### User/Outcome Perspective
+- Requirements describe observable behavior or outcomes
+- Edge cases are about user experience and business impact, not system internals
+- Success is measured by user outcomes or problem resolution
+- Ask "what does the user see/experience?" not "how does the system work?"
 
 ### No Open Questions
 - Resolve everything during the interview
@@ -380,14 +413,22 @@ Review the full spec and let me know if you'd like to adjust anything.
 
 ### Make Decisions When You Can
 - Use research and context to make reasonable defaults
-- Interleave discovery and questions - launch codebase-researcher or web-researcher whenever needed
+- Interleave discovery and questions throughout the interview
+- Launch codebase-researcher for existing behavior, web-researcher for domain knowledge
 - User reviews the final spec and can request changes
 - Only ask when user input is actually required (decisions, preferences, ambiguity)
+- Defer technical decisions to the implementation planning phase
 
 ### Iterate Until Complete
-- Keep asking until all product decisions are made
-- Don't rush to the spec phase with gaps
+- Keep asking until all decisions are made
+- Don't rush to finalize with gaps
 - Better to ask one more question than produce an incomplete spec
+
+### Incremental Updates
+- Write spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` after initial research
+- Update the same file after each iteration
+- Use `[TBD]` markers for unresolved items, replace as decisions are made
+- User can review progress at any point
 
 ### Always Output the Summary
 - Lets user validate quickly without reading the full spec
@@ -396,4 +437,4 @@ Review the full spec and let me know if you'd like to adjust anything.
 
 ## Output Location
 
-Write the spec to `/tmp/feature-spec-{YYYYMMDD-HHMMSS}-{feature-name-kebab-case}.md`
+Write the spec to `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - create after initial research, update incrementally throughout the process.
