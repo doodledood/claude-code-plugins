@@ -1,7 +1,9 @@
 ---
-name: define-customer-profile
 description: 'Iteratively craft a CUSTOMER.md document that precisely defines your ideal customer profile (ICP). This is the foundational document from which everything else (product, features, brand) derives. Uses parallel research agents and multi-choice workflow with feedback cycles.'
+argument-hint: Optional - product name or context
 ---
+
+**User request**: $ARGUMENTS
 
 # Customer Profile Skill
 
@@ -473,6 +475,8 @@ Use this structure:
 
 ---
 
+**User request**: $ARGUMENTS
+
 ## The ICP: [Short Label]
 
 **The ICP is NOT "[common misconception]."** It's **[precise definition]**.
@@ -485,6 +489,8 @@ Use this structure:
 [Brief explanation of why this distinction matters]
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## Current State & Triggers
 
@@ -499,6 +505,8 @@ Use this structure:
 - [External pressure (boss, deadline, competitor)]
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## Profile Data
 
@@ -533,6 +541,8 @@ Use this structure:
 
 ---
 
+**User request**: $ARGUMENTS
+
 ## Audiences to Avoid
 
 | Audience | Why | Signs |
@@ -542,6 +552,8 @@ Use this structure:
 | **[Segment 3]** | [Reason] | [How to identify] |
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## ICP Characteristics
 
@@ -563,6 +575,8 @@ Use this structure:
 
 ---
 
+**User request**: $ARGUMENTS
+
 ## Pain Points (User Voice)
 
 1. **"[Pain point in customer's words]"** - [Brief context]
@@ -572,6 +586,8 @@ Use this structure:
 5. **"[Pain point in customer's words]"** - [Brief context]
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## What the ICP Values (In a Solution)
 
@@ -588,6 +604,8 @@ These are things the ICP cares about when evaluating solutions. Use these to gui
 
 ---
 
+**User request**: $ARGUMENTS
+
 ## Goals & Success
 
 - **Primary**: [Main outcome they want]
@@ -598,9 +616,13 @@ These are things the ICP cares about when evaluating solutions. Use these to gui
 
 ---
 
+**User request**: $ARGUMENTS
+
 **The North Star**: [One sentence that summarizes what success looks like for the ICP]
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## Quick Reference
 
@@ -777,6 +799,8 @@ Finished: {timestamp} | Questions: {count} | Refinement cycles: {count}
 
 ```markdown
 ---
+
+**User request**: $ARGUMENTS
 
 ## Version History
 

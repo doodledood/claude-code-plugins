@@ -1,6 +1,6 @@
 ---
-name: maximize-information-density
 description: 'Compresses documents/prompts to maximize information density while preserving semantic content. Use when asked to make content concise, shorten, reduce tokens, tighten, or compress files like CLAUDE.md, skills, or specs.'
+argument-hint: Required - path to file to compress
 ---
 
 # Maximize Information Density Skill

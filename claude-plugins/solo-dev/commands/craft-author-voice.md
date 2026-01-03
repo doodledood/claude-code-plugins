@@ -1,7 +1,9 @@
 ---
-name: craft-author-voice
 description: 'Captures writing style/voice into AUTHOR_VOICE.md so AI can write like the user. Use when asked to match tone, write like me, replicate voice, or capture writing style for content generation.'
+argument-hint: Optional - writing samples or context
 ---
+
+**User request**: $ARGUMENTS
 
 # Author Voice Skill
 
@@ -269,6 +271,8 @@ NEVER:
 "[Same idea in the author's distinctive style]"
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## Quick Reference
 

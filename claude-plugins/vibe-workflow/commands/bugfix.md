@@ -1,7 +1,9 @@
 ---
-name: bugfix
 description: 'Investigates and fixes bugs systematically with root cause analysis. Use when asked to debug, troubleshoot, fix a bug, investigate an issue, or find why something is broken. Creates reproduction tests and verifies fixes.'
+argument-hint: Optional - bug description or error message
 ---
+
+**User request**: $ARGUMENTS
 
 # Bugfix Skill
 

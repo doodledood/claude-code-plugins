@@ -1,7 +1,9 @@
 ---
-name: implement
 description: 'Executes implementation plans autonomously chunk by chunk. Use after /plan to build features, implement changes, or code solutions. Auto-fixes gate failures and tracks progress.'
+argument-hint: Optional - path to plan file
 ---
+
+**User request**: $ARGUMENTS
 
 # Implement Skill
 

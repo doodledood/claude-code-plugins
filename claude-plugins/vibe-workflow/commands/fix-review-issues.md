@@ -1,6 +1,6 @@
 ---
-name: fix-review-issues
 description: 'Orchestrate fixing issues found by /review. Handles issue discovery, user confirmation, prioritized execution, and progress tracking. Works with review output from any category (bugs, maintainability, types, docs, coverage, claude-md).'
+argument-hint: Optional - --severity critical,high --category bugs,types
 ---
 
 # Fix Review Issues Skill

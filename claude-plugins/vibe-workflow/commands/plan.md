@@ -1,7 +1,9 @@
 ---
-name: plan
 description: 'Create implementation plans from spec via iterative codebase research and strategic questions. Produces mini-PR plans optimized for iterative development.'
+argument-hint: Optional - path to spec file
 ---
+
+**User request**: $ARGUMENTS
 
 # Plan Skill
 
@@ -223,6 +225,8 @@ Do NOT implement until user explicitly approves. After approval: create todos fr
 
 ---
 
+**User request**: $ARGUMENTS
+
 # Planning Methodology
 
 ## 1. Principles
@@ -319,6 +323,8 @@ Each chunk must:
 Gates: Type checks (0 errors), Tests (pass), Lint (clean)
 
 ---
+
+**User request**: $ARGUMENTS
 
 ## 1. [Name]
 

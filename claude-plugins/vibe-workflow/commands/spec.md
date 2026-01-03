@@ -1,7 +1,9 @@
 ---
-name: spec
 description: 'Builds requirements specification through structured discovery interview. Use when defining scope, gathering requirements, specifying what a feature should do, or creating a spec for features, bugs, docs, or refactors.'
+argument-hint: Optional - work name or topic
 ---
+
+**User request**: $ARGUMENTS
 
 # Spec Skill
 
