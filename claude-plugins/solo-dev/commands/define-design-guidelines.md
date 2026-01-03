@@ -1,5 +1,4 @@
 ---
-name: define-design-guidelines
 description: 'Create a DESIGN_GUIDELINES.md that defines how to design UI/UX for your customer. Requires CUSTOMER.md to exist first. Covers aesthetic direction, design tokens, typography, color, motion, components, and layout patterns. Bakes in frontend-design skill principles to avoid generic AI aesthetics.'
 ---
 

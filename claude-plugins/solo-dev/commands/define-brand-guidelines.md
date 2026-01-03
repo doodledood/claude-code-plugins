@@ -1,5 +1,4 @@
 ---
-name: define-brand-guidelines
 description: 'Create a BRAND_GUIDELINES.md that defines how to communicate with your customer. Requires CUSTOMER.md to exist first. Covers voice, tone, language rules, messaging framework, and copy patterns.'
 ---
 
