@@ -36,26 +36,37 @@ Systematically identify all units in original:
 | **Examples** | Code, usage demos, samples |
 | **Caveats** | Warnings, edge cases, exceptions |
 | **Relationships** | Dependencies, prerequisites, ordering |
+| **Emphasis** | Bold, caps, repetition, "IMPORTANT", "CRITICAL", "NEVER" |
+| **Hedging** | "might", "consider", "usually" (intentional uncertainty) |
+| **Priority signals** | Ordering, "first", "most important", numbered lists |
 
 ### Step 3: Verify Each Unit
 
 For each unit, check if present in compressed version.
 
 **Acceptable transformations** (VERIFIED):
-- Different wording, same meaning
-- Merged with related content
-- Restructured/relocated
+- Different wording, same meaning AND same emphasis level
+- Merged with related content (if priority relationships preserved)
+- Restructured/relocated (if ordering doesn't convey priority)
 - Abbreviated after first mention
-- Format change (prose → table/list)
-- Implied by broader statement
+- Format change (prose → table/list) with emphasis markers preserved
 
 **Unacceptable** (GAP):
 - Missing entirely
 - Meaning altered/ambiguous
-- Constraint weakened ("must" → "should")
+- **Ambiguity introduced** (clear original → unclear compressed):
+  - Conditions merged that have different triggers ("when A, do X; when B, do Y" → "when A/B, do X/Y")
+  - Referents unclear (removed antecedent for "it", "this", "the tool")
+  - Relationships flattened ("A requires B, C requires D" → "A, C require B, D")
+  - Scope unclear (does qualifier apply to all items or just adjacent?)
+- Constraint weakened ("must" → "should", "always" → "usually")
+- Emphasis removed (bold/caps/repetition that signals priority)
+- Intentional hedging removed (uncertainty was meaningful)
 - Example removed without equivalent
 - Important caveat dropped
 - Dependency/relationship lost
+- Priority ordering lost (first items often = highest priority)
+- Tone significantly altered (formal→casual or vice versa when context-inappropriate)
 
 ### Step 4: Generate Report
 
@@ -106,9 +117,18 @@ All semantic content preserved. Compression is lossless.
 | Severity | Criteria | Action |
 |----------|----------|--------|
 | CRITICAL | Core instruction/constraint lost; behavior would be wrong | Must restore |
-| HIGH | Important context lost; degraded but functional | Should restore |
-| MEDIUM | Useful info lost; minor impact | Restore if space allows |
+| HIGH | Important context OR emphasis/priority signal lost; degraded but functional | Should restore |
+| MEDIUM | Useful info OR nuance lost; minor impact | Restore if space allows |
 | LOW | Minor detail; acceptable loss for density | Optional |
+
+**Nuance/ambiguity severity**:
+- Ambiguity introduced in critical instructions → CRITICAL
+- Emphasis on safety/critical path removed → CRITICAL
+- Conditions merged incorrectly (behavior would differ) → CRITICAL
+- Priority ordering changed for important items → HIGH
+- Intentional hedging removed (created false certainty) → HIGH
+- Referent unclear but inferable from context → MEDIUM
+- Tone mismatch for audience → MEDIUM
 
 ## Restoration Guidelines
 
@@ -157,15 +177,28 @@ AskUserQuestion tool for ALL questions - never plain text
 Examples: `if err != nil { return err }` | `try/catch with specific types` | `Result<T,E> pattern`
 ```
 
+### Ambiguity Introduced
+
+**Original**: "Use the Read tool for files. Use the Grep tool for searching content."
+**In Compressed**: "Use the tool for files and content searching"
+**Gap**: "the tool" is ambiguous; two distinct tools merged into one unclear reference
+
+**Suggested Restoration**:
+```
+Read for files; Grep for content search
+```
+
 ## False Positive Avoidance
 
-| Not a Gap | Why |
-|-----------|-----|
-| Heading changed | Structure, not content |
-| Prose → list | Format preserves info |
-| Removed redundancy | Same info stated elsewhere |
-| Merged sections | All info present |
-| Shortened example | Same concept demonstrated |
+| Not a Gap | Why | BUT check for... |
+|-----------|-----|------------------|
+| Heading changed | Structure, not content | Emphasis in heading (e.g., "CRITICAL:") |
+| Prose → list | Format preserves info | Priority ordering preserved |
+| Removed redundancy | Same info stated elsewhere | Repetition was for emphasis |
+| Merged sections | All info present | Priority/ordering relationships |
+| Shortened example | Same concept demonstrated | Edge cases still covered |
+
+**When in doubt**: Flag as MEDIUM gap. Over-flagging is safer than under-flagging.
 
 ## Output Requirements
 
@@ -178,9 +211,11 @@ Examples: `if err != nil { return err }` | `try/catch with specific types` | `Re
 ## Self-Check Before Output
 
 - [ ] Read both files completely
-- [ ] Extracted all semantic units from original
+- [ ] Extracted all semantic units from original (including emphasis, hedging, priority signals)
 - [ ] Checked each unit against compressed
-- [ ] Only flagged true information loss
+- [ ] Checked for ambiguity introduction (merged conditions, unclear referents, flattened relationships)
+- [ ] Checked for nuance loss (emphasis removed, hedging stripped, priority signals lost)
+- [ ] Only flagged true information/nuance loss or ambiguity creation
 - [ ] Provided dense restoration for each gap
 - [ ] Specified insert location for each
 - [ ] Assigned severity to each gap

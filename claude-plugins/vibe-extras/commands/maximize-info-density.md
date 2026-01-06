@@ -56,7 +56,7 @@ Extract file path from `$ARGUMENTS`. If no path provided, error with usage instr
 
 **Mark "Initial compression" todo `in_progress`.**
 
-Apply ALL compression techniques aggressively. Full restructuring is allowed.
+Apply compression techniques thoughtfully. Prioritize nuance preservation over reduction percentage.
 
 **Compression Techniques**:
 
@@ -72,9 +72,10 @@ Apply ALL compression techniques aggressively. Full restructuring is allowed.
 **Transformation Rules**:
 
 1. **Preserve ALL semantic information** - Every fact, instruction, constraint, and example must be present
-2. **Full restructuring allowed** - Reorder, merge sections, change hierarchy if it increases density
-3. **Format preservation** - Output must be same format as input (markdown stays markdown)
-4. **Primary audience is AI** - Optimize for machine parsing, not human aesthetics
+2. **Preserve nuance and emphasis** - Bold, caps, repetition, ordering that signals priority; intentional hedging (uncertainty was meaningful)
+3. **Restructuring allowed** - Reorder, merge sections if it increases density WITHOUT losing priority signals
+4. **Format preservation** - Output must be same format as input (markdown stays markdown)
+5. **No reduction target** - 10% reduction with nuance preserved > 40% reduction with nuance lost; some docs are already near-optimal
 
 **Step 2.1: Analyze content**
 
@@ -85,7 +86,17 @@ Identify:
 
 **Step 2.2: Apply transformation**
 
-Rewrite the entire document applying all techniques. Be aggressive - maximize density.
+Rewrite the document applying techniques where safe. Preserve:
+- Emphasis markers (bold, caps, "IMPORTANT", "NEVER", "CRITICAL")
+- Intentional hedging ("might", "consider" when uncertainty is genuine)
+- Priority ordering (first items often = highest priority)
+- Tone appropriate to audience
+
+**Avoid creating ambiguity**:
+- Don't merge conditions with different triggers ("when A, do X; when B, do Y" ≠ "when A/B, do X/Y")
+- Keep explicit referents (don't reduce "Use Read tool" to "Use the tool" if context is unclear)
+- Don't flatten relationships ("A requires B, C requires D" ≠ "A, C require B, D")
+- Ensure scope is clear (qualifier applies to which items?)
 
 **Step 2.3: Write to temp file**
 
@@ -105,7 +116,7 @@ Launch the `vibe-extras:information-density-verifier` agent to verify lossless c
 
 ```
 iteration = 1
-max_iterations = 3
+max_iterations = 5
 
 while iteration <= max_iterations:
     1. Launch information-density-verifier agent via Task tool:
@@ -167,7 +178,7 @@ If verification passed:
   Verification: ✓ Lossless ({iteration_count} iteration(s))
 ```
 
-If verification failed after 3 iterations:
+If verification failed after 5 iterations:
 ```
 ⚠ Compressed with warnings: {file_path}
   Original:   {original_tokens} tokens
@@ -190,11 +201,11 @@ If verification failed after 3 iterations:
 |----------|----------|
 | File not found | Error: "File not found: {path}" |
 | Unsupported type | Error: "Unsupported file type. Supported: .md, .txt, .yaml, .json" |
-| Already dense content | May achieve minimal reduction; still run verification |
+| Already dense content | Report success with low/zero reduction; don't force compression |
 | YAML/JSON structure | Preserve structure validity, compress string values only |
 | Very large file (>50KB) | Process as single unit |
-| 0% reduction | Report: "Content already maximally dense" |
-| Verification fails 3x | Output best attempt with warning about potential loss |
+| 0-10% reduction | Success: "Content was already near-optimal density" |
+| Verification fails 5x | Output best attempt with warning about potential nuance loss |
 | mv fails | Error with temp file path; user can manually review/apply |
 
 ## Key Principles
@@ -203,7 +214,9 @@ If verification failed after 3 iterations:
 |-----------|------|
 | **Memento** | Use TodoWrite to track phases; expand todos when verification fails; mark progress immediately |
 | **Losslessness** | Never sacrifice semantic information for density; every fact must be preserved |
-| **Aggressive** | Full restructuring allowed; maximize density, not preserve original style |
+| **Nuance preservation** | Keep emphasis, intentional hedging, priority signals; 10% with nuance > 40% without |
+| **No ambiguity** | Compressed must be as unambiguous as original; don't merge distinct conditions or flatten relationships |
+| **Thoughtful** | Restructuring allowed where safe; some docs are already near-optimal |
 | **Verification** | Always run information-density-verifier; never skip; iterate with specific feedback |
 
 ## Example Usage
@@ -224,11 +237,24 @@ If verification failed after 3 iterations:
 ```
 ✓ Compressed: docs/README.md
   Original:   4,250 tokens
-  Compressed: 2,890 tokens
-  Reduction:  32%
+  Compressed: 3,612 tokens
+  Reduction:  15%
 
   Changes: Removed redundant intro, consolidated examples,
-  merged overlapping sections, tersified instructions.
+  tersified instructions. Preserved emphasis markers and
+  conditional logic.
+
+  Verification: ✓ Lossless - nuance preserved (2 iterations)
+```
+
+```
+✓ Compressed: CLAUDE.md
+  Original:   2,100 tokens
+  Compressed: 1,995 tokens
+  Reduction:  5%
+
+  Changes: Minor redundancy removal. Content was already
+  near-optimal density.
 
   Verification: ✓ Lossless (1 iteration)
 ```
