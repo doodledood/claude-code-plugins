@@ -5,7 +5,7 @@ Standalone utilities that complement the core development workflow.
 ## What It Does
 
 **Skills** (auto-invoked by Claude when relevant):
-- **maximize-information-density** - Compress docs/prompts losslessly for reduced token consumption
+- **maximize-info-density** - Compress docs/prompts losslessly for reduced token consumption
 
 **Commands** (invoke explicitly):
 - `/rebase-on-main` - Safe rebasing with conflict resolution

@@ -125,8 +125,13 @@ README-only changes don't require version bumps.
 When adding commands, agents, skills, or hooks:
 1. Create the component file in the appropriate directory
 2. Bump plugin version (minor for new features)
-3. Update affected plugin's `README.md` and repo root `README.md` if needed
+3. Update affected plugin's `README.md` and repo root `README.md`
 4. Update `plugin.json` description/keywords if the new component adds significant capability
+
+**README sync checklist** (when adding/renaming/removing components):
+- `README.md` (root) - Available Plugins section, directory structure
+- `claude-plugins/README.md` - Plugin table
+- `claude-plugins/<plugin>/README.md` - Component lists
 
 **README Guidelines**: Keep READMEs high-level (overview, what it does, how to use). Avoid implementation details that require frequent updates—readers can explore code for specifics.
 

@@ -19,9 +19,10 @@ A curated collection of plugins for Claude Code.
 
 | Plugin | Description |
 |--------|-------------|
-| `vibe-workflow` | Spec → Plan workflow, code review agents, codebase exploration |
+| `vibe-workflow` | Spec → Plan → Implement workflow, code review agents, codebase exploration |
+| `vibe-extras` | Git utilities, documentation tools, AI slop cleanup |
 | `consultant` | Multi-provider LLM consultations via LiteLLM |
-| `solo-dev` | Toolkit for indie hackers (customer profiles, brand, design, SEO) |
+| `solo-dev` | Toolkit for solo developers (customer profiles, brand, design, SEO) |
 | `prompt-engineering` | LLM prompt review and analysis |
 
 See each plugin's README for details.

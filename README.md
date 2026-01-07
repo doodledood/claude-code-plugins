@@ -44,17 +44,17 @@ Flexible multi-provider LLM consultations using Python/LiteLLM for deep AI-power
 **Components:**
 - **Agent:** `consultant` - Expert agent for multi-provider AI analysis with automatic model selection
 - **Commands:**
-  - `/consultant-review` - Production-level PR reviews with severity-tagged findings
-  - `/consultant-investigate-bug` - Deep bug investigation with root cause analysis
-  - `/consultant-execplan` - Comprehensive execution planning with architectural analysis
+  - `/review` - Production-level PR reviews with severity-tagged findings
+  - `/analyze-code` - Architectural and security code analysis
+  - `/investigate-bug` - Deep bug investigation with root cause analysis
+  - `/ask` - Single-model consultation (defaults to gpt-5.2-pro)
+  - `/ask-counsil` - Multi-model ensemble consultation (3 models in parallel)
 - **Skill:** `consultant` - Python/LiteLLM CLI knowledge and best practices
 - **Category:** development
 - **Key Features:**
   - 100+ LLM provider support (OpenAI, Anthropic, Google, Azure, local models)
   - Custom base URLs for local LLM deployments
   - Automatic model discovery and selection
-  - Token management with context validation
-  - Async execution with session reattachment
 
 #### vibe-workflow
 Autonomous development workflow with spec→plan→implement pipeline, code review agents, and quality gates.
@@ -83,13 +83,43 @@ Standalone utilities that complement the core development workflow.
 **Components:**
 - **Agents:**
   - `slop-cleaner` - AI slop detection and removal
-  - `density-verifier` - Opus-based semantic verification for lossless compression
+  - `information-density-verifier` - Opus-based semantic verification for lossless compression
 - **Commands:**
   - `/rebase-on-main` - Safe git rebasing with conflict resolution
+  - `/rewrite-history` - Restructure branch into clean, reviewer-friendly commits
   - `/clean-slop` - Remove AI-generated code noise
   - `/update-claude-md` - Create or maintain CLAUDE.md
-  - `/maximize-information-density` - Compress docs/prompts losslessly for reduced tokens
+  - `/maximize-info-density` - Compress docs/prompts losslessly for reduced tokens
 - **Category:** development
+
+#### prompt-engineering
+Tools for reviewing and analyzing LLM prompts.
+
+**Components:**
+- **Agent:** `prompt-reviewer` - Deep prompt analysis via 10-Layer Architecture framework
+- **Commands:**
+  - `/review-prompt` - Analyze prompts for improvement opportunities (reports only, non-modifying)
+- **Category:** development
+
+#### solo-dev
+Toolkit for solo developers to build, manage, and grow their business.
+
+**Components:**
+- **Agents:**
+  - `design-research` - Research industry design patterns and competitor approaches
+  - `design-quality-auditor` - Verify design guidelines align with customer and brand
+  - `seo-researcher` - Research SEO and GEO strategies
+  - `ux-auditor` - Audit UI/UX changes against design guidelines
+  - `voice-writer` - Generate content in user's captured voice
+- **Commands:**
+  - `/define-customer-profile` - Create foundational CUSTOMER.md document
+  - `/define-brand-guidelines` - Define communication guidelines (requires CUSTOMER.md)
+  - `/define-design-guidelines` - Create UI/UX guidelines (requires CUSTOMER.md)
+  - `/define-seo-strategy` - Traditional SEO + AI citation optimization (requires CUSTOMER.md)
+  - `/craft-author-voice` - Capture unique writing style for AI replication
+  - `/write-as-me` - Generate content in your voice (requires AUTHOR_VOICE.md)
+  - `/audit-ux` - Check UI changes against design guidelines
+- **Category:** productivity
 
 ## 🛠️ Development
 
@@ -102,9 +132,11 @@ claude-code-plugins/
 ├── claude-plugins/            # Claude Code plugins directory
 │   ├── README.md             # Plugin development guide
 │   ├── PLUGIN_TEMPLATE/      # Template for creating new plugins
-│   ├── consultant/           # Consultant plugin (Python/LiteLLM)
-│   ├── vibe-workflow/        # Vibe workflow plugin (spec→plan→implement, review, bugfix)
-│   └── vibe-extras/          # Vibe extras plugin (git, docs, cleanup utilities)
+│   ├── consultant/           # Multi-provider LLM consultations
+│   ├── vibe-workflow/        # Spec→plan→implement, review, bugfix
+│   ├── vibe-extras/          # Git, docs, cleanup utilities
+│   ├── prompt-engineering/   # LLM prompt review and analysis
+│   └── solo-dev/             # Solo developer business toolkit
 ├── CONTRIBUTING.md            # Contributing guidelines
 └── README.md                  # This file
 ```
