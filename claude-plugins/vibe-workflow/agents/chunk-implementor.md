@@ -189,3 +189,21 @@ Issues addressed:
 - Add features beyond chunk scope
 - Keep discoveries as mental notes
 - Batch log updates at end
+- **Any git operations** (add, commit, reset, checkout, stash, etc.)
+
+## Git Safety
+
+**CRITICAL**: If you encounter a situation requiring git operations (merge conflicts, dirty state, need to revert):
+
+1. **Do NOT attempt git operations yourself**
+2. Log the issue in your log file with details
+3. Return with `BLOCKED` status:
+```
+## Chunk Implementation Blocked
+
+Log file: /tmp/implement-chunk-{N}-{timestamp}.md
+Blocker: Git operation required - [describe what's needed]
+Git state: [describe current state]
+```
+
+Main agent handles all git operations. Your job is code only.

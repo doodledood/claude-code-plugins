@@ -75,16 +75,20 @@ Last updated: [timestamp]
 
 ### 1.5 Create Todo List
 
-Build Memento-style todos with chunk pairs:
+Build Memento-style todos with 4 items per chunk:
 ```
 [ ] Implement chunk 1: [Name]
 [ ] Verify chunk 1: [Name]
+[ ] (Fix loop for chunk 1 - expand if needed)
+[ ] Commit chunk 1: [Name]
 [ ] Implement chunk 2: [Name]
 [ ] Verify chunk 2: [Name]
+[ ] (Fix loop for chunk 2 - expand if needed)
+[ ] Commit chunk 2: [Name]
 ...
 ```
 
-All todos created at once via TodoWrite, status `pending`.
+All todos created at once via TodoWrite, status `pending`. Fix loop placeholder is expanded into implement/verify pairs during Phase 3.
 
 ### 1.6 Handle Resume
 
@@ -162,8 +166,10 @@ Verify chunk N: [Name]
 
 **If Status: PASS**
 1. Mark verify todo `completed`
-2. **Update progress file**: chunk status → `COMPLETE`, `Completed: N/M`, `Last updated`
-3. Continue to next chunk
+2. Mark fix loop placeholder `completed` (not needed)
+3. **Update progress file**: chunk status → `COMPLETE`, `Completed: N/M`, `Last updated`
+4. Commit chunk (see 2.4)
+5. Continue to next chunk
 
 **If Status: FAIL**
 1. **Update progress file**: increment `Attempts`, add issues to `Notes`, `Last updated`
@@ -172,38 +178,68 @@ Verify chunk N: [Name]
 4. If can retry → enter fix loop (Phase 3)
 5. If max attempts or same-error → escalate (Phase 4)
 
+### 2.4 Commit Chunk (Main Agent Only)
+
+**CRITICAL**: Main agent handles all git operations directly. Subagents NEVER perform git actions.
+
+1. Mark commit todo `in_progress`
+2. Stage files from chunk: `git add [files created/modified]`
+3. Commit with message: `feat(plan): implement chunk N - [Name]`
+4. **Do NOT push** - push happens at end or on user request
+5. **Update progress file**: add commit SHA to chunk notes
+6. Mark commit todo `completed`
+
+**If git operation fails** (conflicts, dirty state, etc.):
+1. Log issue in progress file
+2. Report to user with specific error
+3. User must resolve before continuing
+
 ## Phase 3: Fix Loop
 
 When verification fails and retry is possible:
 
-### 3.1 Analyze Failure
+### 3.1 Expand Fix Loop Placeholder
+
+Replace fix loop placeholder todo with specific items:
+```
+[x] (Fix loop for chunk N - expand if needed) → completed
+[ ] Fix attempt 1: implement chunk N
+[ ] Fix attempt 1: verify chunk N
+[ ] (Additional fix attempts - expand if needed)
+```
+
+### 3.2 Analyze Failure
 
 From verifier output, identify:
 - Gate failures (specific errors)
 - Acceptance criteria failures
 - File:line locations
 
-### 3.2 Respawn Implementor with Fix Context
+### 3.3 Respawn Implementor with Fix Context
 
-1. Respawn implementor (same as 2.1 but with fix context)
-2. **Update progress file**: new `Implementor log`, updated files, `Last updated`
-3. Mark implement todo `completed`
+1. Mark fix implement todo `in_progress`
+2. Respawn implementor (same as 2.1 but with fix context)
+3. **Update progress file**: new `Implementor log`, updated files, `Last updated`
+4. Mark fix implement todo `completed`
 
-### 3.3 Re-verify
+### 3.4 Re-verify
 
-1. Respawn verifier with `previous_errors` for same-error detection
-2. **Update progress file**: new `Verifier log`, `Last updated`
+1. Mark fix verify todo `in_progress`
+2. Respawn verifier with `previous_errors` for same-error detection
+3. **Update progress file**: new `Verifier log`, `Last updated`
 
-### 3.4 Process Result
+### 3.5 Process Result
 
 **If PASS**:
-1. Mark verify todo `completed`
-2. **Update progress file**: status → `COMPLETE`, `Completed: N/M`, `Last updated`
-3. Continue to next chunk
+1. Mark fix verify todo `completed`
+2. Mark additional attempts placeholder `completed`
+3. **Update progress file**: status → `COMPLETE`, `Completed: N/M`, `Last updated`
+4. Commit chunk (2.4)
+5. Continue to next chunk
 
 **If FAIL with different errors**:
 1. **Update progress file**: increment `Attempts`, update `Notes`, `Last updated`
-2. If attempts < 5 → repeat fix loop (3.1)
+2. If attempts < 5 → expand placeholder, repeat fix loop (3.2)
 
 **If FAIL with same errors OR attempts >= 5**:
 1. **Update progress file**: status → `FAILED`, `Notes` with reason, `Last updated`
@@ -306,11 +342,13 @@ Last updated: [timestamp]
 
 ## Principles
 
-- **Subagent isolation**: Implementor edits, Verifier only reads
+- **Subagent isolation**: Implementor edits, Verifier only reads, neither does git
+- **Git in main agent only**: All git operations (add, commit) happen in main agent, not subagents
+- **Commit per chunk**: Each successful chunk gets its own commit (no push until end)
 - **Autonomous**: No prompts/pauses/approval except blocking issues
 - **Retry heavily**: 5 attempts before giving up, escalation is last resort
 - **Same-error aware**: Detect loops, don't wall-slam
-- **Progress after every step**: Update progress file after each todo completion (implementor done, verifier done, etc.)
+- **Progress after every step**: Update progress file after each todo completion
 - **Acceptance-focused**: Gates + criteria must pass
 
 ## Gate Detection (Verifier Reference)
