@@ -9,6 +9,7 @@ Standalone utilities that complement the core development workflow.
 
 **Commands** (invoke explicitly):
 - `/rebase-on-main` - Safe rebasing with conflict resolution
+- `/rewrite-history` - Safely rewrite git history (squash, reorder, edit commits) with automatic backup
 - `/clean-slop` - Remove AI-generated noise (useless comments, verbose patterns)
 - `/update-claude-md` - Create or maintain project instructions
 
