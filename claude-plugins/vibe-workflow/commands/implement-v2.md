@@ -102,7 +102,9 @@ For each chunk in dependency order:
 
 ### 2.1 Spawn Implementor Agent
 
-Use Task tool with `subagent_type: "vibe-workflow:chunk-implementor"`:
+1. Mark implement todo `in_progress`
+2. **Update progress file**: chunk status → `IN_PROGRESS`, `Last updated` timestamp
+3. Use Task tool with `subagent_type: "vibe-workflow:chunk-implementor"`:
 
 ```
 Implement chunk N: [Name]
@@ -125,18 +127,16 @@ Previous verification failed with:
 Focus on fixing these specific issues.]
 ```
 
-Mark implement todo `in_progress` → wait for completion.
-
-**Parse implementor output**:
-- Extract `Log file:` path
-- Extract `Files created:` and `Files modified:` lists
-- Update progress file with log path
-
-Mark implement todo `completed`.
+4. Wait for completion, parse output:
+   - Extract `Log file:` path
+   - Extract `Files created:` and `Files modified:` lists
+5. **Update progress file**: `Implementor log`, `Files created`, `Files modified`, `Last updated`
+6. Mark implement todo `completed`
 
 ### 2.2 Spawn Verifier Agent
 
-Use Task tool with `subagent_type: "vibe-workflow:chunk-verifier"`:
+1. Mark verify todo `in_progress`
+2. Use Task tool with `subagent_type: "vibe-workflow:chunk-verifier"`:
 
 ```
 Verify chunk N: [Name]
@@ -151,81 +151,72 @@ Verify chunk N: [Name]
 [Errors from last verification for same-error detection]]
 ```
 
-Mark verify todo `in_progress` → wait for result.
-
-**Parse verifier output**:
-- Extract `Status:` (PASS/FAIL)
-- Extract `Log file:` path
-- Extract issues list if FAIL
-- Check `Same as previous:` if retry
-
-Update progress file with verifier log path.
+3. Wait for result, parse output:
+   - Extract `Status:` (PASS/FAIL)
+   - Extract `Log file:` path
+   - Extract issues list if FAIL
+   - Check `Same as previous:` if retry
+4. **Update progress file**: `Verifier log`, `Last updated`
 
 ### 2.3 Process Verification Result
 
-Parse verifier's structured output:
-
 **If Status: PASS**
 1. Mark verify todo `completed`
-2. Update progress file: chunk status → `COMPLETE`, files created/modified
+2. **Update progress file**: chunk status → `COMPLETE`, `Completed: N/M`, `Last updated`
 3. Continue to next chunk
 
 **If Status: FAIL**
-1. Check attempt count (max 5 total including initial)
-2. Check for same-error condition
-3. If can retry → enter fix loop (Phase 3)
-4. If max attempts or same-error → escalate (Phase 4)
+1. **Update progress file**: increment `Attempts`, add issues to `Notes`, `Last updated`
+2. Check attempt count (max 5 total including initial)
+3. Check for same-error condition
+4. If can retry → enter fix loop (Phase 3)
+5. If max attempts or same-error → escalate (Phase 4)
 
 ## Phase 3: Fix Loop
 
 When verification fails and retry is possible:
 
-### 3.1 Update Progress
-
-Increment attempt count in progress file.
-
-### 3.2 Analyze Failure
+### 3.1 Analyze Failure
 
 From verifier output, identify:
 - Gate failures (specific errors)
 - Acceptance criteria failures
 - File:line locations
 
-### 3.3 Respawn Implementor with Fix Context
+### 3.2 Respawn Implementor with Fix Context
 
-Include in prompt:
-```
-## Fix Context
-Attempt: N/5
+1. Respawn implementor (same as 2.1 but with fix context)
+2. **Update progress file**: new `Implementor log`, updated files, `Last updated`
+3. Mark implement todo `completed`
 
-Previous verification failed with:
-[Verifier's issues list]
+### 3.3 Re-verify
 
-Focus on fixing these specific issues.
-```
+1. Respawn verifier with `previous_errors` for same-error detection
+2. **Update progress file**: new `Verifier log`, `Last updated`
 
-### 3.4 Re-verify
+### 3.4 Process Result
 
-Spawn verifier again with `previous_errors` for same-error detection.
+**If PASS**:
+1. Mark verify todo `completed`
+2. **Update progress file**: status → `COMPLETE`, `Completed: N/M`, `Last updated`
+3. Continue to next chunk
 
-### 3.5 Same-Error Detection
+**If FAIL with different errors**:
+1. **Update progress file**: increment `Attempts`, update `Notes`, `Last updated`
+2. If attempts < 5 → repeat fix loop (3.1)
 
-If verifier reports `Same as previous: YES`:
-- Stop retrying this chunk
-- Approach is fundamentally broken
-- Escalate immediately
-
-### 3.6 Continue or Escalate
-
-- **Pass**: Continue to next chunk
-- **Different errors, attempts < 5**: Retry
-- **Same errors OR attempts >= 5**: Escalate
+**If FAIL with same errors OR attempts >= 5**:
+1. **Update progress file**: status → `FAILED`, `Notes` with reason, `Last updated`
+2. Escalate (Phase 4)
 
 ## Phase 4: Escalation & Completion
 
 ### 4.1 Escalation
 
 When chunk cannot be completed:
+
+1. **Update progress file**: overall status → `FAILED`, chunk status → `FAILED`, `Last updated`
+2. Report to user:
 
 ```
 ## Implementation Blocked
@@ -252,6 +243,9 @@ Stop implementation. User must intervene.
 ### 4.2 Successful Completion
 
 When all chunks complete:
+
+1. **Update progress file**: overall status → `COMPLETE`, `Completed: N/N`, `Last updated`
+2. Report to user:
 
 ```
 ## Implementation Complete
@@ -316,7 +310,7 @@ Last updated: [timestamp]
 - **Autonomous**: No prompts/pauses/approval except blocking issues
 - **Retry heavily**: 5 attempts before giving up, escalation is last resort
 - **Same-error aware**: Detect loops, don't wall-slam
-- **Progress persisted**: Resume from any interruption
+- **Progress after every step**: Update progress file after each todo completion (implementor done, verifier done, etc.)
 - **Acceptance-focused**: Gates + criteria must pass
 
 ## Gate Detection (Verifier Reference)
