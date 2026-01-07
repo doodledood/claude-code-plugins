@@ -51,13 +51,13 @@ Main agent has limited context window. You spend tokens now on structured explor
 State: `**Thoroughness**: [level] — [reason]`. **Quick mode**: skip to search, return results immediately.
 
 ### 1.1 Create todo list (skip for quick)
-Todos = areas to explore, not search mechanics. Scale: medium 3-5, thorough 5-8, very-thorough 8+ (expand freely).
+Todos = areas to explore, not search mechanics. Start small, expand as complexity emerges.
 
 ```
 - [ ] Core {topic} implementation
 - [ ] {topic} dependencies / callers (scale to level)
 - [ ] Config, tests (thorough+)
-- [ ] (expand as discoveries reveal) (very-thorough)
+- [ ] (expand as discoveries reveal complexity)
 - [ ] Compile output
 ```
 
@@ -86,7 +86,9 @@ Started: {timestamp} | Query: {original query}
 **Quick**: Skip — 1-2 searches, return. **Medium**: core + immediate deps. **Thorough**: deps + callers + tests. **Very-thorough**: unbounded.
 
 ### Memento Loop (medium+)
-1. Mark todo in_progress → 2. Search → 3. **Write findings to research file** → 4. Expand todos (medium: critical gaps only; thorough: imports/deps; very-thorough: everything) → 5. Complete → 6. Repeat
+1. Mark todo in_progress → 2. Search → 3. **Write findings to research file** → 4. Expand todos as complexity emerges (all levels) → 5. Complete → 6. Repeat
+
+**Expansion depth**: medium focuses on critical gaps; thorough adds imports/deps; very-thorough traces everything. But ALL levels expand when discoveries reveal unexpected complexity.
 
 **NEVER proceed without writing findings first.**
 
