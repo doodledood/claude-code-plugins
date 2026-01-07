@@ -92,7 +92,7 @@ Started: {timestamp} | Query: {original query}
 
 **NEVER proceed without writing findings first.**
 
-### Todo Expansion Triggers (thorough+)
+### Todo Expansion Triggers (medium+)
 
 | Discovery | Add todos for |
 |-----------|---------------|
