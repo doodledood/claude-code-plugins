@@ -145,37 +145,38 @@ Architecture decisions:
 
 ### Interview Rules
 
-**Unbounded loop**: Iterate until ALL completion criteria met.
+**Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit.
 
-1. **Research first, ask strategically** - Only ask when:
-   - Multiple architecturally significant paths with different trade-offs
-   - Scope boundaries unclear, affecting chunk structure
-   - Technology choices lack precedent
-   - Business context needed (speed vs quality, MVP vs complete)
-   - User preferences ambiguous
+**Spec-first**: Business scope and requirements belong in spec. Questions here are TECHNICAL only—architecture, patterns, implementation approach. If spec has gaps, flag them rather than re-asking requirements.
 
-   **Interleave**: User answer reveals new area → codebase-explorer → update plan.
+1. **Prioritize by information gain** - Ask questions that split technical decision space most. If answer changes architecture or chunk structure, ask early.
 
-2. **Don't ask when research provides answer**:
-   - Established patterns exist
-   - Standard best practices documented
-   - Implementation details don't affect public APIs
-   - Minor tool/library choices
-   - Tactical decisions adjustable later
+2. **Interleave discovery and questions**:
+   - User answer reveals new area → launch codebase-explorer
+   - Need external context → launch web-researcher
+   - Update plan after each iteration, replacing `[TBD]` markers
 
-3. **Always mark one option "(Recommended)"** first with reasoning
+3. **Question priority order**:
 
-4. **Be thorough**: Don't skip to save time. Reduce cognitive load via HOW: concrete options, batch ≤4, good defaults. Decide when research suffices. Complete+easy > incomplete+fewer.
+   | Priority | Type | Purpose | Examples |
+   |----------|------|---------|----------|
+   | 1 | Implementation Phasing | How much to build now vs later | Full impl vs stub? Include migration? Optimize or simple first? |
+   | 2 | Branching | Open/close implementation paths | Sync vs async? Polling vs push? In-memory vs persistent? |
+   | 3 | Technical Constraints | Non-negotiable technical limits | Must integrate with X? Perf requirements? Backward compat? |
+   | 4 | Architectural | Choose between patterns | Error strategy? State management? Concurrency model? |
+   | 5 | Detail Refinement | Fine-grained technical details | Test coverage scope? Retry policy? Logging verbosity? |
 
-5. **Question priority**:
-   | Priority | Type | Examples |
-   |----------|------|----------|
-   | 1 | Scope Eliminators | V1/MVP vs full? Core only? Single vs batch? |
-   | 2 | Architectural | Pattern for X? Sync vs async? Existing vs new? |
-   | 3 | Hard Constraints | Must integrate with X? Perf requirements? Backward compat? |
-   | 4 | Detail Refinement | Error handling? Test coverage? Naming? |
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description
 
-6. **Iterate until complete**: Architectural decisions made, chunks defined, manifests complete, no `[TBD]`.
+5. **Be thorough via technique**:
+   - Cover everything relevant - don't skip to save time
+   - Reduce cognitive load through HOW you ask: concrete options, batching (up to 4), good defaults
+   - Make decisions yourself when codebase research suffices
+   - Complete plan with easy questions > incomplete plan with fewer questions
+
+6. **Ask non-obvious questions** - Error handling strategies, edge cases affecting correctness, performance implications, testing approach for complex logic, rollback/migration needs, failure modes
+
+7. **Only ask user when**: (a) technical decision with significant trade-offs, (b) codebase lacks clear precedent, (c) multiple valid approaches need user preference. Defer business/product questions to spec.
 
 ## Phase 4: Finalize & Present
 
