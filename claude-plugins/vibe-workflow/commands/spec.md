@@ -5,8 +5,6 @@ argument-hint: Optional - work name or topic
 
 **User request**: $ARGUMENTS
 
-# Spec Skill
-
 Build requirements spec through structured discovery interview. Defines WHAT and WHY - not technical implementation (architecture, APIs, data models come in planning phase).
 
 **Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete

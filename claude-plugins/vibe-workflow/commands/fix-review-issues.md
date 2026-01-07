@@ -3,11 +3,11 @@ description: 'Orchestrate fixing issues found by /review. Handles issue discover
 argument-hint: Optional - --severity critical,high --category bugs,types
 ---
 
-# Fix Review Issues Skill
+**User request**: $ARGUMENTS
 
-Systematically address issues found from `/review` runs. This skill orchestrates the multi-step workflow: discover issues, confirm scope with user, create fix plan, execute fixes, and verify.
+Systematically address issues found from `/review` runs. Orchestrates the multi-step workflow: discover issues, confirm scope with user, create fix plan, execute fixes, and verify.
 
-## Overview
+## Categories
 
 This skill supports fixing issues from any review category:
 - **bugs** - Logical bugs, race conditions, edge cases

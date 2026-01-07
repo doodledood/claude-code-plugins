@@ -14,10 +14,13 @@ Autonomous development workflow with code review agents and quality gates.
 
 **Commands** (invoke explicitly):
 - `/review` - Audit changes for bugs, maintainability, type safety, docs, and coverage
+- `/implement-v2` - Execute plans via subagents with automated verification and fix loops (5 attempts per chunk)
 - `/web-research` - Research external topics with structured hypothesis tracking
 
 **Agents**:
 - **codebase-explorer** - Context-gathering agent, prefer over built-in Explore
+- **chunk-implementor** - Implements a single plan chunk, logs progress (used by /implement-v2)
+- **chunk-verifier** - Runs gates and checks acceptance criteria (used by /implement-v2)
 
 Use `/help` after installation to see all available commands.
 

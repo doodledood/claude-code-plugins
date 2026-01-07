@@ -5,13 +5,11 @@ argument-hint: Optional - bug description or error message
 
 **User request**: $ARGUMENTS
 
-# Bugfix Skill
+Investigate and fix bugs with systematic root cause analysis. Orchestrates the complete debugging workflow from understanding the problem to verifying the fix.
 
-Investigate and fix bugs with systematic root cause analysis. This skill orchestrates the complete debugging workflow from understanding the problem to verifying the fix.
+> **Prerequisite**: Run in a git repository with a testable codebase.
 
-> **Prerequisite**: This should be run in a git repository with a testable codebase.
-
-## Overview
+## Workflow
 
 **Loop**: Prerequisites → Gather context → Investigate/Fix → Verify → Report
 

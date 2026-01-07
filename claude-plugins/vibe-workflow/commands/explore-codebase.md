@@ -5,8 +5,6 @@ argument-hint: Required - query or topic to explore
 
 **User request**: $ARGUMENTS
 
-# Explore Codebase Skill
-
 Find all files relevant to a specific query so main agent masters that topic without another search.
 
 **Loop**: Search → Expand todos → Write findings → Repeat until exhaustive → Compress output

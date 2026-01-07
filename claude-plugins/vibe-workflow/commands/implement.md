@@ -5,8 +5,6 @@ argument-hint: Optional - path to plan file
 
 **User request**: $ARGUMENTS
 
-# Implement Skill
-
 Autonomously execute plan chunks in dependency order. Completes spec→plan→implement pipeline.
 
 **Fully autonomous**: No pauses except truly blocking issues.

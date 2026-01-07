@@ -5,11 +5,9 @@ argument-hint: Optional - path to spec file
 
 **User request**: $ARGUMENTS
 
-# Plan Skill
-
 Build implementation plan through structured discovery. Takes spec (from `/spec` or inline), iteratively researches codebase + asks strategic questions → detailed plan.
 
-**Focus**: HOW not WHAT. Spec=what; this skill=architecture, files, functions, chunks, deps, tests.
+**Focus**: HOW not WHAT. Spec=what; plan=architecture, files, functions, chunks, deps, tests.
 
 **Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
@@ -348,6 +346,10 @@ Tasks:
 - Tests - [cases]
 - Run gates
 
+Acceptance criteria:
+- Gates pass
+- [Specific verifiable criterion]
+
 Key functions: fn(), helper()
 Types: TypeName
 ```
@@ -378,6 +380,12 @@ Tasks:
 - Tests: valid email, invalid formats, password edges, rate limit
 - Run gates
 
+Acceptance criteria:
+- Gates pass
+- validateEmail() rejects invalid formats, accepts valid RFC 5322
+- validatePassword() enforces min 8, 1 number, 1 special
+- Rate limiter blocks after 5 attempts/min/IP
+
 Functions: validateUserInput(), validateEmail(), rateLimit()
 Types: ValidationResult, RateLimitConfig
 ```
@@ -391,7 +399,7 @@ Files: user.ts
 Tasks: Add validation, Add tests
 ```
 
-**Why bad**: No deps, vague, missing paths, no context, generic tasks, no functions.
+**Why bad**: No deps, vague, missing paths, no context, generic tasks, no functions, no acceptance criteria.
 
 ## 9. File Manifest & Context
 
