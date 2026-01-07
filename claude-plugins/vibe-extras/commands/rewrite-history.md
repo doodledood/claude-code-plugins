@@ -1,5 +1,5 @@
 ---
-description: 'Restructure messy branch history into clean, reviewer-friendly commits. Analyzes commits since divergence from main, groups by concern, and rewrites with conventional commit messages. Use when branch history is cluttered with WIP commits, fixups, or disorganized changes.'
+description: 'Restructure branch into clean, reviewer-friendly commits. Analyzes total diff since main, groups files by concern, and rewrites with conventional commit messages.'
 argument-hint: Optional --auto to skip interactive proposal approval
 ---
 
@@ -10,8 +10,8 @@ Restructures messy branch history into a clean, reviewer-friendly progression of
 ## Overview
 
 This command:
-1. Analyzes all commits since divergence from main/master
-2. Groups changes by single concern
+1. Analyzes total diff since divergence from main/master
+2. Groups files by single concern
 3. Arranges in logical order (foundations first, features second, polish last)
 4. Generates commit messages matching repo style (default: Conventional Commits)
 5. Rewrites history via soft reset and staged commits
@@ -32,13 +32,16 @@ Before any destructive operations, verify:
 2. **Clean working tree**: Run `git status --porcelain`
    - If uncommitted changes: Error "Uncommitted changes detected. Commit or stash changes before rewriting history."
 
-3. **Has commits to rewrite**: Find merge-base with main/master, count commits
-   - Run `git merge-base HEAD main` (or master)
+3. **Identify base branch and fetch**:
+   - Try `git fetch origin main` or `git fetch origin master` (whichever exists)
+   - If fetch succeeds: use `origin/main` or `origin/master` as base
+   - If fetch fails (no remote, offline): fall back to local `main` or `master`
+   - Report which base is being used: "Using origin/main as base" or "Using local main as base (no remote)"
+
+4. **Has commits to rewrite**: Find merge-base with base branch, count commits
+   - Run `git merge-base HEAD {base-branch}`
    - Run `git rev-list --count {merge-base}..HEAD`
    - If 0 commits: Error "No commits to rewrite. Branch is up to date with main."
-
-4. **Identify main branch**: Check if `main` or `master` exists
-   - Run `git rev-parse --verify main 2>/dev/null` and `git rev-parse --verify master 2>/dev/null`
 
 ### 2. Create Backup Branch
 
@@ -50,18 +53,17 @@ git branch {current-branch}-backup-{YYYYMMDD-HHMM}
 
 Report: "Created backup: {backup-branch-name}"
 
-### 3. Analyze Commits
+### 3. Analyze Diff
 
-Gather information about all commits since divergence:
+Gather information about all changes since divergence:
 
-1. **Get merge-base**: `git merge-base HEAD {main-branch}`
-2. **List commits**: `git log --oneline {merge-base}..HEAD`
-3. **Get full diff**: `git diff {merge-base}..HEAD`
-4. **Analyze repo commit style**: `git log --oneline -20` to identify message patterns
+1. **Get merge-base**: `git merge-base HEAD {base-branch}` (using origin/main or local main from step 1)
+2. **Get full diff**: `git diff {merge-base}..HEAD`
+3. **Analyze repo commit style**: `git log --oneline -20` to identify message patterns (optional)
 
 **Analysis goals**:
 - Identify distinct concerns/features in the changes
-- Group related changes together
+- Group related files together
 - Determine logical ordering (dependencies, foundations before features)
 - Match existing commit message style (Conventional Commits if no clear pattern)
 
@@ -70,14 +72,12 @@ Gather information about all commits since divergence:
 Create a restructuring proposal:
 
 ```
-Proposed restructuring ({N} commits -> {M} commits):
+Proposed commits:
 
 1. {type}({scope}): {description}
-   - Groups: {what this commit combines}
    - Files: {key files affected}
 
 2. {type}({scope}): {description}
-   - Groups: {what this commit combines}
    - Files: {key files affected}
 
 [...]
@@ -126,7 +126,7 @@ Perform the history rewrite:
    - Run `git log --oneline {merge-base}..HEAD` to show new history
    - Run `git diff {backup-branch}..HEAD` to confirm no code changes (should be empty)
 
-Report: "History rewritten: {old-count} commits -> {new-count} commits"
+Report: "History rewritten into {new-count} commits"
 
 ### 7. Push Prompt
 
@@ -155,8 +155,7 @@ Report final summary:
 ```
 History rewrite complete.
 
-Original: {N} commits
-Rewritten: {M} commits
+Commits: {M}
 Backup: {backup-branch-name}
 
 New history:
@@ -177,6 +176,7 @@ New history:
 |----------|----------|
 | On main/master branch | Error: "Cannot rewrite history on main/master branch. Checkout a feature branch first." |
 | Uncommitted changes | Error: "Uncommitted changes detected. Commit or stash changes before rewriting history." |
+| No remote available | Fall back to local main/master. Report: "Using local main as base (no remote)" |
 | No commits since main | Error: "No commits to rewrite. Branch is up to date with main." |
 | Single commit only | Proceed normally (may just improve commit message) |
 | Merge commits in history | Warning: "Branch contains merge commits. Rewrite will linearize history." Proceed if user confirms. |
@@ -198,26 +198,23 @@ New history:
 
 **Interactive mode**:
 ```
-Analyzing 23 commits since divergence from main...
+Using origin/main as base.
+Analyzing diff...
 
 Created backup: feature-auth-backup-20260107-1430
 
-Proposed restructuring (23 commits -> 4 commits):
+Proposed commits:
 
 1. feat(auth): add JWT authentication middleware
-   - Groups: middleware setup, token validation, error handling
    - Files: src/middleware/auth.ts, src/utils/jwt.ts
 
 2. feat(auth): implement login and logout endpoints
-   - Groups: login handler, logout handler, session management
    - Files: src/routes/auth.ts, src/controllers/auth.ts
 
 3. test(auth): add authentication test suite
-   - Groups: unit tests, integration tests
    - Files: tests/auth/*.test.ts
 
 4. docs(auth): add authentication documentation
-   - Groups: API docs, README updates
    - Files: docs/auth.md, README.md
 
 Proceed with this restructuring?
@@ -227,7 +224,7 @@ Proceed with this restructuring?
 
 > Yes
 
-History rewritten: 23 commits -> 4 commits
+History rewritten into 4 commits.
 
 Push rewritten history to remote?
 - [Yes] Push with --force-with-lease
@@ -239,8 +236,7 @@ Pushed to remote with --force-with-lease
 
 History rewrite complete.
 
-Original: 23 commits
-Rewritten: 4 commits
+Commits: 4
 Backup: feature-auth-backup-20260107-1430
 
 New history:
