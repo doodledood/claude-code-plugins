@@ -191,7 +191,7 @@ After EACH decision (even implicit), append to Decisions Made:
    | 4 | Differentiating | Choose between approaches | Pattern A vs B? Which UX model? |
    | 5 | Detail Refinement | Fine-grained details | Exact copy, specific error handling |
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. Question whether each requirement is truly needed—don't pad with nice-to-haves. When options are equivalent, lean toward simpler.
 
 5. **Be thorough via technique**:
    - Cover everything relevant - don't skip to save time
@@ -208,12 +208,12 @@ After EACH decision (even implicit), append to Decisions Made:
 | Priority | Header | Question | Options (first = recommended) |
 |----------|--------|----------|-------------------------------|
 | 1 | Feature Scope | What's the scope? | V1/MVP - core only; Full feature; Custom |
-| 1 | Target User | Primary user? | [From CUSTOMER.md]; All users; Specific segment; Admin only |
+| 1 | Target User | Primary user? | [From CUSTOMER.md]; Specific segment; All users; Admin only |
 | 2 | Interaction | How triggered? | User-initiated; System-triggered; Both |
 | 3 | Constraints | Hard constraints? (multiSelect) | None; Must integrate with X; Regulatory; Performance |
 | 4 | Problem | What problem are we solving? | (freeText with placeholder) |
-| 4 | Edge Cases | How handle [edge case]? | Best practice default; Alternative 1; Alternative 2; Skip in v1 |
-| 5 | Success | How measure success? (multiSelect) | Faster task completion; Adoption increase; Fewer tickets; NPS; Custom |
+| 4 | Edge Cases | How handle [edge case]? | Best practice default; Simpler alternative; Defer to v2 if non-critical |
+| 5 | Success | How measure success? (multiSelect) | Primary metric; Task completion time; Multiple metrics; Custom |
 
 ## Phase 4: Finalize & Summarize
 
@@ -314,6 +314,7 @@ Review full spec and let me know adjustments.
 | WHAT not HOW | Requirements only - no architecture, APIs, data models, code patterns. Self-check: if thinking "how to implement," refocus on "what should happen" |
 | User perspective | Observable behavior, user experience, outcomes. Ask "what does user see?" not "how does system work?" Edge cases = UX/business impact |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
+| Question requirements | Don't accept requirements at face value. Ask "is this truly needed for v1?" Don't pad specs with nice-to-haves |
 | Reduce cognitive load | Recommended option first, multi-choice over free-text (free-text only when necessary), batch up to 4, max 6-8 options. User accepting defaults should yield solid result |
 | Make decisions | Use research for defaults; only ask when user input required. Defer technical decisions to planning phase |
 | Incremental updates | Update interview log after EACH step (not at end) |
