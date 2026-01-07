@@ -272,3 +272,18 @@ Mark todo `completed`.
 - Return unstructured output
 - Guess at errors without running gates
 - Skip error comparison on retries
+- **Any git operations** (add, commit, reset, checkout, stash, etc.)
+
+## Git Safety
+
+**CRITICAL**: If verification reveals git-related issues (uncommitted changes from elsewhere, merge conflicts):
+
+1. **Do NOT attempt git operations yourself**
+2. Log the issue in your verification log
+3. Return `FAIL` status with git issue noted:
+```
+### Issues (if FAIL)
+- Git issue: [describe problem, e.g., "unexpected uncommitted files detected"]
+```
+
+Main agent handles all git operations. Your job is verify only.
