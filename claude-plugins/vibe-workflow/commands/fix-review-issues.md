@@ -59,19 +59,7 @@ options:
 
 ### Phase 2: Confirm Scope with User
 
-Present a summary of discovered issues and confirm what to fix.
-
-**If arguments were provided** (user already specified scope):
-
-```
-header: "Fix Scope Confirmed"
-question: "Found {N} issues matching your filters. Ready to proceed?"
-[Display: Issue count by category/severity within filter scope]
-options:
-  - "Yes - create fix plan and proceed (Recommended)"
-  - "Show me the issues first - list them before fixing"
-  - "Adjust scope - I want to change the filters"
-```
+**If arguments were provided** → skip Phase 2, proceed directly to Phase 3 (user already chose scope)
 
 **If NO arguments** (fix all):
 
