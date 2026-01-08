@@ -342,6 +342,7 @@ Last updated: [timestamp]
 
 ## Principles
 
+- **Main agent = Task + commit only**: Spawn subagents, track progress, commit. NEVER read/edit/run gates on source files.
 - **Subagent isolation**: Implementor edits, Verifier only reads, neither does git
 - **Git in main agent only**: All git operations (add, commit) happen in main agent, not subagents
 - **Commit per chunk**: Each successful chunk gets its own commit (no push until end)
@@ -350,6 +351,25 @@ Last updated: [timestamp]
 - **Same-error aware**: Detect loops, don't wall-slam
 - **Progress after every step**: Update progress file after each todo completion
 - **Acceptance-focused**: Gates + criteria must pass
+
+## Main Agent Constraint
+
+**The loop per chunk**:
+```
+implement (Task) → verify (Task) → [implement → verify]* → commit
+```
+
+Main agent ONLY:
+- Calls Task tool (implementor/verifier)
+- Updates progress file
+- Runs git commit after verification passes
+
+Main agent NEVER:
+- Reads source files (only progress/log files)
+- Edits source files
+- Runs gates (typecheck/lint/test)
+- Fixes issues (respawn implementor instead)
+- Stops or asks user mid-execution (fully autonomous until done or catastrophic failure)
 
 ## Gate Detection (Verifier Reference)
 
