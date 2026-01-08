@@ -1,6 +1,6 @@
 ---
 description: 'Executes implementation plans via subagents with automated verification and fix loops. Use after /plan for complex features. Each chunk gets dedicated Implementor + Verifier agents with up to 5 fix attempts.'
-argument-hint: Optional - path to plan file, or --progress <file> to resume
+argument-hint: plan path | --progress <file> | inline task | (empty for recent plan)
 ---
 
 **User request**: $ARGUMENTS
@@ -21,12 +21,20 @@ For each chunk:
 
 ## Phase 1: Parse Plan & Setup
 
-### 1.1 Locate Plan
+### 1.1 Resolve Input
 
-Accept:
-- `/implement-v2 /tmp/plan.md` - explicit path
-- `/implement-v2 --progress /tmp/implement-*.md` - resume from progress file
-- Infer from context or recent `/tmp/plan-*.md` files
+**Priority order:**
+1. **`--progress <path>`** → resume from progress file
+2. **File path** (ends in `.md` or starts with `/`) → use plan file
+3. **Inline task** (any other text) → create ad-hoc single chunk:
+   ```
+   ## 1. [Task summary]
+   - Depends on: -
+   - Tasks: [user's description]
+   - Files: (implementor discovers)
+   - Acceptance criteria: gates pass
+   ```
+4. **Empty** → search `/tmp/plan-*.md` (most recent) or error with guidance
 
 ### 1.2 Parse Chunks
 
@@ -353,6 +361,8 @@ Last updated: [timestamp]
 | Dependency not met (prior chunk failed) | Mark BLOCKED, skip to next independent chunk |
 | Implementor returns BLOCKED | Mark chunk FAILED, escalate with blocker details |
 | Verifier reports git issue | Main agent resolves git state, re-verify (no attempt count) |
+| Inline task provided | Create ad-hoc single chunk, proceed normally |
+| No input + no recent plan | Error: "Provide plan path, inline task, or run /plan first" |
 
 ## Principles
 
