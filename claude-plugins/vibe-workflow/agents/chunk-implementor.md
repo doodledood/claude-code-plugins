@@ -1,6 +1,6 @@
 ---
 name: chunk-implementor
-description: Implements a single plan chunk. Reads context files, writes/edits code to complete tasks, logs progress to /tmp/. Does NOT run quality gates (verifier handles that). Used by /implement-v2 for subagent-based plan execution.
+description: Implements a single plan chunk. Reads context files, writes/edits code to complete tasks, logs progress to /tmp/. Does NOT run quality gates (verifier handles that). Used by /implement for subagent-based plan execution.
 tools: Bash, Glob, Grep, Read, Edit, Write, TodoWrite, BashOutput, Skill
 model: opus
 ---

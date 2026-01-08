@@ -63,14 +63,14 @@ Autonomous development workflow with spec→plan→implement pipeline, code revi
 - **Agents:**
   - `codebase-explorer` - Returns structural overview + prioritized file list (prefer over built-in Explore)
   - `bug-fixer` - Systematic bug investigation with root cause analysis
-  - `chunk-implementor` - Implements a single plan chunk, logs progress (used by /implement-v2)
-  - `chunk-verifier` - Runs gates and checks acceptance criteria (used by /implement-v2)
+  - `chunk-implementor` - Implements a single plan chunk, logs progress (used by /implement)
+  - `chunk-verifier` - Runs gates and checks acceptance criteria (used by /implement)
   - Code review agents (bugs, coverage, maintainability, type-safety, docs, CLAUDE.md adherence)
 - **Commands:**
   - `/spec` - Interactive PRD builder using EARS syntax
   - `/plan` - Create mini-PR implementation plans from specs
-  - `/implement` - Execute plans autonomously with auto-fix quality gates
-  - `/implement-v2` - Execute plans via subagents with verification and fix loops (5 attempts per chunk)
+  - `/implement` - Execute plans via subagents with verification and fix loops (5 attempts per chunk)
+  - `/implement-inplace` - Single-agent implementation without subagent overhead
   - `/review` - Run all code review agents in parallel
   - `/bugfix` - Investigate and fix bugs with test-driven verification
   - `/web-research` - Research external topics with hypothesis tracking
