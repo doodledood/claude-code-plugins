@@ -1,7 +1,7 @@
 {
   "name": "vibe-extras",
   "description": "Standalone utilities that complement the core development workflow",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"

@@ -10,11 +10,11 @@ Restructures messy branch history into a clean, reviewer-friendly progression of
 ## Overview
 
 This command:
-1. Analyzes total diff since divergence from main/master
+1. Analyzes total diff since divergence from main/master (ignores existing commits)
 2. Groups files by single concern
 3. Arranges in logical order (foundations first, features second, polish last)
-4. Generates commit messages matching repo style (default: Conventional Commits)
-5. Rewrites history via soft reset and staged commits
+4. Generates Conventional Commit messages
+5. Rewrites history: `git reset --soft` → `git add` + `git commit` for each group
 
 **Modes**:
 - **Interactive** (default): Shows proposal, allows adjustment/approval via AskUserQuestion
@@ -55,17 +55,17 @@ Report: "Created backup: {backup-branch-name}"
 
 ### 3. Analyze Diff
 
-Gather information about all changes since divergence:
+Get the full diff since divergence:
 
 1. **Get merge-base**: `git merge-base HEAD {base-branch}` (using origin/main or local main from step 1)
 2. **Get full diff**: `git diff {merge-base}..HEAD`
-3. **Analyze repo commit style**: `git log --oneline -20` to identify message patterns (optional)
 
-**Analysis goals**:
+**Analysis goals** (based solely on the diff):
 - Identify distinct concerns/features in the changes
 - Group related files together
 - Determine logical ordering (dependencies, foundations before features)
-- Match existing commit message style (Conventional Commits if no clear pattern)
+
+Do NOT investigate individual commits or commit history—only analyze the diff content.
 
 ### 4. Generate Proposal
 
@@ -115,16 +115,20 @@ Perform the history rewrite:
    ```bash
    git reset --soft {merge-base}
    ```
-   This unstages all commits but keeps changes in working directory.
+   This preserves all changes in the working directory but removes all commits.
 
-2. **Create new commits** for each group in the proposal:
-   - Stage relevant files: `git add {files}`
-   - Commit with new message: `git commit -m "{message}"`
-   - Repeat for each logical commit
+2. **Create new commits** - for each group in the proposal, execute:
+   ```bash
+   git add {files-for-this-commit}
+   git commit -m "{message}"
+   ```
+   Repeat for each logical commit group until all changes are committed.
 
 3. **Verify result**:
-   - Run `git log --oneline {merge-base}..HEAD` to show new history
-   - Run `git diff {backup-branch}..HEAD` to confirm no code changes (should be empty)
+   ```bash
+   git log --oneline {merge-base}..HEAD
+   git diff {backup-branch}..HEAD  # should be empty
+   ```
 
 Report: "History rewritten into {new-count} commits"
 
@@ -164,10 +168,11 @@ New history:
 
 ## Important Guidelines
 
+- **Diff-only analysis** - only look at the full diff, never investigate individual commits
 - **Always use `--force-with-lease`** instead of `--force` for push safety
 - **Backup branch is permanent** - only delete manually after confirming rewrite is correct
 - **Verify no code changes** - diff between backup and new HEAD should be empty
-- **Conventional Commits** - use if repo has no clear style (feat, fix, docs, refactor, test, chore)
+- **Conventional Commits** - use standard types (feat, fix, docs, refactor, test, chore)
 - **One concern per commit** - resist urge to combine unrelated changes
 
 ## Edge Cases
@@ -178,8 +183,7 @@ New history:
 | Uncommitted changes | Error: "Uncommitted changes detected. Commit or stash changes before rewriting history." |
 | No remote available | Fall back to local main/master. Report: "Using local main as base (no remote)" |
 | No commits since main | Error: "No commits to rewrite. Branch is up to date with main." |
-| Single commit only | Proceed normally (may just improve commit message) |
-| Merge commits in history | Warning: "Branch contains merge commits. Rewrite will linearize history." Proceed if user confirms. |
+| Single commit only | Proceed normally (may reorganize or improve commit message) |
 | Conflicts during commit creation | Should not occur (soft reset preserves all changes). If staging issues, report specific files. |
 | Push rejected despite --force-with-lease | Error: "Push rejected. Remote has new commits. Fetch and review before retrying." |
 | User cancels mid-execution | Backup branch preserved. User can: `git reset --hard {backup-branch}` to restore. |
