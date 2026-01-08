@@ -1,21 +1,31 @@
 ---
 description: 'Single-agent implementation: executes plans in-place without subagents. Use /implement (default) for complex features; use this for simpler tasks or when subagent overhead is unwanted.'
-argument-hint: Optional - path to plan file
+argument-hint: plan path | inline task | (empty for recent plan or interactive)
 ---
 
 **User request**: $ARGUMENTS
 
-Autonomously execute plan chunks in dependency order. Completes spec→plan→implement pipeline.
+Autonomously execute implementation in-place. Supports plan files, inline tasks, or interactive mode.
 
 **Fully autonomous**: No pauses except truly blocking issues.
 
 ## Workflow
 
-### Phase 1: Parse Plan → Todo List
+### Phase 1: Resolve Input & Setup
 
-**Locate plan**: Accept `/implement-inplace /tmp/plan.md`, `/implement-inplace plan.md --spec spec.md`, or infer from context/recent `/tmp/plan-*.md` files.
+**Priority order:**
+1. **File path** (ends in `.md` or starts with `/`) → use plan file, optionally with `--spec <path>`
+2. **Inline task** (any other text) → create ad-hoc single chunk:
+   ```
+   ## 1. [Task summary - first 50 chars or natural break]
+   - Depends on: -
+   - Tasks: [user's description]
+   - Files: (discover during implementation)
+   - Acceptance criteria: gates pass
+   ```
+3. **Empty** → search `/tmp/plan-*.md` (most recent); if none found, **ask user** what they want to implement
 
-**Parse each chunk** (`## N. [Name]` headers):
+**For plan files**, parse each chunk (`## N. [Name]` headers):
 - Dependencies (`Depends on:` field, `-` = none)
 - Files to modify/create with descriptions
 - Context files (paths, optional line ranges)
@@ -74,7 +84,8 @@ Run `/review` for quality verification.
 | Invalid plan | Error with path + expected structure |
 | Missing context file | Warn, continue (non-blocking) |
 | Chunk fails completely | Leave todos pending, skip dependents, continue independents, report in summary |
-| No plan specified | Prompt for path or suggest `/plan` first |
+| Inline task provided | Create ad-hoc single chunk, proceed normally |
+| No input + no recent plan | Ask user what they want to implement |
 | Interrupted | Todos reflect exact progress (Memento), manual cleanup needed for re-run |
 
 ## Principles
