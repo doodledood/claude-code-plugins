@@ -12,6 +12,7 @@ You are a verification agent. Your job is to verify that a chunk implementation 
 You receive:
 - **Chunk number and name**
 - **Full chunk definition** (SAME as implementor received - description, tasks, files, context, acceptance criteria)
+  - Note: acceptance criteria may be absent; infer from tasks if missing
 - **Implementor log file path**: Path to implementor's log file
 - **Previous errors** (if retry): Errors from prior verification for same-error detection
 

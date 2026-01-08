@@ -127,7 +127,7 @@ Implement chunk N: [Name]
 
 [If retry: ## Fix Context
 Attempt: N/5
-Previous verification failed with:
+Verifier log: [path for detailed gate output]
 
 ### Direct Issues (in chunk's files)
 [errors in files this chunk created/modified]
@@ -136,10 +136,11 @@ Previous verification failed with:
 [errors in files NOT touched by chunk - your changes broke these]
 Files: [list of affected files from Indirect issues]
 
-Fix Direct issues first. For Indirect issues: fix in your files if possible, otherwise you MAY edit the listed files to resolve breakage you caused.]
+Fix Direct first. For Indirect: fix in your files if possible, else edit listed files. See verifier log for full gate output.]
 ```
 
 4. Wait for completion, parse output:
+   - Check for `## Chunk Implementation Blocked` → if BLOCKED, escalate immediately (Phase 4)
    - Extract `Log file:` path
    - Extract `Files created:` and `Files modified:` lists
    - Extract `Out-of-scope fixes:` if present (Indirect issue fixes)
@@ -182,10 +183,11 @@ Verify chunk N: [Name]
 
 **If Status: FAIL**
 1. **Update progress file**: increment `Attempts`, add issues to `Notes`, `Last updated`
-2. Check attempt count (max 5 total including initial)
-3. Check for same-error condition
-4. If can retry → enter fix loop (Phase 3)
-5. If max attempts or same-error → escalate (Phase 4)
+2. Check for git issues (`Git issue:` in output) → if found, main agent resolves git state first, then re-verify (don't count as attempt)
+3. Check attempt count (max 5 total including initial)
+4. Check for same-error condition
+5. If can retry → enter fix loop (Phase 3)
+6. If max attempts or same-error → escalate (Phase 4)
 
 ### 2.4 Commit Chunk (Main Agent Only)
 
@@ -320,7 +322,7 @@ Status: IN_PROGRESS | COMPLETE | FAILED
 ## Chunks
 
 ### Chunk 1: [Name]
-Status: COMPLETE | IN_PROGRESS | PENDING | FAILED
+Status: PENDING | IN_PROGRESS | COMPLETE | FAILED | BLOCKED
 Attempts: N
 Implementor log: [path or (none)]
 Verifier log: [path or (none)]
@@ -348,7 +350,9 @@ Last updated: [timestamp]
 | No acceptance criteria in plan | Auto-infer from tasks |
 | Interrupted mid-chunk | Progress file shows IN_PROGRESS, resume re-starts that chunk |
 | Resume with progress file | Skip COMPLETE chunks, start from first non-complete |
-| Dependency not met (prior chunk failed) | Skip this chunk, mark as blocked |
+| Dependency not met (prior chunk failed) | Mark BLOCKED, skip to next independent chunk |
+| Implementor returns BLOCKED | Mark chunk FAILED, escalate with blocker details |
+| Verifier reports git issue | Main agent resolves git state, re-verify (no attempt count) |
 
 ## Principles
 
