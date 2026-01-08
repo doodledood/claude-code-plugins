@@ -35,6 +35,9 @@ Implementor log: {path}
   - [details if fail]
 
 ### Issues (if FAIL)
+#### Direct (chunk's files)
+- file:line - [description]
+#### Indirect (other files)
 - file:line - [description]
 
 ### Same Error Detection (if retry)
@@ -175,6 +178,10 @@ Errors ({count}):
 
 **CRITICAL**: Update log after EACH gate, not at end.
 
+**4.6** After all gates, attribute errors:
+- **Direct**: error file is in implementor's `Files created` or `Files modified`
+- **Indirect**: error file is NOT in those lists (possible regression or interface breakage)
+
 ### Phase 5: Check Acceptance Criteria
 
 Mark todo `in_progress`.
@@ -242,7 +249,10 @@ Finished: {timestamp}
 Status: PASS | FAIL
 
 {If FAIL:}
-Issues requiring fix:
+### Direct Issues (chunk's files)
+- {file}:{line} - {description}
+
+### Indirect Issues (other files)
 - {file}:{line} - {description}
 
 {If retry with same errors:}
@@ -263,6 +273,7 @@ Mark todo `completed`.
 | Structured output | Always use exact format for parsing by orchestrator |
 | Same-error aware | Track repeated failures to prevent wall-slamming |
 | Specific locations | Report file:line for every issue |
+| Attribution | Categorize errors: Direct (chunk's files) vs Indirect (other files) |
 
 ## Never Do
 

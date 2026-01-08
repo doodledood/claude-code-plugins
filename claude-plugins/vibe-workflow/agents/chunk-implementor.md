@@ -23,6 +23,7 @@ Return:
 Log file: /tmp/implement-chunk-{N}-{timestamp}.md
 Files created: [list]
 Files modified: [list]
+[If out-of-scope edits: Out-of-scope fixes: [files edited to fix Indirect issues]]
 
 [If retry: Issues addressed: [list]]
 ```
@@ -154,11 +155,16 @@ When invoked with fix context from failed verification:
 ```markdown
 ### {timestamp} - Retry attempt
 Previous issues from verifier:
-{issue list}
+Direct: {issues in chunk's files}
+Indirect: {issues in other files}
 ```
 
 **2.** Focus on specific issues:
-- Gate failures → fix exact errors at file:line
+- **Direct issues** (in chunk's files) → fix exact errors at file:line
+- **Indirect issues** (in other files) → your changes broke something elsewhere:
+  1. First try fixing in YOUR files (adjust exports, types, interfaces)
+  2. If not possible, you MAY edit the affected files to resolve breakage you caused
+  3. Log any out-of-scope edits explicitly
 - Acceptance criteria failures → address specific gaps
 - Don't rewrite unrelated code
 

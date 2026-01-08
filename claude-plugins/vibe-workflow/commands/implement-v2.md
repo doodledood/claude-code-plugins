@@ -62,6 +62,7 @@ Implementor log: (none)
 Verifier log: (none)
 Files created: []
 Files modified: []
+Out-of-scope fixes: []
 Notes:
 
 ### Chunk 2: [Name]
@@ -127,14 +128,22 @@ Implement chunk N: [Name]
 [If retry: ## Fix Context
 Attempt: N/5
 Previous verification failed with:
-[Verifier's issue list from structured output]
-Focus on fixing these specific issues.]
+
+### Direct Issues (in chunk's files)
+[errors in files this chunk created/modified]
+
+### Indirect Issues (in other files)
+[errors in files NOT touched by chunk - your changes broke these]
+Files: [list of affected files from Indirect issues]
+
+Fix Direct issues first. For Indirect issues: fix in your files if possible, otherwise you MAY edit the listed files to resolve breakage you caused.]
 ```
 
 4. Wait for completion, parse output:
    - Extract `Log file:` path
    - Extract `Files created:` and `Files modified:` lists
-5. **Update progress file**: `Implementor log`, `Files created`, `Files modified`, `Last updated`
+   - Extract `Out-of-scope fixes:` if present (Indirect issue fixes)
+5. **Update progress file**: `Implementor log`, `Files created`, `Files modified`, `Out-of-scope fixes`, `Last updated`
 6. Mark implement todo `completed`
 
 ### 2.2 Spawn Verifier Agent
@@ -158,7 +167,7 @@ Verify chunk N: [Name]
 3. Wait for result, parse output:
    - Extract `Status:` (PASS/FAIL)
    - Extract `Log file:` path
-   - Extract issues list if FAIL
+   - Extract issues: `Direct` (chunk's files) and `Indirect` (other files)
    - Check `Same as previous:` if retry
 4. **Update progress file**: `Verifier log`, `Last updated`
 
@@ -317,6 +326,7 @@ Implementor log: [path or (none)]
 Verifier log: [path or (none)]
 Files created: [list]
 Files modified: [list]
+Out-of-scope fixes: [list or empty]
 Notes: [issues or warnings]
 
 ### Chunk 2: [Name]
