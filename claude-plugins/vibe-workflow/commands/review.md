@@ -107,6 +107,24 @@ Produce a **Final Consolidated Review Report** with:
 - Recommended fix order (dependencies, quick wins first)
 ```
 
+## Step 4: Follow-up Action
+
+After presenting the final consolidated report, ask the user what they'd like to address:
+
+```
+header: "Next Steps"
+question: "Would you like to address any of these findings?"
+options:
+  - "Critical/High only (Recommended)" - Focus on issues that should block release
+  - "All issues" - Address everything including medium and low severity
+  - "Skip" - No fixes needed right now
+```
+
+**Based on selection:**
+- **Critical/High only**: Use Skill tool: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
+- **All issues**: Use Skill tool: `Skill("vibe-workflow:fix-review-issues")`
+- **Skip**: End workflow
+
 ## Execution
 
 1. Run detection commands first (can be parallel)
@@ -114,3 +132,5 @@ Produce a **Final Consolidated Review Report** with:
 3. Do NOT run agents sequentially—always parallel
 4. After all agents complete, launch the verification agent with all findings
 5. Present the final consolidated report to the user
+6. Ask user about next steps using AskUserQuestion
+7. If user chooses to fix, invoke /fix-review-issues with appropriate scope

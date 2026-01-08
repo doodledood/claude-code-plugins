@@ -97,33 +97,26 @@ If a finding fails any criterion, either drop it or demote to "Minor Suggestions
 
 ## Severity Classification
 
-**Critical**: Documentation actively misleads users
-- Examples that would fail or error
-- Incorrect API signatures or parameters
-- Wrong file paths or commands
-- Security-relevant documentation errors
+**Documentation issues are capped at Medium severity** - docs don't cause data loss or security breaches.
 
-**High**: Significant documentation gaps
+**Medium**: Actionable documentation issues
+- Examples that would fail or error
+- Incorrect API signatures, parameters, or file paths
 - New features with no documentation
 - Major behavior changes not reflected
 - Removed features still documented
 - Incorrect installation/setup steps
 - JSDoc/docstrings with wrong parameter names or types
 
-**Medium**: Noticeable inaccuracies
+**Low**: Minor inaccuracies and polish
 - Minor parameter or option changes not reflected
 - Outdated examples that still work but aren't ideal
 - Missing edge cases or caveats
-- Slightly stale version references
-
-**Low**: Polish and completeness
-- Minor wording improvements needed
-- Could add more examples
+- Minor wording improvements
 - Formatting inconsistencies
-- Missing optional details
-- Stale TODO/FIXME comments that could be removed
+- Stale TODO/FIXME comments
 
-**Calibration check**: Most documentation issues are Medium or Low. Critical means "users will fail immediately following these docs." If you're marking more than one issue as Critical, recalibrate.
+**Calibration check**: If you're tempted to mark something higher than Medium, reconsider - even actively misleading docs are Medium because users can recover by reading code or asking.
 
 ## Output Format
 
@@ -170,8 +163,6 @@ Your audit must follow this exact structure:
 
 ## Summary
 
-- Critical: [count]
-- High: [count]
 - Medium: [count]
 - Low: [count]
 
