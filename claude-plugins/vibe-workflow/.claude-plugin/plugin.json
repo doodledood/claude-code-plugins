@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
   "description": "Ship high-quality code faster with less back-and-forth",
-  "version": "1.78.2",
+  "version": "1.78.3",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
