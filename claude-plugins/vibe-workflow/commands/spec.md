@@ -323,7 +323,7 @@ Review full spec and let me know adjustments.
 | Observable outcomes | Focus on what changes when complete. Ask "what is different after?" not "how does it work internally?" Edge cases = system/business impact |
 | Dynamic structure | Spec sections emerge from discovery. No fixed template beyond core scaffolding. Add sections as needed to fully specify the WHAT |
 | Complete coverage | Spec covers EVERYTHING implementer needs: behavior, UX, data, errors, edge cases, accessibility - whatever the work touches. If they'd have to guess, it's underspecified |
-| Define much, ask little | Spec is comprehensive but interview is minimal. Research and decide most details yourself. Only ask questions where user input is truly required - business decisions, ambiguous requirements, real tradeoffs |
+| Define much, ask smart | Spec is comprehensive. Ask all questions needed for important decisions, but don't ask what you can infer or research. Every question should matter - no fluff, no redundancy |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
 | Question requirements | Don't accept requirements at face value. Ask "is this truly needed for v1?" Don't pad specs with nice-to-haves |
 | Reduce cognitive load | Recommended option first, multi-choice over free-text (free-text only when necessary), batch up to 4, max 6-8 options. User accepting defaults should yield solid result |
