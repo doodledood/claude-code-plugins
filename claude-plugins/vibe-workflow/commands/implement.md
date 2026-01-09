@@ -309,13 +309,11 @@ When all chunks complete:
 Chunks: N | Files created: [list] | Files modified: [list]
 
 ### Chunk Summary
-1. [Name] - [files touched] - **HIGH**
-2. [Name] - [files touched] - **MEDIUM** ⚠️
-3. [Name] - [files touched] - **LOW** ⚠️ [uncertainty reason]
+1. [Name] - [files touched]
+2. [Name] - [files touched] - ⚠️ [uncertainty reason]
 
 ### Notes
 [Any warnings, assumptions, or follow-ups]
-[If any MEDIUM/LOW chunks: "Review recommended for chunks marked ⚠️"]
 
 Progress file: [path]
 Run `/review` for quality verification.
