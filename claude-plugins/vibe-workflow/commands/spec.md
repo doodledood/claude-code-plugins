@@ -412,14 +412,3 @@ Any question from these simulations = gap to address before finalizing.
 | User corrects earlier decision | Update spec, log correction with reason, check if other requirements affected |
 | Interview interrupted | Spec saved; add `[INCOMPLETE]` at top. To resume: provide existing spec file path as argument |
 | "Just build it" | Push back with 2-3 critical questions (questions where guessing wrong = significant rework). If declined, document assumptions clearly |
-
-### Interview Depth Heuristic
-
-| Work Complexity | Typical Questions |
-|-----------------|-------------------|
-| Simple bug fix | 2-4 |
-| Small feature | 5-8 |
-| Medium feature | 8-15 |
-| Major refactor/feature | 15+ |
-
-Scale depth to complexity. Don't over-interview simple work; don't under-interview complex work.
