@@ -1,17 +1,23 @@
 # Prompt Engineering
 
-Analyze prompts against structured frameworks.
+Analyze and refine prompts for clarity and precision.
 
 ## What It Does
 
-Run `/review-prompt` to analyze a prompt file against the 10-Layer Architecture framework. Identifies genuine improvement opportunities—gaps in context, unclear instructions, missing constraints.
+Two complementary workflows:
 
-Reports only. Does not modify files.
+- **`/review-prompt`** - Analyze a prompt against the 10-Layer Architecture framework. Reports issues without modifying files.
+- **`/refine-prompt`** - Iteratively refine a prompt for precision. Eliminates ambiguities, resolves conflicts, adds missing definitions. Modifies the file after verification passes.
 
 ## Components
 
-- `/review-prompt` - Analyze a prompt file
-- `prompt-reviewer` agent - Deep analysis for automated reviews
+### Commands
+- `/review-prompt` - Analyze a prompt file (read-only)
+- `/refine-prompt` - Iteratively refine a prompt for precision (modifies file)
+
+### Agents
+- `prompt-reviewer` - Deep 10-layer analysis for review
+- `prompt-precision-verifier` - Checks for ambiguities, conflicts, undefined terms
 
 ## Installation
 
