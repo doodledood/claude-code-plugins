@@ -20,10 +20,10 @@ uvx --from claude-plugins/consultant/skills/consultant/scripts consultant-cli --
 
 ## Foundational Documents
 
-These docs define WHO we build for and HOW LLMs actually work - read before building plugins:
+Read before building plugins:
 
-- **@docs/CUSTOMER.md** - Ideal Customer Profile. Defines "The Quality-First Developer" persona, their pain points, success metrics, anti-personas, and messaging guidelines. Reference when prioritizing features or writing copy.
-- **docs/LLM_CODING_CAPABILITIES.md** - LLM coding research. Covers what LLMs do well (greenfield, tests, refactoring) vs poorly (debugging, large codebases), and strategies to maximize strengths while mitigating limitations. Informs our first-principles workflow design.
+- **@docs/CUSTOMER.md** - Who we build for, messaging guidelines
+- **docs/LLM_CODING_CAPABILITIES.md** - LLM strengths/limitations, informs workflow design
 
 ## Repository Structure
 
