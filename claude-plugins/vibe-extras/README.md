@@ -1,22 +1,19 @@
-# Vibe Extras Plugin
+# Vibe Extras
 
-Standalone utilities that complement the core development workflow.
+Standalone utilities for common development tasks.
 
-## What It Does
+## Commands
 
-**Skills** (auto-invoked by Claude when relevant):
-- **maximize-info-density** - Compress docs/prompts losslessly for reduced token consumption
+**Git utilities:**
+- `/rebase-on-main` - Safe rebasing with conflict resolution guidance
+- `/rewrite-history` - Restructure commits for clean, reviewer-friendly PRs (automatic backup)
 
-**Commands** (invoke explicitly):
-- `/rebase-on-main` - Safe rebasing with conflict resolution
-- `/rewrite-history` - Safely rewrite git history (squash, reorder, edit commits) with automatic backup
-- `/clean-slop` - Remove AI-generated noise (useless comments, verbose patterns)
-- `/update-claude-md` - Create or maintain project instructions
+**Code maintenance:**
+- `/clean-slop` - Remove AI-generated noise (redundant comments, verbose patterns)
+- `/update-claude-md` - Create or maintain CLAUDE.md project instructions
 
-**Agents**:
-- **information-density-verifier** - Verifies lossless compression (used by maximize-information-density skill)
-
-Use `/help` after installation to see all available commands.
+**Skills** (auto-invoked):
+- `maximize-info-density` - Compress docs/prompts losslessly for reduced token usage
 
 ## Installation
 
