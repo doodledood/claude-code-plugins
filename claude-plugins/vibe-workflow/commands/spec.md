@@ -205,6 +205,9 @@ After EACH decision (even implicit), append to Decisions Made:
 
 7. **Only ask user when**: (a) business/product decision required, (b) codebase lacks answer, (c) multiple interpretations need user choice. Otherwise decide yourself.
 
+   *Decide yourself*: error message copy (follow patterns), retry counts (use sensible defaults), loading indicator style (match existing), validation rules (standard practice).
+   *Ask user*: which user segments, opt-in vs opt-out, feature priority, business rule ambiguities, tradeoffs with no clear winner.
+
 ## Phase 4: Finalize & Summarize
 
 ### 4.1 Final interview log update
@@ -270,6 +273,10 @@ Generated: {date}
 | Migration | Data preservation, rollback, cutover strategy |
 | Performance | Current baseline, target metrics, measurement method |
 | Data changes | Schema, validation rules, retention |
+| Security & privacy | Auth/authz requirements, data sensitivity, audit needs |
+| User preferences | Configurable options, defaults, persistence |
+| External integrations | Third-party services, rate limits, fallbacks |
+| Observability | Analytics events, logging, success/error metrics |
 
 **Specificity**: Each requirement should be verifiable. "User can log in" is too vague; "on valid credentials → redirect to dashboard; on invalid → show inline error, no page reload" is right.
 
