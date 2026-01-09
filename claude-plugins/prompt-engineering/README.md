@@ -1,15 +1,17 @@
-# Prompt Engineering Plugin
+# Prompt Engineering
 
-Tools for reviewing and analyzing LLM prompts.
+Analyze prompts against structured frameworks.
 
 ## What It Does
 
-- **Prompt Review** - Run `/review-prompt` to analyze prompts against the 10-Layer Architecture framework
-- **Prompt Reviewer Agent** - Deep prompt analysis via the `prompt-reviewer` agent for automated reviews
+Run `/review-prompt` to analyze a prompt file against the 10-Layer Architecture framework. Identifies genuine improvement opportunities—gaps in context, unclear instructions, missing constraints.
 
-Identifies genuine improvement opportunities while respecting what already works. Reports only—does not modify files.
+Reports only. Does not modify files.
 
-Use `/help` after installation to see all available commands.
+## Components
+
+- `/review-prompt` - Analyze a prompt file
+- `prompt-reviewer` agent - Deep analysis for automated reviews
 
 ## Installation
 
