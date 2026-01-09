@@ -24,6 +24,17 @@ Autonomous development workflow with code review agents and quality gates.
 
 Use `/help` after installation to see all available commands.
 
+## Choosing Your Entry Point
+
+| Task Complexity | Entry Point |
+|-----------------|-------------|
+| Single function, clear scope | Ask Claude directly |
+| 1-2 files, requirements clear | `/implement-inplace` with inline task |
+| Multi-file, approach unclear | `/plan` → `/implement` |
+| Scope ambiguous, needs discovery | `/spec` → `/plan` → `/implement` |
+
+Start with the simplest entry point that fits. Escalate if you hit ambiguity.
+
 ## Installation
 
 ```bash
