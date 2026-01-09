@@ -412,7 +412,6 @@ Any question from these simulations = gap to address before finalizing.
 | User corrects earlier decision | Update spec, log correction with reason, check if other requirements affected |
 | Interview interrupted | Spec saved; add `[INCOMPLETE]` at top. To resume: provide existing spec file path as argument |
 | "Just build it" | Push back with 2-3 critical questions (questions where guessing wrong = significant rework). If declined, document assumptions clearly |
-| 15+ questions asked | Checkpoint: "We've covered X areas. Finalize now or continue exploring?" |
 
 ### Interview Depth Heuristic
 
