@@ -46,6 +46,10 @@ Start simple. Escalate if you hit ambiguity.
 - `chunk-implementor` - Implements single plan chunks
 - `chunk-verifier` - Runs verification gates
 
+**Hooks**:
+- `SessionStart` - Reminds Claude to prefer codebase-explorer over built-in Explore
+- `Stop` - Prevents premature stops during `/implement` workflows when todos are incomplete
+
 ## Installation
 
 ```bash

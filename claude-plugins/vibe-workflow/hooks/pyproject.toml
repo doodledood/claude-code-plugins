@@ -6,6 +6,7 @@ requires-python = ">=3.10"
 
 [project.scripts]
 session-start-reminder = "session_start_reminder:main"
+stop-todo-enforcement = "stop_todo_enforcement:main"
 
 [build-system]
 requires = ["hatchling"]

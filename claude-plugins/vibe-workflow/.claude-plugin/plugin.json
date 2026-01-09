@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
   "description": "Ship high-quality code faster with less back-and-forth",
-  "version": "1.82.0",
+  "version": "1.83.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
@@ -18,6 +18,18 @@
           {
             "type": "command",
             "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks session-start-reminder"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "description": "Prevent premature stops during /implement and /implement-inplace workflows when todos are incomplete",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks stop-todo-enforcement"
           }
         ]
       }
