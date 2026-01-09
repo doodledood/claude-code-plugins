@@ -18,6 +18,13 @@ ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
 uvx --from claude-plugins/consultant/skills/consultant/scripts consultant-cli --help
 ```
 
+## Foundational Documents
+
+Read before building plugins:
+
+- **@docs/CUSTOMER.md** - Who we build for, messaging guidelines
+- **docs/LLM_CODING_CAPABILITIES.md** - LLM strengths/limitations, informs workflow design
+
 ## Repository Structure
 
 - `.claude-plugin/marketplace.json` - Registry of all plugins
