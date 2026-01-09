@@ -110,7 +110,7 @@ def count_block_in_line(line_data: dict[str, Any]) -> int:
 
     # Handle string content format
     if isinstance(content, str):
-        return content.count("BLOCKED: Implementation incomplete")
+        return content.count("HOLD: You have")
 
     count = 0
     for block in content:
@@ -119,7 +119,7 @@ def count_block_in_line(line_data: dict[str, Any]) -> int:
         if block.get("type") != "text":
             continue
         text = block.get("text", "")
-        count += text.count("BLOCKED: Implementation incomplete")
+        count += text.count("HOLD: You have")
 
     return count
 
@@ -209,9 +209,10 @@ def main() -> None:
         "decision": "block",
         "reason": f"{todo_count} todos remain incomplete",
         "systemMessage": (
-            f"BLOCKED: Implementation incomplete. You have {todo_count} "
-            f"pending/in-progress todos. You MUST complete all remaining work "
-            f"before stopping. Resume implementation now."
+            f"HOLD: You have {todo_count} pending/in-progress todos and an /implement "
+            f"workflow was detected in this session. If you're still implementing a plan, "
+            f"continue working through the remaining todos autonomously. If the user has "
+            f"moved on to different work, you may proceed. Bias toward completion."
         ),
     }
     print(json.dumps(output))

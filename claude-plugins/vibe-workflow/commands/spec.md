@@ -9,17 +9,19 @@ Build requirements spec through structured discovery interview. Defines WHAT and
 
 **Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
-**Role**: Senior PM - smart, non-obvious questions that reduce ambiguity and cognitive load.
+**Role**: Senior Product Manager - smart, non-obvious questions that reduce ambiguity and cognitive load.
 
 **Spec file**: `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
 
 **Interview log**: `/tmp/spec-interview-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - external memory.
 
+**Timestamp**: Generate once at Phase 1 start. Use same timestamp for both files. Running /spec again creates new files (no overwrite).
+
 ## Phase 1: Initial Setup
 
 ### 1.1 Create todo list (TodoWrite immediately)
 
-Todos = **areas to discover**, not interview steps. Each todo reminds you what conceptual area needs resolution. List is **never fixed** - continuously expands as user answers reveal new areas.
+Todos = **areas to discover**, not interview steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as user answers reveal new areas. "Finalize spec" is fixed anchor; all others are dynamic.
 
 **Starter todos** (just seeds - actual list grows organically):
 
@@ -94,7 +96,7 @@ Started: {timestamp}
 
 ### 2.1 Launch codebase-explorer
 
-Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work.
+Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work. Max 3 parallel researchers; if findings conflict, note both perspectives and ask user to resolve.
 
 Explore: product purpose, existing patterns, user flows, terminology, product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md), existing specs in `docs/` or `specs/`. For bug fixes: also explore bug context, related code, potential causes.
 
@@ -122,9 +124,29 @@ After EACH research step, append to interview log:
 
 Write first draft with `[TBD]` markers for unresolved items. Use same file path for all updates.
 
+### Phase 2 Complete When
+- All codebase-explorer tasks finished
+- All recommended files read
+- Initial draft written with `[TBD]` markers
+- Interview log populated with research findings
+
 ## Phase 3: Iterative Discovery Interview
 
 **CRITICAL**: Use AskUserQuestion tool for ALL questions - never plain text.
+
+**Example AskUserQuestion call**:
+```
+questions: [{
+  question: "Who should receive these notifications?",
+  header: "User Scope",
+  options: [
+    { label: "All active users (Recommended)", description: "Broadest reach, simplest logic" },
+    { label: "Premium users only", description: "Limited scope, may need upgrade prompts" },
+    { label: "Users who opted in", description: "Requires preference system first" }
+  ],
+  multiSelect: false
+}]
+```
 
 ### Memento Loop
 
@@ -141,7 +163,7 @@ For each step:
 
 ### Interview Log Update Format
 
-After EACH question/answer, append:
+After EACH question/answer, append (Round = one AskUserQuestion call, may contain batched questions):
 
 ```markdown
 ### Round {N} - {timestamp}
@@ -176,7 +198,7 @@ After EACH decision (even implicit), append to Decisions Made:
 
 **Unbounded loop**: Keep iterating (research → question → update spec) until ALL completion criteria are met. No fixed round limit.
 
-1. **Prioritize by information gain** - Ask questions that split decision space most. If answer changes other questions, ask early.
+1. **Prioritize by information gain** - Ask questions where the answer would change what other questions you need to ask, or would eliminate entire branches of requirements. If knowing X makes Y irrelevant, ask X first.
 
 2. **Interleave discovery and questions**:
    - User answer reveals new area → launch codebase-explorer
@@ -193,11 +215,12 @@ After EACH decision (even implicit), append to Decisions Made:
    | 4 | Differentiating | Choose between approaches | Pattern A vs B? Which UX model? |
    | 5 | Detail Refinement | Fine-grained details | Exact copy, specific error handling |
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description. Question whether each requirement is truly needed—don't pad with nice-to-haves. When options are equivalent, lean toward simpler.
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. Question whether each requirement is truly needed—don't pad with nice-to-haves. When options are equivalent AND easily reversible, decide yourself (lean simpler). When options are equivalent BUT have different user-facing tradeoffs, ask user.
 
 5. **Be thorough via technique**:
    - Cover everything relevant - don't skip to save time
-   - Reduce cognitive load through HOW you ask: concrete options, batching (up to 4), good defaults
+   - Reduce cognitive load through HOW you ask: concrete options, good defaults
+   - **Batching**: Up to 4 related questions per AskUserQuestion call; max 6-8 options per question
    - Make decisions yourself when context suffices
    - Complete spec with easy questions > incomplete spec with fewer questions
 
@@ -279,7 +302,7 @@ Generated: {date}
 {Add sections relevant to this specific work - examples below}
 ```
 
-**Dynamic sections** - add based on what discovery revealed:
+**Dynamic sections** - add based on what discovery revealed (illustrative, not exhaustive):
 
 | Discovery Reveals | Add Section |
 |-------------------|-------------|
@@ -337,7 +360,7 @@ Review full spec and let me know adjustments.
 | Define much, ask smart | Spec is comprehensive. Ask all questions needed for important decisions, but don't ask what you can infer or research. Every question should matter - no fluff, no redundancy |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
 | Question requirements | Don't accept requirements at face value. Ask "is this truly needed for v1?" Don't pad specs with nice-to-haves |
-| Reduce cognitive load | Recommended option first, multi-choice over free-text (free-text only when necessary), batch up to 4, max 6-8 options. User accepting defaults should yield solid result |
+| Reduce cognitive load | Recommended option first, multi-choice over free-text. Free-text only when: options are infinite/unpredictable, asking for specific values (names, numbers), or user needs to describe own context. User accepting defaults should yield solid result |
 | Incremental updates | Update interview log after EACH step (not at end) |
 
 ### Completion Checklist
@@ -386,5 +409,18 @@ Any question from these simulations = gap to address before finalizing.
 | User declines to answer | Note `[USER SKIPPED: reason]`, flag in summary |
 | Insufficient research | Ask user directly, note uncertainty |
 | Contradictory requirements | Surface conflict before proceeding |
-| Interview interrupted | Spec saved; add `[INCOMPLETE]` at top |
-| "Just build it" | Push back with top 2-3 critical questions; if declined, document assumptions |
+| User corrects earlier decision | Update spec, log correction with reason, check if other requirements affected |
+| Interview interrupted | Spec saved; add `[INCOMPLETE]` at top. To resume: provide existing spec file path as argument |
+| "Just build it" | Push back with 2-3 critical questions (questions where guessing wrong = significant rework). If declined, document assumptions clearly |
+| 15+ questions asked | Checkpoint: "We've covered X areas. Finalize now or continue exploring?" |
+
+### Interview Depth Heuristic
+
+| Work Complexity | Typical Questions |
+|-----------------|-------------------|
+| Simple bug fix | 2-4 |
+| Small feature | 5-8 |
+| Medium feature | 8-15 |
+| Major refactor/feature | 15+ |
+
+Scale depth to complexity. Don't over-interview simple work; don't under-interview complex work.
