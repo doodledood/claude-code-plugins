@@ -13,7 +13,7 @@ Build requirements spec through structured discovery interview. Defines WHAT and
 
 **Spec file**: `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
 
-**Interview log**: `/tmp/spec-interview-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` - external memory.
+**Interview log**: `/tmp/spec-interview-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - external memory.
 
 ## Phase 1: Initial Setup
 
@@ -71,7 +71,7 @@ After user mentions "also needs email digest option":
 
 ### 1.2 Create interview log
 
-Path: `/tmp/spec-interview-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` (use SAME path for ALL updates)
+Path: `/tmp/spec-interview-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` (use SAME path for ALL updates)
 
 ```markdown
 # Interview Log: {work name}
@@ -205,20 +205,6 @@ After EACH decision (even implicit), append to Decisions Made:
 
 7. **Only ask user when**: (a) business/product decision required, (b) codebase lacks answer, (c) multiple interpretations need user choice. Otherwise decide yourself.
 
-### Sample Questions
-
-**Universal question patterns** - adapt to specific work:
-
-| Priority | Purpose | Example Questions |
-|----------|---------|-------------------|
-| 1 | Scope Eliminators | V1/MVP vs full? All affected areas or subset? Which systems in scope? |
-| 2 | Branching | Opens/closes lines of inquiry based on answer |
-| 3 | Hard Constraints | Non-negotiable limits? Dependencies? Deadlines? |
-| 4 | Differentiating | Choose between valid approaches when multiple exist |
-| 5 | Detail Refinement | Fine-grained details after big picture clear |
-
-**Guidance**: Ask questions that maximize information gain. If info can be inferred from research or codebase, don't ask. Adapt question content to the specific work - ask about reproduction for bugs, rollback for infrastructure, baseline metrics for performance, etc.
-
 ## Phase 4: Finalize & Summarize
 
 ### 4.1 Final interview log update
@@ -276,16 +262,16 @@ Generated: {date}
 
 | Discovery Reveals | Add Section |
 |-------------------|-------------|
-| User-facing behavior | User stories, user flow, key states |
-| API/technical interface | Contract (inputs/outputs), integration points |
-| Bug context | Current vs expected behavior, reproduction, verification |
-| Refactoring | Current/target structure, behavior preservation |
-| Infrastructure | Rollback plan, monitoring approach |
-| Migration | Data preservation, rollback strategy |
-| Performance | Current baseline, target metrics |
-| Documentation | Affected docs, audience |
+| User-facing behavior | Screens/states (empty, loading, success, error), interactions, accessibility |
+| API/technical interface | Contract (inputs/outputs/errors), integration points, versioning |
+| Bug context | Current vs expected, reproduction steps, verification criteria |
+| Refactoring | Current/target structure, invariants (what must NOT change) |
+| Infrastructure | Rollback plan, monitoring, failure modes |
+| Migration | Data preservation, rollback, cutover strategy |
+| Performance | Current baseline, target metrics, measurement method |
+| Data changes | Schema, validation rules, retention |
 
-**Key**: No fixed sections beyond core scaffolding. Structure emerges from discovery.
+**Specificity**: Each requirement should be verifiable. "User can log in" is too vague; "on valid credentials → redirect to dashboard; on invalid → show inline error, no page reload" is right.
 
 ### 4.3 Mark all todos complete
 
