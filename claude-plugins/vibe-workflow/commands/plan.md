@@ -5,15 +5,15 @@ argument-hint: Optional - path to spec file
 
 **User request**: $ARGUMENTS
 
-Build implementation plan through structured discovery. Takes spec (from `/spec` or inline), iteratively researches codebase + asks strategic questions → detailed plan.
+Build implementation plan through structured discovery. Takes spec (from `/spec` or inline), iteratively researches codebase + asks high-priority technical questions that shape implementation direction → detailed plan.
 
-**Focus**: HOW not WHAT. Spec=what; plan=architecture, files, functions, chunks, deps, tests.
+**Focus**: HOW not WHAT. Spec=what; plan=architecture, files, functions, chunks, dependencies, tests.
 
 **Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
 **Output files**:
 - Plan: `/tmp/plan-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md`
-- Research log: `/tmp/plan-research-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` (external memory)
+- Research log: `/tmp/plan-research-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` (external memory)
 
 ## Boundaries
 
@@ -26,7 +26,7 @@ Build implementation plan through structured discovery. Takes spec (from `/spec`
 
 ### 1.1 Create todos (TodoWrite immediately)
 
-Todos = **areas to research/decide**, not steps. Continuously expands as research reveals complexity.
+Todos = **areas to research/decide**, not steps. Expand when research reveals: (a) files/modules to modify beyond those already in todos, (b) 2+ valid implementation patterns with different trade-offs, (c) dependencies on code/systems not yet analyzed, or (d) questions that must be answered before completing an existing todo.
 
 **Starter seeds**:
 ```
@@ -55,7 +55,7 @@ Initial → After codebase research (found WebSocket) → After "needs offline t
 
 ### 1.2 Create research log
 
-Path: `/tmp/plan-research-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md`
+Path: `/tmp/plan-research-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md`
 
 ```markdown
 # Research Log: {feature}
@@ -69,11 +69,13 @@ Started: {timestamp} | Spec: {path or "inline"}
 
 ## Phase 2: Context Gathering
 
+**Prerequisites**: Requires `vibe-workflow:codebase-explorer` agent. If Task tool fails for any reason (agent not found, timeout after 120 seconds, permission error, incomplete results) OR returns fewer than 3 relevant files when exploring an area expected to touch multiple modules (cross-cutting concerns, features spanning >2 directories), perform supplementary codebase research manually using Read, Glob, and Grep tools and note `[SUPPLEMENTED RESEARCH: codebase-explorer insufficient - {reason}]` in research log. Do not retry on timeout—proceed directly to supplementary research.
+
 ### 2.1 Read/infer spec
 
 Extract: requirements, user stories, acceptance criteria, constraints, out-of-scope.
 
-**No formal spec?** Infer from conversation, tool outputs, user request.
+**No formal spec?** Infer from conversation, tool outputs, user request. If spec and conversation together provide fewer than 2 concrete requirements, ask user via AskUserQuestion: "I need at least 2 concrete requirements to plan. Please provide: [list what's missing]" before proceeding.
 
 ### 2.2 Launch codebase-explorer
 
@@ -102,19 +104,47 @@ First draft with `[TBD]` markers. Same file path for all updates.
 
 ## Phase 3: Iterative Discovery Interview
 
-**CRITICAL**: Use AskUserQuestion for ALL questions. Unavailable → ask in chat, mark as requiring user input.
+**CRITICAL**: Use AskUserQuestion tool for ALL questions—never plain text. If AskUserQuestion is unavailable, present questions in structured markdown with numbered options and wait for user response.
+
+**Example** (the `questions` array supports 1-4 questions per call—that's batching):
+```
+questions: [
+  {
+    question: "Should we build the full implementation or a minimal stub?",
+    header: "Phasing",
+    options: [
+      { label: "Full implementation (Recommended)", description: "Complete feature per spec, production-ready" },
+      { label: "Minimal stub", description: "Interface only, implementation deferred" },
+      { label: "Incremental", description: "Core first, enhance in follow-up PRs" }
+    ],
+    multiSelect: false
+  },
+  {
+    question: "Which state management approach?",
+    header: "State",
+    options: [
+      { label: "Extend existing store (Recommended)", description: "Matches codebase pattern in src/store/" },
+      { label: "Local component state", description: "Simpler but less shareable" },
+      { label: "New dedicated store", description: "Isolated but adds complexity" }
+    ],
+    multiSelect: false
+  }
+]
+```
 
 ### Memento Loop
 
-1. Mark todo `in_progress`
+1. Mark todo `in_progress` (via TodoWrite with status "in_progress")
 2. Research (codebase-explorer) OR ask (AskUserQuestion)
 3. **Write findings immediately** to research log
-4. Expand todos for new questions/integration points/deps
+4. Expand todos for new questions/integration points/dependencies
 5. Update plan (replace `[TBD]`)
-6. Mark todo `completed`
+6. Mark todo `completed` (via TodoWrite with status "completed")
 7. Repeat until no pending todos
 
 **NEVER proceed without writing findings** — research log = external memory.
+
+**If user answer contradicts prior decisions**: (1) Inform user: "This contradicts earlier decision X. Proceeding with new answer." (2) Log in research log under `## Conflicts` with both decisions. (3) Re-evaluate affected todos. (4) Update plan accordingly. If contradiction cannot be resolved, ask user to clarify priority.
 
 ### Research Log Update Format
 
@@ -145,15 +175,15 @@ Architecture decisions:
 
 ### Interview Rules
 
-**Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit.
+**Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit. If user says "just decide", "you pick", "I don't care", "skip this", or otherwise explicitly delegates the decision, document remaining decisions with `[INFERRED: {choice} - {rationale}]` markers and finalize.
 
-**Spec-first**: Business scope and requirements belong in spec. Questions here are TECHNICAL only—architecture, patterns, implementation approach. If spec has gaps, flag them rather than re-asking requirements.
+**Spec-first**: Business scope and requirements belong in spec. Questions here are TECHNICAL only—architecture, patterns, implementation approach. If spec has gaps affecting implementation: (1) flag in research log under `## Spec Gaps`, (2) ask user via AskUserQuestion whether to pause for spec update OR proceed with stated assumption, (3) document choice and continue.
 
-1. **Prioritize by information gain** - Ask questions that split technical decision space most. If answer changes architecture or chunk structure, ask early.
+1. **Prioritize questions that eliminate other questions** - Ask questions where the answer changes what other questions you need to ask, or eliminates entire branches of implementation. If knowing X makes Y irrelevant, ask X first.
 
 2. **Interleave discovery and questions**:
    - User answer reveals new area → launch codebase-explorer
-   - Need external context → launch web-researcher
+   - Need external context → launch web-researcher (if unavailable, ask user to provide external context directly via AskUserQuestion)
    - Update plan after each iteration, replacing `[TBD]` markers
 
 3. **Question priority order**:
@@ -162,21 +192,44 @@ Architecture decisions:
    |----------|------|---------|----------|
    | 1 | Implementation Phasing | How much to build now vs later | Full impl vs stub? Include migration? Optimize or simple first? |
    | 2 | Branching | Open/close implementation paths | Sync vs async? Polling vs push? In-memory vs persistent? |
-   | 3 | Technical Constraints | Non-negotiable technical limits | Must integrate with X? Perf requirements? Backward compat? |
+   | 3 | Technical Constraints | Non-negotiable technical limits | Must integrate with X? Performance requirements? Backward compatibility? |
    | 4 | Architectural | Choose between patterns | Error strategy? State management? Concurrency model? |
    | 5 | Detail Refinement | Fine-grained technical details | Test coverage scope? Retry policy? Logging verbosity? |
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. When options are equivalent AND easily reversible (changes affect only 1-2 files, where each changed file is imported by 5 or fewer other files, and there are no data migrations, schema changes, or public API changes), decide yourself (lean toward existing codebase patterns).
 
 5. **Be thorough via technique**:
-   - Cover everything relevant - don't skip to save time
-   - Reduce cognitive load through HOW you ask: concrete options, batching (up to 4), good defaults
+   - Cover technical decisions from each applicable priority category (1-5 in the priority table)—don't skip categories to save time
+   - Reduce cognitive load through HOW you ask: concrete options, good defaults
+   - **Batching**: Up to 4 questions in `questions` array per call (batch questions that share a common decision—e.g., multiple state management questions, or multiple error handling questions—where answers to one inform the others); max 4 options per question (tool limit)
    - Make decisions yourself when codebase research suffices
    - Complete plan with easy questions > incomplete plan with fewer questions
 
 6. **Ask non-obvious questions** - Error handling strategies, edge cases affecting correctness, performance implications, testing approach for complex logic, rollback/migration needs, failure modes
 
-7. **Only ask user when**: (a) technical decision with significant trade-offs, (b) codebase lacks clear precedent, (c) multiple valid approaches need user preference. Defer business/product questions to spec.
+7. **Ask vs Decide** - Codebase patterns and technical standards are authority; user decides significant trade-offs.
+
+   **Ask user when**:
+   | Category | Examples |
+   |----------|----------|
+   | Trade-offs affecting measurable outcomes | Estimated >20% change to latency/throughput vs current implementation, adds abstraction layers, locks approach for >6 months, changes user-facing behavior |
+   | No clear codebase precedent | New pattern not yet established |
+   | Multiple valid approaches | Architecture choice with different implications |
+   | Phasing decisions | Full impl vs stub, migration included or deferred |
+   | Breaking changes | API changes, schema migrations |
+   | Resource allocation | Cache size, connection pools, batch sizes with cost implications |
+
+   **Decide yourself when**:
+   | Category | Examples |
+   |----------|----------|
+   | Existing codebase pattern | Error format, naming conventions, file structure |
+   | Industry standard | HTTP status codes, retry with exponential backoff |
+   | Sensible defaults | Timeout 30s, pagination 50 items, debounce 300ms |
+   | Easily changed later | Internal function names, log messages, test structure |
+   | Implementation detail | Which hook to use, internal state shape, helper organization |
+   | Clear best practice | Dependency injection, separation of concerns |
+
+   **Test**: "If I picked wrong, would user say 'that's not what I meant' (ASK) or 'that works, I would have done similar' (DECIDE)?"
 
 ## Phase 4: Finalize & Present
 
@@ -184,7 +237,7 @@ Architecture decisions:
 
 ```markdown
 ## Planning Complete
-Finished: {timestamp} | Research steps: {count} | Decisions: {count}
+Finished: {timestamp} | Research log entries: {count} | Architecture decisions: {count}
 ## Summary
 {Key decisions}
 ```
@@ -224,24 +277,27 @@ Do NOT implement until user explicitly approves. After approval: create todos fr
 
 ---
 
-**User request**: $ARGUMENTS
-
 # Planning Methodology
 
 ## 1. Principles
 
 | Principle | Description |
 |-----------|-------------|
-| **Safety** | Never skip gates; every chunk tests+demos independently |
+| **Safety** | Never skip gates (type checks, tests, lint); every chunk tests+demos independently |
 | **Clarity** | Full paths, numbered chunks, rationale for context files, line ranges |
-| **Minimalism** | 1-3 chunks preferred; ship today's requirements; parallelize |
-| **Forward focus** | Don't prioritize backward compat unless requested or boundaries violated |
+| **Minimalism** | Ship today's requirements; parallelize where possible |
+| **Forward focus** | Don't prioritize backward compatibility unless requested or public API/schema contracts would be broken |
 | **Cognitive load** | Deep modules with simple interfaces > many shallow; reduce choices |
 | **Conflicts** | Safety > Clarity > Minimalism > Forward focus |
 
+**Definitions**:
+- **Gates**: Quality checks every chunk must pass—type checks (0 errors), tests (pass), lint (clean)
+- **Mini-PR**: A chunk sized to be its own small pull request—complete, mergeable, reviewable independently
+- **Deep modules**: Modules that hide complexity behind simple interfaces (few public methods, rich internal logic)
+
 ### Code Quality (P1-P10)
 
-User's explicit intent takes precedence.
+User's explicit intent takes precedence for implementation choices (P2-P10). P1 (Correctness) and Safety gates (type checks 0 errors, tests pass, lint clean) are non-negotiable—if user requests skipping these, flag as risk but do not skip.
 
 | # | Principle | Planning Implication |
 |---|-----------|---------------------|
@@ -250,11 +306,13 @@ User's explicit intent takes precedence.
 | P3 | Illegal States Unrepresentable | Design types preventing compile-time bugs |
 | P4 | Single Responsibility | Each chunk ONE thing |
 | P5 | Explicit Over Implicit | Clear APIs, no hidden behaviors |
-| P6 | Minimal Surface Area | YAGNI |
+| P6 | Minimal Surface Area | YAGNI—don't add features beyond spec |
 | P7 | Tests | Specific cases, not "add tests" |
 | P8 | Safe Evolution | Public API/schema changes need migration |
 | P9 | Fault Containment | Plan failure isolation, retry/fallback |
 | P10 | Comments Why | Document complex logic why, not what |
+
+P1-P10 apply to code quality within chunks. Principle conflicts (Safety > Clarity > Minimalism > Forward focus) govern planning-level decisions. When both apply, Safety (gates) takes precedence over all P2-P10.
 
 **Values**: Mini-PR > monolithic; parallel > sequential; function-level > code details; dependency clarity > implicit coupling; ship-ready > half-built
 
@@ -263,34 +321,35 @@ User's explicit intent takes precedence.
 Each chunk must:
 1. Ship complete value (demo independently)
 2. Pass all gates (type checks, tests, lint)
-3. Be mergeable alone (1-3 functions, <200 LOC)
-4. Include its tests (specific cases)
+3. Be mergeable alone (1-3 functions, <200 lines of code)
+4. Include its tests (name specific inputs/scenarios, e.g., "valid email accepts user@domain.com", "invalid rejects missing @")
 
 ## 3. Chunk Sizing
 
 | Complexity | Chunks | Guidance |
 |------------|--------|----------|
 | Simple | 1-2 | 1-3 functions each |
-| Medium | 3-5 | <200 LOC per chunk |
+| Medium | 3-5 | <200 lines of code per chunk |
 | Complex | 5-8 | Each demo-able |
 | Integration | +1 final | Connect prior work |
 
-**Decision guide**: New model/schema → types chunk first | >3 files or >5 functions → split by concern | Complex integration → foundation then integration | One module <200 LOC → single chunk OK
+**Decision guide**: New model/schema → types chunk first | >3 files or >5 functions → split by concern | Complex integration → foundation then integration | One module <200 lines of code → single chunk OK
 
 ## 4. Dependency Ordering
 
-- **True deps**: uses types, calls functions, extends
-- **False deps**: same feature, no interaction (parallelize)
+- **True dependencies**: uses types, calls functions, extends
+- **False dependencies**: same feature, no interaction (parallelize these)
 - Minimize chains: A→B and A→C, then B,C→D (not A→B→C→D)
+- Circular dependencies: If chunks form a cycle (A needs B, B needs C, C needs A), extract shared interfaces/types into a new foundation chunk that breaks the cycle
 - Number chunks; mark parallel opportunities
 
 ## 5. What Belongs
 
-| Belongs | Not |
-|---------|-----|
+| Belongs | Does Not Belong |
+|---------|-----------------|
 | Numbered chunks, gates, todo descriptions | Code snippets |
 | File manifests with reasons | Extra features, future-proofing |
-| Function names only | Perf tuning, assumed knowledge |
+| Function names only | Performance tuning, assumed knowledge |
 
 ## 6. Cognitive Load
 
@@ -300,7 +359,7 @@ Each chunk must:
 - Decide late: abstraction only when PR needs extension
 - Framework at edges: core logic agnostic, thin adapters
 - Reduce choices: one idiomatic approach per concern
-- Measure: reviewer >40 min confused → simplify
+- Measure: if understanding the chunk's purpose requires reading more than 3 files or tracing more than 5 function calls, simplify it
 
 ## 7. Common Patterns
 
@@ -322,8 +381,6 @@ Each chunk must:
 Gates: Type checks (0 errors), Tests (pass), Lint (clean)
 
 ---
-
-**User request**: $ARGUMENTS
 
 ## Requirement Coverage
 - [Spec requirement] → Chunk N
@@ -406,19 +463,19 @@ Files: user.ts
 Tasks: Add validation, Add tests
 ```
 
-**Why bad**: No deps, vague, missing paths, no context, generic tasks, no functions, no acceptance criteria.
+**Why bad**: No dependencies, vague description, missing full paths, no context files, generic tasks, no functions listed, no acceptance criteria.
 
 ## 9. File Manifest & Context
 
 - Every file to modify/create; specify changes and purpose
 - Full paths; zero prior knowledge assumed
-- Context files: explain WHY; line ranges for >500 lines
+- Context files: explain WHY; line ranges for files >500 lines
 
 ## 10. Quality Criteria
 
 | Level | Criteria |
 |-------|----------|
-| Good | Each chunk ships value; deps ordered; parallel identified; files explicit; context has reasons; tests in todos; gates listed |
+| Good | Each chunk ships value; dependencies ordered; parallel identified; files explicit; context has reasons; tests in todos; gates listed |
 | Excellent | + optimal parallelization, line numbers, clear integration, risks, alternatives, reduces cognitive load |
 
 ### Quality Checklist
@@ -432,7 +489,7 @@ Tasks: Add validation, Add tests
 - [ ] Observability: errors logged with context
 - [ ] Resilience: timeouts, retries with backoff, cleanup
 - [ ] Clarity: descriptive names, no magic values
-- [ ] Modularity: single responsibility, <200 LOC, minimal coupling
+- [ ] Modularity: single responsibility, <200 lines of code, minimal coupling
 - [ ] Evolution: public API/schema changes have migration
 
 ### Test Priority
@@ -457,10 +514,10 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 
 | Scenario | Action |
 |----------|--------|
-| No detailed requirements | Research → fundamentals unclear: ask via tool OR stop → non-critical: assume+document |
+| No detailed requirements | Research → core requirements/constraints unclear: ask via AskUserQuestion OR stop → non-critical: assume+document |
 | Extensive requirements | MUSTs first → research scope → ask priority trade-offs → defer SHOULD/MAY |
 | Multiple approaches | Research first → ask only when significantly different implications |
-| Everything dependent | Start from types → question each dep → find false deps → foundation → parallel → integration |
+| Everything dependent | Start from types → question each dependency → find false dependencies → foundation → parallel → integration |
 
 ## Planning Mantras
 
@@ -477,7 +534,7 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 
 **Secondary:**
 8. Ship with less?
-9. Deps determine order?
+9. Dependencies determine order?
 10. Researched first, asked strategically?
 11. Reduces cognitive load?
 12. Satisfies P1-P10?
@@ -489,7 +546,7 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 - Keep discoveries as mental notes
 - Skip todos
 - Write to project directories (always `/tmp/`)
-- Ask scope/requirements (spec phase)
+- Ask scope/requirements questions (that's spec phase)
 - Finalize with `[TBD]`
 - Implement without approval
 - Forget expanding todos on new areas
@@ -498,7 +555,7 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 
 | Symptom | Action |
 |---------|--------|
-| Chunk >200 LOC | Split by concern |
+| Chunk >200 lines of code | Split by concern |
 | No clear value | Merge or refocus |
 | Dependencies unclear | Make explicit, number |
 | Context missing | Add files + line numbers |
