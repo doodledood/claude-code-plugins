@@ -7,15 +7,17 @@ argument-hint: Optional - work name or topic
 
 Build requirements spec through structured discovery interview. Defines WHAT and WHY - not technical implementation (architecture, APIs, data models come in planning phase).
 
+**If $ARGUMENTS is empty**: Ask user "What work would you like to specify? (feature, bug fix, refactor, etc.)" via AskUserQuestion before proceeding to Phase 1.
+
 **Loop**: Research → Expand todos → Ask questions → Write findings → Repeat until complete
 
-**Role**: Senior Product Manager - smart, non-obvious questions that reduce ambiguity and cognitive load.
+**Role**: Senior Product Manager - questions that uncover hidden requirements, edge cases, and assumptions the user hasn't considered. Reduce ambiguity through concrete options.
 
 **Spec file**: `/tmp/spec-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - updated after each iteration.
 
 **Interview log**: `/tmp/spec-interview-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md` - external memory.
 
-**Timestamp**: Generate once at Phase 1 start. Use same timestamp for both files. Running /spec again creates new files (no overwrite).
+**Timestamp format**: `YYYYMMDD-HHMMSS` (e.g., `20260109-143052`). Generate once at Phase 1.1 start. Use same value for both file paths. Running /spec again creates new files (no overwrite).
 
 ## Phase 1: Initial Setup
 
@@ -23,7 +25,7 @@ Build requirements spec through structured discovery interview. Defines WHAT and
 
 Todos = **areas to discover**, not interview steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as user answers reveal new areas. "Finalize spec" is fixed anchor; all others are dynamic.
 
-**Starter todos** (just seeds - actual list grows organically):
+**Starter todos** (seeds only - list grows as discovery reveals new areas):
 
 ```
 - [ ] Initial context research
@@ -94,9 +96,11 @@ Started: {timestamp}
 
 ## Phase 2: Initial Context Gathering
 
+**Prerequisites**: Requires vibe-workflow plugin with codebase-explorer and web-researcher agents installed. If Task tool fails with agent not found, inform user: "Required agent {name} not available. Install vibe-workflow plugin or proceed with manual research?" If proceeding manually, use Read/Glob/Grep for codebase exploration and note `[LIMITED RESEARCH: {agent} unavailable]` in interview log.
+
 ### 2.1 Launch codebase-explorer
 
-Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work. Max 3 parallel researchers; if findings conflict, note both perspectives and ask user to resolve.
+Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work. Limit to 3 parallel researchers per batch. If findings conflict, immediately present both perspectives to user via AskUserQuestion: "Research found conflicting information about {topic}: {perspective A} vs {perspective B}. Which applies to your situation?" If user cannot resolve, document both perspectives in spec with `[CONTEXT-DEPENDENT: {perspective A} applies when X; {perspective B} applies when Y]` and ask follow-up to clarify applicability. If 3 researchers don't cover all needed areas, run additional batches sequentially.
 
 Explore: product purpose, existing patterns, user flows, terminology, product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md), existing specs in `docs/` or `specs/`. For bug fixes: also explore bug context, related code, potential causes.
 
@@ -106,14 +110,14 @@ Read ALL files from researcher prioritized reading lists - no skipping.
 
 ### 2.3 Launch web-researcher (if needed)
 
-Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` for knowledge gaps: domain concepts, user expectations, industry standards, compliance requirements, competitor approaches (UX perspective). Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
+Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` when you cannot answer a question from codebase research alone and the answer requires: domain concepts unfamiliar to you, current industry standards or best practices, regulatory/compliance requirements, or competitor UX patterns. Do not use for questions answerable from codebase or general knowledge. Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
 
 ### 2.4 Update interview log
 
 After EACH research step, append to interview log:
 
 ```markdown
-### {timestamp} - {what researched}
+### {HH:MM:SS} - {what researched}
 - Explored: {areas/topics}
 - Key findings: {list}
 - New areas identified: {list}
@@ -178,7 +182,7 @@ For each step:
 After EACH question/answer, append (Round = one AskUserQuestion call, may contain batched questions):
 
 ```markdown
-### Round {N} - {timestamp}
+### Round {N} - {HH:MM:SS}
 **Todo**: {which todo this addresses}
 **Question asked**: {question}
 **User answer**: {answer}
@@ -208,9 +212,9 @@ After EACH decision (even implicit), append to Decisions Made:
 
 ### Interview Rules
 
-**Unbounded loop**: Keep iterating (research → question → update spec) until ALL completion criteria are met. No fixed round limit.
+**Unbounded loop**: Keep iterating (research → question → update spec) until ALL completion criteria are met. No fixed round limit - continue as long as needed for complex problems. If user says "just infer the rest" or similar, document remaining decisions with `[INFERRED: {choice} - {rationale}]` markers and finalize.
 
-1. **Prioritize by information gain** - Ask questions where the answer would change what other questions you need to ask, or would eliminate entire branches of requirements. If knowing X makes Y irrelevant, ask X first.
+1. **Prioritize questions that eliminate other questions** - Ask questions where the answer would change what other questions you need to ask, or would eliminate entire branches of requirements. If knowing X makes Y irrelevant, ask X first.
 
 2. **Interleave discovery and questions**:
    - User answer reveals new area → launch codebase-explorer
@@ -227,16 +231,16 @@ After EACH decision (even implicit), append to Decisions Made:
    | 4 | Differentiating | Choose between approaches | Pattern A vs B? Which UX model? |
    | 5 | Detail Refinement | Fine-grained details | Exact copy, specific error handling |
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description. Question whether each requirement is truly needed—don't pad with nice-to-haves. When options are equivalent AND easily reversible, decide yourself (lean simpler). When options are equivalent BUT have different user-facing tradeoffs, ask user.
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. Question whether each requirement is truly needed—don't pad with nice-to-haves. When options are equivalent AND reversible without data migration or API changes, decide yourself (lean simpler). When options are equivalent BUT have different user-facing tradeoffs, ask user.
 
 5. **Be thorough via technique**:
    - Cover everything relevant - don't skip to save time
    - Reduce cognitive load through HOW you ask: concrete options, good defaults
-   - **Batching**: Up to 4 related questions in `questions` array per call (see example above); max 6-8 options per question
+   - **Batching**: Up to 4 questions in `questions` array per call (batch questions that address the same todo or decision area); max 4 options per question (tool limit)
    - Make decisions yourself when context suffices
    - Complete spec with easy questions > incomplete spec with fewer questions
 
-6. **Ask non-obvious questions** - User motivations, edge cases affecting UX, business rules, user expectations vs delivery, tradeoffs
+6. **Ask non-obvious questions** - Uncover what user hasn't explicitly stated: motivations behind requirements, edge cases affecting UX, business rules implied by use cases, gaps between user expectations and feasibility, tradeoffs user may not have considered
 
 7. **Ask vs Decide** - User is authority for business decisions; codebase/standards are authority for implementation details.
 
@@ -256,7 +260,7 @@ After EACH decision (even implicit), append to Decisions Made:
    | Existing pattern | Error format, naming conventions, component structure |
    | Industry standard | HTTP status codes, validation rules, retry strategies |
    | Sensible defaults | Timeout values, pagination limits, debounce timing |
-   | Easily changed later | Copy text, colors, specific thresholds |
+   | Easily changed later (single-file change, no data migration, no API contract change) | Copy text, colors, specific thresholds |
    | Implementation detail | Which hook to use, event naming, internal state shape |
 
    **Test**: "If I picked wrong, would user say 'that's not what I meant' (ASK) or 'that works, I would have done similar' (DECIDE)?"
@@ -267,7 +271,7 @@ After EACH decision (even implicit), append to Decisions Made:
 
 ```markdown
 ## Interview Complete
-Finished: {timestamp} | Questions: {count} | Decisions: {count}
+Finished: {YYYY-MM-DD HH:MM:SS} | Questions: {count} | Decisions: {count}
 ## Summary
 {Brief summary of discovery process}
 ```
@@ -369,7 +373,7 @@ Review full spec and let me know adjustments.
 | Observable outcomes | Focus on what changes when complete. Ask "what is different after?" not "how does it work internally?" Edge cases = system/business impact |
 | Dynamic structure | Spec sections emerge from discovery. No fixed template beyond core scaffolding. Add sections as needed to fully specify the WHAT |
 | Complete coverage | Spec covers EVERYTHING implementer needs: behavior, UX, data, errors, edge cases, accessibility - whatever the work touches. If they'd have to guess, it's underspecified |
-| Define much, ask smart | Spec is comprehensive. Ask all questions needed for important decisions, but don't ask what you can infer or research. Every question should matter - no fluff, no redundancy |
+| Comprehensive spec, minimal questions | Spec covers everything implementer needs. Ask questions only when: (1) answer isn't inferable from codebase/context, (2) wrong guess would require changing 3+ files or redoing more than one day of work, (3) it's a business decision only user can make. Skip questions you can answer via research |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
 | Question requirements | Don't accept requirements at face value. Ask "is this truly needed for v1?" Don't pad specs with nice-to-haves |
 | Reduce cognitive load | Recommended option first, multi-choice over free-text. Free-text only when: options are infinite/unpredictable, asking for specific values (names, numbers), or user needs to describe own context. User accepting defaults should yield solid result |
@@ -382,7 +386,7 @@ Interview complete when ALL true (keep iterating until every box checked):
 - [ ] Scope defined - what's in, what's explicitly out
 - [ ] Affected areas identified - what changes
 - [ ] Success criteria specified - observable outcomes
-- [ ] Core requirements documented (3+)
+- [ ] Core requirements documented (3+ must-have behaviors that define the work's purpose)
 - [ ] Edge cases addressed
 - [ ] Constraints captured
 - [ ] Out of scope listed with reasons
@@ -410,7 +414,7 @@ Any question from these simulations = gap to address before finalizing.
 - Ask about technical implementation
 - Finalize with unresolved `[TBD]`
 - Skip summary output
-- Ask questions without AskUserQuestion tool
+- Ask interview questions without AskUserQuestion tool (research findings don't require user questions)
 - Proceed past Phase 2 without initial draft
 - Forget to expand todos on new areas revealed
 
@@ -423,4 +427,5 @@ Any question from these simulations = gap to address before finalizing.
 | Contradictory requirements | Surface conflict before proceeding |
 | User corrects earlier decision | Update spec, log correction with reason, check if other requirements affected |
 | Interview interrupted | Spec saved; add `[INCOMPLETE]` at top. To resume: provide existing spec file path as argument |
+| Resume interrupted spec | Read provided spec file. If file not found or not a valid spec (missing required sections like Overview, Requirements), inform user: "Could not resume from {path}: {reason}. Start fresh?" via AskUserQuestion. If valid, look for matching interview log at same timestamp, scan for `[TBD]` and `[INCOMPLETE]` markers, present status to user and ask "Continue from {last incomplete area}?" via AskUserQuestion |
 | "Just build it" | Push back with 2-3 critical questions (questions where guessing wrong = significant rework). If declined, document assumptions clearly |
