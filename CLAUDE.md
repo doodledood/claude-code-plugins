@@ -18,6 +18,13 @@ ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
 uvx --from claude-plugins/consultant/skills/consultant/scripts consultant-cli --help
 ```
 
+## Foundational Documents
+
+These docs define WHO we build for and HOW LLMs actually work - read before building plugins:
+
+- **@docs/CUSTOMER.md** - Ideal Customer Profile. Defines "The Quality-First Developer" persona, their pain points, success metrics, anti-personas, and messaging guidelines. Reference when prioritizing features or writing copy.
+- **docs/LLM_CODING_CAPABILITIES.md** - LLM coding research. Covers what LLMs do well (greenfield, tests, refactoring) vs poorly (debugging, large codebases), and strategies to maximize strengths while mitigating limitations. Informs our first-principles workflow design.
+
 ## Repository Structure
 
 - `.claude-plugin/marketplace.json` - Registry of all plugins
