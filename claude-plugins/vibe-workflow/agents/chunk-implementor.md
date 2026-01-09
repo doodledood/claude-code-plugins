@@ -25,6 +25,8 @@ Log file: /tmp/implement-chunk-{N}-{timestamp}.md
 Files created: [list]
 Files modified: [list]
 [If out-of-scope edits: Out-of-scope fixes: [files edited to fix Indirect issues]]
+Confidence: HIGH | MEDIUM | LOW
+[If not HIGH: Uncertainty: {what's unclear - decisions made without spec/plan guidance, ambiguous requirements, unfamiliar patterns}]
 
 [If retry: Issues addressed: [list]]
 ```

@@ -325,6 +325,12 @@ Gates: Type checks (0 errors), Tests (pass), Lint (clean)
 
 **User request**: $ARGUMENTS
 
+## Requirement Coverage
+- [Spec requirement] → Chunk N
+- [Spec requirement] → Chunk M, Chunk N
+
+---
+
 ## 1. [Name]
 
 Depends on: - | Parallel: -
