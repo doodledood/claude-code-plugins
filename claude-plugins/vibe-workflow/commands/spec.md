@@ -134,18 +134,30 @@ Write first draft with `[TBD]` markers for unresolved items. Use same file path 
 
 **CRITICAL**: Use AskUserQuestion tool for ALL questions - never plain text.
 
-**Example AskUserQuestion call**:
+**Example** (the `questions` array supports 1-4 questions per call - that's batching):
 ```
-questions: [{
-  question: "Who should receive these notifications?",
-  header: "User Scope",
-  options: [
-    { label: "All active users (Recommended)", description: "Broadest reach, simplest logic" },
-    { label: "Premium users only", description: "Limited scope, may need upgrade prompts" },
-    { label: "Users who opted in", description: "Requires preference system first" }
-  ],
-  multiSelect: false
-}]
+questions: [
+  {
+    question: "Who should receive these notifications?",
+    header: "User Scope",
+    options: [
+      { label: "All active users (Recommended)", description: "Broadest reach, simplest logic" },
+      { label: "Premium users only", description: "Limited scope, may need upgrade prompts" },
+      { label: "Users who opted in", description: "Requires preference system first" }
+    ],
+    multiSelect: false
+  },
+  {
+    question: "How should notifications be delivered?",
+    header: "Delivery",
+    options: [
+      { label: "In-app only (Recommended)", description: "Simplest, no external dependencies" },
+      { label: "Push + in-app", description: "Requires push notification setup" },
+      { label: "Email digest", description: "Async, requires email service" }
+    ],
+    multiSelect: true
+  }
+]
 ```
 
 ### Memento Loop
@@ -220,7 +232,7 @@ After EACH decision (even implicit), append to Decisions Made:
 5. **Be thorough via technique**:
    - Cover everything relevant - don't skip to save time
    - Reduce cognitive load through HOW you ask: concrete options, good defaults
-   - **Batching**: Up to 4 related questions per AskUserQuestion call; max 6-8 options per question
+   - **Batching**: Up to 4 related questions in `questions` array per call (see example above); max 6-8 options per question
    - Make decisions yourself when context suffices
    - Complete spec with easy questions > incomplete spec with fewer questions
 
