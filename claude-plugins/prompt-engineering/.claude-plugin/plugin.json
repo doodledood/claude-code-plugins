@@ -1,7 +1,7 @@
 {
   "name": "prompt-engineering",
-  "description": "Tools for reviewing, analyzing, and refining LLM prompts - includes review-prompt command using 10-Layer Architecture framework and refine-prompt for iterative precision improvement",
-  "version": "1.6.0",
+  "description": "Tools for reviewing, analyzing, and refining LLM prompts for clarity and precision",
+  "version": "1.6.1",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
