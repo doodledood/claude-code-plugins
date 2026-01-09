@@ -1,5 +1,5 @@
 ---
-description: 'Builds requirements specification through structured discovery interview. Use when defining scope, gathering requirements, specifying what a feature should do, or creating a spec for features, bugs, docs, or refactors.'
+description: 'Builds requirements specification through structured discovery interview. Use when defining scope, gathering requirements, or specifying WHAT any work should accomplish - features, bugs, refactors, infrastructure, migrations, performance, documentation, or any other work type.'
 argument-hint: Optional - work name or topic
 ---
 
@@ -75,7 +75,7 @@ Path: `/tmp/spec-interview-{name-kebab-case}-{YYYYMMDD-HHMMSS}.md` (use SAME pat
 
 ```markdown
 # Interview Log: {work name}
-Started: {timestamp} | Type: {Feature | Bug Fix | Doc Update | Refactor}
+Started: {timestamp}
 
 ## Research Phase
 (populated incrementally)
@@ -160,15 +160,17 @@ After EACH decision (even implicit), append to Decisions Made:
 
 ### Todo Expansion Triggers
 
-| User Answer Reveals | Add Todos For |
-|---------------------|---------------|
-| New user segment | Target user requirements |
+| Discovery Reveals | Add Todos For |
+|-------------------|---------------|
+| New affected area | Requirements for that area |
 | Integration need | Integration constraints |
 | Compliance/regulatory | Compliance requirements |
-| Multiple flows | Each flow's UX |
-| Error scenarios | Error handling approach |
-| Performance concern | Performance constraints |
-| Existing feature dependency | Dependency investigation |
+| Multiple scenarios/flows | Each scenario's behavior |
+| Error conditions | Error handling approach |
+| Performance concern | Performance constraints/metrics |
+| Existing dependency | Dependency investigation |
+| Rollback/recovery need | Recovery strategy |
+| Data preservation need | Data integrity requirements |
 
 ### Interview Rules
 
@@ -205,15 +207,17 @@ After EACH decision (even implicit), append to Decisions Made:
 
 ### Sample Questions
 
-| Priority | Header | Question | Options (first = recommended) |
-|----------|--------|----------|-------------------------------|
-| 1 | Feature Scope | What's the scope? | V1/MVP - core only; Full feature; Custom |
-| 1 | Target User | Primary user? | [From CUSTOMER.md]; Specific segment; All users; Admin only |
-| 2 | Interaction | How triggered? | User-initiated; System-triggered; Both |
-| 3 | Constraints | Hard constraints? (multiSelect) | None; Must integrate with X; Regulatory; Performance |
-| 4 | Problem | What problem are we solving? | (freeText with placeholder) |
-| 4 | Edge Cases | How handle [edge case]? | Best practice default; Simpler alternative; Defer to v2 if non-critical |
-| 5 | Success | How measure success? (multiSelect) | Primary metric; Task completion time; Multiple metrics; Custom |
+**Universal question patterns** - adapt to specific work:
+
+| Priority | Purpose | Example Questions |
+|----------|---------|-------------------|
+| 1 | Scope Eliminators | V1/MVP vs full? All affected areas or subset? Which systems in scope? |
+| 2 | Branching | Opens/closes lines of inquiry based on answer |
+| 3 | Hard Constraints | Non-negotiable limits? Dependencies? Deadlines? |
+| 4 | Differentiating | Choose between valid approaches when multiple exist |
+| 5 | Detail Refinement | Fine-grained details after big picture clear |
+
+**Guidance**: Ask questions that maximize information gain. If info can be inferred from research or codebase, don't ask. Adapt question content to the specific work - ask about reproduction for bugs, rollback for infrastructure, baseline metrics for performance, etc.
 
 ## Phase 4: Finalize & Summarize
 
@@ -228,55 +232,60 @@ Finished: {timestamp} | Questions: {count} | Decisions: {count}
 
 ### 4.2 Finalize specification
 
-Final pass: remove `[TBD]` markers, ensure consistency. Use EARS format adapted to work type:
+Final pass: remove `[TBD]` markers, ensure consistency. Use this **minimal scaffolding** - add sections dynamically based on what discovery revealed:
 
 ```markdown
 # Requirements: {Work Name}
 
 Generated: {date}
-Type: {Feature | Bug Fix | Doc Update | Refactor | Other}
 
 ## Overview
 ### Problem Statement
-### Target Users / Affected Areas
-### Success Criteria
+{What is wrong/missing/needed? Why now?}
 
-## User Stories
-### {Story Name}
-As a {user}, I want to {action} so that {benefit}.
-**Acceptance Criteria:** Given {context}, when {action}, then {outcome}
+### Scope
+{What's included? What's explicitly excluded?}
+
+### Affected Areas
+{Systems, components, processes, users impacted}
+
+### Success Criteria
+{Observable outcomes that prove this work succeeded}
 
 ## Requirements
-
-### EARS Patterns
-- **Ubiquitous**: The system shall {behavior}.
-- **Event-Driven**: When {trigger}, the system shall {response}.
-- **State-Driven**: While {condition}, the system shall {behavior}.
-- **Unwanted Behavior**: If {error}, then the system shall {handling}.
-- **Optional**: Where {feature exists}, the system shall {behavior}.
+{Verifiable statements about what's true when this work is complete. Each requirement should be specific enough to check as true/false.}
 
 ### Core Behavior
-### User Interactions
-### States & Feedback
-### Edge Cases & Errors
-### Business Rules
+- {Verifiable outcome}
+- {Another verifiable outcome}
 
-## User Experience
-### User Flow
-### Key Screens/States (Empty, Loading, Success, Error)
-### Accessibility
+### Edge Cases & Error Handling
+- When {condition}, {what happens}
 
 ## Constraints
-### Business Constraints
-### Dependencies
+{Non-negotiable limits, dependencies, prerequisites}
 
 ## Out of Scope
-- {Non-goal}: {reason}
+{Non-goals with reasons}
+
+## {Additional sections as needed based on discovery}
+{Add sections relevant to this specific work - examples below}
 ```
 
-**Section guidance**: Problem Statement (what+why), Target Users (who+affected areas), Success Criteria (how know succeeded), User Flow (step-by-step), Key Screens (what user sees in Empty/Loading/Success/Error states), Accessibility (user-facing requirements), Business Constraints (limits, quotas, permissions), Dependencies (external factors), Out of Scope (non-goals with reasons).
+**Dynamic sections** - add based on what discovery revealed:
 
-Adapt by work type: bug fixes include root cause/verification; doc updates list affected docs.
+| Discovery Reveals | Add Section |
+|-------------------|-------------|
+| User-facing behavior | User stories, user flow, key states |
+| API/technical interface | Contract (inputs/outputs), integration points |
+| Bug context | Current vs expected behavior, reproduction, verification |
+| Refactoring | Current/target structure, behavior preservation |
+| Infrastructure | Rollback plan, monitoring approach |
+| Migration | Data preservation, rollback strategy |
+| Performance | Current baseline, target metrics |
+| Documentation | Affected docs, audience |
+
+**Key**: No fixed sections beyond core scaffolding. Structure emerges from discovery.
 
 ### 4.3 Mark all todos complete
 
@@ -286,7 +295,6 @@ Adapt by work type: bug fixes include root cause/verification; doc updates list 
 ## Spec Summary
 
 **Work**: {name}
-**Type**: {type}
 **File**: /tmp/spec-{...}.md
 
 ### What We're Doing
@@ -311,26 +319,29 @@ Review full spec and let me know adjustments.
 |-----------|------|
 | Memento style | Write findings BEFORE next question (interview log = external memory) |
 | Todo-driven | Every discovery needing follow-up → todo (no mental notes) |
-| WHAT not HOW | Requirements only - no architecture, APIs, data models, code patterns. Self-check: if thinking "how to implement," refocus on "what should happen" |
-| User perspective | Observable behavior, user experience, outcomes. Ask "what does user see?" not "how does system work?" Edge cases = UX/business impact |
+| WHAT not HOW | Requirements only - no architecture, APIs, data models, code patterns. Self-check: if thinking "how to implement," refocus on "what should happen/change" |
+| Observable outcomes | Focus on what changes when complete. Ask "what is different after?" not "how does it work internally?" Edge cases = system/business impact |
+| Dynamic structure | Spec sections emerge from discovery. No fixed template beyond core scaffolding. Add sections as needed to fully specify the WHAT |
 | No open questions | Resolve everything during interview - no TBDs in final spec |
 | Question requirements | Don't accept requirements at face value. Ask "is this truly needed for v1?" Don't pad specs with nice-to-haves |
 | Reduce cognitive load | Recommended option first, multi-choice over free-text (free-text only when necessary), batch up to 4, max 6-8 options. User accepting defaults should yield solid result |
 | Make decisions | Use research for defaults; only ask when user input required. Defer technical decisions to planning phase |
+| Completeness over brevity | Keep iterating until spec is complete - one more question beats incomplete spec. If you'd ask "what about X?" during implementation, spec is incomplete |
 | Incremental updates | Update interview log after EACH step (not at end) |
 
 ### Completion Checklist
 
 Interview complete when ALL true (keep iterating until every box checked):
-- [ ] Work type and scope defined (v1/MVP vs full)
-- [ ] Target users identified
-- [ ] Success criteria specified
-- [ ] Core requirements (3+) documented
-- [ ] Edge cases for core flow addressed
-- [ ] Out of scope explicitly listed
+- [ ] Problem/trigger defined - why this work is needed
+- [ ] Scope defined - what's in, what's explicitly out
+- [ ] Affected areas identified - what changes
+- [ ] Success criteria specified - observable outcomes
+- [ ] Core requirements documented (3+)
+- [ ] Edge cases addressed
+- [ ] Constraints captured
+- [ ] Out of scope listed with reasons
 - [ ] No `[TBD]` markers remain
-
-Don't rush - one more question beats incomplete spec.
+- [ ] No underspecified areas - if you'd need to ask "what about X?" during implementation, spec is incomplete
 
 ### Never Do
 
