@@ -20,7 +20,7 @@
 - **Mindset**: Quality over speed; willing to invest tokens and time upfront for better autonomous results
 - **Frustration**: Exhausted by "shiny object syndrome" - endless new tools/prompts that overpromise and underdeliver
 - **Expectation**: Realistic about LLM limitations; wants tools that work *with* those constraints, not ignore them
-- **Preference**: Simple workflows that "just work" when followed, not complex configurations requiring constant tweaking
+- **Preference**: Low cognitive load - minimal steps, nothing to memorize, "just follow along and it works"
 
 ### The Pain They Feel
 
@@ -65,6 +65,7 @@ Sharing proven workflows and best practices with teams, creating consistency in 
 - **Honest scope**: We don't promise the world; we deliver reliable results within realistic constraints
 - **Play to strengths**: Maximize LLM capabilities while mitigating known limitations
 - **Quality over speed**: Optimize for output quality, not token efficiency or execution time
+- **Complexity hidden, simplicity exposed**: Workflows can be sophisticated under the hood, but the user experience is minimal steps, low cognitive load, "just go with it"
 
 ---
 
@@ -74,7 +75,7 @@ Sharing proven workflows and best practices with teams, creating consistency in 
 |--------------|---------|
 | **Cost optimizers** | Our workflows may use more tokens for better results; not for those counting every cent |
 | **Speed-first developers** | We prioritize quality over raw speed; not for "just ship it" mentality |
-| **Complexity avoiders** | Some workflows require following multi-step processes; not for those wanting zero-friction magic |
+| **Tinkerers & customizers** | We provide opinionated workflows that "just work"; not for those who want to tweak everything |
 | **Hype chasers** | We're grounded and realistic; not for those wanting revolutionary promises |
 | **Non-Claude Code users** | Plugins are specifically for Claude Code ecosystem |
 
@@ -101,6 +102,8 @@ Sharing proven workflows and best practices with teams, creating consistency in 
 - "Built by developers who understand LLM limitations"
 - "Grounded, realistic, and reliable"
 - "Invest upfront, ship with confidence"
+- "Simple to use, sophisticated under the hood"
+- "Just follow along - it works"
 
 ### Don't Say
 - "Revolutionary" / "Game-changing" / "Magic"
