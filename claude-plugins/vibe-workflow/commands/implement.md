@@ -152,7 +152,8 @@ Fix Direct first. For Indirect: fix in your files if possible, else edit listed 
    - Extract `Log file:` path
    - Extract `Files created:` and `Files modified:` lists
    - Extract `Out-of-scope fixes:` if present (Indirect issue fixes)
-5. **Update progress file**: `Implementor log`, `Files created`, `Files modified`, `Out-of-scope fixes`, `Last updated`
+   - Extract `Confidence:` (HIGH/MEDIUM/LOW) and `Uncertainty:` if present
+5. **Update progress file**: `Implementor log`, `Files created`, `Files modified`, `Out-of-scope fixes`, `Confidence`, `Uncertainty`, `Last updated`
 6. Mark implement todo `completed`
 
 ### 2.2 Spawn Verifier Agent
@@ -308,11 +309,13 @@ When all chunks complete:
 Chunks: N | Files created: [list] | Files modified: [list]
 
 ### Chunk Summary
-1. [Name] - [files touched]
-2. [Name] - [files touched]
+1. [Name] - [files touched] - **HIGH**
+2. [Name] - [files touched] - **MEDIUM** ⚠️
+3. [Name] - [files touched] - **LOW** ⚠️ [uncertainty reason]
 
 ### Notes
 [Any warnings, assumptions, or follow-ups]
+[If any MEDIUM/LOW chunks: "Review recommended for chunks marked ⚠️"]
 
 Progress file: [path]
 Run `/review` for quality verification.
@@ -332,12 +335,13 @@ Status: IN_PROGRESS | COMPLETE | FAILED
 ### Chunk 1: [Name]
 Status: PENDING | IN_PROGRESS | COMPLETE | FAILED | BLOCKED
 Attempts: N
+Confidence: HIGH | MEDIUM | LOW
 Implementor log: [path or (none)]
 Verifier log: [path or (none)]
 Files created: [list]
 Files modified: [list]
 Out-of-scope fixes: [list or empty]
-Notes: [issues or warnings]
+Notes: [issues, warnings, or uncertainty details]
 
 ### Chunk 2: [Name]
 ...
