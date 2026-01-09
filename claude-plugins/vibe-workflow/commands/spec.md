@@ -203,10 +203,28 @@ After EACH decision (even implicit), append to Decisions Made:
 
 6. **Ask non-obvious questions** - User motivations, edge cases affecting UX, business rules, user expectations vs delivery, tradeoffs
 
-7. **Only ask user when**: (a) business/product decision required, (b) codebase lacks answer, (c) multiple interpretations need user choice. Otherwise decide yourself.
+7. **Ask vs Decide** - User is authority for business decisions; codebase/standards are authority for implementation details.
 
-   *Decide yourself*: error message copy (follow patterns), retry counts (use sensible defaults), loading indicator style (match existing), validation rules (standard practice).
-   *Ask user*: which user segments, opt-in vs opt-out, feature priority, business rule ambiguities, tradeoffs with no clear winner.
+   **Ask user when**:
+   | Category | Examples |
+   |----------|----------|
+   | Business rules | Pricing logic, eligibility criteria, approval thresholds |
+   | User segments | Who gets this? All users, premium, specific roles? |
+   | Tradeoffs with no winner | Speed vs completeness, flexibility vs simplicity |
+   | Scope boundaries | V1 vs future, must-have vs nice-to-have |
+   | External constraints | Compliance, contracts, stakeholder requirements |
+   | Preferences | Opt-in vs opt-out, default on vs off |
+
+   **Decide yourself when**:
+   | Category | Examples |
+   |----------|----------|
+   | Existing pattern | Error format, naming conventions, component structure |
+   | Industry standard | HTTP status codes, validation rules, retry strategies |
+   | Sensible defaults | Timeout values, pagination limits, debounce timing |
+   | Easily changed later | Copy text, colors, specific thresholds |
+   | Implementation detail | Which hook to use, event naming, internal state shape |
+
+   **Test**: "If I picked wrong, would user say 'that's not what I meant' (ASK) or 'that works, I would have done similar' (DECIDE)?"
 
 ## Phase 4: Finalize & Summarize
 
@@ -334,7 +352,19 @@ Interview complete when ALL true (keep iterating until every box checked):
 - [ ] Constraints captured
 - [ ] Out of scope listed with reasons
 - [ ] No `[TBD]` markers remain
-- [ ] No underspecified areas - if you'd need to ask "what about X?" during implementation, spec is incomplete
+- [ ] Passes completeness test (below)
+
+### Completeness Test (before finalizing)
+
+Simulate three consumers of this spec:
+
+1. **Implementer**: Read each requirement. Could you code it without guessing? If you'd think "I'll ask about X later" → X is underspecified.
+
+2. **Tester**: For each behavior, can you write a test? If inputs/outputs/conditions are unclear → underspecified.
+
+3. **Reviewer**: For each success criterion, how would you verify it shipped correctly? If verification method is unclear → underspecified.
+
+Any question from these simulations = gap to address before finalizing.
 
 ### Never Do
 
