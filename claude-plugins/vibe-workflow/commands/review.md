@@ -1,9 +1,11 @@
 ---
 description: Run all code review agents in parallel (bugs, coverage, maintainability, type-safety if typed, CLAUDE.md adherence, docs).
-argument-hint: Optional - specific files or directories to review. Leave empty to review all changes on current branch
+argument-hint: [files/dirs] [--autonomous]
 ---
 
 Run a comprehensive code review. First detect the codebase type, then launch appropriate agents.
+
+**Flags**: `--autonomous` → skip Step 4 user prompt, return report only (for programmatic invocation)
 
 ## Step 1: Detect Typed Language
 
@@ -109,7 +111,9 @@ Produce a **Final Consolidated Review Report** with:
 
 ## Step 4: Follow-up Action
 
-After presenting the final consolidated report, ask the user what they'd like to address:
+**If `--autonomous`**: Skip user prompt, end after presenting report. Caller handles next steps.
+
+**Otherwise**, ask the user what they'd like to address:
 
 ```
 header: "Next Steps"
@@ -121,8 +125,8 @@ options:
 ```
 
 **Based on selection:**
-- **Critical/High only**: Use Skill tool: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
-- **All issues**: Use Skill tool: `Skill("vibe-workflow:fix-review-issues")`
+- **Critical/High only**: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
+- **All issues**: `Skill("vibe-workflow:fix-review-issues")`
 - **Skip**: End workflow
 
 ## Execution

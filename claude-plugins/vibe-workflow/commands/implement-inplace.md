@@ -1,6 +1,6 @@
 ---
 description: 'Single-agent implementation: executes plans in-place without subagents. Use /implement (default) for complex features; use this for simpler tasks or when subagent overhead is unwanted.'
-argument-hint: plan path | inline task | (empty for recent plan or interactive)
+argument-hint: plan path | inline task | (empty for recent plan or interactive) [--no-review]
 ---
 
 **User request**: $ARGUMENTS
@@ -12,6 +12,8 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 ## Workflow
 
 ### Phase 1: Resolve Input & Setup
+
+**Review flag**: Review workflow runs by default after implementation. If arguments contain `--no-review` (case-insensitive), disable it. Remove flag from arguments before processing below.
 
 **Priority order:**
 1. **File path** (ends in `.md` or starts with `/`) → use plan file, optionally with `--spec <path>`
@@ -41,6 +43,10 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 [ ] Read context for [Chunk]
 [ ] [Task 1]...[ ] [Task N]
 [ ] Run gates for [Chunk]
+...
+# Unless --no-review, append:
+[ ] Run review on implemented changes
+[ ] (Fix review issues - expand as findings emerge)
 ```
 All todos created at once via TodoWrite (status `pending`). If TodoWrite unavailable, use `/tmp/implement-progress.md` with markdown checkboxes: `- [ ] pending`, `- [~] in progress`, `- [x] completed`, with timestamp prefix `[HH:MM:SS]`.
 
@@ -89,6 +95,25 @@ Chunks: N | Todos: M | Created: [list] | Modified: [list]
 ### Notes: [warnings/assumptions/follow-ups]
 Run `/review` for quality verification.
 ```
+
+Unless `--no-review` → proceed to Phase 5.
+
+### Phase 5: Review Workflow (default, skip with --no-review)
+
+Skip if `--no-review` was set.
+
+1. Mark "Run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+2. If no issues → mark fix placeholder `completed`, done
+3. Expand fix placeholder:
+   ```
+   [x] (Fix review issues - expand as findings emerge)
+   [ ] Fix critical/high severity issues
+   [ ] Re-run review to verify fixes
+   [ ] (Additional fix iterations - expand if needed)
+   ```
+4. Mark "Fix critical/high" `in_progress` → invoke `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")` → mark `completed`
+5. Mark "Re-run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+6. Repeat fix/review cycle until clean or max 3 cycles
 
 ## Edge Cases
 

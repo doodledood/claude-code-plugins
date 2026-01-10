@@ -1,11 +1,13 @@
 ---
 description: 'Orchestrate fixing issues found by /review. Handles issue discovery, user confirmation, plan creation, and execution via /implement.'
-argument-hint: Optional - --severity critical,high --category <from-review>
+argument-hint: [--severity <levels>] [--category <types>] [--autonomous]
 ---
 
 **User request**: $ARGUMENTS
 
-Systematically address issues found from `/review` runs. Orchestrates the multi-step workflow: discover issues, confirm scope with user, create fix plan, execute fixes, and verify.
+Systematically address issues found from `/review` runs. Orchestrates: discover issues → confirm scope → plan → execute → verify.
+
+**Flags**: `--autonomous` → skip Phase 2 scope confirmation and Phase 5 next-steps prompt (requires scope args)
 
 ## Workflow
 
@@ -49,7 +51,7 @@ options:
 
 ### Phase 2: Confirm Scope with User
 
-**If arguments were provided** → skip Phase 2, proceed directly to Phase 3 (user already chose scope)
+**If `--autonomous` OR scope arguments provided** → skip Phase 2, proceed to Phase 3
 
 **If NO arguments** (fix all):
 
@@ -91,7 +93,9 @@ The `/implement` skill handles dependency-ordered execution, progress tracking, 
 
 ### Phase 5: Next Steps
 
-After `/implement` completes, ask the user:
+**If `--autonomous`**: Skip prompt, end after implementation completes. Caller handles verification.
+
+**Otherwise**, ask the user:
 
 ```
 header: "Fixes Complete"
