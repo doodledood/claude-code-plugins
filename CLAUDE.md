@@ -107,13 +107,18 @@ Examples:
 
 ### Memento Pattern for Non-Trivial Workflows
 
-Skills/commands/agents with multi-phase workflows MUST use the memento pattern:
-- **Create todo list immediately** (TodoWrite) - areas to discover, not fixed steps
-- **Include expansion placeholder** - e.g., `- [ ] (expand as discovery reveals new areas)`
-- **External memory file** - log file in `/tmp/` updated after EACH step
-- **Never proceed without writing findings** - log is external memory
-- **Expand todos dynamically** - as user answers or research reveals new areas
-- **Refresh context before finalizing** - read the full log file before writing final output to restore all decisions/findings into context
+Skills/commands/agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`):
+
+| Step | What | Why (Limitation Addressed) |
+|------|------|---------------------------|
+| **Create todo list immediately** | TodoWrite with areas to discover, not fixed steps | Externalizes state beyond working memory limits (5-10 variables max) |
+| **Include expansion placeholder** | e.g., `- [ ] (expand as discovery reveals new areas)` | Prevents premature "declaring done"—agents mark features complete without verification |
+| **External memory file** | Log file in `/tmp/` updated after EACH step | Counters context window degradation—findings persist outside conversation where they'd be "lost in the middle" |
+| **Never proceed without writing findings** | Log is external memory | Working memory limits mean unwritten findings are forgotten within steps |
+| **Expand todos dynamically** | As user answers or research reveals new areas | Prevents "going off rails"—explicit tracking keeps agent aligned with evolving goals |
+| **Refresh context before finalizing** | Read full log file before writing final output | **Key insight**: Converts holistic synthesis (poor LLM performance) into concentrated recent context (high attention). All findings move to context end where attention is strongest, enabling quality synthesis |
+
+The refresh step is critical: LLMs struggle with holistic tasks across long contexts (<50% accuracy at 32K tokens) but excel at processing recently-read information. Reading the full log immediately before output transforms a scattered, degraded context into dense, high-attention input.
 
 See `vibe-workflow/commands/spec.md` or `vibe-workflow/commands/plan.md` for reference implementations.
 
