@@ -1,6 +1,6 @@
 ---
 description: 'Single-agent implementation: executes plans in-place without subagents. Use /implement (default) for complex features; use this for simpler tasks or when subagent overhead is unwanted.'
-argument-hint: plan path | inline task | (empty for recent plan or interactive) [--with-review]
+argument-hint: plan path | inline task | (empty for recent plan or interactive) [--no-review]
 ---
 
 **User request**: $ARGUMENTS
@@ -13,7 +13,7 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 
 ### Phase 1: Resolve Input & Setup
 
-**With-review flag**: If arguments contain `--with-review` or `with review` (case-insensitive), enable post-implementation review workflow. Remove flag from arguments before processing below.
+**Review flag**: Review workflow runs by default after implementation. If arguments contain `--no-review` (case-insensitive), disable it. Remove flag from arguments before processing below.
 
 **Priority order:**
 1. **File path** (ends in `.md` or starts with `/`) → use plan file, optionally with `--spec <path>`
@@ -44,7 +44,7 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 [ ] [Task 1]...[ ] [Task N]
 [ ] Run gates for [Chunk]
 ...
-# If --with-review enabled, append:
+# Unless --no-review, append:
 [ ] Run review on implemented changes
 [ ] (Fix review issues - expand as findings emerge)
 ```
@@ -96,11 +96,11 @@ Chunks: N | Todos: M | Created: [list] | Modified: [list]
 Run `/review` for quality verification.
 ```
 
-If `--with-review` enabled → proceed to Phase 5.
+Unless `--no-review` → proceed to Phase 5.
 
-### Phase 5: Review Workflow (--with-review only)
+### Phase 5: Review Workflow (default, skip with --no-review)
 
-Skip if `--with-review` was not set.
+Skip if `--no-review` was set.
 
 1. Mark "Run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
 2. If no issues → mark fix placeholder `completed`, done

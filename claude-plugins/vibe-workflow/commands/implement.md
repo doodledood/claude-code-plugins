@@ -1,6 +1,6 @@
 ---
 description: 'Executes implementation plans via subagents with automated verification and fix loops. Use after /plan for complex features. Each chunk gets dedicated Implementor + Verifier agents with up to 5 fix attempts.'
-argument-hint: plan path | --progress <file> | inline task | (empty for recent plan) [--with-review]
+argument-hint: plan path | --progress <file> | inline task | (empty for recent plan) [--no-review]
 ---
 
 **User request**: $ARGUMENTS
@@ -25,7 +25,7 @@ For each chunk:
 
 ### 1.1 Resolve Input
 
-**With-review flag**: If arguments contain `--with-review` or `with review` (case-insensitive), enable post-implementation review workflow. Remove flag from arguments before processing below.
+**Review flag**: Review workflow runs by default after implementation. If arguments contain `--no-review` (case-insensitive), disable it. Remove flag from arguments before processing below.
 
 **Priority order:**
 1. **`--progress <path>`** → resume from progress file
@@ -101,7 +101,7 @@ Build Memento-style todos with 4 items per chunk:
 [ ] (Fix loop for chunk 2 - expand if needed)
 [ ] Commit chunk 2: [Name]
 ...
-# If --with-review enabled, append:
+# Unless --no-review, append:
 [ ] Run review on implemented changes
 [ ] (Fix review issues - expand as findings emerge)
 ```
@@ -332,11 +332,11 @@ Progress file: [path]
 Run `/review` for quality verification.
 ```
 
-3. If `--with-review` enabled → proceed to Phase 5
+3. Unless `--no-review` → proceed to Phase 5
 
-## Phase 5: Review Workflow (--with-review only)
+## Phase 5: Review Workflow (default, skip with --no-review)
 
-Skip if `--with-review` was not set.
+Skip if `--no-review` was set.
 
 ### 5.1 Run Review
 
