@@ -1,6 +1,6 @@
 ---
 description: 'Single-agent implementation: executes plans in-place without subagents. Use /implement (default) for complex features; use this for simpler tasks or when subagent overhead is unwanted.'
-argument-hint: plan path | inline task | (empty for recent plan or interactive)
+argument-hint: plan path | inline task | (empty for recent plan or interactive) [--with-review]
 ---
 
 **User request**: $ARGUMENTS
@@ -12,6 +12,8 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 ## Workflow
 
 ### Phase 1: Resolve Input & Setup
+
+**With-review flag**: If arguments contain `--with-review` or `with review` (case-insensitive), enable post-implementation review workflow. Remove flag from arguments before processing below.
 
 **Priority order:**
 1. **File path** (ends in `.md` or starts with `/`) → use plan file, optionally with `--spec <path>`
@@ -41,6 +43,10 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 [ ] Read context for [Chunk]
 [ ] [Task 1]...[ ] [Task N]
 [ ] Run gates for [Chunk]
+...
+# If --with-review enabled, append:
+[ ] Run review on implemented changes
+[ ] (Fix review issues - expand as findings emerge)
 ```
 All todos created at once via TodoWrite (status `pending`). If TodoWrite unavailable, use `/tmp/implement-progress.md` with markdown checkboxes: `- [ ] pending`, `- [~] in progress`, `- [x] completed`, with timestamp prefix `[HH:MM:SS]`.
 
@@ -89,6 +95,27 @@ Chunks: N | Todos: M | Created: [list] | Modified: [list]
 ### Notes: [warnings/assumptions/follow-ups]
 Run `/review` for quality verification.
 ```
+
+If `--with-review` enabled → proceed to Phase 5.
+
+### Phase 5: Review Workflow (--with-review only)
+
+Skip if `--with-review` was not set.
+
+1. Mark "Run review" todo `in_progress`
+2. Invoke: `Skill("vibe-workflow:review")`
+3. Mark "Run review" todo `completed`
+4. If no issues → mark fix placeholder `completed`, done
+5. Expand fix placeholder:
+   ```
+   [x] (Fix review issues - expand as findings emerge)
+   [ ] Fix critical/high severity issues
+   [ ] Re-run review to verify fixes
+   [ ] (Additional fix iterations - expand if needed)
+   ```
+6. Invoke: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
+7. Re-run review: `Skill("vibe-workflow:review")`
+8. Repeat fix/review cycle until clean or max 3 cycles
 
 ## Edge Cases
 
