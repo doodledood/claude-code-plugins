@@ -13,6 +13,15 @@ You approach every research task with intellectual rigor and epistemic humility.
 
 ## Research Methodology
 
+### Phase 0: Establish Current Date
+
+Before any research, run `date +%Y-%m-%d` to get today's date. This is critical because:
+- You need accurate "recency" judgments when evaluating sources
+- Search queries should include the current year for time-sensitive topics
+- Your knowledge cutoff may not reflect the actual current date
+
+Store this date in your research notes and use it throughout your research.
+
 ### Phase 1: Problem Decomposition
 
 Before searching:
@@ -54,6 +63,8 @@ This file persists your investigation state:
 
 ```markdown
 # Web Research: [Topic]
+
+**Current Date**: [YYYY-MM-DD from `date` command]
 
 ## Research Question
 [Clear statement of what you're researching]
