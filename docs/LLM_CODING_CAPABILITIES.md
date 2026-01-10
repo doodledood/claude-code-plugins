@@ -24,6 +24,46 @@ The **NoLiMa benchmark** tested 12 models across context lengths: at 1K tokens, 
 
 For agentic coding, this means the common approach of "loading the entire codebase into context" fundamentally doesn't work. Models cannot reliably track state across more than **5-10 variables** before exceeding working memory capacity. Cross-file reasoning degrades rapidly as file count increases, with working limits around **10 files maximum** for reliable performance.
 
+### Needle retrieval vs. holistic understanding: The hidden performance gap
+
+Marketing materials often cite impressive "needle-in-a-haystack" (NIAH) scores—finding a specific fact buried in long context. But this benchmark tests **lexical retrieval**, not the holistic understanding required for real coding tasks. The distinction is critical: models achieving 95%+ on vanilla NIAH often fail dramatically on synthesis tasks over the same context lengths.
+
+**Needle tasks** (where LLMs perform well):
+- Simple retrieval via pattern/lexical matching
+- "Find the function named X", "What does variable Y contain?"
+- Performance: 95-100% at short contexts, gradual degradation with length
+
+**Holistic tasks** (where LLMs struggle):
+- Synthesis, aggregation, reasoning across full context
+- "Summarize how authentication works across these 10 files", "Count pattern occurrences", "Trace data flow end-to-end"
+- Performance: Dramatic drops, especially beyond 32K tokens
+
+Benchmarks designed to expose this gap show the reality:
+
+| Benchmark | Task Type | Finding |
+|-----------|-----------|---------|
+| **NoLiMa** (ICML 2025) | Non-lexical retrieval | 11/13 models drop below 50% baseline at 32K |
+| **RULER** (NVIDIA) | Multi-hop + aggregation | Half of models fail at 32K despite 100% NIAH scores |
+| **OOLONG** (2025) | Aggregation tasks | GPT-5, Claude Sonnet 4, Gemini 2.5 Pro: all <50% at 128K |
+| **Context Rot** (Chroma, July 2025) | Non-uniform utilization | "Models do not use their context uniformly; performance grows increasingly unreliable as input length grows" |
+| **LongCodeBench** (May 2025) | Coding at 1M context | Claude 3.5 Sonnet: 29% at 32K → 3% at 256K |
+
+**Effective context length is typically 25-50% of claimed context**:
+
+| Model | Claimed | Effective |
+|-------|---------|-----------|
+| Llama 3.1 8B | 128K | 32K (25%) |
+| Llama 3.1 70B | 128K | 64K (50%) |
+| Most open-source models | 128K+ | <64K (<50%) |
+
+The root cause is training data distribution: positions representing distant relationships (1024+ tokens apart) occur in <20% of training examples; positions 1536+ occur in <5%.
+
+**Practical implications**:
+- Do not trust context windows at face value for synthesis tasks
+- Distinguish task types: needle lookups can use full context; holistic reasoning needs chunking
+- Place critical information at beginning or end, not middle
+- Consider multi-agent decomposition (e.g., Chain of Agents) for full-codebase reasoning
+
 -----
 
 ## Hallucination patterns: APIs, packages, and phantom functions
