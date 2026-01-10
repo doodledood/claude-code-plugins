@@ -743,9 +743,10 @@ If "No": Return to relevant section review.
 
 When user approves:
 
-1. Update version history with creation date
-2. Set next review date (3 months out)
-3. Display completion summary:
+1. Read the full research log file to restore all findings, decisions, and rationale into context
+2. Update version history with creation date
+3. Set next review date (3 months out)
+4. Display completion summary:
 
 ```
 ## SEO Strategy Complete

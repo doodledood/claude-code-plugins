@@ -291,13 +291,15 @@ Mark todo `completed`.
 
 Mark todo `in_progress`.
 
-**7.1** Determine final status:
+**7.1** Read the full verification log file to restore all gate results, acceptance criteria checks, and error comparisons into context before determining the final status.
+
+**7.2** Determine final status:
 - `FAIL_NO_GATES`: ALL gates are SKIPPED (no quality gates detected to run)
 - `PASS`: At least one gate ran, all non-skipped gates passed, AND all code-verifiable acceptance criteria passed (MANUAL_REVIEW criteria do not block PASS)
 - `FAIL_SAME_ERROR`: This is a retry AND same-error detected (Phase 6 returned YES)
 - `FAIL`: Any gate failed OR any code-verifiable acceptance criterion failed (and not same-error)
 
-**7.2** Update log with final status:
+**7.3** Update log with final status:
 ```markdown
 ## Final Result
 
@@ -322,7 +324,7 @@ Note: Identical errors to previous attempt. Orchestrator should consider alterna
 - {criterion}: {why manual verification needed}
 ```
 
-**7.3** Return structured output (see Output Contract)
+**7.4** Return structured output (see Output Contract)
 
 Mark todo `completed`.
 

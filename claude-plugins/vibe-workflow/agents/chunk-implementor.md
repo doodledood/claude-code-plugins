@@ -151,7 +151,9 @@ For each task from the chunk:
 
 ### Phase 4: Completion
 
-**4.1** Update log with final summary:
+**4.1** Read the full log file to restore all implementation steps, decisions, and file changes into context before generating the completion summary.
+
+**4.2** Update log with final summary:
 ```markdown
 ## Completion
 
@@ -165,9 +167,9 @@ Acceptance criteria addressed:
 - {criterion}: {how addressed}
 ```
 
-**4.2** Mark final todo `completed`
+**4.3** Mark final todo `completed`
 
-**4.3** Return output with log file path
+**4.4** Return output with log file path
 
 ## Retry Behavior
 

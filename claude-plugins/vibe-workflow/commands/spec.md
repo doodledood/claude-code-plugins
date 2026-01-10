@@ -276,7 +276,11 @@ Finished: {YYYY-MM-DD HH:MM:SS} | Questions: {count} | Decisions: {count}
 {Brief summary of discovery process}
 ```
 
-### 4.2 Finalize specification
+### 4.2 Refresh context
+
+Read the full interview log file to restore all decisions, findings, and rationale into context before writing the final spec.
+
+### 4.3 Finalize specification
 
 Final pass: remove `[TBD]` markers, ensure consistency. Use this **minimal scaffolding** - add sections dynamically based on what discovery revealed:
 
@@ -337,9 +341,9 @@ Generated: {date}
 
 **Specificity**: Each requirement should be verifiable. "User can log in" is too vague; "on valid credentials → redirect to dashboard; on invalid → show inline error, no page reload" is right.
 
-### 4.3 Mark all todos complete
+### 4.4 Mark all todos complete
 
-### 4.4 Output summary
+### 4.5 Output summary
 
 ```
 ## Spec Summary

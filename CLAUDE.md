@@ -113,8 +113,9 @@ Skills/commands/agents with multi-phase workflows MUST use the memento pattern:
 - **External memory file** - log file in `/tmp/` updated after EACH step
 - **Never proceed without writing findings** - log is external memory
 - **Expand todos dynamically** - as user answers or research reveals new areas
+- **Refresh context before finalizing** - read the full log file before writing final output to restore all decisions/findings into context
 
-See `vibe-workflow/skills/spec/SKILL.md` or `vibe-workflow/skills/plan/SKILL.md` for reference implementations.
+See `vibe-workflow/commands/spec.md` or `vibe-workflow/commands/plan.md` for reference implementations.
 
 See each plugin's README for architecture details.
 

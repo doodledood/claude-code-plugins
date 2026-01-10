@@ -153,7 +153,11 @@ Finished: {timestamp} | Files: {count} | Queries: {count}
 {Brief structural summary}
 ```
 
-### 3.2 Generate structured output
+### 3.2 Refresh context
+
+Read the full research file to restore all findings, file discoveries, and relationships into context before generating the output.
+
+### 3.3 Generate structured output
 
 ```
 ## OVERVIEW
@@ -176,7 +180,7 @@ REFERENCE:
 - path/types.ts - [1-line reason]
 ```
 
-### 3.3 Mark all todos complete
+### 3.4 Mark all todos complete
 
 ## Overview Guidelines
 

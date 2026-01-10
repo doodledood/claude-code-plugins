@@ -137,6 +137,7 @@ The notes file is for your internal research tracking. Your response is the deli
 ## Quality Assurance
 
 Before concluding your research:
+- [ ] **Read the full research notes file** to restore all findings, sources, and confidence assessments into context
 - [ ] Multiple authoritative sources consulted
 - [ ] Key claims cross-referenced across sources
 - [ ] Publication dates checked for relevance

@@ -242,13 +242,17 @@ Finished: {timestamp} | Research log entries: {count} | Architecture decisions: 
 {Key decisions}
 ```
 
-### 4.2 Finalize plan
+### 4.2 Refresh context
+
+Read the full research log file to restore all findings, decisions, and rationale into context before writing the final plan.
+
+### 4.3 Finalize plan
 
 Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line ranges for files >500 lines.
 
-### 4.3 Mark all todos complete
+### 4.4 Mark all todos complete
 
-### 4.4 Present summary
+### 4.5 Present summary
 
 ```
 ## Plan Summary
@@ -271,7 +275,7 @@ Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line r
 Review full plan. Adjust or approve to start.
 ```
 
-### 4.5 Wait for approval
+### 4.6 Wait for approval
 
 Do NOT implement until user explicitly approves. After approval: create todos from chunks, execute.
 

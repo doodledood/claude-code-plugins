@@ -780,10 +780,11 @@ If "Yes" or "Almost done", return to Step 4.1.
 
 When user indicates they're done:
 
-1. Add a "Version History" section noting when created/updated
-2. Add a "Usage Instructions" section for how to use the doc
-3. Display final document summary
-4. Remind user to keep CUSTOMER.md updated as they learn more
+1. Read the full discovery log file to restore all decisions, findings, and rationale into context
+2. Add a "Version History" section noting when created/updated
+3. Add a "Usage Instructions" section for how to use the doc
+4. Display final document summary
+5. Remind user to keep CUSTOMER.md updated as they learn more
 
 **Append to discovery log**:
 ```markdown
