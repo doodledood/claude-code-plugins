@@ -35,23 +35,28 @@ Read before building plugins:
 
 Each plugin can contain:
 - `agents/` - Specialized agent definitions (markdown)
-- `commands/` - Slash commands (markdown with frontmatter)
-- `skills/` - Contextual skills with `SKILL.md` files
+- `skills/` - Skills with `SKILL.md` files in subdirectories (e.g., `skills/review/SKILL.md`)
 - `hooks/` - Event handlers for Claude Code events
 
-**Naming convention**: Use kebab-case (`-`) for all file, command, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
+**Naming convention**: Use kebab-case (`-`) for all file, skill, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
 
-### Commands vs Skills
+### Skills (Unified Model - Claude Code 2.1.3+)
 
-**Skills are auto-invoked** by Claude based on semantic matching with the description. **Commands require explicit `/command` invocation.**
+As of Claude Code 2.1.3, skills and commands are unified. All skills:
+- Appear in the `/` menu by default (opt-out with `user-invocable: false`)
+- Can be auto-invoked by Claude based on semantic matching with the description
+- Can be explicitly invoked via `/skill-name`
 
-**Anti-pattern**: Don't create thin command wrappers that just invoke a skill:
-```markdown
-# BAD: commands/my-feature.md that only does:
-Use the Skill tool: Skill("plugin:my-feature", "$ARGUMENTS")
+**Required frontmatter fields:**
+```yaml
+---
+name: skill-name        # Lowercase, hyphens, max 64 chars
+description: '...'      # What it does + when to use (max 1024 chars)
+argument-hint: '...'    # Optional - hint for arguments
+---
 ```
 
-**Instead**: Create skills directly. Claude will auto-invoke them when relevant. Only create commands for workflows that genuinely need explicit user invocation (e.g., `/review`, `/commit`).
+**File structure:** `skills/{skill-name}/SKILL.md`
 
 ### Skill Description Best Practices
 
@@ -77,13 +82,13 @@ description: 'Investigates and fixes bugs systematically. Use when asked to debu
 
 ### Tool Definitions
 
-**Skills/Commands**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
+**Skills**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
 
 **Agents**: MUST explicitly declare all needed tools in frontmatter—agents run in isolation and won't inherit tools.
 
-### Invoking Skills from Commands/Skills
+### Invoking Skills from Skills
 
-When a command or skill needs to invoke another skill, use the explicit Skill tool pattern:
+When a skill needs to invoke another skill, use the explicit Skill tool pattern:
 
 ```markdown
 Use the Skill tool to <action>: Skill("<plugin>:<skill>", "$ARGUMENTS")
@@ -107,7 +112,7 @@ Examples:
 
 ### Memento Pattern for Non-Trivial Workflows
 
-Skills/commands/agents with multi-phase workflows MUST use the memento pattern:
+Skills and agents with multi-phase workflows MUST use the memento pattern:
 - **Create todo list immediately** (TodoWrite) - areas to discover, not fixed steps
 - **Include expansion placeholder** - e.g., `- [ ] (expand as discovery reveals new areas)`
 - **External memory file** - log file in `/tmp/` updated after EACH step
@@ -129,7 +134,7 @@ README-only changes don't require version bumps.
 
 ## Adding New Components
 
-When adding commands, agents, skills, or hooks:
+When adding skills, agents, or hooks:
 1. Create the component file in the appropriate directory
 2. Bump plugin version (minor for new features)
 3. Update affected plugin's `README.md` and repo root `README.md`
