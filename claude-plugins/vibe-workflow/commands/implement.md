@@ -341,27 +341,26 @@ Skip if `--with-review` was not set.
 ### 5.1 Run Review
 
 1. Mark "Run review" todo `in_progress`
-2. Invoke review: `Skill("vibe-workflow:review")`
+2. Invoke: `Skill("vibe-workflow:review", "--autonomous")`
 3. Mark "Run review" todo `completed`
-4. If review finds issues → proceed to 5.2; if no issues → mark fix placeholder `completed`, done
+4. If no issues → mark fix placeholder `completed`, done; else → 5.2
 
 ### 5.2 Fix Review Issues
 
-1. Expand fix placeholder todo into specific items based on review findings:
+1. Expand fix placeholder:
    ```
    [x] (Fix review issues - expand as findings emerge)
    [ ] Fix critical/high severity issues
    [ ] Re-run review to verify fixes
    [ ] (Additional fix iterations - expand if needed)
    ```
-2. Mark "Fix critical/high" todo `in_progress`
-3. Invoke fix: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
-4. Mark "Fix critical/high" todo `completed`
-5. Mark "Re-run review" todo `in_progress`
-6. Re-invoke review: `Skill("vibe-workflow:review")`
-7. Mark "Re-run review" todo `completed`
-8. If issues remain → expand placeholder with another fix/review cycle (max 3 cycles total)
-9. After 3 cycles or no issues → mark remaining placeholders `completed`, report final status
+2. Mark "Fix critical/high" `in_progress`
+3. Invoke: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")`
+4. Mark "Fix critical/high" `completed`, mark "Re-run review" `in_progress`
+5. Invoke: `Skill("vibe-workflow:review", "--autonomous")`
+6. Mark "Re-run review" `completed`
+7. If issues remain → expand placeholder, repeat (max 3 cycles)
+8. After 3 cycles or clean → mark placeholders `completed`, report status
 
 ## Progress File Format
 

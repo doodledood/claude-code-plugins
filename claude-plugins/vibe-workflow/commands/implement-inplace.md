@@ -102,20 +102,18 @@ If `--with-review` enabled → proceed to Phase 5.
 
 Skip if `--with-review` was not set.
 
-1. Mark "Run review" todo `in_progress`
-2. Invoke: `Skill("vibe-workflow:review")`
-3. Mark "Run review" todo `completed`
-4. If no issues → mark fix placeholder `completed`, done
-5. Expand fix placeholder:
+1. Mark "Run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+2. If no issues → mark fix placeholder `completed`, done
+3. Expand fix placeholder:
    ```
    [x] (Fix review issues - expand as findings emerge)
    [ ] Fix critical/high severity issues
    [ ] Re-run review to verify fixes
    [ ] (Additional fix iterations - expand if needed)
    ```
-6. Invoke: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high")`
-7. Re-run review: `Skill("vibe-workflow:review")`
-8. Repeat fix/review cycle until clean or max 3 cycles
+4. Mark "Fix critical/high" `in_progress` → invoke `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")` → mark `completed`
+5. Mark "Re-run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+6. Repeat fix/review cycle until clean or max 3 cycles
 
 ## Edge Cases
 
