@@ -135,7 +135,7 @@ class TestPostCompactHookImplementRecovery:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -149,7 +149,7 @@ class TestPostCompactHookImplementRecovery:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             not in context
         )
 
@@ -166,7 +166,7 @@ class TestPostCompactHookImplementRecovery:
         result = run_post_compact_hook(transcript_lines=lines, tmp_path=tmp_path)
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "plan-*.md" in context
+        assert "plan-*" in context
 
     def test_recovery_reminder_mentions_implement_files(self, tmp_path):
         """Recovery reminder should mention implement log files."""
@@ -181,7 +181,7 @@ class TestPostCompactHookImplementRecovery:
         result = run_post_compact_hook(transcript_lines=lines, tmp_path=tmp_path)
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "implement-*.md" in context
+        assert "implement-*" in context
 
     def test_recovery_reminder_mentions_todo_list(self, tmp_path):
         """Recovery reminder should mention checking todo list."""
@@ -232,7 +232,7 @@ class TestPostCompactHookImplementDetection:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -256,7 +256,7 @@ class TestPostCompactHookImplementDetection:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -280,7 +280,7 @@ class TestPostCompactHookImplementDetection:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -303,7 +303,7 @@ class TestPostCompactHookImplementDetection:
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -348,7 +348,7 @@ class TestPostCompactHookEdgeCases:
         context = output["hookSpecificOutput"]["additionalContext"]
         assert "codebase-explorer" in context
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             not in context
         )
 
@@ -361,7 +361,7 @@ class TestPostCompactHookEdgeCases:
         assert "codebase-explorer" in context
         # No implement workflow in empty transcript
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             not in context
         )
 
@@ -388,7 +388,7 @@ class TestPostCompactHookEdgeCases:
         context = output["hookSpecificOutput"]["additionalContext"]
         # Should still detect implement workflow from valid line
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in context
         )
 
@@ -451,12 +451,12 @@ class TestPostCompactHookVsSessionStartReminder:
 
         # Session start should not have recovery reminder
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             not in session_context
         )
 
         # Post-compact should have recovery reminder
         assert (
-            "This session may have been in the middle of an /implement workflow"
+            "This session may have been in the middle of a vibe-workflow:implement workflow"
             in compact_context
         )

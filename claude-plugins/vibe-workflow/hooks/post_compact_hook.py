@@ -20,9 +20,9 @@ from hook_utils import (
 )
 
 IMPLEMENT_RECOVERY_REMINDER = (
-    "This session may have been in the middle of an /implement workflow before compaction. "
+    "This session may have been in the middle of a vibe-workflow:implement workflow before compaction. "
     "If you were implementing a plan and haven't already read your working files in full, "
-    "check for implementation log files in /tmp/ matching implement-*.md pattern. If found, "
+    "check for implementation log files in /tmp/ matching the implement-*.md pattern. If found, "
     "read the FULL log file to recover your progress - it typically contains a reference to "
     "the associated plan file (plan-*.md) which you should also read in full if not already "
     "loaded. Check your todo list for incomplete items, then resume from where you left off. "
