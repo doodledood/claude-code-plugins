@@ -8,6 +8,7 @@ requires-python = ">=3.10"
 session-start-reminder = "session_start_reminder:main"
 stop-todo-enforcement = "stop_todo_enforcement:main"
 post-compact-hook = "post_compact_hook:main"
+post-todo-write-hook = "post_todo_write_hook:main"
 
 [build-system]
 requires = ["hatchling"]

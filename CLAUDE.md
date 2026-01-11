@@ -52,6 +52,7 @@ Hooks are Python scripts in `hooks/` that respond to Claude Code events. Shared 
 - `hook_utils.py` - Shared transcript parsing, reminder strings, state extraction
 - `session_start_reminder.py` - Injects agent preference reminders at session start
 - `post_compact_hook.py` - Re-anchors after compaction with session reminders + implement recovery
+- `post_todo_write_hook.py` - Reminds to update log files after todo completion during implement workflows
 - `stop_todo_enforcement.py` - Blocks premature stops during implement workflows
 
 **When modifying hooks**:
