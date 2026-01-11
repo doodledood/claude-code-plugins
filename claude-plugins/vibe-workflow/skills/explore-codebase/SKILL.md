@@ -2,7 +2,6 @@
 name: explore-codebase
 description: 'Find all files relevant to a query. Returns topic-specific overview + file list with line ranges—NOT a general codebase map.'
 context: fork
-agent: Explore
 ---
 
 **User request**: $ARGUMENTS
