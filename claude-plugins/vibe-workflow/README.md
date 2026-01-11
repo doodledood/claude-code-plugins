@@ -35,6 +35,7 @@ Start simple. Escalate if you hit ambiguity.
 - `implement` - Execute plans via subagents with verification loops
 - `bugfix` - Root cause analysis with test-driven verification
 - `explore-codebase` - Structural overview with prioritized file list
+- `research-web` - Deep web research with parallel investigators and synthesis
 
 **Commands** (explicit invocation):
 - `/review` - Parallel code review agents

@@ -37,6 +37,7 @@ Structured development workflow: spec → plan → implement. Reduces iteration 
 - `/implement` - Execute plans via subagents with verification loops
 - `/review` - Parallel code review agents (bugs, types, maintainability)
 - `/bugfix` - Root cause analysis with test-driven verification
+- `/research-web` - Deep web research with parallel investigators (quick/medium/thorough/very-thorough)
 
 ### consultant
 
