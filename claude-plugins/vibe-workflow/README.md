@@ -47,7 +47,8 @@ Start simple. Escalate if you hit ambiguity.
 - `chunk-verifier` - Runs verification gates
 
 **Hooks**:
-- `SessionStart` - Reminds Claude to prefer codebase-explorer over built-in Explore
+- `SessionStart` - Reminds Claude to prefer codebase-explorer and web-researcher agents
+- `SessionStart (compact)` - Re-anchors session after compaction; adds implement workflow recovery if mid-implementation
 - `Stop` - Prevents premature stops during `/implement` workflows when todos are incomplete
 
 ## Installation
