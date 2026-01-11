@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
   "description": "Ship high-quality code faster with less back-and-forth",
-  "version": "1.89.1",
+  "version": "1.91.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
@@ -20,6 +20,16 @@
             "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks session-start-reminder"
           }
         ]
+      },
+      {
+        "matcher": "compact",
+        "description": "Re-anchor session after compaction with reminders and implement workflow recovery",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks post-compact-hook"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -30,6 +40,18 @@
           {
             "type": "command",
             "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks stop-todo-enforcement"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "TodoWrite",
+        "description": "Remind to update progress/log files after todo completion during implement workflows",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks post-todo-write-hook"
           }
         ]
       }
