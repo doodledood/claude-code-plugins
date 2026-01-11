@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Claude Code plugins marketplace - a curated collection of plugins with agents, skills, commands, and hooks.
+Claude Code plugins marketplace - a curated collection of plugins with agents, skills, and hooks.
 
 ## Development Commands
 
@@ -35,23 +35,28 @@ Read before building plugins:
 
 Each plugin can contain:
 - `agents/` - Specialized agent definitions (markdown)
-- `commands/` - Slash commands (markdown with frontmatter)
-- `skills/` - Contextual skills with `SKILL.md` files
+- `skills/` - Skills with `SKILL.md` files (replaces deprecated commands)
 - `hooks/` - Event handlers for Claude Code events
 
-**Naming convention**: Use kebab-case (`-`) for all file, command, and agent names (e.g., `bug-fixer.md`, `/clean-slop`).
+**Naming convention**: Use kebab-case (`-`) for all file and skill names (e.g., `bug-fixer.md`, `clean-slop`).
 
-### Commands vs Skills
+### Skills
 
-**Skills are auto-invoked** by Claude based on semantic matching with the description. **Commands require explicit `/command` invocation.**
+Skills are the primary way to extend Claude Code. Each skill lives in `skills/{skill-name}/SKILL.md`.
 
-**Anti-pattern**: Don't create thin command wrappers that just invoke a skill:
-```markdown
-# BAD: commands/my-feature.md that only does:
-Use the Skill tool: Skill("plugin:my-feature", "$ARGUMENTS")
+**Invocation modes**:
+- **Auto-invoked**: Claude discovers and invokes skills based on semantic matching with the description
+- **User-invoked**: Users can explicitly invoke via `/skill-name` (controlled by `user-invocable` frontmatter, defaults to `true`)
+- **Programmatic**: Other skills invoke via `Skill("plugin:skill-name", "$ARGUMENTS")`
+
+**Skill frontmatter**:
+```yaml
+---
+name: skill-name           # Required: lowercase, hyphens, max 64 chars
+description: '...'         # Required: max 1024 chars, drives auto-discovery
+user-invocable: true       # Optional: show in slash command menu (default: true)
+---
 ```
-
-**Instead**: Create skills directly. Claude will auto-invoke them when relevant. Only create commands for workflows that genuinely need explicit user invocation (e.g., `/review`, `/commit`).
 
 ### Skill Description Best Practices
 
@@ -77,13 +82,13 @@ description: 'Investigates and fixes bugs systematically. Use when asked to debu
 
 ### Tool Definitions
 
-**Skills/Commands**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
+**Skills**: Omit `tools` frontmatter to inherit all tools from the invoking context (recommended default).
 
 **Agents**: MUST explicitly declare all needed tools in frontmatter—agents run in isolation and won't inherit tools.
 
-### Invoking Skills from Commands/Skills
+### Invoking Skills from Skills
 
-When a command or skill needs to invoke another skill, use the explicit Skill tool pattern:
+When a skill needs to invoke another skill, use the explicit Skill tool pattern:
 
 ```markdown
 Use the Skill tool to <action>: Skill("<plugin>:<skill>", "$ARGUMENTS")
@@ -107,7 +112,7 @@ Examples:
 
 ### Memento Pattern for Non-Trivial Workflows
 
-Skills/commands/agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`):
+Skills and agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`):
 
 | Step | What | Why (Limitation Addressed) |
 |------|------|---------------------------|
@@ -120,7 +125,7 @@ Skills/commands/agents with multi-phase workflows MUST use the memento pattern. 
 
 The refresh step is critical: LLMs struggle with holistic tasks across long contexts (<50% accuracy at 32K tokens) but excel at processing recently-read information. Reading the full log immediately before output transforms a scattered, degraded context into dense, high-attention input.
 
-See `vibe-workflow/commands/spec.md` or `vibe-workflow/commands/plan.md` for reference implementations.
+See `vibe-workflow/skills/spec/SKILL.md` or `vibe-workflow/skills/plan/SKILL.md` for reference implementations.
 
 See each plugin's README for architecture details.
 
@@ -128,14 +133,14 @@ See each plugin's README for architecture details.
 
 When updating plugin files, bump version in `.claude-plugin/plugin.json`:
 - **Patch** (0.0.x): Bug fixes, typos
-- **Minor** (0.x.0): New features, new commands/agents
+- **Minor** (0.x.0): New features, new skills/agents
 - **Major** (x.0.0): Breaking changes
 
 README-only changes don't require version bumps.
 
 ## Adding New Components
 
-When adding commands, agents, skills, or hooks:
+When adding agents, skills, or hooks:
 1. Create the component file in the appropriate directory
 2. Bump plugin version (minor for new features)
 3. Update affected plugin's `README.md` and repo root `README.md`

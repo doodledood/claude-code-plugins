@@ -8,12 +8,10 @@ Starting point for creating Claude Code plugins.
 your-plugin-name/
 ├── .claude-plugin/
 │   └── plugin.json          # Required: metadata
-├── commands/                 # Slash commands (explicit invocation)
-│   └── example.md
 ├── agents/                   # Specialized agents
 │   └── example-agent.md
-├── skills/                   # Auto-invoked based on context
-│   └── example-skill/
+├── skills/                   # Skills (user and auto-invoked)
+│   └── example/
 │       └── SKILL.md
 ├── hooks/                    # Event handlers
 │   └── hooks.json
@@ -46,18 +44,19 @@ your-plugin-name/
    /plugin install your-plugin-name@claude-code-plugins-marketplace
    ```
 
-## Commands vs Skills
+## Skills
 
-**Skills** are auto-invoked by Claude based on semantic matching. Use for capabilities Claude should use automatically when relevant.
+Skills are the primary way to extend Claude Code. Each skill lives in `skills/{skill-name}/SKILL.md`.
 
-**Commands** require explicit `/command` invocation. Use for workflows that need user intent.
+**Invocation modes**:
+- **Auto-invoked**: Claude discovers skills based on semantic matching with the description
+- **User-invoked**: Users invoke via `/skill-name` (controlled by `user-invocable` frontmatter)
 
 See [CLAUDE.md](../../CLAUDE.md) for detailed guidelines.
 
 ## Testing
 
 - [ ] Plugin installs without errors
-- [ ] Commands execute correctly
 - [ ] Agents are accessible
 - [ ] Skills activate in appropriate contexts
 
