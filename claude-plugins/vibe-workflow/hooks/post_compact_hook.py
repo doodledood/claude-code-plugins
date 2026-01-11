@@ -20,13 +20,13 @@ from hook_utils import (
 )
 
 IMPLEMENT_RECOVERY_REMINDER = (
-    "IMPORTANT: You were in the middle of an /implement workflow when compaction occurred. "
-    "Context has been lost. Before continuing, you MUST:\n"
-    "1. List files in /tmp/ matching plan-*.md and implement-*.md patterns to find your working files\n"
-    "2. Read the FULL plan file (most recent /tmp/plan-*.md) to understand the overall implementation\n"
-    "3. Read the FULL implementation log file (/tmp/implement-*.md) to see progress and current state\n"
-    "4. Check your todo list for incomplete items\n"
-    "Then resume implementation from where you left off. Do not restart work that was already completed."
+    "This session may have been in the middle of an /implement workflow before compaction. "
+    "If you were implementing a plan and haven't already read your working files in full, "
+    "check for implementation log files in /tmp/ matching implement-*.md pattern. If found, "
+    "read the FULL log file to recover your progress - it typically contains a reference to "
+    "the associated plan file (plan-*.md) which you should also read in full if not already "
+    "loaded. Check your todo list for incomplete items, then resume from where you left off. "
+    "Do not restart work that was already completed."
 )
 
 
