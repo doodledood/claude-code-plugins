@@ -1,6 +1,7 @@
 ---
 name: review-maintainability
 description: Audit code for DRY violations, dead code, complexity, and consistency issues.
+context: fork
 ---
 
 Use the code-maintainability-reviewer agent to perform a maintainability audit on: $ARGUMENTS
