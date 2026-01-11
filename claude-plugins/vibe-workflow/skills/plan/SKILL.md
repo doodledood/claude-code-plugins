@@ -34,6 +34,7 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 - [ ] Codebase research (patterns, files to modify)
 - [ ] Architecture decisions
 - [ ] (expand as research reveals new areas)
+- [ ] Read full research log and spec (context refresh before output)
 - [ ] Finalize chunks
 ```
 
@@ -48,6 +49,7 @@ Initial → After codebase research (found WebSocket) → After "needs offline t
 - [ ] Offline storage (IndexedDB vs localStorage)
 - [ ] Sync conflict resolution
 - [ ] Service worker integration
+- [ ] Read full research log and spec (context refresh before output)
 - [ ] Finalize chunks
 ```
 
