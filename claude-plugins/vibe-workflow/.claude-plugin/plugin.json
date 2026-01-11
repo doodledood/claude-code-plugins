@@ -1,7 +1,7 @@
 {
   "name": "vibe-workflow",
   "description": "Ship high-quality code faster with less back-and-forth",
-  "version": "1.89.1",
+  "version": "1.90.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
@@ -18,6 +18,16 @@
           {
             "type": "command",
             "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks session-start-reminder"
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "description": "Re-anchor session after compaction with reminders and implement workflow recovery",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ${CLAUDE_PLUGIN_ROOT}/hooks post-compact-hook"
           }
         ]
       }
