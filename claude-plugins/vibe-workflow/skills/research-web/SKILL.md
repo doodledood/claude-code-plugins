@@ -114,15 +114,39 @@ When continuing to a new wave:
 
 Run `date '+%Y-%m-%d %H%M%S'` to get current date and timestamp.
 
-Todos = **research areas to investigate**, not fixed steps. Each todo represents a distinct angle or facet of the research. List expands as decomposition reveals new areas.
+Todos = **research areas to investigate + memento operations**, not fixed steps. Each research todo represents a distinct angle or facet. List expands as decomposition reveals new areas. Memento todos ensure external memory stays current.
 
 **Starter todos** (seeds - list grows during decomposition):
 
 ```
+- [ ] Create orchestration file
 - [ ] Topic decomposition & research planning
-- [ ] (research areas added during decomposition)
-- [ ] Collect and cross-reference findings
+- [ ] Write decomposition to orchestration file
+- [ ] (expand: research facets added during decomposition - e.g., "Research: {facet 1}")
+- [ ] (expand: Wave 1 agent assignments)
+- [ ] Launch Wave 1 agents
+- [ ] Collect Wave 1 findings → write to orchestration file
+- [ ] Cross-reference findings → write analysis to orchestration file
+- [ ] Evaluate gaps → write gap evaluation to orchestration file
+- [ ] (expand: if continuing - Wave 2+ research todos)
+- [ ] Refresh context: read full orchestration file
 - [ ] Synthesize final output
+```
+
+**Critical memento todos** (never skip):
+- `Write {X} to orchestration file` - after EACH phase/agent completion
+- `Refresh context: read full orchestration file` - ALWAYS before synthesis
+
+**Expansion pattern**: As decomposition reveals facets, add specific research todos:
+```
+- [x] Topic decomposition & research planning
+- [x] Write decomposition to orchestration file
+- [ ] Research: Real-time database landscape 2025
+- [ ] Research: Performance benchmarks
+- [ ] Research: Conflict resolution strategies
+- [ ] Research: Production case studies
+- [ ] Launch Wave 1 agents
+...
 ```
 
 ### 1.2 Create orchestration file (skip for quick)
@@ -237,7 +261,7 @@ After decomposition, update the file:
 
 Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` for each research angle. **Launch agents in parallel** (single message with multiple Task tool calls) to maximize efficiency.
 
-**Prompt template for each agent**:
+**Wave 1 prompt template** (broad exploration):
 ```
 {Specific research question for this facet}
 
@@ -247,11 +271,41 @@ Focus areas:
 - {specific aspect 3}
 
 Current date context: {YYYY-MM-DD} - prioritize recent sources.
+
+---
+Research context:
+- Wave: 1 (initial investigation)
+- Mode: Broad exploration
+- Report any gaps or conflicts you discover for potential follow-up waves.
+```
+
+**Wave 2+ prompt template** (gap-filling):
+```
+{Specific gap or conflict to resolve}
+
+Context from previous waves:
+- Previous findings: {summary of relevant findings from earlier waves}
+- Gap being addressed: {specific gap - e.g., "Sources conflict on X" or "Y aspect unexplored"}
+- What we already know: {established facts from Wave 1}
+
+Focus areas:
+- {targeted aspect 1}
+- {targeted aspect 2}
+
+Current date context: {YYYY-MM-DD} - prioritize recent sources.
+
+---
+Research context:
+- Wave: {N} (gap-filling)
+- Mode: Targeted investigation - focus narrowly on the gap above
+- Build on previous findings, don't repeat broad exploration
+- Flag if this gap cannot be resolved (conflicting authoritative sources, no data available, etc.)
 ```
 
 **Batching rules**:
 - thorough: Launch all 2-4 agents in a single parallel batch
 - very-thorough: Launch in batches of 3-4 agents (avoid overwhelming context)
+- Wave 2+: Launch 1-3 focused agents per wave
 
 ### 3.2 Update orchestration file after each agent completes
 
@@ -268,10 +322,12 @@ After EACH agent returns, immediately update:
 ## Collected Findings
 
 ### Agent 1: {facet}
-**Confidence**: {High/Medium/Low}
+**Confidence**: {High/Medium/Low/Contested/Inconclusive}
 **Sources**: {count}
 
 {Paste key findings from agent - preserve source citations}
+{If Contested: note the conflicting positions}
+{If Inconclusive: note what couldn't be determined}
 
 ### Agent 2: {facet}
 ...
@@ -292,9 +348,15 @@ If an agent times out or returns incomplete results:
 
 Look for:
 - **Agreements**: Where do multiple agents reach similar conclusions?
-- **Conflicts**: Where do findings contradict?
+- **Conflicts**: Where do findings contradict? (includes agent-reported "Contested" findings)
+- **Inconclusive**: Areas where agents couldn't determine answers
 - **Gaps**: What wasn't covered by any agent?
 - **Surprises**: Unexpected findings that warrant highlighting
+
+**Handling agent confidence levels**:
+- **High/Medium/Low**: Standard confidence - use for cross-referencing
+- **Contested**: Agent found high-authority sources that directly contradict each other - treat as a conflict requiring resolution or presentation of both positions
+- **Inconclusive**: Agent couldn't find agreement among sources - may warrant follow-up wave with different search angles
 
 ### 4.3 Update orchestration file with cross-reference
 
@@ -308,6 +370,12 @@ Look for:
 ### Conflicts (Requires Judgment)
 - {Topic}: Agent 1 says X, Agent 3 says Y
   - Resolution: {which to trust and why, or present both}
+- {Topic}: Agent 2 reported as Contested - {Position A} vs {Position B}
+  - Resolution: {present both with supporting sources, or identify which is more authoritative}
+
+### Inconclusive Areas
+- {Topic}: Agent {N} couldn't determine - {reason}
+  - Action: {follow-up wave with different angles, or note as limitation}
 
 ### Gaps Identified
 - {What wasn't answered}
@@ -405,15 +473,30 @@ When continuing to a new wave:
 
 ## Phase 5: Synthesize & Output
 
-### 5.1 Refresh context
+### 5.1 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: Read the full orchestration file to restore all findings, cross-references, and synthesis notes into context before generating output.
+**CRITICAL**: This is the key memento step. Read the FULL orchestration file using the Read tool to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
+
+**Why this matters**: By this point, findings from multiple agents across potentially multiple waves have been written to the orchestration file. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
+
+**Todo must show**:
+```
+- [x] Refresh context: read full orchestration file  ← Must be marked complete before synthesis
+- [ ] Synthesize final output
+```
+
+**Verification**: After reading, you should have access to:
+- All collected findings from every agent
+- Cross-reference analysis (agreements, conflicts, inconclusive)
+- Gap evaluations from each wave
+- Wave tracking with decisions
+- All source citations
 
 ### 5.2 Mark synthesis todo in_progress
 
 ### 5.3 Generate comprehensive output
 
-Your response must synthesize ALL agent findings into a cohesive answer. Include:
+**Only after completing 5.1** - synthesize ALL agent findings into a cohesive answer. Include:
 
 ```markdown
 ## Research Findings: {Topic}
@@ -445,7 +528,9 @@ Your response must synthesize ALL agent findings into a cohesive answer. Include
 ### Confidence Notes
 - **High confidence**: {findings with strong multi-source agreement}
 - **Medium confidence**: {findings with some support}
-- **Contested/Unclear**: {where sources disagreed}
+- **Contested**: {where high-authority sources directly contradicted - present both positions}
+- **Inconclusive**: {where agents couldn't determine answers despite searching}
+- **Low confidence**: {single source or weak agreement}
 
 ### Research Progression (for multi-wave)
 | Wave | Focus | Agents | Key Contribution |
@@ -461,9 +546,9 @@ Your response must synthesize ALL agent findings into a cohesive answer. Include
 - {Gaps intentionally not pursued (minor priority)}
 
 ### Source Summary
-| Source | Authority | Used For | Wave |
-|--------|-----------|----------|------|
-| {url} | High/Med | {finding} | 1 |
+| Source | Authority | Date | Used For | Wave |
+|--------|-----------|------|----------|------|
+| {url} | High/Med | {date} | {finding} | 1 |
 ...
 
 ---
@@ -486,23 +571,29 @@ For quick (single-fact) queries, skip orchestration:
 | Principle | Rule |
 |-----------|------|
 | Thoroughness first | Determine level before any research |
+| Todos with expansion | Start with seed todos, expand as research reveals facets |
+| Memento writes | Write to orchestration file after EACH phase/agent - external memory |
 | Parallel execution | Launch multiple agents simultaneously when possible |
-| Memento orchestration | Write to orchestration file after EACH agent returns |
 | Cross-reference | Compare findings across agents before synthesizing |
 | Gap evaluation | Classify gaps after each wave (critical/significant/minor) |
-| Wave iteration | Continue waves until satisficed OR max reached OR diminishing returns |
-| Context refresh | Read full orchestration file before final synthesis |
+| Wave iteration | Continue waves until satisficed OR diminishing returns |
+| **Context refresh** | **Read full orchestration file BEFORE synthesis - non-negotiable** |
 | Source preservation | Maintain citations through synthesis |
 | Gap honesty | Explicitly state what couldn't be answered despite multi-wave effort |
+
+**Memento Pattern Summary**:
+1. Create orchestration file at start
+2. Write to it after EVERY step (decomposition, agent findings, cross-reference, gap evaluation)
+3. Read FULL file before synthesis (restores all context)
 
 ## Never Do
 
 - Launch agents without determining thoroughness level
-- Proceed to synthesis without collecting all agent results
-- Skip orchestration file updates
+- Proceed to next phase without writing findings to orchestration file
+- Proceed to synthesis without reading full orchestration file first
+- Skip orchestration file updates after agent completions
 - Present synthesized findings without source citations
-- Ignore conflicts between agent findings
-- Skip context refresh before final output
+- Ignore conflicts between agent findings (especially "Contested" findings)
 - Skip gap evaluation for thorough/very-thorough levels
 - Continue waves when diminishing returns detected (wasted effort)
 - Stop prematurely when critical gaps remain (thorough) or significant gaps remain (very-thorough) and waves are still productive
