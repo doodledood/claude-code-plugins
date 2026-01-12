@@ -194,32 +194,48 @@ Wave Policy: {single wave | continue while critical gaps | continue until compre
 
 ## Phase 2: Topic Decomposition & Agent Assignment
 
-### 2.1 Decompose the research topic
+### 2.1 Decompose the research topic into ORTHOGONAL facets
 
-Before launching agents, analyze the query to identify distinct research angles:
+Before launching agents, analyze the query to identify **non-overlapping** research angles. Each agent should have a distinct domain with clear boundaries.
 
 1. **Core question**: What is the fundamental thing being asked?
-2. **Facets**: What distinct aspects need investigation?
+2. **Facets**: What distinct aspects need investigation? Ensure minimal overlap:
    - Technical aspects (how it works, implementation details)
    - Comparison aspects (alternatives, competitors, trade-offs)
    - Practical aspects (real-world usage, adoption, case studies)
    - Current state (recent developments, 2025 updates)
    - Limitations/concerns (drawbacks, issues, criticisms)
 
-3. **Agent assignments**: Map facets to web-researcher prompts
+3. **Orthogonality check**: Before assigning agents, verify:
+   - Each facet covers a distinct domain
+   - No two facets would naturally search the same queries
+   - Boundaries are clear enough to state explicitly
 
-### 2.2 Plan agent assignments
+**Bad decomposition** (overlapping):
+- Agent 1: "Research Firebase"
+- Agent 2: "Research real-time databases" ← Firebase is a real-time database, overlap!
 
-| Facet | Research Prompt | Priority |
-|-------|-----------------|----------|
-| {facet 1} | "{specific research question}" | High |
-| {facet 2} | "{specific research question}" | High |
-| ... | ... | ... |
+**Good decomposition** (orthogonal):
+- Agent 1: "Research Firebase specifically - features, pricing, limits"
+- Agent 2: "Research non-Firebase alternatives: Supabase, Convex, PlanetScale"
+
+### 2.2 Plan agent assignments with explicit boundaries
+
+| Facet | Research Focus | Explicitly EXCLUDE |
+|-------|----------------|-------------------|
+| {facet 1} | "{what to research}" | "{what other agents cover}" |
+| {facet 2} | "{what to research}" | "{what other agents cover}" |
 
 **Agent count by level**:
 - medium: 1-2 agents (core + one related angle)
 - thorough: 2-4 agents (core + alternatives + practical + concerns)
 - very-thorough: 4-6 agents (comprehensive coverage of all facets)
+
+**Orthogonality strategies**:
+- By entity: Agent 1 = Product A, Agent 2 = Product B (not both "products")
+- By dimension: Agent 1 = Performance, Agent 2 = Pricing, Agent 3 = Security
+- By time: Agent 1 = Current state, Agent 2 = Historical evolution
+- By perspective: Agent 1 = Official docs, Agent 2 = Community experience
 
 ### 2.3 Expand todos for each research area
 
@@ -261,22 +277,27 @@ After decomposition, update the file:
 
 Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` for each research angle. **Launch agents in parallel** (single message with multiple Task tool calls) to maximize efficiency.
 
-**Wave 1 prompt template** (broad exploration):
+**Wave 1 prompt template** (broad exploration with boundaries):
 ```
 {Specific research question for this facet}
 
-Focus areas:
-- {specific aspect 1}
-- {specific aspect 2}
-- {specific aspect 3}
+YOUR ASSIGNED SCOPE:
+- Focus areas: {specific aspect 1}, {specific aspect 2}, {specific aspect 3}
+- This is YOUR domain - go deep on these topics
+
+DO NOT RESEARCH (other agents cover these):
+- {facet assigned to Agent 2}
+- {facet assigned to Agent 3}
+- {etc.}
 
 Current date context: {YYYY-MM-DD} - prioritize recent sources.
 
 ---
 Research context:
 - Wave: 1 (initial investigation)
-- Mode: Broad exploration
-- Report any gaps or conflicts you discover for potential follow-up waves.
+- Mode: Broad exploration within your assigned scope
+- Stay within your boundaries - other agents handle the excluded areas
+- Report any gaps or conflicts you discover for potential follow-up waves
 ```
 
 **Wave 2+ prompt template** (gap-filling):
@@ -288,9 +309,13 @@ Context from previous waves:
 - Gap being addressed: {specific gap - e.g., "Sources conflict on X" or "Y aspect unexplored"}
 - What we already know: {established facts from Wave 1}
 
-Focus areas:
-- {targeted aspect 1}
-- {targeted aspect 2}
+YOUR ASSIGNED SCOPE:
+- Focus narrowly on: {targeted aspect 1}, {targeted aspect 2}
+- This gap was identified because: {why previous research was insufficient}
+
+DO NOT RESEARCH:
+- Topics already well-covered in Wave 1 (don't repeat)
+- {areas other Wave 2 agents are handling}
 
 Current date context: {YYYY-MM-DD} - prioritize recent sources.
 
@@ -625,21 +650,21 @@ Query: "Give me a comprehensive analysis of all the AI coding assistant options 
 **Thoroughness**: very-thorough — "comprehensive analysis" + "all options" triggers maximum depth
 
 ### Wave 1: Initial Investigation
-**Decomposition** (6 facets):
-- Facet 1: AI coding assistant landscape 2025 (market overview)
-- Facet 2: Feature comparison (autocomplete, chat, agents, IDE support)
-- Facet 3: Pricing and business models
-- Facet 4: Enterprise considerations (security, compliance, on-prem)
-- Facet 5: Developer experience and reviews
-- Facet 6: Recent developments and announcements
+**Decomposition** (6 orthogonal facets):
+- Facet 1: Market landscape - what tools exist (names only, no features/pricing)
+- Facet 2: Feature comparison - autocomplete, chat, agents, IDE support (no pricing)
+- Facet 3: Pricing and licensing - costs, tiers, enterprise deals (no features)
+- Facet 4: Enterprise/security - compliance, SOC2, on-prem (no general features)
+- Facet 5: Developer sentiment - reviews, community feedback (no official docs)
+- Facet 6: Recent news - announcements, launches, acquisitions (no evergreen content)
 
-**Agents launched** (parallel batch of 4, then 2):
-1. "AI coding assistants 2025: GitHub Copilot, Cursor, Claude Code, Codeium, others. Market landscape."
-2. "AI coding assistant features comparison 2025: autocomplete, chat, agentic capabilities."
-3. "AI coding assistant pricing models 2025: subscription, usage-based, enterprise."
-4. "Enterprise AI coding assistants: security, SOC2, on-premise deployment options."
-5. "AI coding assistant developer reviews 2025: Reddit, HN, Twitter sentiment."
-6. "AI coding assistant announcements 2025: new features, launches, acquisitions."
+**Agents launched with explicit boundaries** (parallel batch of 4, then 2):
+1. "AI coding assistant market landscape 2025. YOUR SCOPE: List all tools (Copilot, Cursor, Claude Code, Codeium, etc). DO NOT RESEARCH: features, pricing, reviews."
+2. "AI coding assistant features 2025. YOUR SCOPE: autocomplete, chat, agentic capabilities, IDE support. DO NOT RESEARCH: pricing, enterprise security, user reviews."
+3. "AI coding assistant pricing 2025. YOUR SCOPE: subscription costs, usage-based models, free tiers. DO NOT RESEARCH: features, security compliance."
+4. "Enterprise AI coding assistant compliance 2025. YOUR SCOPE: SOC2, HIPAA, on-premise, data residency. DO NOT RESEARCH: general features, consumer pricing."
+5. "AI coding assistant developer sentiment 2025. YOUR SCOPE: Reddit, HN, Twitter discussions, community feedback. DO NOT RESEARCH: official documentation, pricing pages."
+6. "AI coding assistant news 2025. YOUR SCOPE: recent announcements, launches, acquisitions since Jan 2025. DO NOT RESEARCH: established features, pricing."
 
 **Gap Evaluation (Wave 1)**:
 - Critical gaps: None (all facets had substantial findings)
