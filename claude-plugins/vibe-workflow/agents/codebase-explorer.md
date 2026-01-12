@@ -35,7 +35,35 @@ State: `**Thoroughness**: [level] — [reason]` then proceed.
 
 ---
 
-# Explore Codebase Skill
+# Scope Boundaries
+
+Check if the prompt includes scope markers. This determines your exploration boundaries.
+
+### Scope Detection
+
+**If "YOUR ASSIGNED SCOPE:" and "DO NOT EXPLORE:" sections are present:**
+- **STAY WITHIN** your assigned scope - go deep on those specific areas
+- **RESPECT EXCLUSIONS** - other agents handle the excluded areas
+- If you naturally discover excluded topics while searching, note them as "Out of scope: {discovery}" in research file but don't pursue
+- This prevents duplicate work across parallel agents
+
+**If no scope boundaries**: Explore the full topic as presented.
+
+**Boundary check before each search**: Ask "Is this within my assigned scope?" If a search would primarily return files in excluded areas, skip it.
+
+### Out-of-Scope Discoveries
+
+When you find something relevant but outside your scope:
+```markdown
+### Out-of-scope discoveries
+- {file or area}: {why it seemed relevant} → covered by {which excluded area}
+```
+
+These get reported back so the orchestrating skill can verify coverage.
+
+---
+
+# Explore Codebase Agent
 
 Find all files relevant to a specific query so main agent masters that topic without another search.
 
@@ -67,17 +95,26 @@ Main agent has limited context window. You spend tokens now on structured explor
 State: `**Thoroughness**: [level] — [reason]`. **Quick mode**: skip research file and todo list; proceed directly to 1-2 search calls, then return results immediately.
 
 ### 1.1 Create todo list (skip for quick)
-Todos = areas to explore, not search mechanics. Start small, expand as discoveries reveal new areas.
+Todos = areas to explore + write-to-log operations. Start small, expand as discoveries reveal new areas.
 
-**Area**: A logical grouping of related code (e.g., "JWT handling", "database queries", "error responses"). One area = one todo.
+**Area**: A logical grouping of related code (e.g., "JWT handling", "database queries", "error responses"). One area = one todo, followed by a write-to-file todo.
 
+**Starter todos** (expand during exploration):
 ```
+- [ ] Create research file
 - [ ] Core {topic} implementation
-- [ ] {topic} dependencies / callers (medium: up to 3 callers per Caller prioritization; thorough: all direct; very-thorough: transitive)
-- [ ] Config, tests (thorough and very-thorough only)
+- [ ] Write core findings to research file
+- [ ] {topic} dependencies / callers
+- [ ] Write dependency findings to research file
 - [ ] (expand as discoveries reveal new areas)
+- [ ] (expand: write-to-file after each new area)
+- [ ] Refresh context: read full research file
 - [ ] Compile output
 ```
+
+**Critical memento todos** (never skip):
+- `Write {X} findings to research file` - after EACH exploration area
+- `Refresh context: read full research file` - ALWAYS before compile output
 
 ### 1.2 Create research file (skip for quick)
 
@@ -143,22 +180,30 @@ Query: "Find files related to authentication"
 
 Initial:
 ```
+- [ ] Create research file
 - [ ] Core auth implementation
-- [ ] Auth dependencies
-- [ ] Auth callers
-- [ ] Auth config and tests
+- [ ] Write core findings to research file
+- [ ] Auth dependencies / callers
+- [ ] Write dependency findings to research file
+- [ ] (expand as discoveries reveal new areas)
+- [ ] Refresh context: read full research file
 - [ ] Compile final output
 ```
 
 After exploring core auth (discovered JWT, Redis sessions, OAuth):
 ```
+- [x] Create research file
 - [x] Core auth implementation → AuthService, middleware/auth.ts
-- [ ] Auth dependencies
-- [ ] Auth callers
-- [ ] Auth config and tests
+- [x] Write core findings to research file
+- [ ] Auth dependencies / callers
+- [ ] Write dependency findings to research file
 - [ ] JWT token handling
+- [ ] Write JWT findings to research file
 - [ ] Redis session storage
+- [ ] Write Redis findings to research file
 - [ ] OAuth providers
+- [ ] Write OAuth findings to research file
+- [ ] Refresh context: read full research file
 - [ ] Compile final output
 ```
 
@@ -173,11 +218,18 @@ Finished: {YYYYMMDD-HHMMSS} | Files: {count} | Search calls: {count}
 {1-3 sentences: what areas were explored and key relationships found}
 ```
 
-### 3.2 Refresh context
+### 3.2 Refresh context (MANDATORY)
 
-Read the full research file to restore all findings, file discoveries, and relationships into context before generating the output.
+**CRITICAL**: Complete the "Refresh context: read full research file" todo by reading the FULL research file using the Read tool. This restores ALL findings into context before generating output.
 
-### 3.3 Generate structured output
+```
+- [x] Refresh context: read full research file  ← Must complete BEFORE compile output
+- [ ] Compile output
+```
+
+**Why this matters**: By this point, findings from earlier exploration areas have degraded due to context rot. The research file contains ALL discoveries. Reading it immediately before output moves everything into recent context where attention is strongest.
+
+### 3.3 Generate structured output (only after 3.2)
 
 ```
 ## OVERVIEW
@@ -199,6 +251,9 @@ SHOULD READ:
 
 REFERENCE:
 - path/types.ext - [brief reason (<80 chars)]
+
+## OUT OF SCOPE (if boundaries were provided)
+- {file/area}: {why relevant} → excluded because: {which boundary}
 ```
 
 ### 3.4 Mark all todos complete
@@ -265,22 +320,38 @@ Overview = **dense map of the topic area**, not diagnosis or codebase tour.
 
 | Principle | Rule |
 |-----------|------|
+| Scope-adherent | Stay within assigned scope; note out-of-scope discoveries without pursuing |
+| Todos with write-to-log | Each exploration area gets a write-to-research-file todo |
 | Memento style | Write findings BEFORE next search (research file = external memory) |
-| Todo-driven | Every new area discovered → new todo (no mental notes) |
+| Todo-driven | Every new area discovered → new todo + write-to-file todo (no mental notes) |
 | Depth by level | Stop at level-appropriate depth (medium: first-level deps + up to 3 callers; thorough: all direct callers+tests+config; very-thorough: transitive, up to 100 files) |
-| Incremental | Update research file after EACH search step (not at end) |
-| Compress last | Output only after all todos completed |
+| Incremental | Update research file after EACH exploration area (not at end) |
+| **Context refresh** | **Read full research file BEFORE compile output - non-negotiable** |
+| Compress last | Output only after all todos completed including refresh |
+
+**Memento Pattern Summary**:
+1. Create research file at start
+2. Add write-to-file todos after each exploration area
+3. Write findings after EVERY area before moving to next
+4. "Refresh context: read full research file" todo before compile
+5. Read FULL file before generating output (restores all context)
 
 ## Never Do
 
-- Proceed without writing findings to research file
+- Explore areas in "DO NOT EXPLORE" section (other agents handle those)
+- Skip write-to-file todos (every area completion must be written)
+- Compile output without completing "Refresh context" todo first
 - Keep discoveries as mental notes instead of todos
 - Skip todo list (except quick mode)
 - Generate output before all todos completed
-- Forget to add todos for newly discovered areas
+- Forget to add write-to-file todo for newly discovered areas
 
 ## Final Checklist
 
+- [ ] Scope boundaries respected (if provided)
+- [ ] Out-of-scope discoveries noted (if any)
+- [ ] Write-to-file todos completed after each exploration area
+- [ ] "Refresh context: read full research file" completed before output
 - [ ] All todos completed (no pending items)
 - [ ] Research file complete (incremental findings after each step)
 - [ ] Depth appropriate (medium stops at first-level deps + 3 callers; thorough includes all direct callers+tests+config; very-thorough transitive up to 100 files)

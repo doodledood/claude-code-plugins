@@ -23,18 +23,20 @@ class TranscriptState:
 # Session reminder strings
 CODEBASE_EXPLORER_REMINDER = (
     "When you need to find relevant files for a task - whether for answering questions, "
-    "planning implementation, debugging, or onboarding - prefer using the `codebase-explorer` agent "
-    "(subagent_type: vibe-workflow:codebase-explorer) instead of the built-in Explore agent. "
-    "It returns a structural overview + prioritized file list with precise line ranges, so you "
-    "understand how files relate and read exactly what matters."
+    "planning implementation, debugging, or onboarding - prefer using the `explore-codebase` skill "
+    '(Skill("vibe-workflow:explore-codebase", "your query")) instead of the built-in Explore agent. '
+    "It returns a structural overview + prioritized file list with precise line ranges. For thorough+ "
+    "queries, it automatically launches parallel agents to explore orthogonal angles (implementation, "
+    "usage, tests, config) and synthesizes a comprehensive reading list."
 )
 
 WEB_RESEARCHER_REMINDER = (
     "For non-trivial web research tasks - technology comparisons, best practices, API documentation, "
     "library evaluations, or any question requiring synthesis of multiple sources - prefer using "
-    "the `web-researcher` agent (subagent_type: vibe-workflow:web-researcher) instead of calling "
-    "WebSearch directly. It uses structured hypothesis tracking to systematically gather and "
-    "synthesize web-based evidence, producing higher-quality research output."
+    'the `research-web` skill (Skill("vibe-workflow:research-web", "your query")) instead of calling '
+    "WebSearch directly. For thorough+ queries, it launches parallel investigators across orthogonal "
+    "facets, continues waves until satisficed, and synthesizes findings with confidence levels and "
+    "source citations."
 )
 
 
