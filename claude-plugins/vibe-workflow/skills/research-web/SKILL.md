@@ -137,16 +137,25 @@ Todos = **research areas to investigate + memento operations**, not fixed steps.
 - `Write {X} to orchestration file` - after EACH phase/agent completion
 - `Refresh context: read full orchestration file` - ALWAYS before synthesis
 
-**Expansion pattern**: As decomposition reveals facets, add specific research todos:
+**Expansion pattern**: As decomposition reveals facets, add specific research todos with write-to-log after each collection:
 ```
+- [x] Create orchestration file
 - [x] Topic decomposition & research planning
 - [x] Write decomposition to orchestration file
 - [ ] Research: Real-time database landscape 2025
 - [ ] Research: Performance benchmarks
 - [ ] Research: Conflict resolution strategies
 - [ ] Research: Production case studies
-- [ ] Launch Wave 1 agents
-...
+- [ ] Launch Wave 1 agents (4 parallel)
+- [ ] Collect Agent 1 findings → write to orchestration file
+- [ ] Collect Agent 2 findings → write to orchestration file
+- [ ] Collect Agent 3 findings → write to orchestration file
+- [ ] Collect Agent 4 findings → write to orchestration file
+- [ ] Cross-reference all findings → write analysis to orchestration file
+- [ ] Evaluate gaps → write gap evaluation to orchestration file
+- [ ] (if continuing: Wave 2 research todos with write-to-log)
+- [ ] Refresh context: read full orchestration file
+- [ ] Synthesize final output
 ```
 
 ### 1.2 Create orchestration file (skip for quick)
@@ -596,7 +605,7 @@ For quick (single-fact) queries, skip orchestration:
 | Principle | Rule |
 |-----------|------|
 | Thoroughness first | Determine level before any research |
-| Todos with expansion | Start with seed todos, expand as research reveals facets |
+| Todos with write-to-log | Each collection gets a todo, followed by a write-to-orchestration-file todo |
 | Memento writes | Write to orchestration file after EACH phase/agent - external memory |
 | Parallel execution | Launch multiple agents simultaneously when possible |
 | Cross-reference | Compare findings across agents before synthesizing |
@@ -608,14 +617,17 @@ For quick (single-fact) queries, skip orchestration:
 
 **Memento Pattern Summary**:
 1. Create orchestration file at start
-2. Write to it after EVERY step (decomposition, agent findings, cross-reference, gap evaluation)
-3. Read FULL file before synthesis (restores all context)
+2. Add write-to-log todos after each collection phase
+3. Write to it after EVERY step (decomposition, agent findings, cross-reference, gap evaluation)
+4. "Refresh context: read full orchestration file" todo before synthesis
+5. Read FULL file before synthesis (restores all context)
 
 ## Never Do
 
 - Launch agents without determining thoroughness level
+- Skip write-to-log todos (every collection must be followed by a write todo)
 - Proceed to next phase without writing findings to orchestration file
-- Proceed to synthesis without reading full orchestration file first
+- Synthesize without completing "Refresh context: read full orchestration file" todo first
 - Skip orchestration file updates after agent completions
 - Present synthesized findings without source citations
 - Ignore conflicts between agent findings (especially "Contested" findings)
