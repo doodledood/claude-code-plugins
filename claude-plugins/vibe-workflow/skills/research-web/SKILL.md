@@ -1,6 +1,6 @@
 ---
 name: research-web
-description: 'Deep web research with parallel investigators, multi-wave exploration, and structured synthesis. Spawns multiple web-researcher agents to explore different facets of a topic simultaneously, launches additional waves when gaps are identified, then synthesizes findings. Use when asked to research, investigate, compare options, find best practices, or gather comprehensive information from the web.\n\nThoroughness: quick for factual lookups | medium for focused topics | thorough for comparisons/evaluations (up to 2 waves) | very-thorough for comprehensive research (up to 4 waves until satisficed). Auto-selects if not specified.'
+description: 'Deep web research with parallel investigators, multi-wave exploration, and structured synthesis. Spawns multiple web-researcher agents to explore different facets of a topic simultaneously, launches additional waves when gaps are identified, then synthesizes findings. Use when asked to research, investigate, compare options, find best practices, or gather comprehensive information from the web.\n\nThoroughness: quick for factual lookups | medium for focused topics | thorough for comparisons/evaluations (waves continue while critical gaps remain) | very-thorough for comprehensive research (waves continue until satisficed). Auto-selects if not specified.'
 context: fork
 ---
 
@@ -16,7 +16,9 @@ context: fork
 - Comparison, evaluation, or "best" questions → thorough
 - "comprehensive"/"all options"/"complete analysis"/"deep dive" → very-thorough
 
-**Trigger conflicts**: When query contains triggers from multiple levels, use the highest level indicated (very-thorough > thorough > medium > quick).
+**Explicit user preference**: If user explicitly specifies a thoroughness level (e.g., "do a quick lookup", "thorough research on X"), honor that request regardless of other triggers in the query.
+
+**Trigger conflicts (auto-selection only)**: When auto-selecting and query contains triggers from multiple levels, use the highest level indicated (very-thorough > thorough > medium > quick).
 
 | Level | Agents/Wave | Wave Policy | Behavior | Triggers |
 |-------|-------------|-------------|----------|----------|
@@ -62,10 +64,12 @@ Research continues in waves until satisficing criteria are met for the given tho
 |-------|---------------|------------------------|
 | quick | N/A | Always single wave |
 | medium | N/A | Always single wave |
-| thorough | Critical gaps remain AND previous wave was productive | No critical gaps OR diminishing returns |
-| very-thorough | Significant gaps remain AND previous wave was productive | Comprehensive coverage (no significant gaps) OR diminishing returns |
+| thorough | Critical gaps remain AND previous wave was productive AND ≤50% source overlap with prior waves | No critical gaps OR diminishing returns OR >50% source overlap |
+| very-thorough | Significant gaps remain AND previous wave was productive AND ≤50% source overlap with prior waves | Comprehensive coverage (no significant gaps) OR diminishing returns OR >50% source overlap |
 
 **No hard maximum**: For thorough and very-thorough, waves continue based on necessity, not arbitrary limits. The satisficing criteria drive when to stop.
+
+**Source overlap**: Percentage of sources in current wave that were also cited in any previous wave. >50% overlap indicates research is cycling through same sources.
 
 ## Gap Classification
 
@@ -81,9 +85,19 @@ After each wave, classify identified gaps:
 
 After Phase 4 (Cross-Reference), evaluate whether to continue:
 
+**Definitions**:
+- **Finding**: A distinct piece of information answering part of the research question, with at least one source citation. Multiple sources confirming the same fact count as one finding with higher confidence.
+- **Substantive finding**: A finding that provides new information not already established in previous waves. Variations or restatements of known information do not count.
+- **High-authority source**: Official documentation, peer-reviewed research, established news outlets (e.g., major tech publications), or sources from recognized domain experts. Company blogs about their own products count as high-authority for factual claims about that product.
+- **Independent sources**: Sources with different underlying information origins. Two articles citing the same primary source count as one source. Multiple pages from the same domain count as one source unless they represent different authors/teams with distinct research.
+- **High confidence**: Finding corroborated by ≥3 independent sources OR ≥2 high-authority sources.
+- **Medium confidence**: Finding corroborated by 2 independent sources OR 1 high-authority source.
+- **Low confidence**: Finding from a single non-authoritative source with no corroboration.
+- **Medium+ confidence**: Confidence level of Medium or High (i.e., not Low, Contested, or Inconclusive).
+
 **Satisficed when ANY true**:
 - All critical gaps addressed (thorough) OR all significant gaps addressed (very-thorough)
-- Diminishing returns detected: new wave revealed <2 new substantive findings AND confidence levels unchanged
+- Diminishing returns detected: new wave revealed <2 new substantive findings AND no finding's confidence increased by at least one level AND no new areas discovered
 - User explicitly requested stopping or a specific wave count
 - Comprehensive coverage achieved: all identified facets addressed with medium+ confidence
 
@@ -91,8 +105,8 @@ After Phase 4 (Cross-Reference), evaluate whether to continue:
 - Gaps exist at the triggering threshold:
   - thorough: Critical gaps remain (core question unanswered, major conflicts)
   - very-thorough: Significant gaps remain (important facets unexplored, conflicts, newly discovered areas)
-- Previous wave was productive (≥2 new findings OR confidence improved OR new areas discovered)
-- Research is still yielding value (not cycling through same sources)
+- Previous wave was productive (≥2 new substantive findings OR ≥1 finding's confidence increased by at least one level OR new areas discovered)
+- Research is still yielding value (≤50% of sources in this wave were cited in previous waves)
 
 ## Wave Planning
 
@@ -104,7 +118,7 @@ When continuing to a new wave:
 5. Launch agents and collect findings
 6. Return to gap evaluation
 
-**Topic-slug format**: Extract 2-4 key terms from query, lowercase, replace spaces with hyphens. Example: "best real-time database options 2025" → `real-time-database-options`
+**Topic-slug format**: Extract 2-4 key terms (nouns and adjectives that identify the topic; exclude articles, prepositions, and generic words like "best", "options", "analysis"), lowercase, replace spaces with hyphens. Example: "best real-time database options 2025" → `real-time-database-options`
 
 **Timestamp format**: `YYYYMMDD-HHMMSS`. Obtain via `date +%Y%m%d-%H%M%S`.
 
@@ -112,7 +126,9 @@ When continuing to a new wave:
 
 ### 1.1 Get timestamp & create todo list
 
-Run `date '+%Y-%m-%d %H%M%S'` to get current date and timestamp.
+Run two commands:
+- `date +%Y%m%d-%H%M%S` → for filename timestamp (e.g., `20260112-060615`)
+- `date '+%Y-%m-%d %H:%M:%S'` → for human-readable "Started" field (e.g., `2026-01-12 06:06:15`)
 
 Todos = **research areas to investigate + memento operations**, not fixed steps. Each research todo represents a distinct angle or facet. List expands as decomposition reveals new areas. Memento todos ensure external memory stays current.
 
@@ -240,6 +256,11 @@ Before launching agents, analyze the query to identify **non-overlapping** resea
 - thorough: 2-4 agents (core + alternatives + practical + concerns)
 - very-thorough: 4-6 agents (comprehensive coverage of all facets)
 
+**If decomposition reveals more facets than agent count allows**:
+- Prioritize facets by: (1) directly answers core question, (2) enables comparison if requested, (3) addresses user-specified concerns
+- Combine related facets into single agent assignments where orthogonality allows
+- Schedule remaining facets for Wave 2 if initial wave is productive
+
 **Orthogonality strategies**:
 - By entity: Agent 1 = Product A, Agent 2 = Product B (not both "products")
 - By dimension: Agent 1 = Performance, Agent 2 = Pricing, Agent 3 = Security
@@ -338,7 +359,7 @@ Research context:
 
 **Batching rules**:
 - thorough: Launch all 2-4 agents in a single parallel batch
-- very-thorough: Launch in batches of 3-4 agents (avoid overwhelming context)
+- very-thorough: Launch in batches of 3-4 agents; for 5 agents use 3+2, for 6 agents use 3+3 (avoid overwhelming context)
 - Wave 2+: Launch 1-3 focused agents per wave
 
 ### 3.2 Update orchestration file after each agent completes
@@ -371,8 +392,14 @@ After EACH agent returns, immediately update:
 
 If an agent times out or returns incomplete results:
 1. Note the gap in orchestration file
-2. Decide: retry with narrower prompt, or mark as gap in final output
-3. Never block synthesis for a single failed agent
+2. Decide based on facet criticality:
+   - **Retry** (narrower prompt) if: facet covers a Critical gap for the research question, OR facet is explicitly required by the research question for comparison/evaluation (e.g., query asks to compare X and Y, and facet covers X or Y), OR user explicitly requested this facet
+   - **Mark as gap** (don't retry) if: facet covers a Significant or Minor gap, OR other agents partially covered the topic, OR research can synthesize without this facet
+3. Never block synthesis for a single failed agent - proceed with available findings and note the limitation
+4. If ALL agents in a wave fail:
+   - For Wave 1: Retry with simpler decomposition (fewer agents, broader prompts)
+   - For Wave 2+: Mark gaps as unresolvable, proceed to synthesis with prior wave findings
+   - Always note the systemic failure in Gaps & Limitations
 
 ## Phase 4: Collect, Cross-Reference & Evaluate Gaps
 
@@ -461,7 +488,7 @@ Look for:
 **If SATISFICED** (any of these true):
 - Level is quick or medium → Proceed to Phase 5
 - No critical gaps (thorough) or no significant gaps (very-thorough) → Proceed to Phase 5
-- Diminishing returns: previous wave yielded <2 new findings AND confidence unchanged AND no new areas discovered → Proceed to Phase 5
+- Diminishing returns: previous wave yielded <2 new substantive findings AND no finding's confidence increased by at least one level AND no new areas discovered → Proceed to Phase 5
 - Comprehensive coverage achieved: all identified facets addressed with medium+ confidence → Proceed to Phase 5
 - User explicitly requested stopping
 
@@ -469,8 +496,8 @@ Look for:
 - Gaps exist at triggering threshold:
   - thorough: Critical gaps remain
   - very-thorough: Significant gaps remain
-- Previous wave was productive (≥2 new findings OR confidence improved OR new areas discovered)
-- Not cycling through same sources (research is yielding new information)
+- Previous wave was productive (≥2 new substantive findings OR ≥1 finding's confidence increased by at least one level OR new areas discovered)
+- Not cycling through same sources (≤50% of sources in this wave were cited in previous waves)
 
 ### 4.6 Launch Next Wave (if continuing)
 
