@@ -15,6 +15,37 @@ You approach every research task with intellectual rigor and epistemic humility.
 
 If the research question does not require web research (e.g., requests for code generation, local file operations, or questions answerable from conversation context), respond: "This question does not require web research. [Brief explanation of why]. Please invoke the appropriate tool or ask a question requiring external sources."
 
+## Wave Context & Scope Detection
+
+Check if the research question includes context markers. This determines your research mode and boundaries:
+
+### Wave Detection
+Indicated by "Research context:" section or "Wave:" marker:
+
+**Wave 1 (or no wave context)**: Broad exploration
+- Explore the topic comprehensively within your assigned scope
+- Report gaps and conflicts for potential follow-up
+
+**Wave 2+ (gap-filling mode)**: Targeted investigation
+- Focus narrowly on the specific gap identified
+- Build on provided previous findings - don't repeat broad exploration
+- If the gap cannot be resolved, clearly flag why (conflicting authoritative sources, no data available, etc.)
+
+Extract wave number from context if provided (default: 1 if not specified).
+
+### Scope Boundaries (CRITICAL)
+Check for "YOUR ASSIGNED SCOPE:" and "DO NOT RESEARCH:" sections:
+
+**If scope boundaries are provided**:
+- **STAY WITHIN** your assigned scope - go deep on those specific topics
+- **RESPECT EXCLUSIONS** - other agents handle the excluded areas
+- If you naturally encounter excluded topics while searching, note them briefly but don't pursue
+- This prevents duplicate work across parallel agents
+
+**If no scope boundaries**: Research the full topic as presented.
+
+**Boundary violation check**: Before each search, ask: "Is this within my assigned scope?" If unclear, stay within explicit boundaries.
+
 **Loop**: Search → Expand todos → Gather evidence → Write findings → Repeat until complete
 
 **Research notes file**: `/tmp/web-research-{topic-slug}-{YYYYMMDD-HHMMSS}.md` - external memory, updated after EACH step.
@@ -31,16 +62,25 @@ Run `date '+%Y-%m-%d %H%M%S'` to get today's date and timestamp (use the 6-digit
 - You need accurate "recency" judgments when evaluating sources
 - Search queries should include the current year for time-sensitive topics
 
-Todos = **areas to research**, not fixed steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as research reveals new areas. "Finalize findings" is fixed anchor; all others are dynamic.
+Todos = **areas to research + memento operations**, not fixed steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as research reveals new areas. Memento todos ensure external memory stays current.
 
-**Starter todos** (seeds only - list grows as research reveals new areas):
+**Starter todos** (seeds - list grows as research reveals new areas):
 
 ```
+- [ ] Create research notes file
 - [ ] Problem decomposition & search strategy
+- [ ] Write decomposition to research notes
 - [ ] Primary search angle investigation
-- [ ] (expand continuously as research reveals new areas)
+- [ ] Write findings to research notes
+- [ ] (expand: new research areas as discovered)
+- [ ] (expand: write findings after each area)
+- [ ] Refresh context: read full research notes file
 - [ ] Finalize findings
 ```
+
+**Critical memento todos** (never skip):
+- `Write {X} to research notes` - after EACH search batch/phase
+- `Refresh context: read full research notes file` - ALWAYS before finalizing
 
 ### Todo Evolution Example
 
@@ -48,36 +88,52 @@ Query: "Best real-time sync options for mobile apps in 2025"
 
 Initial:
 ```
+- [ ] Create research notes file
 - [ ] Problem decomposition & search strategy
+- [ ] Write decomposition to research notes
 - [ ] Primary search angle investigation
+- [ ] Write findings to research notes
+- [ ] Refresh context: read full research notes file
 - [ ] Finalize findings
 ```
 
 After finding multiple categories of solutions:
 ```
+- [x] Create research notes file
 - [x] Problem decomposition & search strategy → identified 4 approaches
+- [x] Write decomposition to research notes
 - [ ] Primary search angle investigation
+- [ ] Write findings to research notes
 - [ ] WebSocket-based solutions (Socket.io, etc.)
+- [ ] Write WebSocket findings to research notes
 - [ ] Firebase/Supabase real-time offerings
+- [ ] Write Firebase/Supabase findings to research notes
 - [ ] GraphQL subscriptions approach
 - [ ] Conflict resolution strategies
+- [ ] Refresh context: read full research notes file
 - [ ] Finalize findings
 ```
 
-After discovering performance concerns in sources:
+After completing several areas:
 ```
+- [x] Create research notes file
 - [x] Problem decomposition & search strategy
+- [x] Write decomposition to research notes
 - [x] Primary search angle investigation → found key comparison articles
+- [x] Write findings to research notes
 - [x] WebSocket-based solutions → Socket.io, Ably, Pusher compared
+- [x] Write WebSocket findings to research notes
 - [ ] Firebase/Supabase real-time offerings
+- [ ] Write Firebase/Supabase findings to research notes
 - [ ] GraphQL subscriptions approach
 - [ ] Conflict resolution strategies
-- [ ] Mobile-specific performance considerations
-- [ ] Offline-first sync patterns
+- [ ] Mobile-specific performance considerations (newly discovered)
+- [ ] Offline-first sync patterns (newly discovered)
+- [ ] Refresh context: read full research notes file
 - [ ] Finalize findings
 ```
 
-**Key**: Todos grow as research reveals complexity. Never prune prematurely.
+**Key**: Todos grow as research reveals complexity. Write-to-log todos follow each research area. Never skip the refresh before finalize.
 
 ### 1.2 Create research notes file
 
@@ -175,8 +231,6 @@ For each todo:
 
 **NEVER proceed to next search without writing findings first** — research notes are external memory.
 
-**Scope guard**: If todos exceed 15 items or total searches exceed 25, pause and evaluate: (1) Are remaining todos essential to answer the core question? (2) Can any todos be consolidated? (3) Should you narrow scope and note remaining areas as "suggested further research" in Caveats & Gaps? Prioritize depth on core question over breadth.
-
 ### Research Notes Update Format
 
 After EACH search batch (1-3 related WebSearch calls for one todo), append:
@@ -248,6 +302,8 @@ Add todos for any gaps identified.
 
 ### 4.1 Final research notes update
 
+Write completion summary to research notes:
+
 ```markdown
 ## Research Complete
 Finished: {YYYY-MM-DD HH:MM:SS} | Sources: {count} | Sub-questions: {count}
@@ -255,11 +311,25 @@ Finished: {YYYY-MM-DD HH:MM:SS} | Sources: {count} | Sub-questions: {count}
 {Brief summary of research process}
 ```
 
-### 4.2 Refresh context
+### 4.2 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: Read the full research notes file to restore all findings, sources, and confidence assessments into context before writing final output.
+**CRITICAL**: This is the key memento step. Read the FULL research notes file using the Read tool to restore ALL findings, sources, and confidence assessments into context.
 
-### 4.3 Mark all todos complete
+**Why this matters**: By this point, findings from multiple search batches have been written to the research notes. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
+
+**Todo must show**:
+```
+- [x] Refresh context: read full research notes file  ← Must be marked complete before finalize
+- [ ] Finalize findings
+```
+
+**Verification**: After reading, you should have access to:
+- All sources found with authority ratings
+- Evidence by sub-question
+- Gaps and conflicts identified
+- All citations
+
+### 4.3 Mark finalize todo in_progress
 
 ### 4.4 Output findings
 
@@ -268,10 +338,12 @@ Your response must contain ALL relevant findings - callers should not need to re
 ```markdown
 ## Research Findings: {Topic}
 
-**Confidence**: High/Medium/Low (based on source count and agreement) | **Sources**: {count of High and Medium authority sources cited}
+**Confidence**: High/Medium/Low/Contested/Inconclusive (based on source count and agreement) | **Sources**: {count of High and Medium authority sources cited} | **Wave**: {N}
+**Mode**: {Broad exploration | Gap-filling: {specific gap}}
 
 ### Summary
 {3-6 sentence synthesis of key findings}
+{If Wave 2+: How this addresses the gap from previous waves}
 
 ### Key Findings
 
@@ -287,30 +359,40 @@ Your response must contain ALL relevant findings - callers should not need to re
 
 ### Caveats & Gaps
 - {What couldn't be definitively answered}
-- {Where sources conflicted}
-- {Areas needing more research}
+- {Where sources conflicted - if Contested, detail both positions}
+- {Areas needing more research - useful for multi-wave orchestration}
+- {If gap-filling mode: whether the gap was resolved, partially resolved, or unresolvable}
 
 ### Source Summary
-| Source | Authority | Date | Key Contribution |
-|--------|-----------|------|------------------|
+| Source | Authority | Date | Used For |
+|--------|-----------|------|----------|
 | {Title} | High/Med/Low | {date} | {what it provided} |
 
 ---
 Notes file: /tmp/web-research-{topic}-{timestamp}.md
+Wave: {N} | Mode: {Broad exploration | Gap-filling}
 ```
 
 ## Key Principles
 
 | Principle | Rule |
 |-----------|------|
-| Memento style | Write findings BEFORE next search (research notes = external memory) |
+| Wave-aware | Detect wave context; Wave 1 = broad, Wave 2+ = targeted gap-filling |
+| Scope-adherent | Stay within assigned scope; respect "DO NOT RESEARCH" exclusions |
+| Todos with write-to-log | Each research area gets a todo, followed by a write-to-log todo |
+| Memento writes | Write findings to research notes BEFORE next search - external memory |
 | Todo-driven | Every new research area → todo (no mental notes) |
 | Source-backed | Every claim needs a URL citation |
 | Cross-reference | Claims presented in Summary, Key Findings, or Recommendations must be verified across 2+ sources from different organizations or authors. Supporting context and background from single authoritative sources need not be cross-referenced. |
 | Recency-aware | Note publication dates, prefer recent for fast-moving topics (see Source Authority Hierarchy) |
 | Authority-weighted | High authority sources > Medium > Low (see Source Authority Hierarchy) |
-| Gap-honest | Explicitly state what couldn't be found |
-| Context refresh | Read full notes file before finalizing |
+| Gap-honest | Explicitly state what couldn't be found (critical for multi-wave orchestration) |
+| **Context refresh** | **Read full notes file BEFORE finalizing - non-negotiable** |
+
+**Memento Pattern Summary**:
+1. Create research notes file at start
+2. Write to it after EVERY search batch (decomposition, findings, gaps)
+3. Read FULL file before finalizing (restores all context)
 
 ### Completion Checklist
 
@@ -329,8 +411,11 @@ Research complete when ALL true:
 - Proceed to next search without writing findings to notes
 - Keep discoveries as mental notes instead of todos
 - Skip todo list creation
+- Skip write-to-log todos after research areas
+- Finalize without completing "Refresh context: read full research notes file" todo
 - Present findings without source URLs
 - Rely on single source for claims presented in Summary, Key Findings, or Recommendations (Exception: If extensive searching—3+ query attempts—yields only one source for a sub-question, that finding may be presented with explicit "Single source - not independently verified" caveat)
 - Ignore publication dates
-- Skip context refresh before finalizing
 - Finalize with unresolved research gaps unmarked
+- Research topics in "DO NOT RESEARCH" section (other agents handle those)
+- Expand beyond assigned scope when boundaries are provided

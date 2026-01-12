@@ -134,20 +134,89 @@ Examples:
 
 ### Memento Pattern for Non-Trivial Workflows
 
-Skills and agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`):
+Skills and agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`).
 
-| Step | What | Why (Limitation Addressed) |
-|------|------|---------------------------|
-| **Create todo list immediately** | TodoWrite with areas to discover, not fixed steps | Externalizes state beyond working memory limits (5-10 variables max) |
-| **Include expansion placeholder** | e.g., `- [ ] (expand as discovery reveals new areas)` | Prevents premature "declaring done"—agents mark features complete without verification |
-| **External memory file** | Log file in `/tmp/` updated after EACH step | Counters context window degradation—findings persist outside conversation where they'd be "lost in the middle" |
-| **Never proceed without writing findings** | Log is external memory | Working memory limits mean unwritten findings are forgotten within steps |
-| **Expand todos dynamically** | As user answers or research reveals new areas | Prevents "going off rails"—explicit tracking keeps agent aligned with evolving goals |
-| **Refresh context before finalizing** | Read full log file before writing final output | **Key insight**: Converts holistic synthesis (poor LLM performance) into concentrated recent context (high attention). All findings move to context end where attention is strongest, enabling quality synthesis |
+#### Why: The LLM Limitations
 
-The refresh step is critical: LLMs struggle with holistic tasks across long contexts (<50% accuracy at 32K tokens) but excel at processing recently-read information. Reading the full log immediately before output transforms a scattered, degraded context into dense, high-attention input.
+| Limitation | Research Finding | Pattern Response |
+|------------|------------------|------------------|
+| **Context rot** | Information in the middle of context gets "lost"—U-shaped attention curve with >20% accuracy degradation for middle-positioned content | Write findings to external file after EACH step; file persists where conversation content degrades |
+| **Working memory** | LLMs reliably track only 5-10 variables; beyond this, state management fails | TodoWrite externalizes all tracked areas; each todo = one "variable" in external memory |
+| **Holistic synthesis failure** | <50% accuracy on synthesis tasks at 32K tokens; models excel at needle retrieval but fail at aggregation across full context | Read full log file BEFORE synthesis—converts degraded scattered context into concentrated recent content |
+| **Recency bias** | Models pay highest attention to content at context end | Refresh step moves ALL findings to context end where attention is strongest |
+| **Premature completion** | Agents mark tasks "done" without verification; later instances see partial progress and "declare the job done" | Expansion placeholders signal incompleteness; explicit write-to-log todos ensure nothing is skipped |
 
-See `vibe-workflow/skills/spec/SKILL.md` or `vibe-workflow/skills/plan/SKILL.md` for reference implementations.
+#### The Pattern: Full Specification
+
+**1. Create todo list immediately** with areas to discover, not fixed steps:
+
+```
+- [ ] Create log file
+- [ ] Initial decomposition & planning
+- [ ] Write decomposition to log file
+- [ ] Primary investigation area
+- [ ] Write findings to log file
+- [ ] (expand: new areas as discovered)
+- [ ] (expand: write findings after each area)
+- [ ] Refresh context: read full log file    ← CRITICAL: never skip
+- [ ] Finalize output
+```
+
+**2. Embed write-to-log todos after each collection phase**:
+
+```
+- [x] Research: Feature A
+- [x] Write Feature A findings to log file     ← Immediately after research
+- [x] Research: Feature B
+- [x] Write Feature B findings to log file     ← Never batch writes
+- [ ] Research: Feature C
+- [ ] Write Feature C findings to log file
+```
+
+**3. Expand todos dynamically** as work reveals new areas:
+
+```
+Before:
+- [ ] Primary research area
+- [ ] (expand: new areas as discovered)
+
+After:
+- [x] Primary research area → discovered 3 sub-areas
+- [ ] Sub-area A investigation
+- [ ] Write Sub-area A findings to log file
+- [ ] Sub-area B investigation
+- [ ] Write Sub-area B findings to log file
+- [ ] Sub-area C investigation
+- [ ] Write Sub-area C findings to log file
+- [ ] (expand: any additional areas)
+```
+
+**4. Refresh context BEFORE synthesis** (non-negotiable):
+
+```
+- [x] Write final investigation findings to log file
+- [x] Refresh context: read full log file    ← Must complete BEFORE finalize
+- [ ] Finalize output
+```
+
+**Why the refresh step is critical**: By the synthesis phase, earlier findings have degraded due to context rot. The log file contains ALL findings written throughout the workflow. Reading the full file immediately before output:
+- Moves all findings to context END (highest attention zone)
+- Converts holistic synthesis (poor LLM performance) into dense recent context (high LLM performance)
+- Restores details that would otherwise be "lost in the middle"
+
+#### Quick Reference
+
+| Phase | Action | Why |
+|-------|--------|-----|
+| Start | Create log file + todos with expansion placeholders | External memory + signals incompleteness |
+| Each step | Write findings to log file before proceeding | Persists findings beyond working memory |
+| Discovery | Expand todos with new areas + write-to-log todos | Tracks emerging scope, ensures no skipped writes |
+| Before synthesis | Read FULL log file | Restores all context to high-attention zone |
+| End | Mark all todos complete | Verification that pattern was followed |
+
+**Never skip**: The write-to-log and refresh-before-finalize steps. These are the core mechanism that makes synthesis work despite context rot.
+
+See `vibe-workflow/skills/spec/SKILL.md`, `vibe-workflow/skills/plan/SKILL.md`, or `vibe-workflow/skills/research-web/SKILL.md` for reference implementations.
 
 See each plugin's README for architecture details.
 
