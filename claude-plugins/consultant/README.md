@@ -11,8 +11,9 @@ Different models have different strengths. Sometimes you want a second opinion o
 - `/review` - PR review with severity-tagged findings
 - `/analyze-code` - Architectural and security analysis
 - `/investigate-bug` - Root cause analysis
-- `/ask` - Single-model consultation (defaults to gpt-5.2-pro)
-- `/ask-counsil` - Multi-model ensemble (3 models in parallel)
+- `/ask` - Single-model consultation
+- `/ask-council` - Multi-model ensemble (3 models in parallel)
+- `consultant` - Direct consultation skill (auto-invoked)
 
 ## Requirements
 
