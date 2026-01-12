@@ -88,18 +88,18 @@ class TestPostCompactHookSessionReminders:
     """Tests for standard session reminders (always included)."""
 
     def test_contains_codebase_explorer_reminder(self):
-        """Should always include codebase-explorer reminder."""
+        """Should always include explore-codebase reminder."""
         result = run_post_compact_hook()
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "codebase-explorer" in context
+        assert "explore-codebase" in context
 
     def test_contains_web_researcher_reminder(self):
-        """Should always include web-researcher reminder."""
+        """Should always include research-web reminder."""
         result = run_post_compact_hook()
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "web-researcher" in context
+        assert "research-web" in context
 
     def test_reminders_wrapped_in_system_reminder_tags(self):
         """Reminders should be wrapped in system-reminder tags."""
@@ -114,8 +114,8 @@ class TestPostCompactHookSessionReminders:
         result = run_post_compact_hook(transcript_path="")
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "codebase-explorer" in context
-        assert "web-researcher" in context
+        assert "explore-codebase" in context
+        assert "research-web" in context
 
 
 class TestPostCompactHookImplementRecovery:
@@ -323,7 +323,7 @@ class TestPostCompactHookEdgeCases:
         assert result.returncode == 0
         # Should still output session reminders
         output = json.loads(result.stdout)
-        assert "codebase-explorer" in output["hookSpecificOutput"]["additionalContext"]
+        assert "explore-codebase" in output["hookSpecificOutput"]["additionalContext"]
 
     def test_handles_empty_stdin(self):
         """Should handle empty stdin gracefully."""
@@ -337,7 +337,7 @@ class TestPostCompactHookEdgeCases:
         assert result.returncode == 0
         # Should still output session reminders
         output = json.loads(result.stdout)
-        assert "codebase-explorer" in output["hookSpecificOutput"]["additionalContext"]
+        assert "explore-codebase" in output["hookSpecificOutput"]["additionalContext"]
 
     def test_handles_nonexistent_transcript(self):
         """Should handle nonexistent transcript path gracefully."""
@@ -346,7 +346,7 @@ class TestPostCompactHookEdgeCases:
         # Should output session reminders but no recovery reminder
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "codebase-explorer" in context
+        assert "explore-codebase" in context
         assert (
             "This session may have been in the middle of a vibe-workflow:implement workflow"
             not in context
@@ -358,7 +358,7 @@ class TestPostCompactHookEdgeCases:
         assert result.returncode == 0
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "codebase-explorer" in context
+        assert "explore-codebase" in context
         # No implement workflow in empty transcript
         assert (
             "This session may have been in the middle of a vibe-workflow:implement workflow"
@@ -417,10 +417,10 @@ class TestPostCompactHookVsSessionStartReminder:
         compact_context = compact_output["hookSpecificOutput"]["additionalContext"]
 
         # Both should have same session reminders
-        assert "codebase-explorer" in session_context
-        assert "codebase-explorer" in compact_context
-        assert "web-researcher" in session_context
-        assert "web-researcher" in compact_context
+        assert "explore-codebase" in session_context
+        assert "explore-codebase" in compact_context
+        assert "research-web" in session_context
+        assert "research-web" in compact_context
 
     def test_post_compact_has_extra_recovery_reminder_with_implement(self, tmp_path):
         """Post-compact should have extra recovery reminder when implement detected."""

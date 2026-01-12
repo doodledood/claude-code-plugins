@@ -66,7 +66,7 @@ class TestSessionStartReminderHook:
         assert len(context) > 0
 
     def test_context_contains_codebase_explorer_reminder(self):
-        """Context should mention codebase-explorer agent."""
+        """Context should mention explore-codebase skill."""
         result = subprocess.run(
             [sys.executable, str(HOOKS_DIR / "session_start_reminder.py")],
             capture_output=True,
@@ -75,10 +75,10 @@ class TestSessionStartReminderHook:
         )
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "codebase-explorer" in context
+        assert "explore-codebase" in context
 
     def test_context_contains_web_researcher_reminder(self):
-        """Context should mention web-researcher agent."""
+        """Context should mention research-web agent."""
         result = subprocess.run(
             [sys.executable, str(HOOKS_DIR / "session_start_reminder.py")],
             capture_output=True,
@@ -87,7 +87,7 @@ class TestSessionStartReminderHook:
         )
         output = json.loads(result.stdout)
         context = output["hookSpecificOutput"]["additionalContext"]
-        assert "web-researcher" in context
+        assert "research-web" in context
 
     def test_context_wrapped_in_system_reminder_tags(self):
         """Context should be wrapped in system-reminder tags."""
