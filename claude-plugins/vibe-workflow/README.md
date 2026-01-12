@@ -29,29 +29,46 @@ Start simple. Escalate if you hit ambiguity.
 
 ## Components
 
-**Skills** (auto-invoked when relevant):
-- `spec` - Interactive requirements builder
+### Core Workflow Skills
+- `spec` - Interactive requirements builder with structured interview
 - `plan` - Create implementation plans with codebase research
 - `implement` - Execute plans via subagents with verification loops
+- `implement-inplace` - Single-agent implementation for simpler tasks
+
+### Code Review Skills
+- `review` - Parallel code review (runs all review types)
+- `review-bugs` - Focused bug detection
+- `review-type-safety` - Type safety analysis
+- `review-maintainability` - Code quality and maintainability
+- `review-coverage` - Test coverage gaps
+- `review-docs` - Documentation completeness
+- `review-claude-md-adherence` - Check adherence to project instructions
+- `fix-review-issues` - Address findings from review
+
+### Research & Debugging Skills
 - `bugfix` - Root cause analysis with test-driven verification
+- `research-web` - Deep web research with parallel investigators (quick/medium/thorough/very-thorough)
+- `web-research` - External research with hypothesis tracking
 - `explore-codebase` - Structural overview with prioritized file list
-- `research-web` - Deep web research with parallel investigators and synthesis
 
-**Commands** (explicit invocation):
-- `/review` - Parallel code review agents
-- `/implement-inplace` - Single-agent implementation, no subagent overhead
-- `/web-research` - External research with hypothesis tracking
-
-**Agents**:
+### Agents
 - `codebase-explorer` - Context gathering, prefer over built-in Explore
 - `chunk-implementor` - Implements single plan chunks
 - `chunk-verifier` - Runs verification gates
+- `bug-fixer` - Root cause analysis agent
+- `web-researcher` - Web research with source tracking
+- `code-bugs-reviewer` - Bug detection agent
+- `code-maintainability-reviewer` - Maintainability analysis
+- `code-coverage-reviewer` - Coverage gap analysis
+- `type-safety-reviewer` - Type safety analysis
+- `docs-reviewer` - Documentation review
+- `claude-md-adherence-reviewer` - Project instruction adherence
 
-**Hooks**:
+### Hooks
 - `SessionStart` - Reminds Claude to prefer codebase-explorer and web-researcher agents
-- `SessionStart (compact)` - Re-anchors session after compaction; adds implement workflow recovery if mid-implementation
-- `PostToolUse (TodoWrite)` - Reminds to update progress/log files after todo completion during implement workflows
-- `Stop` - Prevents premature stops during `/implement` workflows when todos are incomplete
+- `PostCompact` - Re-anchors session after compaction; adds implement workflow recovery
+- `PostToolUse (TodoWrite)` - Reminds to update progress/log files during implement workflows
+- `Stop` - Prevents premature stops during `/implement` when todos are incomplete
 
 ## Installation
 
