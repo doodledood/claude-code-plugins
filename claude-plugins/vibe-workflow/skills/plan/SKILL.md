@@ -41,18 +41,20 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 
 **Evolution example** - "Add real-time notifications":
 
-Initial → After codebase research (found WebSocket) → After "needs offline too":
+Initial → After codebase research → After approach selection → After "needs offline too":
 ```
 - [x] Read spec → 3 types, mobile+web
-- [x] Codebase research → ws.ts, notification-service.ts
-- [x] WebSocket approach → extend existing
-- [ ] Architecture decisions
+- [x] Codebase research → found ws.ts, notification-service.ts, also polling pattern in legacy/
+- [x] Approach selection → WebSocket vs polling? User chose WebSocket (lower latency, existing infra)
+- [ ] Architecture decisions (within WebSocket approach)
 - [ ] Offline storage (IndexedDB vs localStorage)
 - [ ] Sync conflict resolution
 - [ ] Service worker integration
 - [ ] Read full research log and spec (context refresh before output)
 - [ ] Finalize chunks
 ```
+
+Note: Approach selection (line 3) shows **user decision**—not auto-decided. Found two valid approaches (WebSocket, polling), presented trade-offs, user chose.
 
 **Key**: Never prune todos prematurely.
 
@@ -181,7 +183,7 @@ questions: [
 
 **Only skip asking when**:
 - Research shows genuinely ONE valid approach (document why others don't work)
-- OR approaches differ only in trivial details with identical trade-offs
+- OR approaches differ only in trivial implementation details with identical trade-offs (same consumer impact, same reversibility, same blast radius—NOT different architectural layers or different integration points)
 
 ### 2.6 Write initial draft
 
@@ -284,9 +286,9 @@ Architecture decisions:
    | 4 | Architectural | Choose between patterns | Error strategy? State management? Concurrency model? |
    | 5 | Detail Refinement | Fine-grained technical details | Test coverage scope? Retry policy? Logging verbosity? |
 
-   **Priority 0 is MANDATORY**: If multiple valid approaches exist (per 2.5), you MUST ask before proceeding to Priority 1-5 questions. Approach selection eliminates entire branches of planning—asking Priority 1-5 questions before settling approach wastes effort if user picks different approach.
+   **Priority 0 is MANDATORY**: If multiple valid approaches exist (per 2.5), you MUST ask before proceeding to Priority 1-5 questions. Approach selection eliminates entire branches of planning—asking Priority 1-5 questions before settling approach wastes effort if user picks different approach. **Exception**: Skip only when approaches differ in trivial implementation details with identical trade-offs (see 2.5 skip conditions)—never skip when approaches differ in architectural layer, consumer impact, or reversibility.
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description. When options are equivalent AND easily reversible (changes affect only 1-2 files, where each changed file is imported by 5 or fewer other files, and there are no data migrations, schema changes, or public API changes), decide yourself (lean toward existing codebase patterns).
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. For Priority 1-5 questions (NOT Priority 0), when options are equivalent AND easily reversible (changes affect only 1-2 files, where each changed file is imported by 5 or fewer other files, and there are no data migrations, schema changes, or public API changes), decide yourself (lean toward existing codebase patterns).
 
 5. **Be thorough via technique**:
    - Cover technical decisions from each applicable priority category (0-5 in the priority table)—don't skip categories to save time
@@ -644,9 +646,8 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 - Finalize with `[TBD]`
 - Implement without approval
 - Forget expanding todos on new areas
-- **Commit to an approach without presenting alternatives when multiple valid approaches exist**
-- **Assume the "obvious" solution without checking for alternatives and their trade-offs**
-- **Dive into implementation details (Priority 1-5 questions) before approach is decided (Priority 0)**
+- **Commit to any approach without first checking for alternatives and their trade-offs (Priority 0)**
+- **Dive into implementation details (Priority 1-5 questions) before approach is decided**
 - **Modify data-layer code without analyzing who consumes it and whether they expect current behavior**
 
 ## Recognize & Adjust
