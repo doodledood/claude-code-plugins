@@ -30,7 +30,7 @@ description: |
   </commentary>
   </example>
 tools: Glob, Grep, Read, Write, WebFetch, WebSearch, Skill, SlashCommand, Bash, BashOutput, KillShell, TodoWrite
-model: opus
+model: sonnet
 ---
 
 # Consultant Agent
