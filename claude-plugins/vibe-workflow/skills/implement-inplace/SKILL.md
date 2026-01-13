@@ -43,6 +43,7 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 [ ] Read context for [Chunk]
 [ ] [Task 1]...[ ] [Task N]
 [ ] Run gates for [Chunk]
+[ ] Commit chunk: [Chunk]
 ...
 # Unless --no-review, append:
 [ ] Run review on implemented changes
@@ -60,7 +61,8 @@ Per chunk:
 1. Read context files from plan + files-to-modify, respect line ranges
 2. Implement each task, marking `in_progress`→`completed` immediately
 3. Run gates (Phase 3)
-4. Track created/modified files for summary
+4. Commit chunk: `git add [files created/modified] && git commit -m "feat(plan): implement chunk N - [Name]"` (do NOT push)
+5. Track created/modified files for summary
 
 ### Phase 3: Auto-Fix Gates
 
@@ -139,6 +141,7 @@ Skip if `--no-review` was set.
 - **Persistent auto-fix**: Iterate until gates pass (up to 3 distinct strategies per issue), escalate only when stuck
 - **Dependency order**: Execute in order, skip failed chunk's dependents
 - **Gates non-negotiable**: Fix root cause (no `@ts-ignore`, test skips, or suppressions); skip chunk only after 3 failed strategies
+- **Commit per chunk**: Each successful chunk gets its own commit (no push until end); provides rollback points for recovery
 
 ## Gate Detection
 
