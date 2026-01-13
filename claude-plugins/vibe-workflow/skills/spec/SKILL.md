@@ -347,29 +347,77 @@ Generated: {date}
 
 ### 4.4 Mark all todos complete
 
-### 4.5 Output summary
+### 4.5 Output approval summary
+
+Present a scannable summary that allows approval without reading the full spec. Users may approve based on this summary alone.
 
 ```
-## Spec Summary
+## Spec Approval Summary: {Work Name}
 
-**Work**: {name}
-**File**: /tmp/spec-{...}.md
+**Full spec**: /tmp/spec-{...}.md
 
-### What We're Doing
-{1-2 sentences}
+### At a Glance
+| Aspect | Summary |
+|--------|---------|
+| Problem | {One-liner problem statement} |
+| Scope | {What's in / explicitly out} |
+| Users | {Who's affected} |
+| Success | {Primary observable success criterion} |
 
-### Key Decisions Made
-- {Decision}: {choice}
+### State Flow
 
-### Core Requirements ({count})
-- {Top 3 requirements}
+{ASCII state machine showing main states/transitions of the feature}
+
+Example format:
+┌─────────────┐   action    ┌─────────────┐
+│  STATE A    │────────────>│  STATE B    │
+└─────────────┘             └─────────────┘
+       │                          │
+       v                          v
+┌─────────────────────────────────────────┐
+│              OUTCOME STATE              │
+└─────────────────────────────────────────┘
+
+Generate diagram that captures:
+- Key states the system/user moves through
+- Transitions (user actions or system events)
+- Terminal states or outcomes
+
+### Requirements ({count} total)
+
+**Core** (must have):
+- {Requirement 1}
+- {Requirement 2}
+- {Requirement 3}
+- ...
+
+**Edge Cases**:
+- {Edge case 1}: {behavior}
+- {Edge case 2}: {behavior}
+
+### Key Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| {Area 1} | {Choice} | {Brief why} |
+| {Area 2} | {Choice} | {Brief why} |
 
 ### Out of Scope
-- {Key non-goals}
+- {Non-goal 1}
+- {Non-goal 2}
 
 ---
-Review full spec and let me know adjustments.
+Approve to proceed to planning, or request adjustments.
 ```
+
+**State machine guidelines**:
+- Show the primary flow, not every edge case
+- Use box characters: `┌ ┐ └ ┘ │ ─ ┬ ┴ ├ ┤ ┼` or simple ASCII: `+---+`, `|`, `--->`
+- Label transitions with user actions or system events
+- Keep to 3-7 states for readability
+- For CRUD features: show entity lifecycle
+- For user flows: show user journey states
+- For system changes: show before/after states
 
 ## Key Principles
 

@@ -318,28 +318,78 @@ Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line r
 
 ### 4.4 Mark all todos complete
 
-### 4.5 Present summary
+### 4.5 Present approval summary
+
+Present a scannable summary that allows approval without reading the full plan. Users may approve based on this summary alone.
 
 ```
-## Plan Summary
+## Plan Approval Summary: {Feature Name}
 
-**Plan file**: /tmp/plan-{...}.md
+**Full plan**: /tmp/plan-{...}.md
 
-### What We're Building
-{1-2 sentences}
+### At a Glance
+| Aspect | Summary |
+|--------|---------|
+| Approach | {Chosen approach from P0 decision} |
+| Chunks | {count} mini-PRs |
+| Parallel | {Which chunks can run in parallel, or "Sequential"} |
+| Primary Risk | {Main risk + mitigation} |
 
-### Chunks ({count})
-1. {Name} - {description}
+### Execution Flow
+
+{ASCII diagram showing chunk dependencies and parallel opportunities}
+
+Example format:
+┌──────────────────────────────────────┐
+│  1. Foundation (types, interfaces)   │
+└──────────────────────────────────────┘
+              │
+     ┌────────┴────────┐
+     ▼                 ▼
+┌─────────────┐  ┌─────────────┐
+│ 2. Feature A│  │ 3. Feature B│  ← parallel
+└─────────────┘  └─────────────┘
+     │                 │
+     └────────┬────────┘
+              ▼
+┌──────────────────────────────────────┐
+│  4. Integration (connects all)       │
+└──────────────────────────────────────┘
+
+### Chunks Overview
+
+| # | Name | Delivers | Key Files | Lines |
+|---|------|----------|-----------|-------|
+| 1 | {Name} | {What value it ships} | {count} | ~{est} |
+| 2 | {Name} | {What value it ships} | {count} | ~{est} |
+| ... | | | | |
+
+### Requirements → Chunks
+| Requirement | Chunk(s) |
+|-------------|----------|
+| {Req 1} | {N} |
+| {Req 2} | {N, M} |
 
 ### Key Decisions
-- {Decision}: {choice}
 
-### Execution Order
-{Dependencies, parallel opportunities}
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Approach (P0) | {Choice} | {Brief why} |
+| {Area} | {Choice} | {Brief why} |
 
 ---
-Review full plan. Adjust or approve to start.
+Approve to start implementation, or request adjustments.
 ```
+
+**Execution flow guidelines**:
+- Show chunk numbers and brief names
+- Use arrows to show dependencies: `│ ▼ ─ >`
+- Group parallel chunks side-by-side
+- Use box characters: `┌ ┐ └ ┘ │ ─` or simple ASCII: `+---+`, `|`, `--->`
+- Label parallel opportunities clearly
+- Keep diagram compact but readable
+- For simple sequential plans: vertical flow
+- For complex plans: show critical path + parallel branches
 
 ### 4.6 Wait for approval
 
