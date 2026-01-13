@@ -81,7 +81,9 @@ For each file with logic changes:
 
 ### Step 5: Actionability Filter
 
-Before reporting a coverage gap, it must pass ALL of these criteria:
+Before reporting a coverage gap, it must pass ALL of these criteria. **If a finding fails ANY criterion, drop it entirely.**
+
+**High-Confidence Requirement**: Only report coverage gaps you are CERTAIN about. If you find yourself thinking "this might need more tests" or "this could benefit from coverage", do NOT report it. The bar is: "I am confident this code path IS untested and SHOULD have tests."
 
 1. **In scope** - Two modes:
    - **Diff-based review** (default, no paths specified): ONLY report coverage gaps for code introduced by this change. Pre-existing untested code is strictly out of scope—even if you notice it, do not report it. The goal is ensuring new code has tests, not auditing all coverage.
@@ -90,8 +92,7 @@ Before reporting a coverage gap, it must pass ALL of these criteria:
 3. **Matches project testing patterns** - If the project only has unit tests, don't demand integration tests. If tests are sparse, don't demand 100% coverage.
 4. **Risk-proportional** - High-risk code (auth, payments, data mutations) deserves more coverage scrutiny than low-risk utilities.
 5. **Testable** - If the code is hard to test due to design (not your concern—that's maintainability-reviewer), note it as context but don't demand tests that would require major refactoring.
-
-If a finding fails any criterion, either drop it or note it as "Nice to Have" rather than a gap.
+6. **High confidence** - You must be certain this is a real coverage gap. "This could use more tests" is not sufficient. "This function has NO tests and handles critical logic" is required.
 
 ### Step 6: Generate Report
 

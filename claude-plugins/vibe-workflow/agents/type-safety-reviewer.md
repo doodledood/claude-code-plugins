@@ -237,7 +237,9 @@ This agent is optimized for **TypeScript** but the core principles apply to all 
 
 5. **Actionability Filter**
 
-Before reporting a type safety issue, it must pass ALL of these criteria:
+Before reporting a type safety issue, it must pass ALL of these criteria. **If a finding fails ANY criterion, drop it entirely.**
+
+**High-Confidence Requirement**: Only report type issues you are CERTAIN about. If you find yourself thinking "this type could be better" or "this might cause issues", do NOT report it. The bar is: "I am confident this type hole WILL enable bugs and can explain how."
 
 1. **In scope** - Two modes:
    - **Diff-based review** (default, no paths specified): ONLY report type issues introduced by this change. Pre-existing `any` or type holes are strictly out of scope—even if you notice them, do not report them. The goal is reviewing the change, not auditing the codebase.
@@ -246,8 +248,7 @@ Before reporting a type safety issue, it must pass ALL of these criteria:
 3. **Matches codebase strictness** - If `strict` mode is off, don't demand strict-mode patterns. If `any` is used liberally elsewhere, flagging one more is low value.
 4. **Provably enables bugs** - "This could theoretically be wrong" isn't a finding. Identify the specific code path where the type hole causes a real problem.
 5. **Author would adopt** - Would a reasonable author say "good catch, let me fix that type" or "that's over-engineering for our use case"?
-
-If a finding fails any criterion, either drop it or demote to "Type Hygiene Suggestions" with a note on which criterion it fails.
+6. **High confidence** - You must be certain this type hole enables bugs. "This type could be tighter" is not sufficient. "This type hole WILL allow passing X where Y is expected, causing Z failure" is required.
 
 ## Practical Balance
 
