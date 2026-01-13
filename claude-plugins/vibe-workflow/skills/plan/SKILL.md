@@ -32,7 +32,8 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 ```
 - [ ] Read/infer spec requirements
 - [ ] Codebase research (patterns, files to modify)
-- [ ] Architecture decisions
+- [ ] Approach identification (if >1 valid approach exists → trade-off analysis → user decision)
+- [ ] Architecture decisions (within chosen approach)
 - [ ] (expand as research reveals new areas)
 - [ ] Read full research log and spec (context refresh before output)
 - [ ] Finalize chunks
@@ -64,6 +65,7 @@ Path: `/tmp/plan-research-{YYYYMMDD-HHMMSS}-{name-kebab-case}.md`
 Started: {timestamp} | Spec: {path or "inline"}
 
 ## Codebase Research
+## Approach Trade-offs
 ## Architecture Decisions
 ## Questions & Answers
 ## Unresolved Items
@@ -100,7 +102,88 @@ After EACH step:
 - Architectural questions: {list}
 ```
 
-### 2.5 Write initial draft
+### 2.5 Approach Identification & Trade-off Analysis
+
+**CRITICAL**: Before diving into implementation details, identify whether multiple valid approaches exist. This is THE question that cuts the option space—answering it eliminates entire branches of planning.
+
+**When to do this**: After initial codebase research (2.2-2.4), before writing any implementation details.
+
+**What counts as "multiple approaches"**:
+- Different architectural layers (data layer vs presentation layer vs business logic)
+- Different implementation patterns (eager vs lazy, push vs pull, centralized vs distributed)
+- Different integration points (modify existing function vs create new one)
+- Different scopes (filter at source vs filter at consumer)
+
+**Process**:
+
+1. **Identify approaches** from codebase research:
+   - Where could this change live? (multiple valid locations = multiple approaches)
+   - How could this be implemented? (multiple valid patterns = multiple approaches)
+   - Who are the consumers of what we're modifying? (different consumer needs = approach implications)
+
+2. **If only ONE valid approach**: Document why in research log and proceed.
+
+3. **If MULTIPLE valid approaches**: STOP. Do not proceed with planning until user decides.
+
+**Trade-off analysis format** (write to research log under `## Approach Trade-offs`):
+
+```markdown
+### Approaches: {what we're deciding}
+
+**Approach A: {name}**
+- How: {brief description}
+- Pros: {list}
+- Cons: {list}
+- When it wins: {conditions where this is clearly better}
+- Affected consumers: {who uses what we'd modify}
+
+**Approach B: {name}**
+- How: {brief description}
+- Pros: {list}
+- Cons: {list}
+- When it wins: {conditions where this is clearly better}
+- Affected consumers: {who uses what we'd modify}
+
+**Existing codebase pattern**: {how similar problems are solved elsewhere}
+**Recommendation**: {approach} — {why}
+**Choose alternative if**: {honest conditions where other approach wins}
+```
+
+**Ask user via AskUserQuestion**:
+
+```
+questions: [
+  {
+    question: "Which approach for {requirement}?",
+    header: "Approach",
+    options: [
+      {
+        label: "{Recommended approach} (Recommended)",
+        description: "{Why it's cleanest}. Choose this unless {condition where alternative wins}."
+      },
+      {
+        label: "{Alternative approach}",
+        description: "{What it offers}. Better if {when it wins}."
+      }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+**Recommendation = cleanest approach**, meaning:
+1. Follows separation of concerns (presentation logic in presentation layer, data logic in data layer)
+2. Matches existing codebase patterns for similar problems
+3. Minimizes blast radius (fewest consumers affected, easiest to change later)
+4. Most reversible (if we're wrong, how hard is it to switch?)
+
+**But be honest**: State clearly in the description when the alternative approach wins. User has context you don't (future plans, team preferences, business constraints).
+
+**Only skip asking when**:
+- Research shows genuinely ONE valid approach (document why others don't work)
+- OR approaches differ only in trivial details with identical trade-offs
+
+### 2.6 Write initial draft
 
 First draft with `[TBD]` markers. Same file path for all updates.
 
@@ -167,6 +250,8 @@ Architecture decisions:
 
 | Research Reveals | Add Todos For |
 |------------------|---------------|
+| **Multiple valid implementation locations** | **Approach trade-off analysis → user decision (Priority 0)** |
+| **Multiple consumers of modified code** | **Consumer impact analysis → approach implications** |
 | Existing similar code | Integration approach |
 | Multiple valid patterns | Pattern selection |
 | External dependency | Dependency strategy |
@@ -192,16 +277,19 @@ Architecture decisions:
 
    | Priority | Type | Purpose | Examples |
    |----------|------|---------|----------|
+   | **0** | **Approach Selection** | **Which fundamental approach (see 2.5)** | **Data vs presentation layer? Filter at source vs consumer? Modify existing vs create new?** |
    | 1 | Implementation Phasing | How much to build now vs later | Full impl vs stub? Include migration? Optimize or simple first? |
    | 2 | Branching | Open/close implementation paths | Sync vs async? Polling vs push? In-memory vs persistent? |
    | 3 | Technical Constraints | Non-negotiable technical limits | Must integrate with X? Performance requirements? Backward compatibility? |
    | 4 | Architectural | Choose between patterns | Error strategy? State management? Concurrency model? |
    | 5 | Detail Refinement | Fine-grained technical details | Test coverage scope? Retry policy? Logging verbosity? |
 
+   **Priority 0 is MANDATORY**: If multiple valid approaches exist (per 2.5), you MUST ask before proceeding to Priority 1-5 questions. Approach selection eliminates entire branches of planning—asking Priority 1-5 questions before settling approach wastes effort if user picks different approach.
+
 4. **Always mark one option "(Recommended)"** - put first with reasoning in description. When options are equivalent AND easily reversible (changes affect only 1-2 files, where each changed file is imported by 5 or fewer other files, and there are no data migrations, schema changes, or public API changes), decide yourself (lean toward existing codebase patterns).
 
 5. **Be thorough via technique**:
-   - Cover technical decisions from each applicable priority category (1-5 in the priority table)—don't skip categories to save time
+   - Cover technical decisions from each applicable priority category (0-5 in the priority table)—don't skip categories to save time
    - Reduce cognitive load through HOW you ask: concrete options, good defaults
    - **Batching**: Up to 4 questions in `questions` array per call (batch questions that share a common decision—e.g., multiple state management questions, or multiple error handling questions—where answers to one inform the others); max 4 options per question (tool limit)
    - Make decisions yourself when codebase research suffices
@@ -522,7 +610,7 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 |----------|--------|
 | No detailed requirements | Research → core requirements/constraints unclear: ask via AskUserQuestion OR stop → non-critical: assume+document |
 | Extensive requirements | MUSTs first → research scope → ask priority trade-offs → defer SHOULD/MAY |
-| Multiple approaches | Research first → ask only when significantly different implications |
+| **Multiple approaches** | **STOP. Document trade-offs per 2.5 → ASK user (Priority 0) → proceed only after decision. Never assume "obvious" approach is correct.** |
 | Everything dependent | Start from types → question each dependency → find false dependencies → foundation → parallel → integration |
 
 ## Planning Mantras
@@ -556,6 +644,10 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 - Finalize with `[TBD]`
 - Implement without approval
 - Forget expanding todos on new areas
+- **Commit to an approach without presenting alternatives when multiple valid approaches exist**
+- **Assume the "obvious" solution without checking for alternatives and their trade-offs**
+- **Dive into implementation details (Priority 1-5 questions) before approach is decided (Priority 0)**
+- **Modify data-layer code without analyzing who consumes it and whether they expect current behavior**
 
 ## Recognize & Adjust
 
@@ -565,3 +657,6 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 | No clear value | Merge or refocus |
 | Dependencies unclear | Make explicit, number |
 | Context missing | Add files + line numbers |
+| **Deep in planning, realize alternative approach exists** | **STOP. Go back to 2.5. Document approaches, ask user, may need to restart with chosen approach** |
+| **Picked "obvious" location without checking consumers** | **STOP. Grep for usages. If multiple consumers with different needs, this is a Priority 0 question** |
+| **User pushes back on approach during/after implementation** | **This should have been a Priority 0 question. Document lesson, present alternatives now** |
