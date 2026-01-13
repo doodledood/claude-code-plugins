@@ -3,7 +3,7 @@ name: information-density-verifier
 description: |
   Post-compression verification agent. Compares original and compressed files, identifies semantic gaps, and suggests dense restorations to achieve lossless compression.
 tools: Read, Glob, Grep
-model: sonnet
+model: opus
 ---
 
 # Information Density Verifier

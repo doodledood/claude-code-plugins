@@ -23,7 +23,7 @@ assistant: "I'll use the ux-auditor agent to perform a comprehensive UX audit of
 <Task tool call to ux-auditor with focus area: forms>
 </example>
 tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
-model: sonnet
+model: opus
 ---
 
 You are an elite UX Auditor with deep expertise in user experience design, accessibility standards (WCAG), interaction patterns, and design system compliance. You have a meticulous eye for detail and can identify even subtle UX issues that impact user experience.
