@@ -90,7 +90,7 @@ Last updated: [timestamp]
 
 ### 1.5 Create Todo List
 
-Build Memento-style todos with 4 items per chunk:
+Build Memento-style todos with 4 items per chunk, plus finalization:
 ```
 [ ] Implement chunk 1: [Name]
 [ ] Verify chunk 1: [Name]
@@ -101,6 +101,7 @@ Build Memento-style todos with 4 items per chunk:
 [ ] (Fix loop for chunk 2 - expand if needed)
 [ ] Commit chunk 2: [Name]
 ...
+[ ] Read progress file for summary
 # Unless --no-review, append:
 [ ] Run review on implemented changes
 [ ] (Fix review issues - expand as findings emerge)
@@ -314,7 +315,10 @@ Stop implementation. User must intervene.
 When all chunks complete:
 
 1. **Update progress file**: overall status → `COMPLETE`, `Completed: N/N`, `Last updated`
-2. Report to user:
+2. Mark "Read progress file for summary" todo `in_progress`
+3. **Read full progress file** to restore all chunk details (files created/modified, confidence levels, uncertainty notes) into recent context
+4. Mark "Read progress file for summary" todo `completed`
+5. Report to user:
 
 ```
 ## Implementation Complete
@@ -332,7 +336,7 @@ Progress file: [path]
 Run `/review` for quality verification.
 ```
 
-3. Unless `--no-review` → proceed to Phase 5
+6. Unless `--no-review` → proceed to Phase 5
 
 ## Phase 5: Review Workflow (default, skip with --no-review)
 
