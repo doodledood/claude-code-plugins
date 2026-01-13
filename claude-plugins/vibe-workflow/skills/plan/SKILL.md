@@ -175,6 +175,8 @@ questions: [{
 
 If ANY fails → Priority 0, ask user.
 
+**STOP**: Never commit to approach without checking alternatives. Never proceed to P1-5 before approach decided. Never modify data-layer without analyzing consumers.
+
 ### 2.6 Write initial draft
 
 **Precondition**: Approach decided (single documented OR user chose/delegated after trade-offs). Don't write until Priority 0 resolved.
@@ -213,7 +215,7 @@ questions: [
 6. Mark todo `completed`
 7. Repeat until no pending todos
 
-**NEVER proceed without writing findings** — research log = external memory.
+**STOP**: Never proceed without writing findings. Never keep discoveries as mental notes. Never forget expanding todos.
 
 **Contradictions**: (1) Inform user: "Contradicts earlier X. Proceeding with new answer." (2) Log under `## Conflicts`. (3) Re-evaluate todos. (4) Update plan. Unresolvable → ask priority; still blocked → log under `## Unresolved Items`, proceed with most recent, add risk note.
 
@@ -309,6 +311,8 @@ Finished: {timestamp} | Entries: {count} | Decisions: {count}
 Read full research log to restore findings, decisions, rationale before final plan.
 
 ### 4.3 Finalize plan
+
+**STOP**: Never finalize with `[TBD]` markers. Never implement without approval.
 
 Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line ranges for files >500 lines.
 
@@ -590,17 +594,9 @@ For external systems/user input: (1) what can fail, (2) how failures surface, (3
 
 ### Never Do
 
-- Proceed without writing findings
-- Keep discoveries as mental notes
-- Skip todos
 - Write to project dirs (always `/tmp/`; if denied: ask for alternative)
 - Expand scope (spec phase; exception: 2-req minimum or blocking ambiguity)
-- Finalize with `[TBD]`
-- Implement without approval
-- Forget expanding todos
-- **Commit to approach without checking alternatives (P0)**
-- **P1-5 before approach decided**
-- **Modify data-layer without analyzing consumers**
+- Skip todos
 
 ## Recognize & Adjust
 
