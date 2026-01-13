@@ -26,6 +26,8 @@ Build implementation plan through structured discovery. Takes spec (from `/spec`
 
 ### 1.1 Create todos (TodoWrite immediately)
 
+If TodoWrite is unavailable, track todos in the research log under a `## Todos` section using markdown checkbox format, and update status inline (e.g., `- [x] Completed task` or `- [ ] Pending task`).
+
 Todos = **areas to research/decide**, not steps. Expand when research reveals: (a) files/modules to modify beyond those already in todos, (b) 2+ valid implementation patterns with different trade-offs, (c) dependencies on code/systems not yet analyzed, or (d) questions that must be answered before completing an existing todo.
 
 **Starter seeds**:
@@ -56,7 +58,9 @@ Initial → After codebase research → After approach selection → After "need
 
 Note: Approach selection (line 3) shows **user decision**—not auto-decided. Found two valid approaches (WebSocket, polling), presented trade-offs, user chose.
 
-**Key**: Never prune todos prematurely.
+**Key**: Never prune todos prematurely. If todo expansion creates a cycle (new todo depends on incomplete todo that depends on the new todo), merge into a single combined research todo: "- [ ] Research {Area A} + {Area B} (merged: circular dependency)".
+
+**Adapt seeds to scope**: For simple features (1-2 files, single approach), omit "Approach identification" if only one valid approach exists. For complex features (5+ files or 3+ modules), add domain-specific research todos (e.g., "- [ ] Research {specific subsystem}").
 
 ### 1.2 Create research log
 
@@ -78,17 +82,19 @@ Started: {timestamp} | Spec: {path or "inline"}
 
 ## Phase 2: Context Gathering
 
-**Prerequisites**: Requires `vibe-workflow:codebase-explorer` agent. If Task tool fails for any reason (agent not found, timeout after 120 seconds, permission error, incomplete results) OR returns fewer than 3 relevant files when exploring an area expected to touch multiple modules (cross-cutting concerns, features spanning >2 directories), perform supplementary codebase research manually using Read, Glob, and Grep tools and note `[SUPPLEMENTED RESEARCH: codebase-explorer insufficient - {reason}]` in research log. Do not retry on timeout—proceed directly to supplementary research.
+**Prerequisites**: Requires `vibe-workflow:codebase-explorer` agent. If Task tool fails for any reason (agent not found, timeout error from Task tool, permission error, incomplete results where agent returns without listing files to modify) OR returns fewer than 3 files that would be directly modified or created by the implementation when exploring an area expected to touch multiple modules (expected when: spec requirements explicitly list 3+ distinct components, OR feature description contains any of: "across", "connects", "bridges", "end-to-end", "spans", "links", "integrates", "coordinates", "orchestrates"), perform supplementary codebase research manually using Read, Glob, and Grep tools and note `[SUPPLEMENTED RESEARCH: codebase-explorer insufficient - {reason}]` in research log. Do not retry on timeout—proceed directly to supplementary research.
+
+**If both codebase-explorer AND supplementary research fail** (e.g., no relevant files found, permission errors persist): Log `[RESEARCH BLOCKED: {reason}]` in research log, ask user via AskUserQuestion whether to (a) proceed with assumptions or (b) pause for user to provide context manually.
 
 ### 2.1 Read/infer spec
 
 Extract: requirements, user stories, acceptance criteria, constraints, out-of-scope.
 
-**No formal spec?** Infer from conversation, tool outputs, user request. If spec and conversation together provide fewer than 2 concrete requirements, ask user via AskUserQuestion: "I need at least 2 concrete requirements to plan. Please provide: [list what's missing]" before proceeding.
+**No formal spec?** Infer from conversation, tool outputs, user request. If spec and conversation together provide fewer than 2 concrete requirements (a requirement is concrete if it specifies a behavior or outcome that can be verified by a test, demonstration, or measurable metric—e.g., "user can log in with email/password" is concrete; "system should be fast" is not unless it specifies a latency threshold), ask user via AskUserQuestion: "I need at least 2 concrete requirements to plan. Please provide: [list what's missing]" before proceeding.
 
 ### 2.2 Launch codebase-explorer
 
-Task tool with `subagent_type: "vibe-workflow:codebase-explorer"`. Launch multiple in parallel for cross-cutting work.
+Task tool with `subagent_type: "vibe-workflow:codebase-explorer"`. Launch multiple in parallel for cross-cutting work (work that spans multiple independent modules or architectural layers—e.g., a feature touching both frontend and backend, or changes affecting authentication and logging simultaneously).
 
 Explore: existing implementations, files to modify, patterns, integration points, test patterns.
 
@@ -109,7 +115,7 @@ After EACH step:
 
 ### 2.5 Approach Identification & Trade-off Analysis
 
-**CRITICAL**: Before diving into implementation details, identify whether multiple valid approaches exist. This is THE question that cuts the option space—answering it eliminates entire branches of planning.
+**CRITICAL**: Before diving into implementation details, identify whether multiple valid approaches exist. This is THE question that cuts the option space—answering it eliminates entire branches of planning. An approach is "valid" if: (1) it fulfills all spec requirements, (2) it is technically feasible given codebase constraints, and (3) it has at least one condition where it would be preferred over alternatives ("When it wins" is non-empty). Theoretical possibilities that fail any criterion are not valid—do not present them to the user.
 
 **When to do this**: After initial codebase research (2.2-2.4), before writing any implementation details.
 
@@ -139,14 +145,14 @@ After EACH step:
 - How: {brief description}
 - Pros: {list}
 - Cons: {list}
-- When it wins: {conditions where this is clearly better}
+- When it wins: {conditions where this approach is preferred—e.g., latency requirements, team pattern preferences, data volume thresholds, specific constraints}
 - Affected consumers: {who uses what we'd modify}
 
 **Approach B: {name}**
 - How: {brief description}
 - Pros: {list}
 - Cons: {list}
-- When it wins: {conditions where this is clearly better}
+- When it wins: {conditions where this approach is preferred—e.g., latency requirements, team pattern preferences, data volume thresholds, specific constraints}
 - Affected consumers: {who uses what we'd modify}
 
 **Existing codebase pattern**: {how similar problems are solved elsewhere}
@@ -177,21 +183,23 @@ questions: [
 ```
 
 **Recommendation = cleanest approach**, meaning:
-1. Follows separation of concerns (presentation logic in presentation layer, data logic in data layer)
+1. Follows separation of concerns (changes to presentation logic stay in presentation layer files, data logic stays in data layer files, business rules stay in service/domain files—if unsure which layer, use the layer where similar existing features live)
 2. Matches existing codebase patterns for similar problems
 3. Minimizes blast radius (fewest consumers affected, easiest to change later)
 4. Most reversible (if we're wrong, how hard is it to switch?)
+
+**When criteria conflict**: Prioritize in order listed (1 > 2 > 3 > 4). If criterion 1 is tied, use criterion 2 as tiebreaker, and so on.
 
 **But be honest**: State clearly in the description when the alternative approach wins. User has context you don't (future plans, team preferences, business constraints).
 
 **Only skip asking when**:
 - Research shows genuinely ONE valid approach (document why others don't work)
-- OR approaches differ only in trivial implementation details with identical trade-offs (same consumer impact, same reversibility, same blast radius—NOT different architectural layers or different integration points)
+- OR all five measurable skip criteria below are true (if ANY fails, ask the user)
 
 **Measurable skip criteria** (ALL must be true):
 1. Same files changed by both approaches
 2. No consumer behavior change (grep shows identical call sites)
-3. Reversible in <1 chunk of work
+3. Reversible in <1 chunk of work (where a chunk is 1-3 functions, under 200 lines—see Mini-PR Chunks section)
 4. No schema, API, or public interface changes
 5. No different error handling or failure modes
 
@@ -205,7 +213,7 @@ First draft with `[TBD]` markers. Same file path for all updates.
 
 ## Phase 3: Iterative Discovery Interview
 
-**CRITICAL**: Use AskUserQuestion tool for ALL questions—never plain text. If AskUserQuestion is unavailable, present questions in structured markdown with numbered options and wait for user response.
+**CRITICAL**: Use AskUserQuestion tool for ALL questions—never plain text. If AskUserQuestion is unavailable, present questions in structured markdown with numbered options and wait for user response. For Priority 0 questions when AskUserQuestion is unavailable, the structured markdown MUST include a numbered option for "Planner decides based on recommendation" to satisfy the explicit delegation requirement. If no response after presenting a question: do not proceed with Priority 0 decisions (blocking—after 2 follow-up prompts with no response, inform user: "Planning is blocked pending your decision on [question]. Reply when ready or say 'delegate' to accept the recommendation."); for Priority 1-5, proceed with the recommended option after noting `[USER UNRESPONSIVE: proceeding with recommendation]` in research log.
 
 **Example** (the `questions` array supports 1-4 questions per call—that's batching):
 ```
@@ -245,7 +253,7 @@ questions: [
 
 **NEVER proceed without writing findings** — research log = external memory.
 
-**If user answer contradicts prior decisions**: (1) Inform user: "This contradicts earlier decision X. Proceeding with new answer." (2) Log in research log under `## Conflicts` with both decisions. (3) Re-evaluate affected todos. (4) Update plan accordingly. If contradiction cannot be resolved, ask user to clarify priority.
+**If user answer contradicts prior decisions**: (1) Inform user: "This contradicts earlier decision X. Proceeding with new answer." (2) Log in research log under `## Conflicts` with both decisions. (3) Re-evaluate affected todos. (4) Update plan accordingly. If contradiction cannot be resolved, ask user to clarify priority. If user indicates both are equally important or cannot decide, document the contradiction in the research log under `## Unresolved Items`, proceed with the most recently stated answer, and add a risk note: "Unresolved contradiction between [X] and [Y]—implementation follows [most recent]. May need revision."
 
 ### Research Log Update Format
 
@@ -280,13 +288,15 @@ Architecture decisions:
 
 **Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit. If user says "just decide", "you pick", "I don't care", "skip this", or otherwise explicitly delegates the decision, document remaining decisions with `[INFERRED: {choice} - {rationale}]` markers and finalize. **Priority 0 exception**: Delegation for approach selection requires trade-offs presented first—add explicit option "Planner decides (based on recommendation above)" only after showing alternatives. User cannot delegate Priority 0 without seeing trade-offs.
 
+**User rejects all options**: If user indicates none of the presented options are acceptable, ask follow-up via AskUserQuestion: "What constraints or requirements make these options unsuitable?" Log response in research log under `## Conflicts`, then research alternatives or escalate if none exist.
+
 **Spec-first**: Business scope and requirements belong in spec. Questions here are TECHNICAL only—architecture, patterns, implementation approach. If spec has gaps affecting implementation: (1) flag in research log under `## Spec Gaps`, (2) ask user via AskUserQuestion whether to pause for spec update OR proceed with stated assumption, (3) document choice and continue.
 
 1. **Prioritize questions that eliminate other questions** - Ask questions where the answer changes what other questions you need to ask, or eliminates entire branches of implementation. If knowing X makes Y irrelevant, ask X first.
 
 2. **Interleave discovery and questions**:
    - User answer reveals new area → launch codebase-explorer
-   - Need external context → launch web-researcher (if unavailable, ask user to provide external context directly via AskUserQuestion)
+   - Need external context (third-party API documentation, external library behavior, industry standards not in codebase) → launch web-researcher via Task tool with subagent_type "vibe-workflow:web-researcher" (if Task tool returns error indicating agent not found, ask user via AskUserQuestion: "I need external context about {topic}. Can you provide: {specific information needed}?")
    - Update plan after each iteration, replacing `[TBD]` markers
 
 3. **Question priority order**:
@@ -300,25 +310,25 @@ Architecture decisions:
    | 4 | Architectural | Choose between patterns | Error strategy? State management? Concurrency model? |
    | 5 | Detail Refinement | Fine-grained technical details | Test coverage scope? Retry policy? Logging verbosity? |
 
-   **Priority 0 is MANDATORY**: If multiple valid approaches exist (per 2.5), you MUST ask before proceeding to Priority 1-5 questions. Approach selection eliminates entire branches of planning—asking Priority 1-5 questions before settling approach wastes effort if user picks different approach. **Exception**: Skip only when approaches differ in trivial implementation details with identical trade-offs (see 2.5 skip conditions)—never skip when approaches differ in architectural layer, consumer impact, or reversibility.
+   **Priority 0 is MANDATORY**: If multiple valid approaches exist (per 2.5), you MUST ask before proceeding to Priority 1-5 questions. Approach selection eliminates entire branches of planning—asking Priority 1-5 questions before settling approach wastes effort if user picks different approach. **Exception**: Skip only when all five measurable skip criteria in 2.5 are true. **Dependency exception**: If approach selection depends on a specific technical constraint (Priority 3), ask that constraint question first with context: "Before choosing an approach, I need to understand [constraint] because it determines which approach is viable." Then immediately proceed to approach selection.
 
-4. **Always mark one option "(Recommended)"** - put first with reasoning in description. For Priority 1-5 questions (NOT Priority 0), when options are equivalent AND easily reversible (changes affect only 1-2 files, where each changed file is imported by 5 or fewer other files, and there are no data migrations, schema changes, or public API changes), decide yourself (lean toward existing codebase patterns).
+4. **Always mark one option "(Recommended)"** - put first with reasoning in description. For Priority 1-5 questions (NOT Priority 0), when options produce the same observable behavior (same inputs yield same outputs, same error handling, same API surface) AND are easily reversible (affects 1-2 files totaling under 100 lines of changes, no modified file is directly imported by >10 other files, no migrations/schema/API changes), decide yourself (lean toward existing codebase patterns).
 
 5. **Be thorough via technique**:
    - Cover technical decisions from each applicable priority category (0-5 in the priority table)—don't skip categories to save time
    - Reduce cognitive load through HOW you ask: concrete options, good defaults
-   - **Batching**: Up to 4 questions in `questions` array per call (batch questions that share a common decision—e.g., multiple state management questions, or multiple error handling questions—where answers to one inform the others); max 4 options per question (tool limit)
+   - **Batching**: Up to 4 questions in `questions` array per call. Only batch questions of the same priority level (e.g., multiple Priority 3 questions) where answers are independent of each other. Never batch Priority 0 with Priority 1-5 questions—Priority 0 must be resolved first as it may eliminate downstream questions. Max 4 options per question (tool limit)
    - Make decisions yourself when codebase research suffices
    - Complete plan with easy questions > incomplete plan with fewer questions
 
 6. **Ask non-obvious questions** - Error handling strategies, edge cases affecting correctness, performance implications, testing approach for complex logic, rollback/migration needs, failure modes
 
-7. **Ask vs Decide** - Codebase patterns and technical standards are authority; user decides significant trade-offs.
+7. **Ask vs Decide** - Codebase patterns and technical standards are authority; user decides trade-offs that affect user-facing or operational outcomes (latency, throughput, resource usage, maintenance burden, API surface area—see table below for categories).
 
    **Ask user when**:
    | Category | Examples |
    |----------|----------|
-   | Trade-offs affecting measurable outcomes | Estimated >20% change to latency/throughput vs current implementation, adds abstraction layers, locks approach for >6 months, changes user-facing behavior |
+   | Trade-offs affecting measurable outcomes | Adds abstraction layer, changes architectural pattern, locks approach for 3+ PRs, changes user-facing behavior, estimated performance change exceeds 2x baseline |
    | No clear codebase precedent | New pattern not yet established |
    | Multiple valid approaches | Architecture choice with different implications |
    | Phasing decisions | Full impl vs stub, migration included or deferred |
@@ -331,7 +341,7 @@ Architecture decisions:
    | Existing codebase pattern | Error format, naming conventions, file structure |
    | Industry standard | HTTP status codes, retry with exponential backoff |
    | Sensible defaults | Timeout 30s, pagination 50 items, debounce 300ms |
-   | Easily changed later | Internal function names, log messages, test structure |
+   | Easily changed later (affects 1-2 files totaling under 100 lines, no modified file directly imported by >10 others, no migrations/schema/API changes) | Internal function names, log messages, test structure |
    | Implementation detail | Which hook to use, internal state shape, helper organization |
    | Clear best practice | Dependency injection, separation of concerns |
 
@@ -356,7 +366,7 @@ If ANY criterion unmet, do not proceed to 4.1—resolve first.
 
 ```markdown
 ## Planning Complete
-Finished: {timestamp} | Research log entries: {count} | Architecture decisions: {count}
+Finished: {timestamp} | Research log entries: {count of ### timestamp sections} | Architecture decisions: {count}
 ## Summary
 {Key decisions}
 ```
@@ -367,7 +377,7 @@ Read the full research log file to restore all findings, decisions, and rational
 
 ### 4.3 Finalize plan
 
-Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line ranges for files >500 lines.
+Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line ranges for files over 500 lines (500 is the threshold where context becomes unwieldy—for shorter files, full-file reads are acceptable).
 
 ### 4.4 Mark all todos complete
 
@@ -409,9 +419,9 @@ Do NOT implement until user explicitly approves. After approval: create todos fr
 | **Safety** | Never skip gates (type checks, tests, lint); every chunk tests+demos independently |
 | **Clarity** | Full paths, numbered chunks, rationale for context files, line ranges |
 | **Minimalism** | Ship today's requirements; parallelize where possible |
-| **Forward focus** | Don't prioritize backward compatibility unless requested or public API/schema contracts would be broken |
+| **Forward focus** | Don't prioritize backward compatibility for internal code changes (code used only within the same module/package and not imported by code outside that module); public API/schema changes (any exported function, type, or schema consumed by code outside the module, OR any documented API) always require migration per P8 |
 | **Cognitive load** | Deep modules with simple interfaces > many shallow; reduce choices |
-| **Conflicts** | Safety > Clarity > Minimalism > Forward focus |
+| **Conflicts** | Safety (gates: type checks pass, lint clean) > P1 (Correctness: tests pass, chunk works as specified) > Clarity > Minimalism > Forward focus > P2-P10 in order. Note: Safety = code compiles and is formatted; P1 = code is functionally correct |
 
 **Definitions**:
 - **Gates**: Quality checks every chunk must pass—type checks (0 errors), tests (pass), lint (clean)
@@ -433,18 +443,18 @@ User's explicit intent takes precedence for implementation choices (P2-P10). P1 
 | P7 | Tests | Specific cases, not "add tests" |
 | P8 | Safe Evolution | Public API/schema changes need migration |
 | P9 | Fault Containment | Plan failure isolation, retry/fallback |
-| P10 | Comments Why | Document complex logic why, not what |
+| P10 | Comments Why | Document logic why (not what) when: algorithm requires domain knowledge beyond the programming language (e.g., mathematical formulas, protocol specs), business rule source is external, or code intentionally deviates from typical patterns |
 
-P1-P10 apply to code quality within chunks. Principle conflicts (Safety > Clarity > Minimalism > Forward focus) govern planning-level decisions. When both apply, Safety (gates) takes precedence over all P2-P10.
+P1-P10 apply to code quality within chunks. See Conflicts row in principles table for full priority order.
 
 **Values**: Mini-PR > monolithic; parallel > sequential; function-level > code details; dependency clarity > implicit coupling; ship-ready > half-built
 
 ## 2. Mini-PR Chunks
 
 Each chunk must:
-1. Ship complete value (demo independently)
+1. Ship complete value (demo independently—meaning the chunk's functionality can be verified without requiring subsequent chunks: for logic/service chunks via automated tests that pass, for API chunks via a working endpoint callable via curl/Postman, for UI chunks via component rendering correctly in isolation or with mocked dependencies)
 2. Pass all gates (type checks, tests, lint)
-3. Be mergeable alone (1-3 functions, <200 lines of code)
+3. Be mergeable alone (1-3 functions, under 200 lines of code—200 lines is the threshold where a single chunk becomes difficult to review in one sitting)
 4. Include its tests (name specific inputs/scenarios, e.g., "valid email accepts user@domain.com", "invalid rejects missing @")
 
 ## 3. Chunk Sizing
@@ -452,11 +462,11 @@ Each chunk must:
 | Complexity | Chunks | Guidance |
 |------------|--------|----------|
 | Simple | 1-2 | 1-3 functions each |
-| Medium | 3-5 | <200 lines of code per chunk |
-| Complex | 5-8 | Each demo-able |
+| Medium | 3-5 | Under 200 lines of code per chunk |
+| Complex | 5-8 | Each verifiable via its own tests |
 | Integration | +1 final | Connect prior work |
 
-**Decision guide**: New model/schema → types chunk first | >3 files or >5 functions → split by concern | Complex integration → foundation then integration | One module <200 lines of code → single chunk OK
+**Decision guide**: New model/schema → types chunk first | 4+ files or 6+ functions → split by concern | Complex integration → foundation then integration | One module under 200 lines of code → single chunk OK
 
 ## 4. Dependency Ordering
 
@@ -482,7 +492,7 @@ Each chunk must:
 - Decide late: abstraction only when PR needs extension
 - Framework at edges: core logic agnostic, thin adapters
 - Reduce choices: one idiomatic approach per concern
-- Measure: if understanding the chunk's purpose requires reading more than 3 files or tracing more than 5 function calls, simplify it
+- Measure: if understanding the chunk's purpose requires reading 4+ files or tracing 6+ function calls, simplify it (these thresholds reflect typical human cognitive load limits for holding multiple concepts simultaneously)
 
 ## 7. Common Patterns
 
@@ -600,7 +610,7 @@ Tasks: Add validation, Add tests
 
 - Every file to modify/create; specify changes and purpose
 - Full paths; zero prior knowledge assumed
-- Context files: explain WHY; line ranges for files >500 lines
+- Context files: explain WHY; line ranges for files over 500 lines
 
 ## 10. Quality Criteria
 
@@ -620,13 +630,13 @@ Tasks: Add validation, Add tests
 - [ ] Observability: errors logged with context
 - [ ] Resilience: timeouts, retries with backoff, cleanup
 - [ ] Clarity: descriptive names, no magic values
-- [ ] Modularity: single responsibility, <200 lines of code, minimal coupling
+- [ ] Modularity: single responsibility, under 200 lines of code, minimal coupling
 - [ ] Evolution: public API/schema changes have migration
 
-### Test Priority
+### Test Importance (separate scale from P1-P10)
 
-| Priority | What | Requirement |
-|----------|------|-------------|
+| Score (1-10) | What | Requirement |
+|--------------|------|-------------|
 | 9-10 | Data mutations, money, auth, state machines | MUST |
 | 7-8 | Business logic, API contracts, errors | SHOULD |
 | 5-6 | Edge cases, boundaries, integration | GOOD |
@@ -676,8 +686,8 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 - Proceed without writing findings
 - Keep discoveries as mental notes
 - Skip todos
-- Write to project directories (always `/tmp/`)
-- Expand product scope (that's spec phase)—minimum clarification for planning inputs is allowed per 2.1
+- Write to project directories (always `/tmp/`; if permission denied, ask user for alternative directory)
+- Expand product scope (that's spec phase)—clarification limited to: (1) meeting the 2-requirement minimum per 2.1, or (2) resolving ambiguity that blocks approach selection or chunk definition
 - Finalize with `[TBD]`
 - Implement without approval
 - Forget expanding todos on new areas
@@ -689,10 +699,10 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 
 | Symptom | Action |
 |---------|--------|
-| Chunk >200 lines of code | Split by concern |
+| Chunk over 200 lines of code | Split by concern |
 | No clear value | Merge or refocus |
 | Dependencies unclear | Make explicit, number |
 | Context missing | Add files + line numbers |
-| **Deep in planning, realize alternative approach exists** | **STOP. Go back to 2.5. Document approaches, ask user, may need to restart with chosen approach** |
+| **After Phase 2.6 (initial draft written), realize alternative approach exists** | **STOP. Go back to 2.5. Document approaches, ask user, may need to restart with chosen approach** |
 | **Picked "obvious" location without checking consumers** | **STOP. Grep for usages. If multiple consumers with different needs, this is a Priority 0 question** |
-| **User pushes back on approach during/after implementation** | **This should have been a Priority 0 question. Document lesson, present alternatives now** |
+| **User explicitly rejects approach or requests different fundamental approach during/after implementation** | **This should have been a Priority 0 question. Document lesson, present alternatives now** |
