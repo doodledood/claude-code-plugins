@@ -3,7 +3,7 @@ name: prompt-precision-verifier
 description: |
   Post-refinement verification agent. Checks prompts for ambiguities, conflicts, undefined terms, underspecified rules, edge case gaps. Returns structured findings for iterative refinement.
 tools: Read
-model: opus
+model: sonnet
 ---
 
 # Prompt Precision Verifier

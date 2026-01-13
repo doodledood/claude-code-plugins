@@ -15,6 +15,7 @@ description: |
   assistant: "I'll use the voice-writer agent to write this in your style."
   </example>
 tools: Bash, BashOutput, Glob, Grep, Read, TodoWrite, Skill
+model: sonnet
 ---
 
 # Voice Writer Agent
