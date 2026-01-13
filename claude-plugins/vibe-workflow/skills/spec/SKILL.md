@@ -394,7 +394,7 @@ Interview complete when ALL true (keep iterating until every box checked):
 - [ ] Scope defined - what's in, what's explicitly out
 - [ ] Affected areas identified - what changes
 - [ ] Success criteria specified - observable outcomes
-- [ ] Core requirements documented (3+ must-have behaviors that define the work's purpose)
+- [ ] Core requirements documented (must-have behaviors that define the work's purpose)
 - [ ] Edge cases addressed
 - [ ] Constraints captured
 - [ ] Out of scope listed with reasons
