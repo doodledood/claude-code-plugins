@@ -68,6 +68,9 @@ Started: {timestamp} | Spec: {path or "inline"}
 
 ## Codebase Research
 ## Approach Trade-offs
+## Spec Gaps
+## Conflicts
+## Risks & Mitigations
 ## Architecture Decisions
 ## Questions & Answers
 ## Unresolved Items
@@ -185,7 +188,18 @@ questions: [
 - Research shows genuinely ONE valid approach (document why others don't work)
 - OR approaches differ only in trivial implementation details with identical trade-offs (same consumer impact, same reversibility, same blast radius—NOT different architectural layers or different integration points)
 
+**Measurable skip criteria** (ALL must be true):
+1. Same files changed by both approaches
+2. No consumer behavior change (grep shows identical call sites)
+3. Reversible in <1 chunk of work
+4. No schema, API, or public interface changes
+5. No different error handling or failure modes
+
+If ANY criterion fails, this is a Priority 0 question—ask the user.
+
 ### 2.6 Write initial draft
+
+**Precondition**: Approach decided—either (a) single valid approach documented, or (b) user chose/delegated after seeing trade-offs. Do not write draft until Priority 0 resolved.
 
 First draft with `[TBD]` markers. Same file path for all updates.
 
@@ -264,7 +278,7 @@ Architecture decisions:
 
 ### Interview Rules
 
-**Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit. If user says "just decide", "you pick", "I don't care", "skip this", or otherwise explicitly delegates the decision, document remaining decisions with `[INFERRED: {choice} - {rationale}]` markers and finalize.
+**Unbounded loop**: Iterate until ALL completion criteria met. No fixed round limit. If user says "just decide", "you pick", "I don't care", "skip this", or otherwise explicitly delegates the decision, document remaining decisions with `[INFERRED: {choice} - {rationale}]` markers and finalize. **Priority 0 exception**: Delegation for approach selection requires trade-offs presented first—add explicit option "Planner decides (based on recommendation above)" only after showing alternatives. User cannot delegate Priority 0 without seeing trade-offs.
 
 **Spec-first**: Business scope and requirements belong in spec. Questions here are TECHNICAL only—architecture, patterns, implementation approach. If spec has gaps affecting implementation: (1) flag in research log under `## Spec Gaps`, (2) ask user via AskUserQuestion whether to pause for spec update OR proceed with stated assumption, (3) document choice and continue.
 
@@ -324,6 +338,19 @@ Architecture decisions:
    **Test**: "If I picked wrong, would user say 'that's not what I meant' (ASK) or 'that works, I would have done similar' (DECIDE)?"
 
 ## Phase 4: Finalize & Present
+
+### Planning Completion Criteria
+
+Before finalizing, verify ALL criteria are met:
+
+- [ ] **Priority 0 resolved**: Approach decided (single approach documented OR user chose/delegated after trade-offs)
+- [ ] **All todos completed**: No pending research or decision todos
+- [ ] **Requirements mapped**: Every spec requirement traces to at least one chunk
+- [ ] **Risks captured**: Any identified risks logged in research log with mitigations
+- [ ] **NFRs addressed**: Security, performance, reliability marked as Required/N/A/Addressed per chunk
+- [ ] **Migrations covered**: If schema/API touched, migration and rollback strategy documented
+
+If ANY criterion unmet, do not proceed to 4.1—resolve first.
 
 ### 4.1 Final research log update
 
@@ -445,7 +472,7 @@ Each chunk must:
 |---------|-----------------|
 | Numbered chunks, gates, todo descriptions | Code snippets |
 | File manifests with reasons | Extra features, future-proofing |
-| Function names only | Performance tuning, assumed knowledge |
+| Function names only | Micro-optimizations, assumed knowledge |
 
 ## 6. Cognitive Load
 
@@ -475,6 +502,14 @@ Each chunk must:
 [1-2 sentences]
 
 Gates: Type checks (0 errors), Tests (pass), Lint (clean)
+
+---
+
+## Approach Decision (Priority 0)
+- **Chosen**: {approach}
+- **Alternatives considered**: {list with brief trade-offs}
+- **Rationale**: {why chosen}
+- **Revisit if**: {conditions that would change decision}
 
 ---
 
@@ -642,7 +677,7 @@ Avoid: empty catch, catch-return-null, silent fallbacks, broad catching.
 - Keep discoveries as mental notes
 - Skip todos
 - Write to project directories (always `/tmp/`)
-- Ask scope/requirements questions (that's spec phase)
+- Expand product scope (that's spec phase)—minimum clarification for planning inputs is allowed per 2.1
 - Finalize with `[TBD]`
 - Implement without approval
 - Forget expanding todos on new areas
