@@ -13,6 +13,8 @@ description: |
   Context: User wants to write a specific piece of content.
   user: "Write a tweet about productivity in my voice"
   assistant: "I'll use the voice-writer agent to write this in your style."
+tools: Bash, BashOutput, Glob, Grep, Read, TodoWrite, Skill
+model: opus
   </example>
 tools: Bash, BashOutput, Glob, Grep, Read, TodoWrite, Skill
 model: sonnet
