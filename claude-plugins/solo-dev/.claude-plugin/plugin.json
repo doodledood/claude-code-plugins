@@ -1,12 +1,21 @@
 {
   "name": "solo-dev",
   "description": "Toolkit for solo developers to build, manage, and grow their business - customer profiling, brand guidelines, design system, SEO strategy, content creation, and more",
-  "version": "1.18.1",
+  "version": "1.18.2",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "customer-profile", "brand-guidelines", "design-guidelines", "design-system", "ux-audit", "icp", "productivity", "business", "seo", "geo", "seo-strategy", "ai-citations"]
+  "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "customer-profile", "brand-guidelines", "design-guidelines", "design-system", "ux-audit", "icp", "productivity", "business", "seo", "geo", "seo-strategy", "ai-citations"],
+  "commands": [
+    "./skills/audit-ux/audit-ux.md",
+    "./skills/craft-author-voice/craft-author-voice.md",
+    "./skills/define-brand-guidelines/define-brand-guidelines.md",
+    "./skills/define-customer-profile/define-customer-profile.md",
+    "./skills/define-design-guidelines/define-design-guidelines.md",
+    "./skills/define-seo-strategy/define-seo-strategy.md",
+    "./skills/write-as-me/write-as-me.md"
+  ]
 }

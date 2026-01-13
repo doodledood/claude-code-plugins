@@ -1,12 +1,16 @@
 {
   "name": "prompt-engineering",
   "description": "Tools for reviewing, analyzing, and refining LLM prompts for clarity and precision",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["prompt-engineering", "prompts", "llm", "optimization", "prompt-design"]
+  "keywords": ["prompt-engineering", "prompts", "llm", "optimization", "prompt-design"],
+  "commands": [
+    "./skills/refine-prompt/refine-prompt.md",
+    "./skills/review-prompt/review-prompt.md"
+  ]
 }

@@ -1,12 +1,19 @@
 {
   "name": "vibe-extras",
   "description": "Standalone utilities that complement the core development workflow",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
   },
   "homepage": "https://github.com/doodledood/claude-code-plugins",
   "license": "MIT",
-  "keywords": ["utilities", "git", "rebase", "documentation", "cleanup", "slop", "information-density", "history-rewrite"]
+  "keywords": ["utilities", "git", "rebase", "documentation", "cleanup", "slop", "information-density", "history-rewrite"],
+  "commands": [
+    "./skills/clean-slop/clean-slop.md",
+    "./skills/maximize-info-density/maximize-info-density.md",
+    "./skills/rebase-on-main/rebase-on-main.md",
+    "./skills/rewrite-history/rewrite-history.md",
+    "./skills/update-claude-md/update-claude-md.md"
+  ]
 }
