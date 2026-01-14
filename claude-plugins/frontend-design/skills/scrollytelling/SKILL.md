@@ -478,6 +478,69 @@ useEffect(() => {
 - Maintain 60fps during scrolling
 - Meet Core Web Vitals thresholds
 
+## Mobile Considerations
+
+Mobile users represent 60%+ of web traffic. Scrollytelling must work excellently on mobile or risk excluding the majority of users.
+
+### Mobile-First Design
+
+**Start with mobile**: "Starting with mobile first forces you to pare down your experience to the nuts and bolts, leaving only the necessities. This refines and focuses the content." (The Pudding)
+
+Design the core experience for mobile, then enhance for desktop—not the reverse.
+
+### Technical Differences
+
+| Issue | Problem | Solution |
+|-------|---------|----------|
+| **Touch scrolling** | Behaves differently than mouse wheel | Test with real touch devices, not just Chrome DevTools |
+| **`vh` units** | Mobile browsers resize nav bar during scroll, breaking `vh` calculations | Use `window.innerHeight` in JS or CSS `dvh` (dynamic viewport height) |
+| **Performance** | Mobile GPUs are weaker, battery drain matters | Reduce animation complexity, test on mid-range devices |
+| **Screen size** | Side-by-side layouts don't fit | Stack content vertically, simplify to full-width sections |
+
+### Responsive Layout Strategy
+
+**Side-by-Side → Stacked**:
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  {/* On mobile: stacked, full-width */}
+  {/* On desktop: side-by-side sticky */}
+  <div className="space-y-[50vh] md:space-y-[100vh]">
+    {/* Text steps - shorter spacing on mobile */}
+  </div>
+  <div className="hidden md:block">
+    {/* Sticky visual - hidden on mobile, shown on desktop */}
+  </div>
+</div>
+```
+
+**Mobile alternative patterns**:
+- Replace sticky graphics with inline graphics between text
+- Use simpler reveal animations instead of complex parallax
+- Stack static images with scroll-triggered captions
+- Consider whether scrollytelling is even appropriate (sometimes stacked static content is better on mobile)
+
+### When to Simplify for Mobile
+
+The Pudding recommends stacking static content when:
+- Animations create performance issues on mobile
+- Complexity exceeds mobile capabilities
+- Transitions don't carry meaningful narrative weight
+- Development time is constrained
+
+**"The most important reason to preserve scrolling animations is if the transitions are truly meaningful, not just something to make it pop."**
+
+### Mobile Testing Checklist
+
+- [ ] Test on real iOS and Android devices (not just simulators)
+- [ ] Test on mid-range devices (not just flagship phones)
+- [ ] Verify touch scrolling feels natural
+- [ ] Check that sticky elements work correctly
+- [ ] Confirm reduced motion works on mobile
+- [ ] Test both portrait and landscape orientations
+- [ ] Verify content is readable at all screen sizes
+- [ ] Check battery/performance impact
+
 ## Anti-Patterns to Avoid
 
 | Anti-Pattern | Problem | Solution |
