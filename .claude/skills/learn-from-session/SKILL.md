@@ -6,7 +6,7 @@ user-invocable: true
 
 **User request**: $ARGUMENTS
 
-Analyze a Claude Code session to identify what went well and what could be improved, then suggest high-confidence fixes to skills in this repository (primarily vibe-workflow).
+Analyze a Claude Code session to identify what went well and what could be improved, then suggest high-confidence fixes to skills in this repository.
 
 **Input formats**:
 - Session ID (UUID): `184078b7-2609-46e0-a1f2-bb42367a8d34`
@@ -14,6 +14,8 @@ Analyze a Claude Code session to identify what went well and what could be impro
 - Inline commentary: Text description of what happened
 
 **Output**: High-confidence issues only with evidence-based suggestions for skill improvements.
+
+**Signal quality bar**: Only recommend changes that would have **measurably changed the session outcome**. A fix is high-signal if you can answer: "If this change existed, what specific iteration/correction/rework would NOT have happened?"
 
 ---
 
@@ -70,16 +72,19 @@ Status: IN_PROGRESS
 
 ```
 - [ ] Parse session / read commentary
-- [ ] Extract session overview (user intent, workflow used, outcome)
+- [ ] Write session overview to log (user intent, skills used, outcome)
 - [ ] Detect iteration patterns (retries, corrections)
+- [ ] Write iteration findings to log
 - [ ] Detect workflow deviations (skipped steps, out-of-order)
 - [ ] Detect missing questions / thin requirements
 - [ ] Identify post-implementation fixes
-- [ ] Read relevant skill definitions
-- [ ] Compare actual vs documented behavior
-- [ ] (expand: specific skill comparisons as needed)
-- [ ] Refresh context: read full analysis log
-- [ ] Synthesize high-confidence issues only
+- [ ] Write all pattern detection findings to log
+- [ ] Discover skills used in session
+- [ ] (expand: read and analyze each skill as discovered)
+- [ ] (expand: write skill comparison findings to log)
+- [ ] Refresh context: read full analysis log    ← CRITICAL before synthesis
+- [ ] Apply counterfactual test to each potential fix
+- [ ] Write final recommendations
 ```
 
 ---
@@ -168,16 +173,19 @@ Correction indicators:
 **Evidence required**: Expected workflow step skipped or out-of-order
 
 Check for:
-- `/plan` without `/spec` when requirements were ambiguous
-- `/implement` without `/plan` for multi-file changes
-- Chunks executed out of dependency order
-- Verification skipped before approval
+- Multi-phase skill invoked but phases skipped (read skill to know expected phases)
+- Skill with prerequisites invoked without those prerequisites (e.g., implementation without planning)
+- Ordered steps executed out of order
+- Verification/validation steps skipped before proceeding
+
+**How to detect**: Compare skill's documented phases against actual session sequence.
 
 **Log format**:
 ```markdown
 ### Workflow Deviation: {what was skipped/reordered}
-- Expected flow: {standard workflow}
-- Actual flow: {what happened}
+- Skill: {which skill's workflow}
+- Expected flow: {phases from skill definition}
+- Actual flow: {what happened in session}
 - Impact: {did this cause issues later?}
 ```
 
@@ -221,48 +229,98 @@ Look for:
 
 ## Phase 4: Skill Comparison
 
-### 4.1 Identify relevant skills
+### 4.1 Discover skills used in session
 
-Based on session content, identify which skills to compare:
+Extract skill invocations from session:
 
-| Session Pattern | Relevant Skills |
-|-----------------|-----------------|
-| Used `/spec` | `vibe-workflow/skills/spec/SKILL.md` |
-| Used `/plan` | `vibe-workflow/skills/plan/SKILL.md` |
-| Used `/implement` | `vibe-workflow/skills/implement/SKILL.md` |
-| Used `/implement-inplace` | `vibe-workflow/skills/implement-inplace/SKILL.md` |
-| Code review happened | `vibe-workflow/skills/review*/SKILL.md` |
-| Bug investigation | `vibe-workflow/skills/bugfix/SKILL.md` |
+```bash
+# Find all Skill tool invocations
+grep -o '"skill":"[^"]*"' {session-file} | sort | uniq -c
 
-### 4.2 Read skill definitions
+# Find slash command patterns in user messages
+grep -oE '/(spec|plan|implement|review|bugfix|[a-z-]+)' {session-file} | sort | uniq -c
+```
 
-For each relevant skill:
-1. Read the SKILL.md file
-2. Extract key rules, phases, and decision points
-3. Note required questions and validation steps
+For each skill name found, locate the SKILL.md:
+
+```bash
+# Search across all plugins in the repo
+find claude-plugins -path "*/skills/*/SKILL.md" -exec grep -l "name: {skill-name}" {} \;
+
+# Also check repo-level skills
+find .claude/skills -name "SKILL.md" 2>/dev/null
+```
+
+**Log discovered skills**:
+```markdown
+## Skills Used in Session
+- {skill-name}: {plugin}/{path} - invoked {count} times
+```
+
+### 4.2 Extract actionable rules from each skill
+
+For each skill file, extract:
+
+**Rule indicators** (look for these patterns):
+- `must`, `should`, `never`, `always` → mandatory behaviors
+- `## Phase N:` or `### Step N:` → workflow phases
+- `questions:` or `AskUserQuestion` → required user prompts
+- `| Condition | Action |` tables → decision rules
+- `**CRITICAL**`, `**IMPORTANT**` → high-priority rules
+- `- [ ]` todo templates → expected workflow steps
+- `Acceptance:` or `Validation:` → verification requirements
+
+**Extract and log**:
+```markdown
+### Skill: {name}
+**File**: {path}
+
+**Mandatory behaviors**:
+- {rule with line number}
+
+**Workflow phases**:
+1. {phase name} - expected outputs: {list}
+
+**Required questions** (when applicable):
+- {question topic}
+
+**Verification steps**:
+- {what should be checked}
+```
 
 ### 4.3 Compare documented vs actual
 
 For each skill used in the session:
 
-| Aspect | Documented | Actual | Gap? |
-|--------|------------|--------|------|
-| Questions asked | {from skill} | {from session} | {Y/N} |
-| Phases followed | {from skill} | {from session} | {Y/N} |
-| Validations run | {from skill} | {from session} | {Y/N} |
-| Outputs produced | {from skill} | {from session} | {Y/N} |
+| Aspect | Documented | Actual | Gap? | Impact |
+|--------|------------|--------|------|--------|
+| Questions asked | {from skill} | {from session} | {Y/N} | {would have prevented X} |
+| Phases followed | {from skill} | {from session} | {Y/N} | {would have caught Y} |
+| Validations run | {from skill} | {from session} | {Y/N} | {would have avoided Z} |
+| Outputs produced | {from skill} | {from session} | {Y/N} | {required later but missing} |
 
-### 4.4 Log skill gaps
+**Key comparison questions**:
+1. Did the skill ask all documented questions? If not, did missing answers cause issues?
+2. Were all phases executed in order? If skipped, did it matter?
+3. Were validations run? If skipped, did bugs slip through?
+4. Did outputs match documented format? If not, did downstream steps suffer?
+
+### 4.4 Log skill gaps with impact
 
 ```markdown
 ### Skill Gap: {skill name}
-- Documented behavior: {what skill says to do}
-- Actual behavior: {what happened in session}
-- Evidence: {specific session content showing gap}
-- Confidence: HIGH | MEDIUM | LOW
+- **Rule violated**: {what skill says to do, with line reference}
+- **What happened**: {actual behavior in session}
+- **Evidence**: {specific session content showing gap}
+- **Impact**: {did this cause iteration/correction/rework?}
+- **Counterfactual**: {if rule was followed, would outcome differ?}
+- **Confidence**: HIGH | MEDIUM | LOW
 ```
 
-**Only log HIGH confidence gaps** - where evidence is clear and gap is unambiguous.
+**Only log gaps where**:
+1. Evidence is clear (specific session content)
+2. Impact is documented (caused measurable problem)
+3. Counterfactual is plausible (fix would have helped)
 
 ---
 
@@ -272,21 +330,43 @@ For each skill used in the session:
 
 **CRITICAL**: Read full analysis log before synthesis to restore all findings.
 
-### 5.2 Filter to high-confidence only
+### 5.2 Counterfactual analysis (the high-signal filter)
 
-An issue is HIGH confidence when:
-1. **Clear evidence**: Specific session content demonstrates the problem
-2. **Reproducible pattern**: Not a one-off edge case
-3. **Actionable fix**: Clear change to skill that would address it
-4. **Not already covered**: Skill doesn't already handle this case
+For each potential issue, apply this test:
 
-Discard issues that are:
-- Speculative (might have helped, but unclear)
-- One-off (unusual situation unlikely to recur)
-- Already documented (skill covers it, just wasn't followed)
-- Low impact (wouldn't have changed outcome significantly)
+```
+IF this skill change existed BEFORE the session:
+  WOULD a specific iteration/correction/rework NOT have happened?
+  CAN you name the exact moment it would have intervened?
+  WOULD the change have been triggered (conditions met)?
+```
 
-### 5.3 Format recommendations
+**Scoring**:
+| Score | Criteria | Action |
+|-------|----------|--------|
+| 3/3 | All yes → definite causal link | HIGH confidence |
+| 2/3 | Likely would have helped | MEDIUM confidence |
+| 1/3 or 0/3 | Speculative | Discard |
+
+**Example counterfactual**:
+```
+Issue: Plan skill should ask about time filtering
+Counterfactual:
+  - WOULD iteration have been avoided? YES - 90-day filter added post-implementation
+  - CAN I name exact moment? YES - during "Files to modify" phase, should have asked
+  - WOULD change have triggered? YES - requirement mentioned "recent refunds"
+Score: 3/3 → HIGH confidence
+```
+
+### 5.3 Additional disqualifiers
+
+Even with 3/3 counterfactual score, discard if:
+- **Compliance failure**: Skill already documents this; it just wasn't followed
+- **One-off context**: Unusual situation unlikely to recur (e.g., user typo)
+- **Scope creep**: Fix would make skill too complex for marginal benefit
+- **Side effects**: Fix would break other documented behavior
+
+### 5.4 Format recommendations
 
 For each HIGH confidence issue:
 
@@ -294,22 +374,39 @@ For each HIGH confidence issue:
 ## Issue: {short title}
 
 **Confidence**: HIGH
-**Evidence**: {specific session content or pattern}
+**Counterfactual score**: 3/3
+
+### Evidence
+{Quote or describe specific session content}
 
 ### What Happened
 {Brief description of the problem}
 
 ### Root Cause
-{Why the current skill didn't prevent this}
+{Why the current skill didn't prevent this - be specific about what's missing}
+
+### Counterfactual
+- **Iteration avoided**: {which rework/correction would NOT have happened}
+- **Intervention point**: {exact moment the fix would have triggered}
+- **Trigger condition**: {why the fix would have applied to this session}
 
 ### Suggested Fix
 **File**: {skill file path}
-**Change**: {specific change to make}
+**Section**: {phase/section name}
+**Line**: ~{approximate line number}
 
-{Code block showing the change if applicable}
+**Current behavior**:
+{What the skill does now}
 
-### Expected Impact
-{How this would have changed the session outcome}
+**Proposed behavior**:
+{What the skill should do instead}
+
+```{code block showing the diff if applicable}```
+
+### Risk Assessment
+- **Side effects**: {could this break other flows? NO/LOW/MEDIUM/HIGH}
+- **Complexity added**: {minimal/moderate/significant}
+- **Test approach**: {how to verify the fix works}
 ```
 
 ---
@@ -324,21 +421,36 @@ For each HIGH confidence issue:
 ## Summary
 - **Session outcome**: {success/partial/rework needed}
 - **Workflow used**: {skills invoked}
-- **Issues found**: {count} high-confidence issues
+- **Iterations observed**: {count of retry/fix cycles}
+- **High-signal fixes**: {count} (3/3 counterfactual score)
 
 ## What Went Well
-{List of things that worked correctly}
+{List of things that worked correctly - be specific about which skill behaviors succeeded}
 
-## High-Confidence Issues
+## Iteration Timeline
+{Chronological list of corrections/retries observed, with timestamps if available}
 
-### Issue 1: {title}
-{Full issue format from 5.3}
+1. {time}: {what was attempted}
+2. {time}: {what went wrong}
+3. {time}: {how it was fixed}
 
-### Issue 2: {title}
+## High-Confidence Improvements
+
+### Fix 1: {title}
+{Full format from 5.4}
+
+### Fix 2: {title}
 ...
 
-## Deferred (Medium/Low Confidence)
-{Brief mention of patterns noticed but not confident enough to recommend changes}
+## Deferred (Partial Counterfactual Match)
+{Issues that scored 2/3 - might help but not definitively causal}
+
+| Issue | Missing Criterion | Why Deferred |
+|-------|-------------------|--------------|
+| {title} | {which of the 3 failed} | {brief explanation} |
+
+## Not Actionable
+{Issues that scored 1/3 or 0/3, or hit disqualifiers - briefly note for transparency}
 
 ---
 Analysis log: {log file path}
@@ -354,24 +466,36 @@ Output the final report. User can then decide which fixes to implement.
 
 | Principle | Rule |
 |-----------|------|
-| Evidence-based | Every issue must cite specific session content |
-| High confidence only | Don't suggest speculative improvements |
-| Actionable | Each issue has a concrete fix suggestion |
-| Skill-focused | Goal is improving skills, not critiquing the session |
+| Counterfactual-driven | Every fix must pass the 3/3 counterfactual test |
+| Evidence-based | Quote or cite specific session content |
+| Iteration-focused | Primary signal = things that required retry/correction |
+| Skill-focused | Goal is improving skills, not critiquing user or session |
 | Memento | Write findings to log as you go, refresh before synthesis |
 
-## Confidence Criteria
+## Confidence Criteria (Counterfactual-Based)
 
-| Level | Criteria | Action |
-|-------|----------|--------|
-| HIGH | Clear evidence + reproducible + actionable + not covered | Include in report |
-| MEDIUM | Some evidence but pattern unclear or edge case | Mention in "Deferred" |
-| LOW | Speculative or one-off | Omit from report |
+| Score | Test Results | Action |
+|-------|--------------|--------|
+| 3/3 | Would avoid iteration + Name exact moment + Conditions would trigger | HIGH → Include |
+| 2/3 | Two of three | MEDIUM → Deferred section |
+| 1/3 | One of three | LOW → Not Actionable section |
+| 0/3 | None | Discard entirely |
+
+## Disqualifiers (Even at 3/3)
+
+| Disqualifier | Why It Filters Out |
+|--------------|--------------------|
+| Compliance failure | Skill already covers this - LLM didn't follow |
+| One-off context | Unusual situation unlikely to recur |
+| Scope creep | Fix adds complexity disproportionate to benefit |
+| Side effects | Fix would break other documented behaviors |
 
 ## Never Do
 
-- Suggest changes without clear session evidence
-- Include medium/low confidence issues in main recommendations
+- Suggest changes without specific session evidence
+- Include fixes that score <3/3 in main recommendations
+- Skip the counterfactual test ("it seems like it would help")
 - Skip reading the full analysis log before synthesis
 - Critique user behavior (focus on skill gaps, not user mistakes)
 - Suggest fixes that would break other documented behavior
+- Recommend changes to skills that weren't used in the session
