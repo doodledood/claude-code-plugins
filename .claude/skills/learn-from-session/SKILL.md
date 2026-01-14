@@ -45,6 +45,8 @@ find ~/.claude/projects -name "*{session-id}*" -type f 2>/dev/null
 
 Path: `/tmp/session-analysis-{session-id-short}-{timestamp}.md`
 
+**Purpose**: External memory that persists findings beyond LLM working memory. Write to this file IMMEDIATELY after each discovery—never batch multiple findings into one write.
+
 ```markdown
 # Session Analysis Log
 
@@ -52,40 +54,98 @@ Session: {id or "inline commentary"}
 Started: {timestamp}
 Status: IN_PROGRESS
 
+---
+
 ## Session Overview
-(populated after parsing)
+<!-- Write immediately after Phase 2 parsing -->
+
+**Initial request**:
+**Skills invoked**:
+**Outcome**:
+**Session length**:
+
+---
 
 ## Pattern Detection
-(populated during analysis)
+
+### Iterations Found
+<!-- Write immediately after detecting iterations - before moving to corrections -->
+
+### User Corrections Found
+<!-- Write immediately after detecting corrections - before moving to deviations -->
+
+### Workflow Deviations Found
+<!-- Write immediately after detecting deviations - before moving to missing questions -->
+
+### Missing Questions Found
+<!-- Write immediately after detecting missing questions - before moving to post-impl -->
+
+### Post-Implementation Fixes Found
+<!-- Write immediately after detecting post-impl fixes - before skill comparison -->
+
+---
 
 ## Skill Comparison
-(populated during comparison)
 
-## Issues Found
-(populated as issues identified)
+### Skills Discovered
+<!-- Write immediately after discovering which skills were used -->
+
+### Skill: {name}
+<!-- Write immediately after analyzing EACH skill - don't batch -->
+
+---
+
+## Potential Issues
+<!-- Write each issue as identified during comparison -->
+
+---
+
+## Counterfactual Analysis
+<!-- Write results of 3/3 test for each issue -->
+
+---
 
 ## Final Recommendations
-(populated at end)
+<!-- Populated after refresh step -->
 ```
 
-### 1.4 Create todo list
+### 1.4 Create todo list (Memento pattern)
+
+**CRITICAL**: Never batch writes. Write to log IMMEDIATELY after each finding, before proceeding.
 
 ```
+- [ ] Create analysis log file
 - [ ] Parse session / read commentary
-- [ ] Write session overview to log (user intent, skills used, outcome)
-- [ ] Detect iteration patterns (retries, corrections)
-- [ ] Write iteration findings to log
-- [ ] Detect workflow deviations (skipped steps, out-of-order)
-- [ ] Detect missing questions / thin requirements
-- [ ] Identify post-implementation fixes
-- [ ] Write all pattern detection findings to log
-- [ ] Discover skills used in session
-- [ ] (expand: read and analyze each skill as discovered)
-- [ ] (expand: write skill comparison findings to log)
-- [ ] Refresh context: read full analysis log    ← CRITICAL before synthesis
+- [ ] Write session overview to log file
+- [ ] Detect iteration patterns
+- [ ] Write iteration findings to log file
+- [ ] Detect user corrections
+- [ ] Write correction findings to log file
+- [ ] Detect workflow deviations
+- [ ] Write deviation findings to log file
+- [ ] Detect missing questions
+- [ ] Write missing question findings to log file
+- [ ] Detect post-implementation fixes
+- [ ] Write post-impl findings to log file
+- [ ] Extract skill names from session
+- [ ] Use codebase-explorer to find files for each skill
+- [ ] Write discovered skills to log file
+- [ ] (expand: add "Analyze {skill} skill" + "Write {skill} findings to log" for each skill found)
+- [ ] Refresh context: read FULL analysis log
 - [ ] Apply counterfactual test to each potential fix
-- [ ] Write final recommendations
+- [ ] Write final recommendations to log file
+- [ ] Output final report
 ```
+
+**Expansion example**: If you discover skills `plan` and `implement` were used, expand to:
+```
+- [ ] Analyze plan skill (read SKILL.md, agents, hooks, extract rules, compare)
+- [ ] Write plan skill findings to log file
+- [ ] Analyze implement skill (read SKILL.md, agents, hooks, extract rules, compare)
+- [ ] Write implement skill findings to log file
+```
+
+**Why write-after-each-step matters**: By synthesis, early findings suffer context rot. Writing externalizes findings to a file that persists. The refresh step then moves ALL findings to context end where attention is highest.
 
 ---
 
@@ -151,6 +211,8 @@ Look for:
 - Potential skill gap: {what could have prevented this}
 ```
 
+**⚠️ Memento**: Write ALL iteration findings to log file NOW, before proceeding to 3.2.
+
 ### 3.2 User corrections ("no, I meant...")
 
 **Evidence required**: User message containing correction language
@@ -167,6 +229,8 @@ Correction indicators:
 - User feedback: {correction text}
 - Missing context: {what Claude should have asked/known}
 ```
+
+**⚠️ Memento**: Write ALL correction findings to log file NOW, before proceeding to 3.3.
 
 ### 3.3 Workflow deviations
 
@@ -189,6 +253,8 @@ Check for:
 - Impact: {did this cause issues later?}
 ```
 
+**⚠️ Memento**: Write ALL deviation findings to log file NOW, before proceeding to 3.4.
+
 ### 3.4 Missing questions
 
 **Evidence required**: Information discovered during implementation that should have been asked upfront
@@ -206,6 +272,8 @@ Look for:
 - Impact: {rework required}
 - Skill gap: {which skill should have asked this}
 ```
+
+**⚠️ Memento**: Write ALL missing question findings to log file NOW, before proceeding to 3.5.
 
 ### 3.5 Post-implementation fixes
 
@@ -225,13 +293,15 @@ Look for:
 - Should have been caught by: {which phase/skill}
 ```
 
+**⚠️ Memento**: Write ALL post-implementation findings to log file NOW, before proceeding to Phase 4.
+
 ---
 
 ## Phase 4: Skill Comparison
 
 ### 4.1 Discover skills used in session
 
-Extract skill invocations from session:
+**Step 1**: Extract skill invocations from session:
 
 ```bash
 # Find all Skill tool invocations
@@ -241,21 +311,36 @@ grep -o '"skill":"[^"]*"' {session-file} | sort | uniq -c
 grep -oE '/(spec|plan|implement|review|bugfix|[a-z-]+)' {session-file} | sort | uniq -c
 ```
 
-For each skill name found, locate the SKILL.md:
+**Step 2**: Use codebase-explorer to find ALL relevant files for each skill:
 
-```bash
-# Search across all plugins in the repo
-find claude-plugins -path "*/skills/*/SKILL.md" -exec grep -l "name: {skill-name}" {} \;
+For each skill name found, invoke the codebase-explorer:
 
-# Also check repo-level skills
-find .claude/skills -name "SKILL.md" 2>/dev/null
+```
+Skill("vibe-workflow:explore-codebase", "medium - find all files related to the {skill-name} skill: SKILL.md definition, related agents it spawns, hooks that affect it, and any shared utilities")
 ```
 
-**Log discovered skills**:
+This discovers:
+- The SKILL.md definition itself
+- Agents the skill spawns (e.g., plan-verifier for /plan)
+- Hooks that intercept skill behavior (e.g., Stop hook)
+- Shared utilities the skill depends on
+- Test files that document expected behavior
+
+**Why codebase-explorer**: Manual `find` only locates the SKILL.md. The explorer discovers the full context—agents, hooks, dependencies—needed to understand actual vs documented behavior.
+
+**Step 3**: Log discovered skills with full context:
+
 ```markdown
 ## Skills Used in Session
-- {skill-name}: {plugin}/{path} - invoked {count} times
+
+### {skill-name}
+- **SKILL.md**: {path}
+- **Related agents**: {list from explorer}
+- **Related hooks**: {list from explorer}
+- **Invoked**: {count} times
 ```
+
+**⚠️ Memento**: Write discovered skills to log file NOW, before proceeding to 4.2.
 
 ### 4.2 Extract actionable rules from each skill
 
@@ -322,13 +407,22 @@ For each skill used in the session:
 2. Impact is documented (caused measurable problem)
 3. Counterfactual is plausible (fix would have helped)
 
+**⚠️ Memento**: Write skill gap findings to log file after analyzing EACH skill—never batch multiple skills into one write. This ensures findings from earlier skills aren't lost to context rot.
+
 ---
 
 ## Phase 5: Synthesize Recommendations
 
-### 5.1 Refresh context
+### 5.1 Refresh context (non-negotiable)
 
-**CRITICAL**: Read full analysis log before synthesis to restore all findings.
+**CRITICAL**: Read the FULL analysis log file NOW before any synthesis.
+
+**Why this step exists**: By this point, findings from Phase 3 (pattern detection) have suffered context rot—they're in the "lost middle" of conversation. The log file contains ALL findings written throughout this workflow. Reading it:
+- Moves ALL findings to context END (highest attention zone)
+- Converts holistic synthesis (LLMs are bad at this) into dense recent context (LLMs are good at this)
+- Restores details that would otherwise be missed
+
+**Action**: Read the entire log file at `/tmp/session-analysis-{id}-{timestamp}.md`. Do NOT proceed to 5.2 until this is complete.
 
 ### 5.2 Counterfactual analysis (the high-signal filter)
 
