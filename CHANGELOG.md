@@ -8,6 +8,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-14
 
+- [vibe-workflow] v2.8.0 - /spec now skips codebase research for non-code work (external research, analysis, comparisons)
 - [vibe-workflow] v2.7.1 - Refactor: remove explicit "memento pattern" naming from skills/agents; behavior preserved
 - [prompt-engineering] v1.7.2 - Refactor: remove explicit "memento pattern" naming; behavior preserved
 - [solo-dev] v1.18.2 - Refactor: remove explicit "memento pattern" naming; behavior preserved

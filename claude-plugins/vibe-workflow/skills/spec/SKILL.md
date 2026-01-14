@@ -28,7 +28,8 @@ Todos = **areas to discover**, not interview steps. Each todo reminds you what c
 **Starter todos** (seeds only - list grows as discovery reveals new areas):
 
 ```
-- [ ] Initial context research
+- [ ] Determine work type (code vs non-code research)
+- [ ] Initial context research (skip for non-code work)
 - [ ] Scope & target users
 - [ ] Core requirements
 - [ ] (expand continuously as answers reveal new areas)
@@ -100,23 +101,48 @@ Started: {timestamp}
 
 ## Phase 2: Initial Context Gathering
 
-**Prerequisites**: Requires vibe-workflow plugin with codebase-explorer and web-researcher agents installed. If Task tool fails with agent not found, inform user: "Required agent {name} not available. Install vibe-workflow plugin or proceed with manual research?" If proceeding manually, use Read/Glob/Grep for codebase exploration and note `[LIMITED RESEARCH: {agent} unavailable]` in interview log.
+### 2.0 Determine if codebase research is relevant
 
-### 2.1 Launch codebase-explorer
+**Check $ARGUMENTS**: Does the work involve code, files, features, or system behavior?
+
+| If $ARGUMENTS... | Then... |
+|------------------|---------|
+| References code files, functions, components, features, bugs, refactors, or system behavior | Proceed to 2.1 (codebase research) |
+| Is about external research, analysis, comparison, or domain decisions (e.g., "research best X", "compare options", "find optimal Y") | SKIP to Phase 3 (interview) |
+
+**Indicators of NON-CODE work** (skip codebase research):
+- Keywords: "research", "find best", "compare options", "analyze market", "evaluate vendors", "select tool"
+- No mention of files, functions, components, APIs, or system behavior
+- Domain-specific decisions: investments, vendors, technologies to adopt, market analysis
+
+**Indicators of CODE work** (do codebase research):
+- Keywords: "add feature", "fix bug", "refactor", "implement", "update", "migrate"
+- References to files, functions, APIs, database schemas, components
+- System behavior changes, UI modifications, integration work
+
+**If unclear**: Ask user via AskUserQuestion: "Is this spec about code/system changes, or external research/analysis?" with options:
+- "Code/system changes" → Proceed to 2.1
+- "External research/analysis" → Skip to Phase 3
+
+---
+
+**Prerequisites** (for code work only): Requires vibe-workflow plugin with codebase-explorer and web-researcher agents installed. If Task tool fails with agent not found, inform user: "Required agent {name} not available. Install vibe-workflow plugin or proceed with manual research?" If proceeding manually, use Read/Glob/Grep for codebase exploration and note `[LIMITED RESEARCH: {agent} unavailable]` in interview log.
+
+### 2.1 Launch codebase-explorer (code work only)
 
 Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work. Limit to 3 parallel researchers per batch. If findings conflict, immediately present both perspectives to user via AskUserQuestion: "Research found conflicting information about {topic}: {perspective A} vs {perspective B}. Which applies to your situation?" If user cannot resolve, document both perspectives in spec with `[CONTEXT-DEPENDENT: {perspective A} applies when X; {perspective B} applies when Y]` and ask follow-up to clarify applicability. If 3 researchers don't cover all needed areas, run additional batches sequentially.
 
 Explore: product purpose, existing patterns, user flows, terminology, product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md), existing specs in `docs/` or `specs/`. For bug fixes: also explore bug context, related code, potential causes.
 
-### 2.2 Read recommended files
+### 2.2 Read recommended files (code work only)
 
 Read ALL files from researcher prioritized reading lists - no skipping.
 
-### 2.3 Launch web-researcher (if needed)
+### 2.3 Launch web-researcher (if needed, code work only)
 
 Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` when you cannot answer a question from codebase research alone and the answer requires: domain concepts unfamiliar to you, current industry standards or best practices, regulatory/compliance requirements, or competitor UX patterns. Do not use for questions answerable from codebase or general knowledge. Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
 
-### 2.4 Update interview log
+### 2.4 Update interview log (code work only)
 
 After EACH research step, append to interview log:
 
@@ -133,10 +159,17 @@ After EACH research step, append to interview log:
 Write first draft with `[TBD]` markers for unresolved items. Use same file path for all updates.
 
 ### Phase 2 Complete When
+
+**For code work**:
 - All codebase-explorer tasks finished
 - All recommended files read
 - Initial draft written with `[TBD]` markers
 - Interview log populated with research findings
+
+**For non-code work** (external research/analysis):
+- Phase 2 skipped per 2.0 decision
+- Initial draft written with `[TBD]` markers (based on $ARGUMENTS only)
+- Proceed directly to Phase 3 interview
 
 ## Phase 3: Iterative Discovery Interview
 
