@@ -225,7 +225,7 @@ questions: [
 ]
 ```
 
-### Memento Loop
+### Discovery Loop
 
 1. Mark todo `in_progress`
 2. Research (codebase-explorer) OR ask (AskUserQuestion)
@@ -709,7 +709,7 @@ For external systems/user input: (1) what can fail, (2) how failures surface, (3
 
 ## Planning Mantras
 
-**Memento (always)**:
+**Always**:
 1. Write findings BEFORE next step
 2. Every follow-up discovery → todo
 3. Update research log after EACH step

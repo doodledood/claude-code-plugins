@@ -212,7 +212,7 @@ If verification failed after 5 iterations:
 
 | Principle | Rule |
 |-----------|------|
-| **Memento** | Use TodoWrite to track phases; expand todos when verification fails; mark progress immediately |
+| **Track progress** | Use TodoWrite to track phases; expand todos when verification fails; mark progress immediately |
 | **Losslessness** | Never sacrifice semantic information for density; every fact must be preserved |
 | **Nuance preservation** | Keep emphasis, intentional hedging, priority signals; 10% with nuance > 40% without |
 | **No ambiguity** | Compressed must be as unambiguous as original; don't merge distinct conditions or flatten relationships |

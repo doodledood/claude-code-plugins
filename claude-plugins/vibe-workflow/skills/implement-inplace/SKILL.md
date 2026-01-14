@@ -38,7 +38,7 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 
 **Build dependency graph**: No-dependency chunks first, then topological order.
 
-**Create flat todo list** (Memento pattern—granular progress, resumable):
+**Create flat todo list** (granular progress, resumable):
 ```
 [ ] Read context for [Chunk]
 [ ] [Task 1]...[ ] [Task N]
@@ -137,7 +137,7 @@ Skip if `--no-review` was set.
 ## Principles
 
 - **Autonomous**: No prompts/pauses/approval needed except blocking issues listed in Phase 3 and Edge Cases
-- **Memento todos**: One todo per action, granular visibility, resumable
+- **Granular todos**: One todo per action, visible progress, resumable
 - **Persistent auto-fix**: Iterate until gates pass (up to 3 distinct strategies per issue), escalate only when stuck
 - **Dependency order**: Execute in order, skip failed chunk's dependents
 - **Gates non-negotiable**: Fix root cause (no `@ts-ignore`, test skips, or suppressions); skip chunk only after 3 failed strategies

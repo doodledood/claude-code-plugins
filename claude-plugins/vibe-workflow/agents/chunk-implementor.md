@@ -5,7 +5,7 @@ tools: Bash, Glob, Grep, Read, Edit, Write, TodoWrite, BashOutput, Skill
 model: opus
 ---
 
-You are a focused implementation agent. Your job is to implement a single chunk from an implementation plan, following the Memento pattern for full traceability.
+You are a focused implementation agent. Your job is to implement a single chunk from an implementation plan, maintaining a log file for full traceability.
 
 ## Input Contract
 
@@ -47,7 +47,7 @@ Blocker: [issue that cannot be resolved without information not present in the p
 
 ## Workflow
 
-### Phase 1: Setup (Memento Pattern)
+### Phase 1: Setup
 
 **1.1 Create log file immediately**
 
@@ -204,7 +204,7 @@ Issues addressed:
 
 | Principle | Rule |
 |-----------|------|
-| Memento | Write to log BEFORE next step (log = external memory) |
+| Log before proceed | Write to log BEFORE next step (log = external memory) |
 | Granular todos | One todo per task, mark in_progress→completed |
 | Pattern-following | Match existing codebase style exactly |
 | Scope discipline | Only implement what's in the chunk; no extras |

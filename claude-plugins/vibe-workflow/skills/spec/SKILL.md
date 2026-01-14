@@ -168,7 +168,7 @@ questions: [
 ]
 ```
 
-### Memento Loop
+### Discovery Loop
 
 For each step:
 1. Mark todo `in_progress`
@@ -423,7 +423,7 @@ Approve to proceed to planning, or request adjustments.
 
 | Principle | Rule |
 |-----------|------|
-| Memento style | Write findings BEFORE next question (interview log = external memory) |
+| Write-before-proceed | Write findings BEFORE next question (interview log = external memory) |
 | Todo-driven | Every discovery needing follow-up → todo (no mental notes) |
 | WHAT not HOW | Requirements only - no architecture, APIs, data models, code patterns. Self-check: if thinking "how to implement," refocus on "what should happen/change" |
 | Observable outcomes | Focus on what changes when complete. Ask "what is different after?" not "how does it work internally?" Edge cases = system/business impact |

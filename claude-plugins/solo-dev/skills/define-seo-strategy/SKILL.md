@@ -661,7 +661,7 @@ Write the document to the current working directory as `SEO_STRATEGY.md`.
 
 After generating the initial document, validate major sections with the user.
 
-### Memento Loop for Validation
+### Validation Loop
 
 For each validation section:
 1. Mark current section validation `in_progress`
@@ -781,7 +781,7 @@ Finished: {timestamp} | Research agents: 3 | Validation cycles: {count}
 
 | Principle | Rule |
 |-----------|------|
-| **Memento** | Write findings to research log BEFORE next step; every validation feedback → log; update after EACH phase |
+| **Write before proceed** | Write findings to research log BEFORE next step; every validation feedback → log; update after EACH phase |
 | **Todo-driven** | Create todos for phases; expand when validation reveals issues; never keep mental notes |
 | **Customer-aligned** | Every recommendation ties to ICP searches; content matches pain points; authority signals ICP trusts |
 | **Actionable** | No generic advice; every tactic has implementation details; effort/impact scoring |

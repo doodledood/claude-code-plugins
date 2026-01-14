@@ -50,7 +50,7 @@ find ~/.claude/projects -name "*{session-id}*" -type f 2>/dev/null
 
 **If file not found**: Ask user to provide the session file path directly or check if session ID is correct.
 
-### 1.3 Create analysis log (Memento pattern)
+### 1.3 Create analysis log
 
 Path: `/tmp/session-analysis-{session-id-short}-{timestamp}.md`
 
@@ -118,7 +118,7 @@ Status: IN_PROGRESS
 <!-- Populated after refresh step -->
 ```
 
-### 1.4 Create todo list (Memento pattern)
+### 1.4 Create todo list
 
 **CRITICAL**: Write to log IMMEDIATELY after each finding—never batch writes.
 
@@ -215,7 +215,7 @@ Look for:
 - Potential skill gap: {what could have prevented this}
 ```
 
-**⚠️ Memento**: Write ALL iteration findings to log file NOW, before proceeding to 3.2.
+Write ALL iteration findings to log file NOW, before proceeding to 3.2.
 
 ### 3.2 User corrections ("no, I meant...")
 
@@ -234,7 +234,7 @@ Correction indicators:
 - Missing context: {what Claude should have asked/known}
 ```
 
-**⚠️ Memento**: Write ALL correction findings to log file NOW, before proceeding to 3.3.
+Write ALL correction findings to log file NOW, before proceeding to 3.3.
 
 ### 3.3 Workflow deviations
 
@@ -257,7 +257,7 @@ Check for:
 - Impact: {did this cause issues later?}
 ```
 
-**⚠️ Memento**: Write ALL deviation findings to log file NOW, before proceeding to 3.4.
+Write ALL deviation findings to log file NOW, before proceeding to 3.4.
 
 ### 3.4 Missing questions
 
@@ -277,7 +277,7 @@ Look for:
 - Skill gap: {which skill should have asked this}
 ```
 
-**⚠️ Memento**: Write ALL missing question findings to log file NOW, before proceeding to 3.5.
+Write ALL missing question findings to log file NOW, before proceeding to 3.5.
 
 ### 3.5 Post-implementation fixes
 
@@ -297,7 +297,7 @@ Look for:
 - Should have been caught by: {which phase/skill}
 ```
 
-**⚠️ Memento**: Write ALL post-implementation findings to log file NOW, before proceeding to Phase 4.
+Write ALL post-implementation findings to log file NOW, before proceeding to Phase 4.
 
 ---
 
@@ -357,7 +357,7 @@ This discovers:
 - **Invoked**: {count} times
 ```
 
-**⚠️ Memento**: Write discovered skills to log file NOW, before proceeding to 4.2.
+Write discovered skills to log file NOW, before proceeding to 4.2.
 
 ### 4.2 Extract actionable rules from each skill
 
@@ -424,7 +424,7 @@ For each skill used in the session:
 2. Impact is documented (caused measurable problem)
 3. Counterfactual is plausible (fix would have helped)
 
-**⚠️ Memento**: Write skill gap findings to log file after analyzing EACH skill—never batch multiple skills into one write. This ensures findings from earlier skills aren't lost to context rot.
+Write skill gap findings to log file after analyzing EACH skill—never batch multiple skills into one write.
 
 ---
 
@@ -581,7 +581,7 @@ Output the final report. User can then decide which fixes to implement.
 | Evidence-based | Quote or cite specific session content |
 | Iteration-focused | Primary signal = things that required retry/correction |
 | Skill-focused | Goal is improving skills, not critiquing user or session |
-| Memento | Write findings to log as you go, refresh before synthesis |
+| Log-driven | Write findings to log as you go, refresh before synthesis |
 
 ## Confidence Criteria (Counterfactual-Based)
 
