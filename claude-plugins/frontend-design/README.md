@@ -9,19 +9,46 @@ AI-generated frontend code often falls into predictable patterns—generic anima
 ## Components
 
 **Skills** (auto-invoked when relevant):
-- `scrollytelling` - Scroll-driven storytelling with pinned sections, progressive reveals, parallax, and scroll-linked animations
+- `scrollytelling` - Comprehensive scroll-driven storytelling implementation with 5 standard techniques, 4 layout patterns, accessibility-first design, and modern CSS/JS approaches
 
-## Scrollytelling Patterns
+## Scrollytelling
 
-The scrollytelling skill supports multiple patterns:
+The scrollytelling skill provides research-backed guidance for implementing scroll-driven narrative experiences.
+
+### The 5 Standard Techniques
+
+| Technique | Description |
+|-----------|-------------|
+| **Graphic Sequence** | Discrete visuals that change at scroll thresholds |
+| **Animated Transition** | Smooth morphing between states |
+| **Pan and Zoom** | Scroll controls visible portion of content |
+| **Moviescroller** | Frame-by-frame video-like progression |
+| **Show-and-Play** | Interactive elements activate at waypoints |
+
+### Layout Patterns
 
 | Pattern | Use Case |
 |---------|----------|
-| **Pinned narrative** | Text scrolls while visual stays fixed (NYT, Pudding.cool style) |
-| **Progressive reveal** | Content fades in as it enters viewport |
-| **Scroll-linked** | Animations tied to scroll progress (0-100%) |
-| **Parallax** | Depth through differential scroll speeds |
-| **Step sequence** | Discrete sections with transitions |
+| **Side-by-Side Sticky** | Data viz, step-by-step explanations (most common) |
+| **Full-Width Sections** | Immersive brand storytelling, portfolios |
+| **Layered Parallax** | Atmospheric narratives (requires motion fallback) |
+| **Multi-Directional** | Timelines, unconventional showcases |
+
+### Technical Coverage
+
+- **Native CSS** (2025+): `animation-timeline: scroll()`, `animation-timeline: view()`
+- **GSAP ScrollTrigger**: Complex timelines, pinning, cross-browser
+- **Motion/Framer Motion**: React ecosystem
+- **IntersectionObserver**: Viewport-triggered effects
+- **Lenis**: Smooth scrolling integration
+
+### Accessibility-First
+
+- Mandatory `prefers-reduced-motion` support
+- WCAG 2.2 compliance guidance
+- Vestibular disorder considerations
+- Keyboard navigation patterns
+- Screen reader strategies
 
 ## Installation
 

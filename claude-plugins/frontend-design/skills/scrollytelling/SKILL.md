@@ -7,23 +7,115 @@ description: 'Implements scroll-driven storytelling experiences with pinned sect
 
 Build scroll-driven narrative experiences that reveal content, trigger animations, and create immersive storytelling as users scroll.
 
-## Overview
+## What is Scrollytelling?
 
-Scrollytelling combines scrolling with storytelling—content reveals, animations, and transitions tied to scroll position. This skill helps implement:
+**Definition**: "A storytelling format in which visual and textual elements appear or change as the reader scrolls through an online article." When readers scroll, something other than conventional document movement happens.
 
-- **Pinned sections** - Content stays fixed while scroll progresses through steps
-- **Progressive reveals** - Text/images fade in as they enter viewport
-- **Scroll-linked animations** - Elements animate based on scroll progress (0-100%)
-- **Parallax layers** - Depth through differential scroll speeds
-- **Step-based narratives** - Discrete content changes at scroll thresholds
+**Origin**: The New York Times' "Snow Fall: The Avalanche at Tunnel Creek" (2012), which won the 2013 Pulitzer Prize for Feature Writing.
 
-## When to Use
+**Why it works**: Scrollytelling exploits a fundamental psychological principle—humans crave control. Every scroll is a micro-commitment that increases engagement. Users control the pace, creating deeper connection than passive consumption.
 
-- Landing pages telling a product story
-- Case studies with visual progression
-- Data visualizations that build up
-- Feature tours with step-by-step reveals
-- Any narrative that unfolds over scroll
+**Measured impact**:
+- 400% longer time-on-page vs static content
+- 67% improvement in information recall
+- 5x higher social sharing rates
+- 25-40% improved conversion completion
+
+## Core Principles
+
+### 1. Story First, Technology Second
+
+The biggest mistake is leading with technology instead of narrative. Scrollytelling should enhance the story, not showcase effects.
+
+### 2. User Agency & Progressive Disclosure
+
+Users control the pace. Information reveals gradually to maintain curiosity. This shifts from predetermined pacing to user-controlled narrative flow.
+
+### 3. Sequential Structure
+
+Unlike hierarchical web content, scrollytelling demands linear progression with clear narrative beats. Each section builds on the previous.
+
+### 4. Meaningful Change
+
+Every scroll-triggered effect must serve the narrative. Gratuitous animation distracts rather than enhances.
+
+### 5. Restraint Over Spectacle
+
+Not every section needs animation. Subtle transitions often work better than constant effects. The format should amplify the content's message, not fight it.
+
+## The 5 Standard Techniques
+
+Research analyzing 50 scrollytelling articles identified these core patterns:
+
+| Technique | Description | Best For |
+|-----------|-------------|----------|
+| **Graphic Sequence** | Discrete visuals that change completely at scroll thresholds | Data visualizations, step-by-step explanations |
+| **Animated Transition** | Smooth morphing between states | State changes, evolution over time |
+| **Pan and Zoom** | Scroll controls which portion of a visual is visible | Maps, large images, spatial narratives |
+| **Moviescroller** | Frame-by-frame progression creating video-like effects | Product showcases, 3D object reveals |
+| **Show-and-Play** | Interactive elements activate at scroll waypoints | Multimedia, audio/video integration |
+
+## Layout Patterns
+
+### Pattern 1: Side-by-Side Sticky (Most Common)
+
+The classic scrollytelling pattern: a graphic becomes "stuck" while narrative text scrolls alongside. When the narrative concludes, the graphic "unsticks."
+
+```
+┌─────────────────────────────────────┐
+│  ┌──────────┐  ┌─────────────────┐  │
+│  │  Text    │  │                 │  │
+│  │  Step 1  │  │    STICKY       │  │
+│  ├──────────┤  │    GRAPHIC      │  │
+│  │  Text    │  │                 │  │
+│  │  Step 2  │  │  (updates with  │  │
+│  ├──────────┤  │   active step)  │  │
+│  │  Text    │  │                 │  │
+│  │  Step 3  │  │                 │  │
+│  └──────────┘  └─────────────────┘  │
+└─────────────────────────────────────┘
+```
+
+**When to use**: Data visualization stories, step-by-step explanations, educational content requiring persistent visual context.
+
+**Implementation**: Use CSS `position: sticky` (not JavaScript scroll listeners) for better performance and graceful degradation.
+
+### Pattern 2: Full-Width Sections
+
+Content spans the entire viewport with section-based transitions.
+
+**When to use**: Highly visual narratives, immersive brand storytelling, portfolio showcases, timeline-based stories.
+
+### Pattern 3: Layered Parallax
+
+Multiple visual layers (background, midground, foreground) move at different speeds to create depth.
+
+**When to use**: Atmospheric storytelling, game/product launches, long-form narratives where depth adds emotional impact.
+
+**Accessibility warning**: Parallax triggers vestibular disorders (dizziness, nausea, migraines). Always provide reduced-motion fallback; limit to one subtle parallax effect per page maximum.
+
+### Pattern 4: Multi-Directional
+
+Combines vertical scrolling with horizontal sections or sideways timelines.
+
+**When to use**: Timeline-based content, visually-driven showcases, unconventional layouts where surprise enhances the message.
+
+## When to Use Scrollytelling
+
+**Good candidates**:
+- Long-form journalism with multimedia
+- Brand storytelling celebrating achievements
+- Product pages showcasing features
+- Chronological/historical content
+- Complex narratives broken into digestible chunks
+- High-consideration products needing depth
+
+**Avoid when**:
+- You lack strong visual assets
+- You're tight on time/budget (good scrollytelling requires more investment)
+- The story lacks distinct chronology
+- Content is brief
+- Performance is critical on low-end devices
 
 ## Discovery Questions
 
@@ -35,7 +127,7 @@ question: "What scrollytelling pattern fits your narrative?"
 options:
   - "Pinned narrative - text changes while visual stays fixed (NYT, Pudding.cool style)"
   - "Progressive reveal - content fades in as you scroll down"
-  - "Parallax depth - layers move at different speeds"
+  - "Parallax depth - layers move at different speeds (requires reduced-motion fallback)"
   - "Step sequence - discrete sections with transitions between"
   - "Hybrid - multiple patterns combined"
 ```
@@ -53,132 +145,93 @@ options:
 ```
 
 ```
-header: "Animation Library"
-question: "Any animation library preference?"
+header: "Animation Approach"
+question: "Animation library preference?"
 options:
-  - "CSS-only (scroll-timeline, IntersectionObserver)"
-  - "GSAP ScrollTrigger (most powerful)"
-  - "Framer Motion (React)"
-  - "Lenis + custom (smooth scroll)"
+  - "CSS-only (scroll-timeline API, IntersectionObserver) - best performance"
+  - "GSAP ScrollTrigger - most powerful, cross-browser"
+  - "Framer Motion / Motion - React ecosystem"
+  - "Lenis + custom - smooth scroll"
   - "No preference - recommend based on complexity"
 ```
 
-## Implementation Patterns
+## Technical Implementation (2025-2026)
 
-### Pattern 1: Pinned Narrative (Text + Visual)
+### Technology Selection Guide
 
-The classic scrollytelling pattern: visual stays pinned while text sections scroll past, each triggering content changes.
+| Complexity | Recommendation | Bundle Size |
+|------------|----------------|-------------|
+| Simple reveals, progress bars | Native CSS scroll-timeline | 0 KB |
+| Viewport-triggered effects | IntersectionObserver | 0 KB |
+| Complex timelines, pinning | GSAP ScrollTrigger | ~23 KB |
+| React projects | Motion (Framer Motion) | ~32 KB |
+| Smooth scroll + effects | Lenis + GSAP | ~25 KB |
 
-**Structure:**
-```
-┌─────────────────────────────────────┐
-│  ┌──────────┐  ┌─────────────────┐  │
-│  │  Text    │  │                 │  │
-│  │  Step 1  │  │    PINNED       │  │
-│  ├──────────┤  │    VISUAL       │  │
-│  │  Text    │  │                 │  │
-│  │  Step 2  │  │  (changes with  │  │
-│  ├──────────┤  │   active step)  │  │
-│  │  Text    │  │                 │  │
-│  │  Step 3  │  │                 │  │
-│  └──────────┘  └─────────────────┘  │
-└─────────────────────────────────────┘
-```
+### CSS Scroll-Driven Animations (Native - 2025+)
 
-**Key mechanics:**
-- Container has `height: <num-steps> * 100vh`
-- Visual uses `position: sticky; top: 0`
-- IntersectionObserver tracks which text step is active
-- Visual updates based on active step index
+**Browser support**:
+- Chrome 115+: Full support (since July 2025)
+- Safari 26+: Full support (since September 2025)
+- Firefox: Requires flag (`layout.css.scroll-driven-animations.enabled`)
 
-**React + GSAP example:**
-```tsx
-const ScrollytellingSection = ({ steps }) => {
-  const containerRef = useRef(null);
-  const visualRef = useRef(null);
-  const [activeStep, setActiveStep] = useState(0);
+**Key properties**:
+- `animation-timeline: scroll()` - links animation to scroll position
+- `animation-timeline: view()` - links animation to element visibility
+- `animation-range` - controls when animation starts/stops
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      steps.forEach((_, index) => {
-        ScrollTrigger.create({
-          trigger: `.step-${index}`,
-          start: 'top center',
-          end: 'bottom center',
-          onEnter: () => setActiveStep(index),
-          onEnterBack: () => setActiveStep(index),
-        });
-      });
-    }, containerRef);
-    return () => ctx.revert();
-  }, [steps]);
-
-  return (
-    <section ref={containerRef} className="relative">
-      <div className="grid grid-cols-2 gap-8">
-        {/* Text column - scrolls naturally */}
-        <div className="space-y-[100vh]">
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              className={`step-${i} min-h-screen flex items-center transition-opacity duration-300 ${
-                activeStep === i ? 'opacity-100' : 'opacity-30'
-              }`}
-            >
-              <div className="max-w-md">
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Visual column - sticky */}
-        <div className="relative">
-          <div
-            ref={visualRef}
-            className="sticky top-0 h-screen flex items-center justify-center"
-          >
-            <StepVisual step={activeStep} data={steps[activeStep]} />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-```
-
-### Pattern 2: Progressive Reveal
-
-Content fades/slides in as it enters the viewport. Simpler than pinned, works well for feature lists.
-
-**CSS-only approach (modern browsers):**
+**Example - View-triggered fade in**:
 ```css
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+@supports (animation-timeline: scroll()) {
+  .reveal-on-scroll {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.reveal-on-scroll {
-  animation: reveal linear both;
-  animation-timeline: view();
-  animation-range: entry 0% entry 30%;
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 ```
 
-**IntersectionObserver fallback:**
+**Example - Scroll-linked progress bar**:
+```css
+.progress-bar {
+  animation: grow linear;
+  animation-timeline: scroll();
+}
+
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+```
+
+**Performance benefit**: Tokopedia achieved 80% code reduction and CPU usage dropped from 50% to 2% by switching to native CSS scroll-driven animations.
+
+### IntersectionObserver Pattern
+
+For scroll-triggered effects without continuous scroll tracking:
+
 ```tsx
 const RevealOnScroll = ({ children, delay = 0 }) => {
   const ref = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Check reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIsVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -208,11 +261,98 @@ const RevealOnScroll = ({ children, delay = 0 }) => {
 };
 ```
 
-### Pattern 3: Scroll-Linked Progress
+### GSAP ScrollTrigger (Complex Animations)
 
-Elements animate proportionally to scroll position. Great for progress bars, filling graphics, or continuous transformations.
+For pinned sections, timeline orchestration, and cross-browser reliability:
 
-**Scroll progress hook:**
+```tsx
+const ScrollytellingSection = ({ steps }) => {
+  const containerRef = useRef(null);
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    // Check reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      steps.forEach((_, index) => {
+        ScrollTrigger.create({
+          trigger: `.step-${index}`,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => setActiveStep(index),
+          onEnterBack: () => setActiveStep(index),
+        });
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [steps]);
+
+  return (
+    <section ref={containerRef} className="relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Text column - scrolls naturally */}
+        <div className="space-y-[100vh]">
+          {steps.map((step, i) => (
+            <div
+              key={i}
+              className={`step-${i} min-h-screen flex items-center transition-opacity duration-300 ${
+                activeStep === i ? 'opacity-100' : 'opacity-30'
+              }`}
+            >
+              <div className="max-w-md">
+                <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
+                <p className="text-lg">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Visual column - sticky */}
+        <div className="relative hidden md:block">
+          <div className="sticky top-0 h-screen flex items-center justify-center">
+            <StepVisual step={activeStep} data={steps[activeStep]} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+```
+
+### Motion (Framer Motion) for React
+
+```tsx
+import { motion, useScroll, useTransform } from 'motion/react';
+
+const ScrollLinkedSection = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+
+  return (
+    <section ref={ref} className="h-[200vh] relative">
+      <motion.div
+        className="sticky top-0 h-screen flex items-center justify-center"
+        style={{ opacity, scale }}
+      >
+        <h2 className="text-6xl font-bold">Scroll-Linked Content</h2>
+      </motion.div>
+    </section>
+  );
+};
+```
+
+### Scroll Progress Hook
+
 ```tsx
 const useScrollProgress = (ref) => {
   const [progress, setProgress] = useState(0);
@@ -241,144 +381,148 @@ const useScrollProgress = (ref) => {
 
   return progress;
 };
-
-// Usage
-const AnimatedSection = () => {
-  const ref = useRef(null);
-  const progress = useScrollProgress(ref);
-
-  return (
-    <section ref={ref} className="h-[200vh]">
-      <div className="sticky top-0 h-screen flex items-center">
-        <div
-          style={{
-            width: `${progress * 100}%`,
-            opacity: 0.3 + progress * 0.7,
-          }}
-          className="h-2 bg-accent"
-        />
-      </div>
-    </section>
-  );
-};
 ```
 
-### Pattern 4: Parallax Layers
+## Accessibility Requirements
 
-Multiple layers moving at different speeds create depth.
+Accessibility is non-negotiable. Scrollytelling can trigger vestibular disorders and exclude keyboard/screen reader users if not implemented correctly.
 
-```tsx
-const ParallaxSection = ({ layers }) => {
-  const [scrollY, setScrollY] = useState(0);
+### Critical WCAG Criteria
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+| Criterion | Requirement |
+|-----------|-------------|
+| **SC 2.2.2** | Auto-playing content >5 seconds needs pause/stop/hide controls |
+| **SC 2.3.3** | User-triggered animations must be disableable |
+| **SC 2.3.1** | No flashing more than 3 times per second |
 
-  return (
-    <section className="relative h-screen overflow-hidden">
-      {layers.map((layer, i) => (
-        <div
-          key={i}
-          className="absolute inset-0"
-          style={{
-            transform: `translateY(${scrollY * layer.speed}px)`,
-            zIndex: layer.zIndex,
-          }}
-        >
-          {layer.content}
-        </div>
-      ))}
-    </section>
-  );
-};
+### Reduced Motion Support (Mandatory)
 
-// Usage
-<ParallaxSection
-  layers={[
-    { content: <Background />, speed: 0.1, zIndex: 0 },
-    { content: <MidLayer />, speed: 0.3, zIndex: 1 },
-    { content: <Foreground />, speed: 0.5, zIndex: 2 },
-  ]}
-/>
+**Always** respect user preferences:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
 ```
-
-## Performance Considerations
-
-### Do
-- Use `transform` and `opacity` for animations (GPU-accelerated)
-- Add `will-change: transform` sparingly on animated elements
-- Use `passive: true` on scroll listeners
-- Debounce/throttle scroll handlers if doing heavy calculations
-- Use `position: sticky` over JS-based pinning when possible
-- Consider `content-visibility: auto` for off-screen sections
-
-### Don't
-- Animate `width`, `height`, `top`, `left` (triggers layout)
-- Create scroll listeners without cleanup
-- Forget to handle reduced-motion preferences
-- Load heavy assets until needed (use lazy loading)
-
-### Reduced Motion Support
-
-Always respect user preferences:
 
 ```tsx
 const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// In components
-const shouldAnimate = !prefersReducedMotion();
-```
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .reveal-on-scroll {
-    animation: none;
-    opacity: 1;
-    transform: none;
+// In components - check before animating
+useEffect(() => {
+  if (prefersReducedMotion()) {
+    // Show content immediately, skip animations
+    return;
   }
-}
+  // Set up animations
+}, []);
 ```
 
-## Library Recommendations
+### Safe Animation Guidelines
 
-| Complexity | Recommendation |
-|------------|----------------|
-| Simple reveals | CSS `animation-timeline: view()` or IntersectionObserver |
-| Pinned narratives | GSAP ScrollTrigger (most battle-tested) |
-| React projects | Framer Motion's `useScroll` + `useTransform` |
-| Smooth scroll | Lenis + GSAP combination |
-| Data viz | D3 + ScrollTrigger integration |
+| Animation Type | Safety |
+|----------------|--------|
+| Fade in/out, under 0.5s | Safe |
+| Simple transforms | Safe |
+| Parallax scrolling | Triggers vestibular issues - always provide fallback |
+| Swooping, zooming | Problematic - avoid or provide fallback |
+| Looping animations | Cognitive overload - limit iterations |
+
+**Keep effects small**: Animations affecting more than 1/3 of the viewport can overwhelm users.
+
+### Keyboard Navigation
+
+- Add `tabindex="0"` to scrollable areas
+- Ensure focus follows scroll targets when using smooth scrolling
+- Provide skip links to major sections
+- No keyboard traps in scroll regions
+
+### Screen Reader Considerations
+
+- Use proper heading hierarchy (`<h1>` through `<h6>`)
+- DOM order must match logical reading order
+- Use ARIA live regions for dynamic content updates
+- Ensure all content exists in DOM (even if visually hidden initially)
+
+## Performance Best Practices
+
+### Do
+
+- Use `transform` and `opacity` for animations (GPU-accelerated)
+- Add `will-change: transform` sparingly on animated elements
+- Use `passive: true` on scroll listeners
+- Use `position: sticky` over JS-based pinning
+- Lazy load images/videos until needed
+- Use single IntersectionObserver for multiple elements
+- Test on real devices, not just desktop
+
+### Don't
+
+- Animate `width`, `height`, `top`, `left` (triggers layout recalculation)
+- Use `will-change` excessively (increases memory usage)
+- Create scroll listeners without cleanup
+- Forget to handle reduced-motion preferences
+- Use `overflow: hidden` on ancestors of sticky elements
+
+### Performance Targets
+
+- First Contentful Paint: under 2.5 seconds
+- Maintain 60fps during scrolling
+- Meet Core Web Vitals thresholds
 
 ## Anti-Patterns to Avoid
 
-- **Scroll hijacking** - Don't override natural scroll behavior completely
-- **Too many effects** - Scrollytelling should enhance narrative, not distract
-- **No fallback** - Always ensure content is accessible without JS
-- **Ignoring mobile** - Touch scrolling behaves differently; test thoroughly
-- **Performance death spiral** - Multiple heavy scroll handlers competing
+| Anti-Pattern | Problem | Solution |
+|--------------|---------|----------|
+| **Scroll-jacking** | Overrides natural scroll, breaks accessibility | Preserve native scroll behavior |
+| **Text-graphics conflict** | User can't read text while watching animation | Separate text and animated areas |
+| **Animation overload** | Distracts from content, causes fatigue | Restraint—not every section needs effects |
+| **No length indicator** | Users don't know commitment level | Add progress indicators |
+| **Missing fallbacks** | Breaks for no-JS or reduced-motion users | Progressive enhancement |
+| **Mobile neglect** | Excludes 60% of users | Mobile-first design |
+| **Poor pacing** | Too fast or too slow content reveals | Test with real users |
 
-## Workflow
+## Implementation Workflow
 
 1. **Understand the narrative** - What story are you telling? What's the sequence?
 2. **Choose pattern** - Pinned, progressive, parallax, or hybrid?
-3. **Scaffold structure** - Build the HTML/component structure first
-4. **Add scroll mechanics** - Implement tracking (IntersectionObserver, ScrollTrigger, etc.)
-5. **Wire animations** - Connect scroll state to visual changes
-6. **Add polish** - Easing, timing, micro-interactions
-7. **Performance audit** - Check for jank, optimize as needed
-8. **Accessibility pass** - Reduced motion, keyboard nav, screen readers
-9. **Mobile testing** - Touch scroll, viewport changes, performance
+3. **Plan accessibility** - How will reduced-motion users experience this?
+4. **Select technology** - Native CSS, GSAP, Motion based on complexity
+5. **Scaffold structure** - Build HTML/component structure first
+6. **Add scroll mechanics** - Implement tracking (IntersectionObserver, ScrollTrigger, etc.)
+7. **Wire animations** - Connect scroll state to visual changes
+8. **Add reduced-motion fallbacks** - Content should work without animation
+9. **Performance audit** - Check for jank, optimize
+10. **Cross-device testing** - Mobile, tablet, desktop, different browsers
+11. **Accessibility testing** - Keyboard nav, screen readers, reduced motion
 
 ## Output
 
 After gathering requirements, implement the scrollytelling experience directly in the codebase. Provide:
 
 1. Component structure with scroll tracking
-2. Animation/transition logic
-3. Responsive adjustments
-4. Reduced-motion fallbacks
-5. Any necessary CSS/styles
+2. Animation/transition logic with reduced-motion handling
+3. Responsive adjustments (mobile-first)
+4. Accessible fallbacks
+5. Performance optimizations
+6. Testing recommendations
+
+## Notable Examples for Reference
+
+- **NYT "Snow Fall"** - Origin story, multimedia integration
+- **Pudding.cool** - Data journalism with audio-visual sync
+- **National Geographic "Atlas of Moons"** - Educational, responsive design
+- **BBC "Partition of India"** - Historical narrative with multimedia
+- **Firewatch website** - Multi-layered parallax for atmosphere
+
+## Sources
+
+Research based on 100+ sources including EU Data Visualization Guide, MDN, GSAP documentation, W3C WCAG, A List Apart, Smashing Magazine, The Pudding, CSS-Tricks, and academic research on scrollytelling effectiveness.
