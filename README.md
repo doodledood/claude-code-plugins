@@ -39,10 +39,11 @@ Structured development workflow that front-loads requirements to reduce iteratio
 - `/implement-inplace` - Single-agent implementation for simpler tasks
 
 **Code review:**
-- `/review` - Parallel review agents (bugs, types, maintainability, coverage, docs)
+- `/review` - Parallel review agents (bugs, types, maintainability, simplicity, coverage, docs)
 - `/review-bugs` - Focused bug detection
 - `/review-type-safety` - Type safety analysis
 - `/review-maintainability` - Code quality and maintainability
+- `/review-simplicity` - Over-engineering and cognitive complexity
 - `/review-coverage` - Test coverage gaps
 - `/review-docs` - Documentation completeness
 - `/review-claude-md-adherence` - Check adherence to project instructions
