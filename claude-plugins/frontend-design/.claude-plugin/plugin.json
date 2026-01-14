@@ -1,0 +1,12 @@
+{
+  "name": "frontend-design",
+  "description": "Frontend design patterns and implementation skills for distinctive, non-generic UI experiences",
+  "version": "1.0.0",
+  "author": {
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["frontend", "design", "ui", "ux", "animation", "interactive"]
+}

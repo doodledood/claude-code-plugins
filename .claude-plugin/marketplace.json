@@ -49,6 +49,14 @@
       "version": "1.0.0",
       "category": "development",
       "keywords": ["utilities", "git", "rebase", "documentation", "cleanup", "slop"]
+    },
+    {
+      "name": "frontend-design",
+      "source": "./claude-plugins/frontend-design",
+      "description": "Frontend design patterns and implementation skills for distinctive, non-generic UI experiences",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["frontend", "design", "ui", "ux", "animation", "interactive"]
     }
   ]
 }

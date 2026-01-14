@@ -105,6 +105,12 @@ Analyze and refine prompts for clarity and precision.
 - `/review-prompt` - Analyze against 10-Layer Architecture framework (read-only)
 - `/refine-prompt` - Iteratively refine for precision, eliminating ambiguities
 
+### frontend-design
+
+Frontend design patterns for distinctive, non-generic UI experiences.
+
+- `scrollytelling` - Scroll-driven storytelling with pinned sections, progressive reveals, and parallax effects
+
 ## Repository Structure
 
 ```
@@ -116,7 +122,8 @@ claude-code-plugins/
 │   ├── consultant/            # Multi-provider LLM consultations
 │   ├── vibe-extras/           # Git, docs, cleanup utilities
 │   ├── solo-dev/              # Customer profiles, brand, design docs
-│   └── prompt-engineering/    # Prompt analysis and refinement
+│   ├── prompt-engineering/    # Prompt analysis and refinement
+│   └── frontend-design/       # Frontend design patterns
 └── README.md
 ```
 
