@@ -229,6 +229,12 @@ When updating plugin files, bump version in `.claude-plugin/plugin.json`:
 
 README-only changes don't require version bumps.
 
+**After version bump**: Add entry to `CHANGELOG.md`:
+```
+## YYYY-MM-DD
+- [plugin-name] vX.Y.Z - Brief description of change
+```
+
 ## Adding New Components
 
 When adding agents, skills, or hooks:
