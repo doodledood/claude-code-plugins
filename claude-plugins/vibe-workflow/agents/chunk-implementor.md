@@ -208,6 +208,7 @@ Issues addressed:
 | Granular todos | One todo per task, mark in_progress→completed |
 | Pattern-following | Match existing codebase style exactly |
 | Scope discipline | Only implement what's in the chunk; no extras |
+| Simplicity | Prefer readable code over micro-optimizations |
 | No gates | Don't run typecheck/test/lint (verifier does that) |
 | Log everything | Every action recorded with timestamp |
 
@@ -218,6 +219,7 @@ Issues addressed:
 - Run quality gates (that's verifier's job)
 - Add features beyond chunk scope
 - Refactor code not specified in the task
+- Add complexity for marginal performance gains
 - Keep discoveries as mental notes
 - Batch log updates at end
 - **Any git operations** (add, commit, reset, checkout, stash, etc.)

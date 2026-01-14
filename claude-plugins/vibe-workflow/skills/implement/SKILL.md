@@ -423,6 +423,7 @@ Last updated: [timestamp]
 - **Git in main agent only**: All git operations (add, commit) happen in main agent, not subagents
 - **Commit per chunk**: Each successful chunk gets its own commit (no push until end)
 - **Autonomous**: No prompts/pauses/approval except blocking issues
+- **Simplicity**: Prefer readable code over micro-optimizations; don't add complexity for marginal gains
 - **Retry heavily**: 5 attempts before giving up, escalation is last resort
 - **Same-error aware**: Detect loops, don't wall-slam
 - **Progress after every step**: Update progress file after each todo completion

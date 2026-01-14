@@ -141,6 +141,7 @@ Skip if `--no-review` was set.
 - **Persistent auto-fix**: Iterate until gates pass (up to 3 distinct strategies per issue), escalate only when stuck
 - **Dependency order**: Execute in order, skip failed chunk's dependents
 - **Gates non-negotiable**: Fix root cause (no `@ts-ignore`, test skips, or suppressions); skip chunk only after 3 failed strategies
+- **Simplicity**: Prefer readable code over micro-optimizations; don't add complexity for marginal performance gains
 - **Commit per chunk**: Each successful chunk gets its own commit (no push until end); provides rollback points for recovery
 
 ## Gate Detection
