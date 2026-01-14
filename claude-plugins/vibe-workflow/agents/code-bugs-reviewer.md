@@ -137,6 +137,7 @@ Before reporting a bug, it must pass ALL of these criteria. **Apply criteria in 
 Do NOT report on (handled by other agents):
 - **Type system improvements** that don't cause runtime bugs → type-safety-reviewer
 - **Maintainability concerns** (DRY, coupling, consistency patterns) → code-maintainability-reviewer
+- **Over-engineering / complexity** (premature abstraction, cognitive complexity) → code-simplicity-reviewer
 - **Documentation quality** → docs-reviewer
 - **Test coverage gaps** → code-coverage-reviewer
 - **CLAUDE.md compliance** → claude-md-adherence-reviewer

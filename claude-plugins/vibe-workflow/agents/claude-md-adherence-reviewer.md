@@ -123,6 +123,7 @@ Effort levels:
 Do NOT report on (handled by other agents):
 - **Code bugs** → code-bugs-reviewer
 - **General maintainability** (not specified in CLAUDE.md) → code-maintainability-reviewer
+- **Over-engineering / complexity** (not specified in CLAUDE.md) → code-simplicity-reviewer
 - **Type safety** → type-safety-reviewer
 - **Documentation accuracy** (not specified in CLAUDE.md) → docs-reviewer
 - **Test coverage** → code-coverage-reviewer

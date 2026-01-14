@@ -165,7 +165,8 @@ When evaluating coverage adequacy, consider:
 
 Do NOT report on (handled by other agents):
 - **Code bugs** → code-bugs-reviewer
-- **Code organization** (DRY, coupling, complexity) → code-maintainability-reviewer
+- **Code organization** (DRY, coupling, consistency) → code-maintainability-reviewer
+- **Over-engineering / complexity** (premature abstraction, cognitive complexity) → code-simplicity-reviewer
 - **Type safety** → type-safety-reviewer
 - **Documentation** → docs-reviewer
 - **CLAUDE.md compliance** → claude-md-adherence-reviewer
