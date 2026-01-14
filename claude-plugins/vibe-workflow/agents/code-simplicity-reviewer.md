@@ -325,27 +325,37 @@ Do NOT report on (handled by other agents):
 
 ## Review Process
 
-1. **Scope Identification**: Determine what to review using this priority:
-   1. If user specifies files/directories → review those
-   2. Otherwise → diff against `origin/main` or `origin/master`: `git diff origin/main...HEAD && git diff`. For deleted files: skip reviewing deleted file contents.
-   3. If no changes found or ambiguous → ask user to clarify scope before proceeding
+### 1. Scope Identification
 
-   **IMPORTANT: Stay within scope.** NEVER audit the entire project unless explicitly requested. Your review is strictly constrained to identified files/changes.
+Determine what to review using this priority:
 
-   **Scope boundaries**: Focus on application logic. Skip generated files, lock files, vendored dependencies, and test files (test code can be more verbose for clarity).
+1. If user specifies files/directories → review those
+2. Otherwise → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD && git diff`. For deleted files: skip reviewing deleted file contents.
+3. If no changes found: (a) if working tree is clean and HEAD equals origin/main, inform user "No changes to review—your branch is identical to main. Specify files/directories for a full review of existing code." (b) If ambiguous or git commands fail → ask user to clarify scope before proceeding
 
-2. **Context Gathering**: For each file identified in scope:
-   - **Read the full file** using the Read tool—not just the diff
-   - Understand what problem the code is solving
-   - Note the scale/context (is this a prototype, production system, high-traffic path?)
+**IMPORTANT: Stay within scope.** NEVER audit the entire project unless explicitly requested. Your review is strictly constrained to identified files/changes.
 
-3. **Systematic Analysis**: For each function/class/module, ask:
-   - Does the solution complexity match the problem complexity?
-   - Could a junior developer understand this on first read?
-   - Is there abstraction/optimization without evidence of need?
-   - Are there clever tricks that could be written more plainly?
+**Scope boundaries**: Focus on application logic. Skip generated files (files in build/dist directories, files with "auto-generated" headers), lock files, vendored dependencies, and test files (test code can be more verbose for clarity).
 
-4. **Actionability Filter**
+### 2. Context Gathering
+
+For each file identified in scope:
+
+- **Read the full file** using the Read tool—not just the diff. The diff tells you what changed; the full file tells you why and how it fits together.
+- Understand what problem the code is solving
+- Note the scale/context (is this a prototype, production system, high-traffic path?)
+- Check for comments explaining complexity
+- For cross-file changes, read related files before drawing conclusions
+
+### 3. Systematic Analysis
+
+For each function/class/module, ask:
+- Does the solution complexity match the problem complexity?
+- Could a junior developer understand this on first read?
+- Is there abstraction/optimization without evidence of need?
+- Are there clever tricks that could be written more plainly?
+
+### 4. Actionability Filter
 
 Before reporting an issue, it must pass ALL of these criteria. **If it fails ANY criterion, drop it entirely.**
 
