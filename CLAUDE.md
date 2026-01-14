@@ -136,6 +136,8 @@ Examples:
 
 Skills and agents with multi-phase workflows MUST use the memento pattern. This pattern directly addresses documented LLM limitations (see `docs/LLM_CODING_CAPABILITIES.md`).
 
+**Important**: When implementing this pattern in skills/agents, DO NOT mention the pattern by name (e.g., "memento pattern", "memento loop"). Simply follow the pattern—use descriptive labels like "Write findings to log", "Discovery Loop", "Refresh context" without referencing pattern terminology. The pattern should be invisible to users.
+
 #### Why: The LLM Limitations
 
 | Limitation | Research Finding | Pattern Response |
@@ -216,7 +218,7 @@ After:
 
 **Never skip**: The write-to-log and refresh-before-finalize steps. These are the core mechanism that makes synthesis work despite context rot.
 
-See `vibe-workflow/skills/spec/SKILL.md`, `vibe-workflow/skills/plan/SKILL.md`, or `vibe-workflow/skills/research-web/SKILL.md` for reference implementations.
+See `vibe-workflow/skills/spec/SKILL.md`, `vibe-workflow/skills/plan/SKILL.md`, or `vibe-workflow/skills/research-web/SKILL.md` for reference implementations. Note how these implementations follow the pattern without naming it.
 
 See each plugin's README for architecture details.
 
