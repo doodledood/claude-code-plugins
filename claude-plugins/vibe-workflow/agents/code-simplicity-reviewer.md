@@ -311,10 +311,17 @@ Do NOT report on (handled by other agents):
 - **CLAUDE.md compliance** → claude-md-adherence-reviewer
 
 **Key distinction from maintainability:**
-- **Maintainability** asks: "Will this be easy to CHANGE?"
-- **Simplicity** asks: "Is this HARDER TO UNDERSTAND than necessary?"
+- **Maintainability** asks: "Is this well-organized for future changes?" (DRY, coupling, cohesion, consistency, dead code)
+- **Simplicity** asks: "Is this harder to understand than the problem requires?" (over-engineering, cognitive complexity, cleverness)
 
-Maintainability is about code ORGANIZATION. Simplicity is about code COMPREHENSION.
+**Rule of thumb:** If the issue is about **duplication, dependencies, or consistency across files**, it's maintainability. If the issue is about **whether this specific code is more complex than needed**, it's simplicity.
+
+**Simplicity owns:**
+- YAGNI (premature abstraction, speculative features, unnecessary configurability)
+- KISS comprehension concerns (deep nesting, convoluted flow, clever code)
+- Unnecessary indirection (pass-through wrappers, over-abstracted utilities)
+- Premature optimization (micro-optimizations without profiling)
+- Cognitive burden (dense one-liners, complex boolean expressions, nested ternaries)
 
 ## Review Process
 
