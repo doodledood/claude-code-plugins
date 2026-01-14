@@ -15,7 +15,12 @@ Analyze a Claude Code session to identify what went well and what could be impro
 
 **Output**: High-confidence issues only with evidence-based suggestions for skill improvements.
 
-**Signal quality bar**: Only recommend changes that would have **measurably changed the session outcome**. A fix is high-signal if you can answer: "If this change existed, what specific iteration/correction/rework would NOT have happened?"
+**Signal quality bar**: Only recommend changes that would have **prevented specific rework** in the session. A fix is high-signal when ALL of:
+1. You can point to exact message numbers where rework occurred
+2. The skill change would have triggered BEFORE that rework
+3. Following the change would have produced correct output initially
+
+**Definition - high-signal fix**: A skill change that passes the 3/3 counterfactual test (see Phase 5.2).
 
 ---
 
@@ -36,10 +41,14 @@ Session files are stored at:
 ~/.claude/projects/{project-path-encoded}/{session-id}.jsonl
 ```
 
+**Note**: `{project-path-encoded}` replaces path separators with URL-safe encoding (e.g., `/home/user/myproject` becomes `-home-user-myproject`). Don't rely on exact path structure—use find instead.
+
 Use Bash to find:
 ```bash
 find ~/.claude/projects -name "*{session-id}*" -type f 2>/dev/null
 ```
+
+**If file not found**: Ask user to provide the session file path directly or check if session ID is correct.
 
 ### 1.3 Create analysis log (Memento pattern)
 
@@ -111,41 +120,24 @@ Status: IN_PROGRESS
 
 ### 1.4 Create todo list (Memento pattern)
 
-**CRITICAL**: Never batch writes. Write to log IMMEDIATELY after each finding, before proceeding.
+**CRITICAL**: Write to log IMMEDIATELY after each finding—never batch writes.
 
 ```
-- [ ] Create analysis log file
-- [ ] Parse session / read commentary
-- [ ] Write session overview to log file
-- [ ] Detect iteration patterns
-- [ ] Write iteration findings to log file
-- [ ] Detect user corrections
-- [ ] Write correction findings to log file
-- [ ] Detect workflow deviations
-- [ ] Write deviation findings to log file
-- [ ] Detect missing questions
-- [ ] Write missing question findings to log file
-- [ ] Detect post-implementation fixes
-- [ ] Write post-impl findings to log file
-- [ ] Extract skill names from session
-- [ ] Use codebase-explorer to find files for each skill
-- [ ] Write discovered skills to log file
-- [ ] (expand: add "Analyze {skill} skill" + "Write {skill} findings to log" for each skill found)
+- [ ] Setup: Create log file, parse session, write overview
+- [ ] Pattern detection: iterations, corrections, deviations, missing questions, post-impl fixes (write each to log)
+- [ ] Skill discovery: extract skills, locate files, write to log
+- [ ] (expand: "Analyze {skill}" for each skill found)
 - [ ] Refresh context: read FULL analysis log
-- [ ] Apply counterfactual test to each potential fix
-- [ ] Write final recommendations to log file
+- [ ] Counterfactual analysis: test each issue, write recommendations
 - [ ] Output final report
 ```
 
-**Expansion example**: If you discover skills `plan` and `implement` were used, expand to:
+**Expansion**: When skills are discovered, add one todo per skill:
 ```
-- [ ] Analyze plan skill (read SKILL.md, agents, hooks, extract rules, compare)
-- [ ] Write plan skill findings to log file
-- [ ] Analyze implement skill (read SKILL.md, agents, hooks, extract rules, compare)
-- [ ] Write implement skill findings to log file
+- [ ] Analyze {skill-name} skill + write findings to log
 ```
 
-**Why write-after-each-step matters**: By synthesis, early findings suffer context rot. Writing externalizes findings to a file that persists. The refresh step then moves ALL findings to context end where attention is highest.
+**Why write-after-each-step matters**: By synthesis, early findings suffer context rot. Writing externalizes findings to a file that persists. The refresh step moves ALL findings to context end (highest attention zone).
 
 ---
 
@@ -182,9 +174,21 @@ grep -o '"skill":"[^"]*"' {session-file} | sort | uniq -c
 Extract and log:
 - **Initial request**: First user message (the goal)
 - **Workflow used**: Which skills invoked (`/spec`, `/plan`, `/implement`, etc.)
-- **Workflow skipped**: Expected skills NOT invoked based on task complexity
+- **Workflow skipped**: Skills that would typically apply but weren't invoked (see table below)
 - **Outcome**: Success, partial, or required rework
 - **Session length**: Message count, duration if available
+
+**Expected skills by task type** (use to detect skipped workflows):
+
+| Task Indicators in Request | Expected Skills |
+|---------------------------|-----------------|
+| "build", "implement", "create feature", "add" | spec → plan → implement |
+| "fix bug", "debug", "not working" | bugfix |
+| "review", "check", "audit" | review (or specific review-*) |
+| "refactor", "improve", "optimize" | plan → implement |
+| Multi-file changes (3+ files likely) | plan before implement |
+
+Only flag as "skipped" if evidence suggests the skill would have prevented issues that occurred.
 
 ---
 
@@ -200,7 +204,7 @@ Look for:
 - TypeScript errors followed by fixes
 - Test failures followed by code changes
 - Lint errors followed by formatting changes
-- Same function/file touched 3+ times
+- Same function/file edited more than once with different intent (not additive changes, but corrections)
 
 **Log format**:
 ```markdown
@@ -304,19 +308,34 @@ Look for:
 **Step 1**: Extract skill invocations from session:
 
 ```bash
-# Find all Skill tool invocations
-grep -o '"skill":"[^"]*"' {session-file} | sort | uniq -c
+# Find all Skill tool invocations (handles both "skill" and skill names in tool calls)
+grep -oE '"skill"\s*:\s*"[^"]*"' {session-file} | sort | uniq -c
 
-# Find slash command patterns in user messages
-grep -oE '/(spec|plan|implement|review|bugfix|[a-z-]+)' {session-file} | sort | uniq -c
+# Find slash command patterns in user messages (alphanumeric with hyphens)
+grep -oE '/[a-zA-Z][a-zA-Z0-9-]*' {session-file} | sort | uniq -c
+
+# Find Skill tool calls with plugin:skill format
+grep -oE 'Skill\s*\(\s*"[^"]+:[^"]+"' {session-file} | sort | uniq -c
 ```
 
-**Step 2**: Use codebase-explorer to find ALL relevant files for each skill:
+**Step 2**: Find ALL relevant files for each skill.
 
-For each skill name found, invoke the codebase-explorer:
-
+**Option A - If codebase-explorer skill is available**:
 ```
 Skill("vibe-workflow:explore-codebase", "medium - find all files related to the {skill-name} skill: SKILL.md definition, related agents it spawns, hooks that affect it, and any shared utilities")
+```
+
+**Option B - Manual search fallback**:
+```bash
+# Find skill definition
+find . -path "*/skills/{skill-name}/SKILL.md" -type f
+
+# Find related agents (look in same plugin's agents/ folder)
+PLUGIN_DIR=$(dirname $(dirname {skill-path}))
+ls "$PLUGIN_DIR/agents/" 2>/dev/null
+
+# Find hooks that might affect this skill
+grep -r "{skill-name}" --include="*.py" */hooks/ 2>/dev/null
 ```
 
 This discovers:
@@ -325,8 +344,6 @@ This discovers:
 - Hooks that intercept skill behavior (e.g., Stop hook)
 - Shared utilities the skill depends on
 - Test files that document expected behavior
-
-**Why codebase-explorer**: Manual `find` only locates the SKILL.md. The explorer discovers the full context—agents, hooks, dependencies—needed to understand actual vs documented behavior.
 
 **Step 3**: Log discovered skills with full context:
 
@@ -415,40 +432,40 @@ For each skill used in the session:
 
 ### 5.1 Refresh context (non-negotiable)
 
-**CRITICAL**: Read the FULL analysis log file NOW before any synthesis.
+**CRITICAL**: Use the Read tool to read the FULL analysis log file NOW before any synthesis.
 
 **Why this step exists**: By this point, findings from Phase 3 (pattern detection) have suffered context rot—they're in the "lost middle" of conversation. The log file contains ALL findings written throughout this workflow. Reading it:
 - Moves ALL findings to context END (highest attention zone)
 - Converts holistic synthesis (LLMs are bad at this) into dense recent context (LLMs are good at this)
 - Restores details that would otherwise be missed
 
-**Action**: Read the entire log file at `/tmp/session-analysis-{id}-{timestamp}.md`. Do NOT proceed to 5.2 until this is complete.
+**Action**: Use `Read("/tmp/session-analysis-{id}-{timestamp}.md")` to read the entire log file. Do NOT proceed to 5.2 until this is complete.
 
 ### 5.2 Counterfactual analysis (the high-signal filter)
 
-For each potential issue, apply this test:
+For each potential issue, answer these three questions with specific evidence:
 
-```
-IF this skill change existed BEFORE the session:
-  WOULD a specific iteration/correction/rework NOT have happened?
-  CAN you name the exact moment it would have intervened?
-  WOULD the change have been triggered (conditions met)?
-```
+| Test | Question | Evidence Required |
+|------|----------|-------------------|
+| **T1: Rework identified** | Can you cite specific message numbers where rework occurred? | Message #X shows error, #Y shows fix |
+| **T2: Intervention point** | At which earlier message would the skill change have triggered? | Message #Z is where skill phase X runs |
+| **T3: Trigger conditions met** | Did the session content at that point contain info that would activate the change? | Quote the text that would trigger it |
 
 **Scoring**:
 | Score | Criteria | Action |
 |-------|----------|--------|
-| 3/3 | All yes → definite causal link | HIGH confidence |
-| 2/3 | Likely would have helped | MEDIUM confidence |
-| 1/3 or 0/3 | Speculative | Discard |
+| 3/3 | All three answered with specific evidence | HIGH confidence → Include |
+| 2/3 | One test lacks specific evidence | MEDIUM confidence → Deferred section |
+| 1/3 or 0/3 | Multiple tests lack evidence | LOW confidence → Discard |
 
 **Example counterfactual**:
 ```
 Issue: Plan skill should ask about time filtering
-Counterfactual:
-  - WOULD iteration have been avoided? YES - 90-day filter added post-implementation
-  - CAN I name exact moment? YES - during "Files to modify" phase, should have asked
-  - WOULD change have triggered? YES - requirement mentioned "recent refunds"
+
+T1 (Rework): Message #47 adds 90-day filter, #48 user says "yes that's what I meant"
+T2 (Intervention): Message #12 is plan phase, "Files to modify" section
+T3 (Trigger): Message #5 user wrote "recent refunds" - this would trigger temporal scope question
+
 Score: 3/3 → HIGH confidence
 ```
 
@@ -583,6 +600,16 @@ Output the final report. User can then decide which fixes to implement.
 | One-off context | Unusual situation unlikely to recur |
 | Scope creep | Fix adds complexity disproportionate to benefit |
 | Side effects | Fix would break other documented behaviors |
+
+## Error Handling
+
+| Error | Response |
+|-------|----------|
+| Session file not found | Ask user to provide path directly |
+| Malformed JSONL (parse error) | Skip malformed lines, note in report |
+| Skill file not found | Note as "skill definition unavailable" in comparison |
+| jq not available | Use grep/sed fallback patterns to extract JSON fields |
+| Empty session | Report "Session contains no analyzable content" |
 
 ## Never Do
 
