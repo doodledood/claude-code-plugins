@@ -1,4 +1,5 @@
 ---
+name: learn-from-session
 description: 'Analyze Claude Code sessions to learn what went right/wrong and suggest high-confidence improvements to skills. Use when asked to analyze a session, learn from a session, or review workflow effectiveness.'
 user-invocable: true
 ---
