@@ -678,7 +678,7 @@ After generating the initial document, begin iterative refinement.
 
 **Expected cycles**: Most users need **2-3 refinement cycles** to get from "this is okay" to "this captures my customer." Don't rush - each cycle sharpens the doc.
 
-### Memento Loop for Refinement
+### Refinement Loop
 
 For each refinement cycle:
 1. Mark current refinement todo `in_progress`
@@ -828,7 +828,7 @@ This is your **foundational document**. Use it to:
 
 | Principle | Rule |
 |-----------|------|
-| **Memento** | Write findings to discovery log BEFORE next question; every discovery needing follow-up → todo; update log after EACH step |
+| **Write before proceed** | Write findings to discovery log BEFORE next question; every discovery needing follow-up → todo; update log after EACH step |
 | **Todo-driven** | Create todos for areas to discover; expand when user reveals complexity; never keep mental notes |
 | **Information density** | Every line actionable; concrete examples over abstractions; specific signals over vague guidelines |
 | **Research-backed** | Parallel agents gather real market data; validate against competitive landscape |

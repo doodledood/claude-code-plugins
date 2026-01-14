@@ -90,7 +90,7 @@ Last updated: [timestamp]
 
 ### 1.5 Create Todo List
 
-Build Memento-style todos with 4 items per chunk, plus finalization:
+Build todos with 4 items per chunk, plus finalization:
 ```
 [ ] Implement chunk 1: [Name]
 [ ] Verify chunk 1: [Name]

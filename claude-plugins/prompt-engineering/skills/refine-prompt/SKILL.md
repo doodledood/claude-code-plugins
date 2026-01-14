@@ -229,7 +229,7 @@ Apply these techniques to fix precision issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Memento** | TodoWrite to track phases; expand todos on iteration |
+| **Track progress** | TodoWrite to track phases; expand todos on iteration |
 | **Infer first, ask second** | Try to resolve ambiguity from context before asking user |
 | **Preserve intent** | Don't change what prompt is trying to do; only how clearly it says it |
 | **Minimal changes** | Fix identified issues, don't rewrite unnecessarily |

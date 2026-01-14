@@ -24,7 +24,7 @@ context: fork
 |-------|-------------|-------------|----------|----------|
 | **quick** | 1 | Single wave | Single web-researcher, no orchestration file, direct answer | "what is", "when did", factual lookups, definitions |
 | **medium** | 1-2 | Single wave | Orchestration file, focused research on 1-2 angles | specific how-to, single technology, focused question |
-| **thorough** | 2-4 | Continue while critical gaps remain | Full memento, parallel agents, cross-reference, follow-up waves for critical gaps | "compare", "best options", "evaluate", "pros and cons" |
+| **thorough** | 2-4 | Continue while critical gaps remain | Full logging, parallel agents, cross-reference, follow-up waves for critical gaps | "compare", "best options", "evaluate", "pros and cons" |
 | **very-thorough** | 4-6 | Continue until comprehensive OR diminishing returns | Multi-wave research until all significant gaps addressed or new waves stop yielding value | "comprehensive", "complete analysis", "all alternatives", "deep dive" |
 
 **Multi-wave research**: For thorough and very-thorough levels, research continues in waves until satisficing criteria are met. Each wave can spawn new investigators to address gaps, conflicts, or newly discovered areas from previous waves. There is no hard maximum - waves continue as long as they're productive and gaps remain at the triggering threshold.
@@ -130,7 +130,7 @@ Run two commands:
 - `date +%Y%m%d-%H%M%S` → for filename timestamp (e.g., `20260112-060615`)
 - `date '+%Y-%m-%d %H:%M:%S'` → for human-readable "Started" field (e.g., `2026-01-12 06:06:15`)
 
-Todos = **research areas to investigate + memento operations**, not fixed steps. Each research todo represents a distinct angle or facet. List expands as decomposition reveals new areas. Memento todos ensure external memory stays current.
+Todos = **research areas to investigate + write-to-log operations**, not fixed steps. Each research todo represents a distinct angle or facet. List expands as decomposition reveals new areas. Write-to-log todos ensure external memory stays current.
 
 **Starter todos** (seeds - list grows during decomposition):
 
@@ -149,7 +149,7 @@ Todos = **research areas to investigate + memento operations**, not fixed steps.
 - [ ] Synthesize final output
 ```
 
-**Critical memento todos** (never skip):
+**Critical todos** (never skip):
 - `Write {X} to orchestration file` - after EACH phase/agent completion
 - `Refresh context: read full orchestration file` - ALWAYS before synthesis
 
@@ -536,7 +536,7 @@ When continuing to a new wave:
 
 ### 5.1 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: This is the key memento step. Read the FULL orchestration file using the Read tool to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
+**CRITICAL**: Read the FULL orchestration file using the Read tool to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
 
 **Why this matters**: By this point, findings from multiple agents across potentially multiple waves have been written to the orchestration file. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
 
@@ -633,7 +633,7 @@ For quick (single-fact) queries, skip orchestration:
 |-----------|------|
 | Thoroughness first | Determine level before any research |
 | Todos with write-to-log | Each collection gets a todo, followed by a write-to-orchestration-file todo |
-| Memento writes | Write to orchestration file after EACH phase/agent - external memory |
+| Write after each phase | Write to orchestration file after EACH phase/agent |
 | Parallel execution | Launch multiple agents simultaneously when possible |
 | Cross-reference | Compare findings across agents before synthesizing |
 | Gap evaluation | Classify gaps after each wave (critical/significant/minor) |
@@ -642,7 +642,7 @@ For quick (single-fact) queries, skip orchestration:
 | Source preservation | Maintain citations through synthesis |
 | Gap honesty | Explicitly state what couldn't be answered despite multi-wave effort |
 
-**Memento Pattern Summary**:
+**Log Pattern Summary**:
 1. Create orchestration file at start
 2. Add write-to-log todos after each collection phase
 3. Write to it after EVERY step (decomposition, agent findings, cross-reference, gap evaluation)

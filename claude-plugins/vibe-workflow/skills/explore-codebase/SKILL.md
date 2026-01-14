@@ -79,7 +79,7 @@ Run: `date +%Y%m%d-%H%M%S` → for filename and timestamps
 - [ ] Synthesize unified reading list
 ```
 
-**Critical memento todos** (never skip):
+**Critical todos** (never skip):
 - `Write {X} to orchestration file` - after EACH agent completion
 - `Refresh context: read full orchestration file` - ALWAYS before synthesis
 
@@ -434,7 +434,7 @@ Orchestration file: {path}
 | Principle | Rule |
 |-----------|------|
 | Thoroughness first | Determine level before any exploration |
-| Memento writes | Write to orchestration file after EACH agent - external memory |
+| Write after each agent | Write to orchestration file after EACH agent |
 | Todos with write-to-log | Each agent collection gets a write-to-orchestration-file todo |
 | Parallel launch | All initial agents in single message |
 | Cross-reference | Analyze for duplicates, gaps, conflicts after agents return |
@@ -442,7 +442,7 @@ Orchestration file: {path}
 | **Context refresh** | **Read full orchestration file BEFORE synthesis - non-negotiable** |
 | No source file reads | You orchestrate and synthesize - main agent reads files after |
 
-**Memento Pattern Summary**:
+**Log Pattern Summary**:
 1. Create orchestration file at start
 2. Add write-to-log todos after each agent collection
 3. Write findings after EVERY agent returns

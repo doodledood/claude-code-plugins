@@ -62,7 +62,7 @@ Run `date '+%Y-%m-%d %H%M%S'` to get today's date and timestamp (use the 6-digit
 - You need accurate "recency" judgments when evaluating sources
 - Search queries should include the current year for time-sensitive topics
 
-Todos = **areas to research + memento operations**, not fixed steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as research reveals new areas. Memento todos ensure external memory stays current.
+Todos = **areas to research + write-to-log operations**, not fixed steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as research reveals new areas. Write-to-log todos ensure external memory stays current.
 
 **Starter todos** (seeds - list grows as research reveals new areas):
 
@@ -78,7 +78,7 @@ Todos = **areas to research + memento operations**, not fixed steps. Each todo r
 - [ ] Finalize findings
 ```
 
-**Critical memento todos** (never skip):
+**Critical todos** (never skip):
 - `Write {X} to research notes` - after EACH search batch/phase
 - `Refresh context: read full research notes file` - ALWAYS before finalizing
 
@@ -209,11 +209,11 @@ After decomposition, append to research notes:
 - Research notes populated with strategy
 - Todos expanded for each major research area
 
-## Phase 3: Evidence Gathering (Memento Loop)
+## Phase 3: Evidence Gathering
 
 **CRITICAL**: Write findings to research notes BEFORE starting next search.
 
-### Memento Loop
+### Research Loop
 
 For each todo:
 1. Mark todo `in_progress`
@@ -313,7 +313,7 @@ Finished: {YYYY-MM-DD HH:MM:SS} | Sources: {count} | Sub-questions: {count}
 
 ### 4.2 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: This is the key memento step. Read the FULL research notes file using the Read tool to restore ALL findings, sources, and confidence assessments into context.
+**CRITICAL**: Read the FULL research notes file using the Read tool to restore ALL findings, sources, and confidence assessments into context.
 
 **Why this matters**: By this point, findings from multiple search batches have been written to the research notes. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
 
@@ -380,7 +380,7 @@ Wave: {N} | Mode: {Broad exploration | Gap-filling}
 | Wave-aware | Detect wave context; Wave 1 = broad, Wave 2+ = targeted gap-filling |
 | Scope-adherent | Stay within assigned scope; respect "DO NOT RESEARCH" exclusions |
 | Todos with write-to-log | Each research area gets a todo, followed by a write-to-log todo |
-| Memento writes | Write findings to research notes BEFORE next search - external memory |
+| Write before proceed | Write findings to research notes BEFORE next search |
 | Todo-driven | Every new research area → todo (no mental notes) |
 | Source-backed | Every claim needs a URL citation |
 | Cross-reference | Claims presented in Summary, Key Findings, or Recommendations must be verified across 2+ sources from different organizations or authors. Supporting context and background from single authoritative sources need not be cross-referenced. |
@@ -389,7 +389,7 @@ Wave: {N} | Mode: {Broad exploration | Gap-filling}
 | Gap-honest | Explicitly state what couldn't be found (critical for multi-wave orchestration) |
 | **Context refresh** | **Read full notes file BEFORE finalizing - non-negotiable** |
 
-**Memento Pattern Summary**:
+**Log Pattern Summary**:
 1. Create research notes file at start
 2. Write to it after EVERY search batch (decomposition, findings, gaps)
 3. Read FULL file before finalizing (restores all context)

@@ -17,7 +17,7 @@ model: haiku
 |-------|----------|----------|
 | **quick** | No research file, no todos, 1-2 search calls (Glob or Grep, not counting Read); if first search returns no results, try one alternative (if Glob failed, use Grep with same keyword; if Grep failed, use broader Glob like `**/*keyword*`). If search returns >5 files matching the pattern (before filtering by relevance), note "Query broader than expected for quick mode. Consider re-running with medium thoroughness." and return top 5 files. | "where is", "find the", "locate", single entity lookup |
 | **medium** | Research file, 3-5 todos, core implementation + files in import/export statements within core (first-level only) + up to 3 callers; skip tests/config | specific bug, single feature, query about one bounded subsystem |
-| **thorough** | Full memento, trace all imports + all direct callers + test files + config | multi-area feature, "how do X and Y interact", cross-cutting concerns |
+| **thorough** | Full logging, trace all imports + all direct callers + test files + config | multi-area feature, "how do X and Y interact", cross-cutting concerns |
 | **very-thorough** | Unbounded exploration up to 100 files; if >100 files match, prioritize by dependency centrality (files with more direct import statements from other files, counting each importing file once) and note "N additional files exist" in overview | "comprehensive", "all", "architecture", "security audit", onboarding |
 
 **Definitions**:
@@ -112,7 +112,7 @@ Todos = areas to explore + write-to-log operations. Start small, expand as disco
 - [ ] Compile output
 ```
 
-**Critical memento todos** (never skip):
+**Critical todos** (never skip):
 - `Write {X} findings to research file` - after EACH exploration area
 - `Refresh context: read full research file` - ALWAYS before compile output
 
@@ -140,7 +140,7 @@ Started: {YYYYMMDD-HHMMSS} | Query: {original query}
 
 **Quick**: Skip — 1-2 search calls, return. **Medium**: core + first-level imports/exports only + up to 3 callers (per Caller prioritization in Definitions). **Thorough**: all imports + all direct callers (no transitive) + tests + config. **Very-thorough**: unbounded transitive exploration up to 100 files.
 
-### Memento Loop (medium, thorough, very-thorough)
+### Exploration Loop (medium, thorough, very-thorough)
 1. Mark todo in_progress → 2. Search → 3. **Write findings to research file** → 4. Expand todos when discoveries reveal new areas → 5. Complete → 6. Repeat
 
 **When to expand todos**: Add a new todo when you discover a distinct area not covered by existing todos (e.g., finding Redis session code while exploring auth → add "Session storage in Redis" todo).
@@ -322,14 +322,14 @@ Overview = **dense map of the topic area**, not diagnosis or codebase tour.
 |-----------|------|
 | Scope-adherent | Stay within assigned scope; note out-of-scope discoveries without pursuing |
 | Todos with write-to-log | Each exploration area gets a write-to-research-file todo |
-| Memento style | Write findings BEFORE next search (research file = external memory) |
+| Write before proceed | Write findings BEFORE next search (research file = external memory) |
 | Todo-driven | Every new area discovered → new todo + write-to-file todo (no mental notes) |
 | Depth by level | Stop at level-appropriate depth (medium: first-level deps + up to 3 callers; thorough: all direct callers+tests+config; very-thorough: transitive, up to 100 files) |
 | Incremental | Update research file after EACH exploration area (not at end) |
 | **Context refresh** | **Read full research file BEFORE compile output - non-negotiable** |
 | Compress last | Output only after all todos completed including refresh |
 
-**Memento Pattern Summary**:
+**Log Pattern Summary**:
 1. Create research file at start
 2. Add write-to-file todos after each exploration area
 3. Write findings after EVERY area before moving to next
