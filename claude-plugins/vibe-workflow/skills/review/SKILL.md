@@ -1,6 +1,6 @@
 ---
 name: review
-description: Run all code review agents in parallel (bugs, coverage, maintainability, type-safety if typed, CLAUDE.md adherence, docs).
+description: Run all code review agents in parallel (bugs, coverage, maintainability, simplicity, type-safety if typed, CLAUDE.md adherence, docs).
 ---
 
 Run a comprehensive code review. First detect the codebase type, then launch appropriate agents.
@@ -37,17 +37,18 @@ git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
 
 ## Step 2: Launch Agents
 
-**Always launch these 5 core agents IN PARALLEL:**
+**Always launch these 6 core agents IN PARALLEL:**
 
 1. **code-bugs-reviewer** - Audit for logical bugs, race conditions, edge cases
 2. **code-coverage-reviewer** - Verify test coverage for code changes
-3. **code-maintainability-reviewer** - Check for DRY violations, dead code, complexity
-4. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
-5. **docs-reviewer** - Audit documentation and code comments accuracy
+3. **code-maintainability-reviewer** - Check for DRY violations, dead code, coupling
+4. **code-simplicity-reviewer** - Check for over-engineering, premature optimization, cognitive complexity
+5. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
+6. **docs-reviewer** - Audit documentation and code comments accuracy
 
 **Conditionally launch (only if typed language detected):**
 
-6. **type-safety-reviewer** - Audit type safety, any/unknown abuse, invalid states
+7. **type-safety-reviewer** - Audit type safety, any/unknown abuse, invalid states
    - **Primary:** TypeScript, Python with type hints (agent is optimized for these)
    - **Also useful for:** Java, Kotlin, Go, Rust, C#, Swift, Scala (core principles apply)
    - **Skip for:** Plain JavaScript, Ruby, PHP, shell scripts, untyped Python
@@ -132,7 +133,7 @@ options:
 ## Execution
 
 1. Run detection commands first (can be parallel)
-2. Based on results, launch either 5 or 6 agents simultaneously in a single message
+2. Based on results, launch either 6 or 7 agents simultaneously in a single message
 3. Do NOT run agents sequentially—always parallel
 4. After all agents complete, launch the verification agent with all findings
 5. Present the final consolidated report to the user

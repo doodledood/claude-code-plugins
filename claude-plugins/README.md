@@ -24,7 +24,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 ## Plugin Details
 
 ### vibe-workflow
-Core development workflow with hooks for session continuity. Includes specialized review agents for bugs, types, maintainability, coverage, and docs.
+Core development workflow with hooks for session continuity. Includes specialized review agents for bugs, types, maintainability, simplicity, coverage, and docs.
 
 ### consultant
 Requires Python 3.9+ and uv. Supports any LiteLLM provider. Includes `/ask` for single-model queries and `/ask-council` for multi-model ensemble.

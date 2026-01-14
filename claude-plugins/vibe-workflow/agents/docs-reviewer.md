@@ -194,7 +194,8 @@ When suggesting documentation updates:
 
 Do NOT report on (handled by other agents):
 - **Code bugs** → code-bugs-reviewer
-- **Code organization** (DRY, coupling, complexity) → code-maintainability-reviewer
+- **Code organization** (DRY, coupling, consistency) → code-maintainability-reviewer
+- **Over-engineering / complexity** (premature abstraction, cognitive complexity) → code-simplicity-reviewer
 - **Type safety** → type-safety-reviewer
 - **Test coverage gaps** → code-coverage-reviewer
 - **CLAUDE.md compliance** (except doc-related rules) → claude-md-adherence-reviewer

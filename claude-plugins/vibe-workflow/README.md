@@ -40,6 +40,7 @@ Start simple. Escalate if you hit ambiguity.
 - `review-bugs` - Focused bug detection
 - `review-type-safety` - Type safety analysis
 - `review-maintainability` - Code quality and maintainability
+- `review-simplicity` - Over-engineering and cognitive complexity
 - `review-coverage` - Test coverage gaps
 - `review-docs` - Documentation completeness
 - `review-claude-md-adherence` - Check adherence to project instructions
@@ -59,6 +60,7 @@ Start simple. Escalate if you hit ambiguity.
 - `web-researcher` - Web research with source tracking
 - `code-bugs-reviewer` - Bug detection agent
 - `code-maintainability-reviewer` - Maintainability analysis
+- `code-simplicity-reviewer` - Over-engineering and cognitive complexity analysis
 - `code-coverage-reviewer` - Coverage gap analysis
 - `type-safety-reviewer` - Type safety analysis
 - `docs-reviewer` - Documentation review
