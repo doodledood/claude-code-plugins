@@ -55,7 +55,8 @@ Start simple. Escalate if you hit ambiguity.
 ### Agents
 - `codebase-explorer` - Context gathering, prefer over built-in Explore
 - `chunk-implementor` - Implements single plan chunks
-- `chunk-verifier` - Runs verification gates
+- `chunk-verifier` - Runs verification gates for implementation
+- `plan-verifier` - Validates plans before approval (rules, spec coverage, dependencies)
 - `bug-fixer` - Root cause analysis agent
 - `web-researcher` - Web research with source tracking
 - `code-bugs-reviewer` - Bug detection agent

@@ -39,6 +39,8 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 - [ ] (expand as research reveals)
 - [ ] Read full research log and spec (context refresh before output)
 - [ ] Finalize chunks
+- [ ] Verify plan (attempt 1/5)
+- [ ] (expand: fix issues and re-verify until PASS or max attempts)
 ```
 
 **Evolution example** - "Add real-time notifications":
@@ -88,7 +90,25 @@ Started: {timestamp} | Spec: {path or "inline"}
 
 Extract: requirements, user stories, acceptance criteria, constraints, out-of-scope.
 
-**No formal spec?** Infer from conversation. If <2 concrete requirements (concrete = verifiable by test/demo/metric), ask user: "I need at least 2 concrete requirements. Please provide: [missing items]".
+**No formal spec?** Infer from conversation. If <2 concrete requirements (concrete = verifiable by test/demo/metric), use AskUserQuestion:
+
+```
+questions: [{
+  question: "Requirements are thin (<2 concrete). How should we proceed?",
+  header: "Requirements",
+  options: [
+    { label: "Run /spec first (Recommended)", description: "Launch structured discovery interview to properly define requirements, acceptance criteria, and constraints before planning." },
+    { label: "Provide requirements now", description: "You'll provide the missing requirements in your next message." },
+    { label: "Proceed with assumptions", description: "Continue planning with inferred requirements. Gaps will be flagged and verified before approval." }
+  ],
+  multiSelect: false
+}]
+```
+
+**Handle response**:
+- **Run /spec**: Use Skill tool: `Skill("vibe-workflow:spec", "{original user request}")`. After spec completes, resume planning with spec file path.
+- **Provide requirements**: Wait for user input, then re-evaluate requirement count.
+- **Proceed with assumptions**: Document inferred requirements in research log under `## Inferred Requirements`, continue to 2.2. Plan-verifier will flag gaps before approval.
 
 ### 2.2 Launch codebase-explorer
 
@@ -316,9 +336,65 @@ Read full research log to restore findings, decisions, rationale before final pl
 
 Remove `[TBD]`, ensure chunk consistency, verify dependency ordering, add line ranges for files >500 lines.
 
-### 4.4 Mark all todos complete
+### 4.4 Verify plan (loop until PASS, max 5 attempts)
 
-### 4.5 Present approval summary
+**Verification loop**:
+
+```
+attempt = 1
+while attempt <= 5:
+  1. Launch plan-verifier agent
+  2. If PASS → exit loop, proceed to 4.5
+  3. If ISSUES_FOUND:
+     a. Expand todos for each issue
+     b. Fix BLOCKING issues (must fix)
+     c. Review WARNING issues (fix or document why acceptable)
+     d. Update plan file
+     e. Write fixes to research log
+     f. attempt += 1
+  4. If attempt > 5 → present to user with remaining issues noted
+```
+
+**Launch verifier**:
+
+```
+Task(subagent_type: "vibe-workflow:plan-verifier", prompt: "
+Plan file: {plan path}
+Spec file: {spec path or 'none'}
+Research log: {research log path}
+Attempt: {attempt}/5
+")
+```
+
+**Per-attempt todo expansion** (if ISSUES_FOUND):
+
+```
+- [ ] Fix: {BLOCKING issue 1}
+- [ ] Fix: {BLOCKING issue 2}
+- [ ] Review: {WARNING issue 1} - fix or document
+- [ ] Re-run plan-verifier (attempt {N+1}/5)
+```
+
+**Issue handling by severity**:
+
+| Severity | Action | Blocks Approval? |
+|----------|--------|------------------|
+| BLOCKING | Must fix before next attempt | Yes |
+| WARNING | Fix if appropriate, or add to `## Accepted Warnings` in research log with rationale | No (if documented) |
+| INFO | Note in research log, no action needed | No |
+
+**Common fixes**:
+- **Dependency inconsistency**: Update `Depends on:` field to inherit parallel chunk's dependencies
+- **Missing acceptance criteria**: Add `Acceptance:` section to chunk
+- **Uncovered spec requirement**: Add tasks to existing chunk or create new chunk
+- **TBD markers**: Resolve with actual values or ask user if uncertain
+- **Circular dependency**: Restructure chunks to break cycle
+
+**After 5 failed attempts**: Present approval summary with remaining issues prominently displayed. User decides whether to approve with known issues or request manual fixes.
+
+### 4.5 Mark all todos complete
+
+### 4.6 Present approval summary
 
 Present a scannable summary that allows approval without reading the full plan. Users may approve based on this summary alone.
 
@@ -391,7 +467,7 @@ Approve to start implementation, or request adjustments.
 - For simple sequential plans: vertical flow
 - For complex plans: show critical path + parallel branches
 
-### 4.6 Wait for approval
+### 4.7 Wait for approval
 
 Do NOT implement until user explicitly approves. After approval: create todos from chunks, execute.
 
