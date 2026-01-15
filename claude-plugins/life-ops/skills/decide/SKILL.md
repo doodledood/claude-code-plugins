@@ -104,11 +104,17 @@ Run: `date +%Y%m%d-%H%M%S` for filename timestamp and `date '+%Y-%m-%d %H:%M:%S'
 - [ ] Write regrets to log
 - [ ] (expand: stakeholders if others affected)
 - [ ] (expand: satisficing thresholds per factor)
+- [ ] Discover: Hidden factors probe ("What would make you doubt this in 5 years?")
+- [ ] Write hidden factors to log
 - [ ] Verify discovery completion criteria
 - [ ] Generate research brief
 - [ ] Write research brief to log
-- [ ] Execute research
+- [ ] Execute research (via Task with web-researcher)
 - [ ] Write research results to log
+- [ ] Post-research gap check: identify factors revealed by research not covered in discovery
+- [ ] (expand: ask about each new factor if any found)
+- [ ] (expand: if critical factors → follow-up research loop)
+- [ ] Write all new factors and follow-up research to log
 - [ ] Refresh context: read full decision log
 - [ ] Apply decision framework
 - [ ] (if tie: ask tie-breaker questions)
@@ -150,11 +156,17 @@ Stakes: {level}
 ### Satisficing Thresholds
 {populated incrementally - minimum acceptable for each factor}
 
+### Hidden Factors Probe
+{what would make user doubt decision in 5 years - populated after asking}
+
 ## Research Brief
 {populated after discovery}
 
 ## Research Results
 {summary of findings}
+
+## Post-Research Factors
+{any new factors revealed by research that weren't covered in discovery}
 
 ## Decision Analysis
 {final recommendation}
@@ -347,18 +359,42 @@ Infer or ask:
 - **Stakes level**: (already assessed)
 - **Time pressure**: Urgent / Moderate / None
 
+## 2.9 Hidden Factors Probe (always ask for medium+ stakes)
+
+**Goal**: Surface factors the user hasn't thought to mention but would affect their decision.
+
+**The question**: "What would make you doubt this decision 5 years from now? What would you wish you had known or asked about?"
+
+This open-ended question often surfaces:
+- Regulatory or legal considerations
+- Tax implications
+- Compatibility/lock-in concerns
+- Maintenance or ongoing costs
+- Exit costs or reversibility barriers
+- Secondary effects on other life areas
+
+**Follow-up pattern**: For each factor surfaced, probe:
+- "How important is {factor} relative to your other priorities?"
+- "What's the minimum acceptable threshold for {factor}?"
+
+Add any new factors to the research brief.
+
+---
+
 ## Discovery Completion Criteria
 
-Discovery is complete when ALL THREE are true:
+Discovery is complete when ALL FOUR are true:
 
 1. **Checklist complete**: All required areas for the stakes level have been asked and answered:
    - Low stakes: Underlying need, Time horizon, Constraints (Core 3) - each answered
-   - Medium stakes: All Core 5 - each answered
-   - High/Life-changing: Core 5 + all EBA additions - each answered
+   - Medium stakes: All Core 5 + Hidden Factors Probe - each answered
+   - High/Life-changing: Core 5 + all EBA additions + Hidden Factors Probe - each answered
 
-2. **Confidence reached**: You could write a research brief where changing any answer would change which options you research OR how you'd rank the results. Test: "If I learned the user's {factor} was different, would I research different options or weight factors differently?" If no such questions remain, confidence is reached.
+2. **Hidden factors surfaced**: You've asked "What would make you doubt this decision later?" and probed any factors the user raised.
 
-3. **User signal** (optional): User can indicate "that's enough, let's research" at any point
+3. **Confidence reached**: You could write a research brief where changing any answer would change which options you research OR how you'd rank the results. Test: "If I learned the user's {factor} was different, would I research different options or weight factors differently?" If no such questions remain, confidence is reached.
+
+4. **User signal** (optional): User can indicate "that's enough, let's research" at any point
 
 **If user wants to skip discovery**: Acknowledge their desire to move faster, then explain that 2-3 key questions will prevent wasted research. A "critical question" is one where a wrong assumption would either (a) cause you to research irrelevant options, or (b) lead to a recommendation that violates an unstated constraint. Ask those questions using AskUserQuestion, then proceed. Document remaining assumptions in the log.
 
@@ -437,22 +473,27 @@ Before research, classify the decision:
 
 # Phase 4: Research Execution
 
-## Primary Path: research-web Skill
+## Primary Path: Task with web-researcher Agent
 
-Use Skill tool to conduct research:
+**CRITICAL**: Use Task (not Skill) to preserve todo state. Skill invocations overwrite the parent's TodoWrite state; Task agents run in isolation.
+
 ```
-Skill("vibe-workflow:research-web", "very thorough - {paste full research brief}")
+Task(
+  subagent_type: "vibe-workflow:web-researcher",
+  prompt: "{thoroughness level} - {paste full research brief}",
+  description: "Research options for {decision topic}"
+)
 ```
 
 **Thoroughness by stakes**:
 - Low → medium
 - Medium → thorough
 - High → very thorough
-- Life-changing → very thorough (will auto-continue waves until comprehensive)
+- Life-changing → very thorough
 
-## Fallback: Opus Agent (if research-web unavailable)
+## Fallback: Opus Agent (if web-researcher unavailable)
 
-If Skill tool fails with "skill not found" or similar:
+If Task fails with "agent not found" or similar:
 
 ```
 Task(
@@ -476,7 +517,7 @@ INSTRUCTIONS:
 
 ## When Answer Isn't on Web
 
-If research returns insufficient results (fewer than 3 sources that directly address at least one of the user's stated priority factors, OR topic involves private personal circumstances like relationship dynamics, OR research-web explicitly indicates insufficient coverage):
+If research returns insufficient results (fewer than 3 sources that directly address at least one of the user's stated priority factors, OR topic involves private personal circumstances like relationship dynamics, OR research explicitly indicates insufficient coverage):
 
 1. **Acknowledge limitations**: "I couldn't find specific research on {X}, but based on general principles and your situation..."
 2. **Switch to reasoning mode**: Use general knowledge + user's discovered situation
@@ -484,6 +525,107 @@ If research returns insufficient results (fewer than 3 sources that directly add
 4. **Be explicit about uncertainty**: State "Confidence: Medium - recommendation based on general principles rather than specific research data"
 
 **Write research results summary to decision log** before proceeding.
+
+---
+
+# Phase 4.5: Post-Research Gap Check (Iterative Loop)
+
+**Goal**: Research often reveals factors that weren't discussed during discovery. Before making a recommendation, check if any new factors need user input—and if those factors are critical, do additional targeted research.
+
+**This is a loop**: Research → Identify gaps → Ask user → If critical new factors → More research → Repeat until no new critical gaps.
+
+## 4.5.1 Identify Research-Revealed Factors
+
+After research completes, scan findings for factors that:
+- Are important for the decision (mentioned in multiple sources, or flagged as critical by research)
+- Were NOT discussed during discovery
+- Could change the recommendation depending on user's preference
+
+Common examples:
+- Tax implications, regulatory requirements
+- Compatibility or lock-in concerns
+- Ongoing costs vs. upfront costs trade-offs
+- Different categories of options (e.g., domestic vs. foreign, subscription vs. purchase)
+- Risks or downsides not previously considered
+
+## 4.5.2 Ask About New Factors
+
+If research reveals important factors not covered in discovery:
+
+```
+questions: [
+  {
+    question: "Research revealed {factor} is important for this decision. We didn't discuss this earlier—how important is {factor} to you?",
+    header: "New Factor",
+    options: [
+      { label: "Critical", description: "Could change my decision" },
+      { label: "Important", description: "Should factor into ranking" },
+      { label: "Minor", description: "Nice to have but not decisive" },
+      { label: "Not relevant", description: "Doesn't affect my situation" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+**For each factor rated Critical or Important**: Ask about minimum acceptable threshold and add to decision criteria.
+
+## 4.5.3 Additional Research Loop
+
+**If user rates any new factor as Critical**:
+
+1. Update the research brief with the new factor and user's threshold
+2. Conduct targeted follow-up research on that factor specifically:
+
+```
+Task(
+  subagent_type: "vibe-workflow:web-researcher",
+  prompt: "medium - Targeted follow-up research on {factor} for {decision topic}.
+
+CONTEXT:
+{paste relevant parts of original research}
+
+NEW FACTOR TO RESEARCH:
+- Factor: {factor}
+- User's threshold: {threshold}
+- Why it matters: {from user's response}
+
+FOCUS:
+- How does {factor} affect the top options we've identified?
+- Are there options we missed that excel on {factor}?
+- What are the trade-offs between {factor} and other priorities?",
+  description: "Follow-up research on {factor}"
+)
+```
+
+3. After follow-up research returns, repeat Phase 4.5.1: scan for any NEW factors revealed
+4. Continue loop until no new Critical factors are found
+
+**Loop termination**: The loop ends when either:
+- No new factors are found in latest research, OR
+- All new factors are rated Minor or Not relevant by user, OR
+- User indicates they have enough information to decide
+
+**Maximum iterations**: Cap at 3 research rounds to prevent infinite loops. If still finding critical gaps after 3 rounds, note remaining uncertainties in decision analysis and proceed.
+
+## 4.5.4 Update Decision Log
+
+Write any new factors, user responses, and follow-up research to the decision log before proceeding to Phase 5.
+
+**Log structure for each loop iteration**:
+```markdown
+## Post-Research Factors - Round {N}
+
+### New Factors Identified
+- {factor 1}: User rated {importance}, threshold: {threshold}
+- {factor 2}: User rated {importance}
+
+### Follow-up Research (if any)
+{summary of targeted research}
+
+### Updated Priority Ranking
+1. {updated ranking if changed}
+```
 
 ---
 
@@ -514,6 +656,19 @@ This restores:
 
 ## 5.3 Generate Decision Analysis
 
+### Cross-Category Representation Rule
+
+**Before generating the Top 3**: Check if research found options from distinct categories (e.g., different providers, domiciles, approaches, price tiers, subscription vs. purchase).
+
+**If categories exist**: The Top 3 MUST include at least one option from each major category, even if some rank lower overall. This ensures the user understands WHY the winning category wins, not just which option within a category wins.
+
+Example: If researching software with subscription and perpetual license options:
+- #1: Best subscription option (if subscription wins overall)
+- #2: Best perpetual license option (even if lower-ranked)
+- #3: Second-best from winning category OR best from third category
+
+**Why this matters**: Users often have unstated category preferences. Showing the best from each category with explicit "Why #1's category wins" prevents "but what about {other category}?" follow-up questions.
+
 ```markdown
 ## Decision Analysis: {Topic}
 
@@ -525,6 +680,7 @@ This restores:
 
 | Factor | #1: {Option A} | #2: {Option B} | #3: {Option C} |
 |--------|----------------|----------------|----------------|
+| **Category** | {category} | {category} | {category} |
 | {Priority 1} | {value} | {value} | {value} |
 | {Priority 2} | {value} | {value} | {value} |
 | {Priority 3} | {value} | {value} | {value} |
@@ -534,6 +690,13 @@ This restores:
 - Best matches your priority of {X}
 - Meets your constraint of {Y}
 - Aligns with stakeholder {Z}'s needs (if applicable)
+
+### Why #1's Category Wins (if multiple categories exist)
+- {Comparison against other categories, not just other options}
+- {What you'd give up by choosing a different category}
+
+### When Would {Other Category} Be Better?
+- {Scenarios where user should reconsider the category choice}
 
 ### Trade-offs
 - #1 vs #2: {what you gain/lose}
