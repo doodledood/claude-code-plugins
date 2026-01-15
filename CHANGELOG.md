@@ -8,6 +8,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [prompt-engineering] v1.8.0 - New `/optimize-prompt-goal` skill for goal effectiveness optimization:
+  - Iteratively optimizes prompts to better achieve their stated goals
+  - New `prompt-goal-verifier` agent checks 11 issue types across 3 dimensions:
+    - Goal Achievement (4): Misalignment, Missing/Vague Goal, Goal Dilution, Unmeasurable Success
+    - Error Prevention (4): Misstep Risk, Failure Mode Gaps, Contradictory Guidance, Unsafe Defaults
+    - Efficiency (3): Unnecessary Overhead, Indirect Path, Redundant Instructions
+  - Impact-based severity (CRITICAL/HIGH/MEDIUM/LOW)
+  - Goal inference: explicit → context-inferred → low-confidence best-effort
+  - Complements `/refine-prompt` (precision) with goal optimization
 - [life-ops] v1.7.1 - `/decide` skill: optimize information density (16% token reduction):
   - Compressed verbose prose to terse bullets and tables
   - Minified JSON templates while preserving structure
