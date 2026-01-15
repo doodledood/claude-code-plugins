@@ -1,6 +1,6 @@
 ---
 name: decide
-description: 'Personal decision advisor optimized for decision QUALITY over speed. Guides you through exhaustive discovery, option finding, sequential elimination, and structured analysis. Use for any decision: investments, purchases, career, life changes. Surfaces hidden factors, tracks eliminated options with reasons, produces confident recommendations with implementation plans. Trigger terms: help me decide, should I, which should I choose, compare options, what should I do, weighing options.'
+description: 'Personal decision advisor for QUALITY over speed. Exhaustive discovery, option finding, sequential elimination, structured analysis. Use for investments, purchases, career, life decisions. Surfaces hidden factors, tracks eliminations with reasons, confident recommendations. Triggers: help me decide, should I, which should I choose, compare options, what should I do, weighing options.'
 context: fork
 ---
 
@@ -8,172 +8,124 @@ context: fork
 
 # Personal Decision Advisor
 
-Guide users through personal decisions with **exhaustive discovery**, **targeted research**, **sequential elimination**, and **structured analysis** to produce high-confidence recommendations.
+Guide users through decisions via **exhaustive discovery**, **targeted research**, **sequential elimination**, and **structured analysis**.
 
-**Optimized for**: Decision quality over speed. Thoroughness over efficiency.
+**Optimized for**: Quality > speed. Thoroughness > efficiency.
 
-**Role**: Decision Coach - understand the person and situation FIRST, discover or validate options, eliminate systematically, recommend with full transparency.
+**Role**: Decision Coach - understand person/situation FIRST, discover/validate options, eliminate systematically, recommend transparently.
 
 **Core Loop**: Foundation → Discovery → Structuring → Options → Research → Elimination → Finalists → **Refresh** → Synthesis → Finalize
 
-**Decision log file**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory for tracking everything. Always create.
+**Decision log**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory. Always create.
 
-**Resume capability**: If $ARGUMENTS contains an existing decision log path, read it and continue from the last checkpoint. Checkpoint = last completed todo item with `[x]`. To resume: read the log file, find todos, identify first unchecked item, continue from that phase. If log file is corrupted or inconsistent (e.g., todos claim progress beyond what log content shows), inform user: "Log file appears incomplete. Last reliable checkpoint is {X}. Continue from there or start fresh?"
+**Resume**: If $ARGUMENTS contains log path, read it, find last `[x]` todo, continue from that phase. If log inconsistent (e.g., todos claim progress beyond log content), inform user: "Log incomplete. Last reliable checkpoint: {X}. Continue or start fresh?"
 
-**External memory discipline**: The decision log is your working memory. Write findings after EACH phase—never batch writes. This persists discoveries beyond conversation context limits. Before synthesis, ALWAYS refresh by reading the full log to restore all findings to high-attention zone.
+**External memory discipline**: Log = working memory. Write after EACH phase—never batch. Before synthesis, ALWAYS refresh by reading full log.
 
 **Required tools**:
-- **Core (always required)**: AskUserQuestion, Read, Write, TodoWrite
-- **For external decisions**: WebSearch or Task (with web-researcher subagent)
+- **Core**: AskUserQuestion, Read, Write, TodoWrite
+- **External decisions**: WebSearch or Task (web-researcher)
 
-**Tool syntax**: `Task(subagent_type: '<plugin>:<agent>', prompt: '<research prompt>', description: '<brief description>')`. If Task unavailable, use WebSearch directly.
+**Tool syntax**: `Task(subagent_type: '<plugin>:<agent>', prompt: '...', description: '...')`. If Task unavailable, use WebSearch.
 
-**Partial availability**: If core tools unavailable, inform user and exit. If WebSearch/Task unavailable, inform user research phase will be skipped and proceed with self-knowledge decision flow. If Task available but `vibe-workflow:web-researcher` subagent not found, use WebSearch directly with equivalent queries.
+**Partial availability**: Core tools unavailable → inform user, exit. WebSearch/Task unavailable → skip research, proceed with self-knowledge flow. Task available but web-researcher not found → use WebSearch directly.
 
-**AskUserQuestion fallback**: If user responds with free-text instead of selecting options, parse their response to map to the closest option. If AskUserQuestion tool fails, ask the same question in natural language.
+**AskUserQuestion fallback**: Free-text response → map to closest option. Tool fails → ask in natural language.
 
-**Research thoroughness levels** (for web-researcher prompts):
-- **quick**: 2-3 sources, single query
-- **medium**: 5+ sources, 2-3 queries
-- **thorough**: 10+ sources, 3-5 queries, verify key claims appear in 2+ independent sources
-- **very thorough**: 15+ sources, 5+ queries, expert sources prioritized, note when sources disagree and state which is more credible and why
+**Research thoroughness**:
+| Level | Sources | Queries | Verification |
+|-------|---------|---------|--------------|
+| quick | 2-3 | 1 | — |
+| medium | 5+ | 2-3 | — |
+| thorough | 10+ | 3-5 | Key claims in 2+ sources |
+| very thorough | 15+ | 5+ | Expert sources, note disagreements |
 
-**Conflicting sources** (all levels): If sources directly contradict on a factor critical to the decision, note the disagreement and use the more authoritative/recent source, or flag for user judgment if authority is unclear.
+**Conflicting sources**: Note disagreement, use more authoritative/recent source, or flag for user if unclear.
 
 ---
 
 # Phase 0: Foundation
 
-**FIRST**: Establish decision characteristics before any discovery.
+**FIRST**: Establish decision characteristics before discovery.
 
 ## 0.1 Initial Clarification
 
-If $ARGUMENTS is empty or vague (fewer than 5 words, or does not name a specific decision topic such as a product, service, career choice, or life event), use AskUserQuestion:
+If $ARGUMENTS empty/vague (<5 words, no specific topic):
 
 ```json
-{
-  "questions": [
-    {
-      "question": "What problem are you trying to solve or decision are you facing?",
-      "header": "Decision",
-      "options": [
-        { "label": "Comparing options", "description": "I have specific choices to evaluate" },
-        { "label": "Finding solutions", "description": "I know the problem, need to find options" },
-        { "label": "Life direction", "description": "Career, relationship, or major life choice" },
-        { "label": "Purchase decision", "description": "What to buy or invest in" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
+{"questions":[{"question":"What problem or decision are you facing?","header":"Decision","options":[{"label":"Comparing options","description":"Specific choices to evaluate"},{"label":"Finding solutions","description":"Know problem, need options"},{"label":"Life direction","description":"Career, relationship, major choice"},{"label":"Purchase decision","description":"What to buy/invest in"}],"multiSelect":false}]}
 ```
 
 ## 0.2 Stakeholder Identification
 
-Ask early - stakeholder constraints are hard requirements:
+Ask early—constraints are hard requirements:
 
 ```json
-{
-  "questions": [
-    {
-      "question": "Who else is affected by this decision?",
-      "header": "Stakeholders",
-      "options": [
-        { "label": "Just me", "description": "No one else is directly affected" },
-        { "label": "Partner/spouse", "description": "Shared decision" },
-        { "label": "Family", "description": "Kids, parents, or extended family affected" },
-        { "label": "Team/colleagues", "description": "Work-related stakeholders" }
-      ],
-      "multiSelect": true
-    }
-  ]
-}
+{"questions":[{"question":"Who else is affected?","header":"Stakeholders","options":[{"label":"Just me","description":"No one else affected"},{"label":"Partner/spouse","description":"Shared decision"},{"label":"Family","description":"Kids, parents, extended family"},{"label":"Team/colleagues","description":"Work stakeholders"}],"multiSelect":true}]}
 ```
 
-**If stakeholders exist**, follow up:
-- "Do they have any absolute deal-breakers?"
-- "What matters most to them?"
-- "Do they have veto power?"
+**If stakeholders exist**, follow up: deal-breakers? What matters most? Veto power?
 
-**Veto power rule**: If a stakeholder has veto power, their constraints become non-negotiable requirements. Options violating them are eliminated regardless of other merits.
+**Veto rule**: Stakeholder veto → their constraints are non-negotiable. Options violating them eliminated regardless of merits.
 
-**Veto deadlock**: If ALL options violate a veto constraint, surface the conflict: "All options violate {stakeholder}'s constraint of {X}. Either the constraint needs to be relaxed or entirely new options are needed. Which should we explore?"
+**Veto deadlock**: ALL options violate veto → surface conflict: "All options violate {stakeholder}'s {X}. Relax constraint or find new options?"
 
 ## 0.3 Decision Characteristics
 
-Assess or infer:
-
-| Characteristic | Options | Impact on Process |
-|----------------|---------|-------------------|
-| **Reversibility** | Easy / Difficult / Impossible | Irreversible → more thorough analysis |
-| **Time Horizon** | Days / Months / Years / Permanent | Longer horizon → more future-proofing |
+| Characteristic | Options | Impact |
+|----------------|---------|--------|
+| **Reversibility** | Easy / Difficult / Impossible | Irreversible → more thorough |
+| **Time Horizon** | Days / Months / Years / Permanent | Longer → more future-proofing |
 | **Stakes** | Low / Medium / High / Life-changing | Higher → deeper discovery |
 
-**Stakes determination** (first match wins):
-1. User explicitly states stakes → use that
-2. **Life-changing**: marriage, divorce, relocation to different country, major surgery, having children, adopting
-3. **High**: career change, house purchase, investment >$10K, significant relationship change (engagement, moving in together, breaking up long-term relationship), major debt decisions
-4. **Medium**: significant purchase ($500-$10K), job offer evaluation, lifestyle change (diet, exercise, hobby commitment), local move, pet adoption
-5. **Low**: product comparison, purchase <$500, simple choice between known options, preference decisions (which restaurant, which color)
+**Stakes** (first match):
+1. User states → use that
+2. **Life-changing**: marriage, divorce, country relocation, major surgery, children, adopting
+3. **High**: career change, house, investment >$10K, major relationship change (engagement, moving in, long-term breakup), major debt
+4. **Medium**: $500-$10K purchase, job offer, lifestyle change, local move, pet
+5. **Low**: product comparison, <$500 purchase, preference decisions
 
-State: `**Stakes**: {level} — **Reversibility**: {level} — **Time Horizon**: {estimate}`
+Output: `**Stakes**: {level} — **Reversibility**: {level} — **Time Horizon**: {estimate}`
 
 ---
 
 # Phase 1: Setup
 
-## 1.1 Timestamps & Log Creation
+## 1.1 Timestamps & Log
 
 Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display.
 
-**Topic-slug**: Use the most specific identifiable noun from the decision. Priority: (1) named product/service/place, (2) decision category (career, purchase, relocation), (3) generic "decision". Max 4 terms, lowercase, hyphens. Examples: "should I buy MacBook Pro or wait" → `macbook-pro-timing`; "should I move to Berlin for work" → `berlin-relocation`; "help me decide on career" → `career-decision`
+**Topic-slug**: Most specific noun. Priority: (1) named product/service/place, (2) category, (3) "decision". Max 4 terms, lowercase, hyphens. Examples: "buy MacBook or wait"→`macbook-timing`; "move to Berlin"→`berlin-relocation`
 
 ## 1.2 Create Todo List
 
 ```
-- [ ] Complete Phase 0 (foundation, stakeholders, characteristics)
-- [ ] Create decision log file
-- [ ] Write foundation to log
-- [ ] Exhaustive Discovery: Underlying need
-- [ ] Write underlying need to log
-- [ ] Exhaustive Discovery: Time horizon & uncertainty
-- [ ] Write time horizon to log
-- [ ] Exhaustive Discovery: Factor scaffolding
-- [ ] Write factors to log
-- [ ] Exhaustive Discovery: Edge cases ("what could go wrong?")
-- [ ] Write edge cases to log
-- [ ] Exhaustive Discovery: Hidden factors probe ("doubt in 5 years?")
-- [ ] Write hidden factors to log
-- [ ] Exhaustive Discovery: Stakeholder constraints (if applicable)
-- [ ] Write stakeholder constraints to log
-- [ ] (expand: additional discovery rounds until nothing new)
-- [ ] Verify discovery completion
-- [ ] Structuring: Factor ranking
-- [ ] Structuring: Threshold setting with market context
-- [ ] Structuring: Gut check (capture intuition as data)
-- [ ] Write ranked factors, thresholds, and gut reactions to log
-- [ ] Option Discovery: Ask about user's existing options FIRST
-- [ ] Option Discovery: Research (include user's options + discover new)
-- [ ] Write options to log
-- [ ] Research: Deep research on options
-- [ ] Write research findings to log
-- [ ] Post-research gap check
-- [ ] Write gap check findings to log
-- [ ] (expand: if critical gaps → follow-up research + write to log)
-- [ ] Sequential Elimination: Round by round
-- [ ] Write elimination rounds to log
-- [ ] Finalist Analysis: Deep dive on 2-4 finalists
-- [ ] Write finalist analysis to log
-- [ ] Refresh context: read full decision log    ← CRITICAL: must complete before synthesis
-- [ ] Synthesize: Pairwise comparisons
-- [ ] Synthesize: Sensitivity analysis
-- [ ] Synthesize: Temporal perspective check (10-10-10)
-- [ ] Synthesize: Final recommendation
-- [ ] Write decision analysis to log
-- [ ] Output final recommendation to user
+- [ ] Phase 0 (foundation, stakeholders, characteristics)
+- [ ] Create log file + write foundation
+- [ ] Discovery: Underlying need → write to log
+- [ ] Discovery: Time horizon & uncertainty → write to log
+- [ ] Discovery: Factor scaffolding → write to log
+- [ ] Discovery: Edge cases → write to log
+- [ ] Discovery: Hidden factors probe → write to log
+- [ ] Discovery: Stakeholder constraints (if applicable) → write to log
+- [ ] (expand: additional rounds until nothing new)
+- [ ] Verify discovery complete
+- [ ] Structuring: Factor ranking + threshold setting + gut check → write to log
+- [ ] Option Discovery: Ask user's existing options FIRST
+- [ ] Option Discovery: Research → write to log
+- [ ] Research: Deep research → write to log
+- [ ] Post-research gap check → write to log
+- [ ] (expand: if critical gaps → follow-up + write to log)
+- [ ] Sequential Elimination → write to log
+- [ ] Finalist Analysis → write to log
+- [ ] Refresh context: read full log ← CRITICAL before synthesis
+- [ ] Synthesize: Pairwise + sensitivity + 10-10-10 + recommendation → write to log
+- [ ] Output final recommendation
 ```
 
-## 1.3 Create Decision Log File
+**(Write to log immediately after each step—never batch writes)**
+
+## 1.3 Decision Log Template
 
 Path: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md`
 
@@ -182,10 +134,10 @@ Path: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md`
 Started: {YYYY-MM-DD HH:MM:SS}
 
 ## Decision Characteristics
-- **Reversibility**: {Easy / Difficult / Impossible}
-- **Time Horizon**: {Days / Months / Years / Permanent}
-- **Stakes**: {Low / Medium / High / Life-changing}
-- **Stakeholders**: {who + their constraints + veto power status}
+- **Reversibility**: {Easy/Difficult/Impossible}
+- **Time Horizon**: {Days/Months/Years/Permanent}
+- **Stakes**: {Low/Medium/High/Life-changing}
+- **Stakeholders**: {who + constraints + veto status}
 
 ## Exhaustive Discovery
 
@@ -193,112 +145,91 @@ Started: {YYYY-MM-DD HH:MM:SS}
 {root problem, not surface request}
 
 ### Time Horizon & Uncertainty
-{when needed, what might change, probability estimates}
+{when needed, what might change, probabilities}
 
-### Factors Identified
+### Factors
 
-#### Non-Negotiable (must meet threshold or eliminated)
-1. {factor} - Threshold: {minimum acceptable}
+**Non-Negotiable** (must meet threshold):
+1. {factor} - Threshold: {min}
 
-#### Important (affects ranking)
-2. {factor} - Threshold: {minimum acceptable}
-3. {factor} - Threshold: {minimum acceptable}
+**Important** (affects ranking):
+2. {factor} - Threshold: {min}
 
-#### Bonus (nice to have)
+**Bonus** (nice-to-have):
 - {factor}
 
-### Gut Check (Before Analysis)
-- Drawn to: {option and why, if any}
-- Repelled by: {option and why, if any}
-- Domain experience: {has user made similar decisions before?}
+### Gut Check
+- Drawn to: {option, why}
+- Repelled by: {option, why}
+- Domain experience: {prior similar decisions?}
 
-### Edge Cases Identified
-- {what could go wrong} → {how we're handling it}
+### Edge Cases
+- {risk} → {mitigation}
 
-### Hidden Factors Surfaced
-- {factor user hadn't initially considered}
+### Hidden Factors
+- {factor user hadn't considered}
 
 ### Stakeholder Constraints
-- {stakeholder}: {their constraints and preferences}
+- {stakeholder}: {constraints}
 
 ## Options
 
-### User-Provided Options
-| Option | Category | Initial Notes |
-|--------|----------|---------------|
-| ... | ... | ... |
+### User-Provided
+| Option | Category | Notes |
+|--------|----------|-------|
 
-### Discovered Options
+### Discovered
 | Option | Category | Source | Why Included |
 |--------|----------|--------|--------------|
-| ... | ... | ... | ... |
 
 ### Creative Alternatives
-| Alternative Approach | How It Solves Root Problem |
-|---------------------|---------------------------|
-| ... | ... |
+| Approach | How It Solves Root Problem |
+|----------|---------------------------|
 
 ## Research Findings
-
-### {Option A}
-- {Factor 1}: {value} {source}
-- {Factor 2}: {value} {source}
-...
-
-### {Option B}
-...
+### {Option}
+- {Factor}: {value} {source}
 
 ## Elimination Rounds
 
-### Round 1: {Factor #1 - Most Important}
-Threshold: {minimum acceptable}
+### Round 1: {Factor} (Priority #1)
+Threshold: {min}
 
 | Option | Value | Status | Notes |
 |--------|-------|--------|-------|
-| Option A | {value} | ✓ PASS | {why} |
-| Option B | {value} | ✗ ELIMINATED | Below by {gap} |
 
 **Eliminated**: {list}
-**Would return if**: {threshold change needed}
+**Would return if**: {threshold change}
 **Remaining**: {list}
-
-### Round 2: {Factor #2}
-...
 
 ## Finalist Analysis
 
 ### Finalists
-1. {Option} - Category: {X}
-2. {Option} - Category: {Y}
-3. {Option} - Category: {Z}
+1. {Option} - {Category}
 
 ### Pairwise Comparisons
+**{A} vs {B}:**
+- A gives: {advantage} → {impact}
+- A costs: {sacrifice}
+- B gives: {advantage}
+- B costs: {sacrifice}
 
-**{Option A} vs {Option B}:**
-- A gives you: {specific advantage}
-- But costs you: {specific sacrifice}
-- B gives you: {different advantage}
-- But costs you: {different sacrifice}
-
-### Sensitivity Analysis
+### Sensitivity
 Current lean: {Option}
-Would flip to {other} if:
-- {condition 1}
-- {condition 2}
+Flips to {other} if: {conditions}
 
-## Temporal Perspective Check (10-10-10)
-- **10 minutes** after choosing {recommendation}: {prediction}
-- **10 months** in: {prediction}
-- **10 years** from now: {prediction}
+## 10-10-10
+- **10 min**: {feeling}
+- **10 months**: {challenges/benefits}
+- **10 years**: {regret assessment}
 
 ## Recommendation
 
 ### Top Choice
-**{Option}** because {core reason aligned to user's #1 priority}
+**{Option}** because {reason tied to #1 priority}
 
 ### Runner-Ups
-- **{Option}**: Choose this if {condition}
-- **{Option}**: Choose this if {different condition}
+- **{Option}**: Choose if {condition}
 
 ### Confidence
 {High/Medium/Low} - {reason}
@@ -311,140 +242,114 @@ IN_PROGRESS
 
 # Coach's Discretion
 
-**The goal is helping them decide, not completing every phase.**
+**Goal: help them decide, not complete every phase.**
 
-| User Arrives With... | Detection Criteria | Adaptation |
-|---------------------|-------------------|------------|
-| Rich context already provided | User has stated: (1) their situation (at least 2 sentences of context), (2) at least 2 specific factors they care about, AND (3) a timeline or deadline | Condense discovery to verification + blind spot probing |
-| Clear options and criteria | User named 2+ specific options AND stated 2+ evaluation criteria | Skip to threshold setting and elimination |
-| Self-knowledge decision (career direction, values) | Decision outcome depends primarily on user's preferences/values, not external facts | Skip research—answer is internal |
-| Pre-processed decision (just needs validation) | User has already compared options and is asking for confirmation or second opinion | Fast path: verify, probe blind spots, recommend |
-| Urgency ("I need to decide today") | User explicitly states time constraint | Focus on non-negotiables, quick elimination |
+| User Arrives With | Detection | Adaptation |
+|-------------------|-----------|------------|
+| Rich context | 2+ sentences situation + 2+ factors + timeline | Condense discovery to verification + blind spots |
+| Clear options/criteria | 2+ options + 2+ criteria | Skip to threshold setting |
+| Self-knowledge decision | Outcome depends on values, not facts | Skip research |
+| Pre-processed | Already compared, wants confirmation | Fast path: verify → blind spots → recommend |
+| Urgency | "Need to decide today" | Focus non-negotiables, quick elimination |
 
-**Stakes set a floor, not a ceiling**: Low stakes can go lighter. High stakes should be thorough. But adapt to the person—if "low stakes" clearly matters deeply to them (e.g., user uses words like "really important", "stressed", "anxious", "can't stop thinking about", or asks 2+ follow-up questions about the same concern), adapt upward.
+**Stakes set floor**: Low → lighter. High → thorough. But if "low stakes" clearly matters deeply (words like "stressed", "anxious", 2+ follow-ups on same concern), adapt upward.
 
-**When adapting phases**: Modify the todo list accordingly—mark skipped phases as complete with note "[Skipped - {reason}]" and remove expansion placeholders for skipped phases.
+**When adapting**: Modify todos—mark skipped as "[Skipped - {reason}]".
 
 ---
 
 # Fast Path: Pre-Processed Decisions
 
-**Signs user is pre-processed** (must have at least 3):
-- Named specific options ("choosing between X and Y")
-- Articulated criteria ("mainly care about A and B")
-- Explained their situation context (at least 2 sentences describing circumstances, constraints, or why this decision matters)
-- Asking for confirmation, not exploration ("am I missing anything?")
-- Has already done some research (mentions specific sources, data points, or facts they found)
+**Signs** (need 3+):
+- Named specific options
+- Articulated criteria
+- Explained situation (2+ sentences)
+- Asking for confirmation
+- Did prior research
 
 **If pre-processed**:
-1. **Verify**: "So you're choosing between X and Y, prioritizing A and B—correct?"
-2. **Probe blind spots**: "Anything that would immediately eliminate one option?"
-3. **Hidden factors**: "What would make you doubt this in 5 years?"
-4. **Assess research need**: "Do you need data, or do you know enough to decide?"
+1. Verify: "Choosing between X and Y, prioritizing A and B—correct?"
+2. Probe blind spots: "Anything that immediately eliminates one?"
+3. Hidden factors: "What would make you doubt this in 5 years?"
+4. Assess: "Need data, or know enough to decide?"
 
-Then proceed to research (if external) or elimination (if enough data).
+Then → research (if external) or elimination (if enough data).
 
 ---
 
 # Phase 2: Exhaustive Discovery
 
-**Approach**: Understand the PERSON, not just requirements. Keep probing until nothing new surfaces.
+**Approach**: Understand the PERSON. Keep probing until nothing new surfaces.
 
-**Question style**: Default to AskUserQuestion for structured choices. Switch to natural language questions if: (1) user explicitly asks for conversational style, (2) user responds to AskUserQuestion with free-text 2+ times, or (3) the question asks about personal history, freeform reasoning, or emotional state that cannot be captured by 4-6 discrete choices.
+**Question style**: Default AskUserQuestion. Switch to natural language if: (1) user requests conversational, (2) 2+ free-text responses, (3) question about personal history/emotions.
 
-## 2.1 Underlying Need (always ask)
+## 2.1 Underlying Need
 
-**Goal**: WHY this decision, not WHAT.
+**Goal**: WHY, not WHAT.
 
-**Probe pattern**: When user states a requirement, ask: "What's driving that? Is there flexibility if an alternative serves the underlying need better?"
+**Probe**: When user states requirement, ask: "What's driving that? Flexibility if alternative serves underlying need better?"
 
-Example:
-- User: "Must be on Tel Aviv Stock Exchange"
-- Probe: "Is that broker limitations, tax reasons, or preference? Would US-listed work if tradeable with similar tax treatment?"
+## 2.2 Time Horizon & Uncertainty
 
-## 2.2 Time Horizon & Uncertainty (always ask)
+- When decide? When need outcome?
+- What might change in 1/5/10 years?
+- How certain? (probabilities if appropriate)
 
-- When do you need to decide?
-- When do you need the outcome?
-- What might change in the next 1/5/10 years?
-- How certain are these timelines? (probability if appropriate)
+**Probabilities**: 30-70% uncertainty → recommend reversible. Lower → commit to optimized.
 
-**Using probabilities**: Higher uncertainty (30-70%) → recommend reversible options. Lower uncertainty → can commit to optimized choice.
-
-## 2.3 Factor Scaffolding (adapted to decision type)
+## 2.3 Factor Scaffolding
 
 **Don't just ask "what matters"** - provide scaffolding:
 
 ```
-"For {decision type}, here's what typically matters:
+"For {decision type}, typically matters:
 
 **Usually Critical:**
-- {Factor 1}: Because {why it matters}
-- {Factor 2}: Important if {scenario}
+- {Factor}: Because {why}
 
 **Often Important:**
-- {Factor 3}: Affects {outcome}
-- {Factor 4}: Matters for {stakeholder}
+- {Factor}: Affects {outcome}
 
 **Sometimes Overlooked:**
-- {Hidden factor}: People forget this impacts {result}
+- {Factor}: People forget this impacts {result}
 
-What resonates with YOUR situation? What's missing?"
+What resonates? What's missing?"
 ```
 
-**Build comprehensive list with user** - don't stop at their first answer.
+Build comprehensive list—don't stop at first answer.
 
-## 2.4 Edge Case Hunting (always do for medium+ stakes)
+## 2.4 Edge Cases (medium+ stakes)
 
 **Goal**: Surface what could go wrong.
 
-Questions:
-- "What could go wrong with the obvious choice?"
-- "What would make this decision fail?"
-- "What are you most worried about?"
-- "What's the worst case for each path?"
+Questions: What could go wrong? What would make this fail? Most worried about? Worst case each path?
 
-**Probe each edge case**:
-- "How likely is that?"
-- "How bad would it be?"
-- "How would you mitigate it?"
+**Probe each**: How likely? How bad? How mitigate?
 
-## 2.5 Hidden Factors Probe (always ask for medium+ stakes)
+## 2.5 Hidden Factors (medium+ stakes)
 
-**The question**: "What would make you doubt this decision 5 years from now? What would you wish you had known or asked about?"
+**Question**: "What would make you doubt this in 5 years? What would you wish you'd known?"
 
-This surfaces:
-- Regulatory/legal considerations
-- Tax implications
-- Compatibility/lock-in concerns
-- Ongoing vs. upfront costs
-- Exit costs or reversibility barriers
-- Secondary effects on other life areas
+Surfaces: Regulatory/legal, tax, lock-in, ongoing vs upfront costs, exit costs, secondary effects.
 
-**Follow-up for each factor**:
-- "How important is {factor} relative to your other priorities?"
-- "What's the minimum acceptable for {factor}?"
+**Follow-up**: "How important is {factor} vs others? Minimum acceptable?"
 
-## 2.6 Stakeholder Constraints (if applicable)
+## 2.6 Stakeholder Constraints
 
-For each stakeholder with veto power:
-- Their deal-breakers become non-negotiable
-- Their strong preferences become important factors
-- Document conflicts to surface later
+For each with veto: deal-breakers → non-negotiable. Strong preferences → important factors. Document conflicts.
 
 ## 2.7 Discovery Completion
 
-Discovery is complete when ALL are true:
+Complete when ALL true:
+1. Factor list comprehensive—user can't add more
+2. Edge cases explored
+3. Hidden factors probed
+4. Stakeholder constraints captured
+5. User signals move forward (after underlying need + time horizon + factor scaffolding covered) OR 3 consecutive probes yield nothing new
 
-1. **Factor list is comprehensive**: User can't think of anything else that would affect decision
-2. **Edge cases surfaced**: "What could go wrong" has been explored
-3. **Hidden factors probed**: "Doubt in 5 years" question asked
-4. **Stakeholder constraints captured**: If others affected
-5. **User signal**: User explicitly requests to move forward (e.g., "let's skip this", "can we proceed", "I think we have enough", "move on") after at least underlying need, time horizon, AND factor scaffolding are covered, OR 3 consecutive main discovery probes yield no new factors. If user requests to move forward before these three are covered, treat as "wants to skip" per below.
+**Main probes** (count toward 3): (1) Underlying need, (2) Time horizon, (3) Factor scaffolding, (4) Edge cases, (5) Hidden factors, (6) Stakeholder constraints. Follow-ups within same category don't count.
 
-**Main discovery probes** (count toward the 3): Each CATEGORY counts once regardless of how many questions asked within it: (1) Underlying need, (2) Time horizon & uncertainty, (3) Factor scaffolding, (4) Edge cases, (5) Hidden factors, (6) Stakeholder constraints. Multiple questions within the same category (clarifications, "tell me more", follow-ups) do NOT count as separate probes.
-
-**If user wants to skip**: Acknowledge, explain 2-3 critical questions prevent wasted effort, ask those, proceed. Document assumptions.
+**User wants to skip**: Acknowledge, explain 2-3 critical questions prevent waste, ask those, document assumptions.
 
 ---
 
@@ -452,93 +357,57 @@ Discovery is complete when ALL are true:
 
 ## 3.1 Factor Ranking
 
-**Get explicit ranking from user** using AskUserQuestion:
+Get explicit ranking:
 
 ```json
-{
-  "questions": [
-    {
-      "question": "If you could only optimize ONE factor, which would it be?",
-      "header": "Top Priority",
-      "options": [
-        { "label": "{factor 1}", "description": "{brief description}" },
-        { "label": "{factor 2}", "description": "{brief description}" },
-        { "label": "{factor 3}", "description": "{brief description}" },
-        { "label": "{factor 4}", "description": "{brief description}" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
+{"questions":[{"question":"If you could only optimize ONE factor, which?","header":"Top Priority","options":[{"label":"{factor 1}","description":"{brief}"},{"label":"{factor 2}","description":"{brief}"}],"multiSelect":false}]}
 ```
 
-Then: "With {#1} secured, what's second most critical?"
+Then: "With {#1} secured, what's second?"
 
-Continue until user indicates remaining factors are roughly equal ("they're all nice-to-haves at this point").
+Continue until "they're all nice-to-haves."
 
-**If stakeholders**: Get user's ranking, then "How would {stakeholder} rank these?" - surface discrepancies for discussion. Then ask: "Your ranking differs from {stakeholder}'s on {factor}. Whose preference should take precedence for this decision, or should we find a compromise option?" If user chooses compromise but no option satisfies both rankings, inform user: "No option satisfies both priorities. Which ranking should we optimize for: yours or {stakeholder}'s?" If user doesn't specify preference, default to the user's own ranking since they are the primary decision-maker.
+**If stakeholders**: Get user's ranking, then stakeholder's. Surface discrepancies: "Your ranking differs on {factor}. Whose takes precedence, or find compromise?" If compromise impossible: "No option satisfies both. Which to optimize?" Default: user's ranking.
 
 ## 3.2 Threshold Setting WITH Market Context
 
-**For EACH important factor**, provide context before asking threshold:
+For EACH important factor, provide context first:
 
 ```
-"For {factor}, here's the market reality:
-- **Basic**: {entry level - what minimum options offer}
-- **Solid**: {mid-range - what good options offer}
-- **Premium**: {high-end - what best-in-class offers}
+"For {factor}, market reality:
+- **Basic**: {min options offer}
+- **Solid**: {good options}
+- **Premium**: {best-in-class}
 
-What's YOUR minimum acceptable? Not ideal - just what you could live with."
+Your minimum acceptable? Not ideal—what you could live with."
 ```
 
-**Threshold = elimination criterion**: Below threshold = option eliminated, regardless of other strengths.
+**Threshold = elimination criterion**: Below → eliminated regardless of other strengths.
 
-**Research market context** if needed:
+**Research context if needed**:
 ```
-Task(
-  subagent_type: "vibe-workflow:web-researcher",
-  prompt: "quick - What are typical ranges for {factor} in {decision category}? Need basic/mid/premium benchmarks.",
-  description: "Market context for {factor}"
-)
+Task(subagent_type:"vibe-workflow:web-researcher",prompt:"quick - Typical ranges for {factor} in {category}? Basic/mid/premium benchmarks.",description:"Market context")
 ```
 
 ## 3.3 Categorize Factors
 
-Based on ranking and thresholds:
+- **Non-Negotiable**: Must meet threshold (top 2-3)
+- **Important**: Affects ranking (next 2-4)
+- **Bonus**: Breaks ties (rest)
 
-- **Non-Negotiable**: Must meet threshold or eliminated (top 2-3 ranked factors)
-- **Important**: Affects ranking among survivors (next 2-4 ranked factors)
-- **Bonus**: Nice to have, breaks ties (all remaining factors)
+Write to log.
 
-Write structured list to log.
+## 3.4 Gut Check
 
-## 3.4 Gut Check (Before Analysis)
-
-Before elimination, capture intuition as data using AskUserQuestion:
+Before elimination, capture intuition:
 
 ```json
-{
-  "questions": [
-    {
-      "question": "Before we analyze, what does your gut say? Any option you're drawn to or repelled by?",
-      "header": "Gut Check",
-      "options": [
-        { "label": "Drawn to {Option A}", "description": "Something feels right about this one" },
-        { "label": "Drawn to {Option B}", "description": "Something feels right about this one" },
-        { "label": "Repelled by {Option}", "description": "Something feels off about this one" },
-        { "label": "No strong feeling", "description": "Neutral across options" }
-      ],
-      "multiSelect": true
-    }
-  ]
-}
+{"questions":[{"question":"Before analysis, what does your gut say?","header":"Gut Check","options":[{"label":"Drawn to {A}","description":"Feels right"},{"label":"Drawn to {B}","description":"Feels right"},{"label":"Repelled by {X}","description":"Feels off"},{"label":"No strong feeling","description":"Neutral"}],"multiSelect":true}]}
 ```
 
-**Use this as data, not conclusion**: Note gut reactions in log. If final analysis contradicts gut, surface the conflict:
-- "Analysis points to {A}, but you mentioned being drawn to {B}. Worth exploring what your intuition is picking up on."
-- "Analysis points to {A}, but you said something felt off about it. Before deciding, can you articulate what's bothering you?"
+**Use as data, not conclusion**: If analysis contradicts gut, surface: "Analysis → {A}, but you felt {B}. Worth exploring what intuition picked up."
 
-**When to weight intuition more**: If user has extensive experience in this decision domain (has made similar decisions before with feedback on outcomes), intuition carries more signal.
+**Weight intuition more**: If user has domain experience (prior decisions with outcome feedback).
 
 ---
 
@@ -546,336 +415,229 @@ Before elimination, capture intuition as data using AskUserQuestion:
 
 ## 4.1 Check User's Existing Options (BEFORE Research)
 
-**FIRST**, explicitly ask what options the user already has in mind:
+**FIRST**, ask what user already has in mind:
 
 ```json
-{
-  "questions": [
-    {
-      "question": "Are there specific options you're already considering or have heard about?",
-      "header": "Your Options",
-      "options": [
-        { "label": "Yes, specific ones", "description": "I have particular options in mind" },
-        { "label": "A few ideas", "description": "Some possibilities but not firm" },
-        { "label": "No, start fresh", "description": "Research what's available" },
-        { "label": "Mix - mine + discover", "description": "Include mine and find others" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
+{"questions":[{"question":"Are there specific options you're already considering?","header":"Your Options","options":[{"label":"Yes, specific ones","description":"Particular options in mind"},{"label":"A few ideas","description":"Some possibilities"},{"label":"No, start fresh","description":"Research what's available"},{"label":"Mix - mine + discover","description":"Include mine and find others"}],"multiSelect":false}]}
 ```
 
-**If user has specific options** (answered "Yes" or "A few ideas" or "Mix"):
-- Ask: "Which options are you considering?" (natural language follow-up)
-- Record them in log BEFORE any research
-- Research MUST include these options, not just discovered alternatives
+**If has options** ("Yes"/"A few"/"Mix"): Ask which, record in log BEFORE research. Research MUST include them.
 
-**If user answered "No, start fresh"**: Proceed directly to 4.2 Option Discovery.
+**If "No, start fresh"**: Proceed to 4.2.
 
-**Why this matters**: Users often have options they're comparing but don't mention unprompted. Missing them leads to wasted research and corrections later. The session analysis that prompted this addition showed a user who had specific Israeli funds in mind (Kesem KTF, Kesem Hedged) but wasn't asked—leading to major rework when their options weren't in the initial research.
+**Why**: Users often have options but don't mention unprompted. Missing them → wasted research.
 
-**Category assignment**: Group options by their fundamental approach to solving the problem. Examples: for "which laptop" → brand or tier (budget/midrange/premium); for "career decision" → industry or role type; for "investment" → asset class. If unclear, ask: "Should I group these by {suggested grouping} or another way?" Categories are optional—skip if all options are essentially the same type.
+**Category assignment**: Group by fundamental approach (laptop→brand/tier; career→industry/role; investment→asset class). If unclear, ask. Skip if all same type.
 
-## 4.2 Option Discovery (if user didn't provide or is open)
-
-**Research to FIND options**, not just evaluate:
+## 4.2 Option Discovery
 
 ```
-Task(
-  subagent_type: "vibe-workflow:web-researcher",
-  prompt: "medium - Find options for {decision}.
+Task(subagent_type:"vibe-workflow:web-researcher",prompt:"medium - Find options for {decision}.
 
 REQUIREMENTS:
-- Must have: {non-negotiable factors with thresholds}
-- Important: {important factors}
-- Context: {user's situation}
+- Must have: {non-negotiables}
+- Important: {factors}
+- Context: {situation}
 
-FIND:
-1. Direct solutions (what most people choose)
-2. Alternative approaches (different way to solve root problem)
-3. Creative options (unconventional but valid)
+FIND: (1) Direct solutions, (2) Alternative approaches, (3) Creative options
 
-Return options organized by category with brief description of each.",
-  description: "Discover options for {decision}"
-)
+Return by category with descriptions.",description:"Discover options")
 ```
 
-## 4.3 Present Options in Tiers
+## 4.3 Present Options
 
 ```markdown
-**Based on your priorities, here are the options worth considering:**
+**Options worth considering:**
 
 **Perfect Matches** (meet all non-negotiables):
-- {Option A}: {why it fits}
-- {Option B}: {why it fits}
+- {Option}: {why}
 
-**Borderline Options** (eliminated by strict thresholds, shown only if user asks or no Perfect Matches exist):
-- {Option C}: Strong on {X}, eliminated because {Y} = {value} vs threshold of {threshold}
+**Borderline** (eliminated by strict thresholds—show if asked or no perfects):
+- {Option}: Strong on {X}, eliminated because {Y}={value} vs threshold {T}
 
-**Creative Options** (different approach to root problem):
-- {Alternative}: {how it solves the underlying need differently}
+**Creative** (different approach):
+- {Option}: {how solves root problem}
 
 **Categories Eliminated**:
-- {Category X}: All fail your {#1 priority}
+- {Category}: All fail {#1 priority}
 ```
 
-## 4.4 User Validates Option Set
+## 4.4 Validate Option Set
 
-Before research, confirm:
-- "Are these the right options to research?"
-- "Any I should add or remove?"
+Before research: "Right options to research? Add or remove any?"
 
 ---
 
 # Phase 5: Research
 
-## 5.1 Deep Research on Options
+## 5.1 Deep Research
 
 **CRITICAL**: Use Task (not Skill) to preserve todo state.
 
 ```
-Task(
-  subagent_type: "vibe-workflow:web-researcher",
-  prompt: "{thoroughness} - Research these options for {decision}.
+Task(subagent_type:"vibe-workflow:web-researcher",prompt:"{thoroughness} - Research options for {decision}.
 
-OPTIONS TO RESEARCH:
-{list options}
+OPTIONS: {list}
 
-EVALUATE EACH ON:
-1. {Factor #1}: Need to determine if meets threshold of {X}
-2. {Factor #2}: Need to determine if meets threshold of {Y}
-3. {Factor #3}: How does it compare?
-...
+EVALUATE ON:
+1. {Factor #1}: meets threshold {X}?
+2. {Factor #2}: meets threshold {Y}?
 
-USER CONTEXT:
-{relevant situation details}
+CONTEXT: {situation}
 
-FOR EACH OPTION PROVIDE:
-- Specific values for each factor (with sources)
-- Strengths and weaknesses
-- Hidden costs or gotchas
-- Who it's best for / worst for",
-  description: "Research options for {decision}"
-)
+FOR EACH: values with sources, strengths/weaknesses, hidden costs, best for / worst for",description:"Research options")
 ```
 
-**Thoroughness by stakes**:
-- Low → medium
-- Medium → thorough
-- High/Life-changing → very thorough
+**Thoroughness by stakes**: Low→medium, Medium→thorough, High→very thorough
 
-## 5.2 Post-Research Gap Check (Iterative Loop)
+## 5.2 Post-Research Gap Check
 
-**After research**, scan for factors that:
-- Are important (mentioned in multiple sources)
-- Were NOT discussed during discovery
-- Could change recommendation
+Scan for factors that: are important (multiple sources), NOT discussed in discovery, could change recommendation.
 
-**If new factors found**, use AskUserQuestion:
-
+**If found**:
 ```json
-{
-  "questions": [
-    {
-      "question": "Research revealed {factor} is important. How important is it to you?",
-      "header": "New Factor",
-      "options": [
-        { "label": "Critical", "description": "Could change my decision" },
-        { "label": "Important", "description": "Should affect ranking" },
-        { "label": "Minor", "description": "Nice to know" },
-        { "label": "Not relevant", "description": "Doesn't apply to me" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
+{"questions":[{"question":"Research revealed {factor} is important. How important to you?","header":"New Factor","options":[{"label":"Critical","description":"Could change decision"},{"label":"Important","description":"Should affect ranking"},{"label":"Minor","description":"Nice to know"},{"label":"Not relevant","description":"Doesn't apply"}],"multiSelect":false}]}
 ```
 
-**If Critical**: Get threshold, do targeted follow-up research, repeat gap check.
+**If Critical**: Get threshold, follow-up research, repeat gap check.
 
-**Loop termination** (first condition met):
-- No new factors found, OR
-- All new factors rated Minor/Not relevant, OR
-- User indicates "I have enough info to decide", OR
-- 3 research rounds completed
+**Loop terminates** (first met): No new factors | All minor/not relevant | User has enough | 3 rounds done
 
-## 5.3 When Answer Isn't on Web
+## 5.3 Research Insufficient
 
-If research insufficient:
 1. Acknowledge limitations
-2. Switch to reasoning from general principles
-3. Set confidence to Medium
+2. Reason from principles
+3. Set confidence Medium
 4. Be explicit about uncertainty
 
 ---
 
 # Phase 6: Sequential Elimination
 
-**Core EBA methodology**: Eliminate by most important factor first, then second, etc.
+**EBA methodology**: Eliminate by most important factor first, then second, etc.
 
-## 6.1 Run Elimination Rounds
-
-For each factor in priority order:
+## 6.1 Elimination Rounds
 
 ```markdown
 **Round {N}: {Factor} (Priority #{N})**
-Threshold: {minimum acceptable}
+Threshold: {min}
 
 | Option | Value | Status | Notes |
 |--------|-------|--------|-------|
-| Option A | {value} | ✓ PASS | Exceeds threshold |
-| Option B | {value} | ✗ ELIMINATED | Below by {gap} |
-| Option C | {value} | ✓ PASS | Exactly at threshold |
+| A | {v} | ✓ PASS | Exceeds |
+| B | {v} | ✗ ELIMINATED | Below by {gap} |
 
-**Eliminated this round**: Option B
-**Reason**: {Factor} value of {X} is below minimum of {Y}
-**Would return if**: Threshold lowered from {Y} to {X}
-
-**Remaining**: Option A, Option C
+**Eliminated**: B
+**Reason**: {Factor}={X} below min {Y}
+**Would return if**: threshold {Y}→{X}
+**Remaining**: A
 ```
 
 ## 6.2 Narrate Each Elimination
 
-Don't just show table - explain:
-- "Eliminating {Option} because {factor} = {value}, below your minimum of {threshold}"
-- "This leaves us with {list}"
+Explain: "Eliminating {Option} because {factor}={value}, below your min of {threshold}. Leaves us with {list}."
 
-## 6.3 Handle Finalist Count Edge Cases
+## 6.3 Finalist Count Edge Cases
 
-| Remaining Count | Action |
-|-----------------|--------|
-| **0 (all eliminated)** | Show which threshold eliminated most options; ask: "Which constraint is most flexible?"; relax that threshold; re-run |
-| **1 (single survivor)** | This is the winner by elimination. Proceed directly to synthesis with abbreviated finalist analysis. Still do 10-10-10 check. |
-| **2-4** | Ideal. Proceed to finalist analysis. |
-| **5-6** | Use Important factors (not just Non-Negotiables) to narrow. Continue elimination rounds until 2-4 remain. |
-| **7+** | Revisit thresholds with user: "With {N} options still remaining, would you like to tighten your requirements on {top factor} or {second factor} to narrow the field?" If user declines, proceed to finalist analysis with all remaining options, noting analysis may be less detailed due to option count. |
+| Count | Action |
+|-------|--------|
+| 0 | Show which threshold eliminated most; ask which flexible; relax; re-run |
+| 1 | Winner by elimination; abbreviated synthesis; still do 10-10-10 |
+| 2-4 | Ideal; proceed to finalist analysis |
+| 5-6 | Use Important factors to narrow until 2-4 |
+| 7+ | Ask to tighten thresholds; if declined, proceed noting less detail |
 
-## 6.4 Continue Until 2-4 Finalists
+## 6.4 Target: 2-4 Finalists
 
-Target: 2-4 finalists for deep comparison. If more remain after all non-negotiable rounds, use important factors to narrow.
+If more after non-negotiables, use important factors.
 
 ---
 
 # Phase 7: Finalist Analysis
 
-**Consideration set quality matters more than evaluation sophistication.** Before deep analysis, verify:
-- Do finalists include different approaches/categories? (prevents narrow framing)
-- Did you stop option search too early? (people consistently stop too soon)
+**Consideration set quality > evaluation sophistication.** Verify: different categories represented? Stopped search too early?
 
-## 7.1 Deep Dive on Finalists
+## 7.1 Deep Dive
 
-For each finalist, conduct targeted research using "thorough" level (same thoroughness as Phase 5 for this stakes level):
-- Detailed strengths and weaknesses
-- User reviews and complaints
-- Hidden costs or gotchas
-- Best for / worst for profiles
+For each finalist (same thoroughness as Phase 5 for stakes): strengths/weaknesses, reviews/complaints, hidden costs, best for / worst for.
 
 ## 7.2 Cross-Category Representation
 
-**If finalists are from same category**: Ensure at least one option from each major category makes finalist round, even if lower-ranked.
+If finalists same category: include best from each major category, even if lower-ranked. User may have unstated category preference.
 
-Why: User may have unstated category preference. Showing best from each category with "Why {category} wins" prevents follow-up questions.
-
-## 7.3 Pairwise Trade-Off Comparisons
-
-For each pair of finalists:
+## 7.3 Pairwise Comparisons
 
 ```markdown
-**{Option A} vs {Option B}:**
+**{A} vs {B}:**
 
-A gives you:
-- {Specific advantage} → {concrete impact on your life}
+A gives: {advantage} → {concrete impact}
+A costs: {sacrifice}
 
-But costs you:
-- {Specific sacrifice}
+B gives: {advantage}
+B costs: {sacrifice}
 
-B gives you:
-- {Different advantage} → {concrete impact}
-
-But costs you:
-- {Different sacrifice}
-
-**Which trade-off aligns better with your priorities?**
+**Which trade-off aligns with your priorities?**
 ```
 
 ## 7.4 Sensitivity Analysis
 
 ```markdown
-**Current lean**: {Option A}
+**Current lean**: {A}
 
-**This would flip to {Option B} if:**
-- {Condition 1 - e.g., "your timeline shortened to 6 months"}
-- {Condition 2 - e.g., "budget increased by 20%"}
-- {Condition 3 - e.g., "{stakeholder} strongly preferred B"}
+**Flips to {B} if:**
+- {Condition 1}
+- {Condition 2}
 
-**Likelihood assessment**:
-- Condition 1: {Low/Medium/High likelihood}
-- Condition 2: {Low/Medium/High likelihood}
-- Condition 3: {Low/Medium/High likelihood}
+**Likelihood**: Condition 1: {Low/Med/High}...
 
-**Recommendation stability**: {Stable (all conditions Low) / Moderate (some Medium) / Fragile (any High)}
+**Stability**: {Stable (all Low) / Moderate (some Med) / Fragile (any High)}
 
-If fragile: "Your situation has significant uncertainty. Consider: (1) waiting until uncertainty resolves, (2) choosing the more reversible option, or (3) accepting the risk if upside justifies it."
+If fragile: "Significant uncertainty. Consider: (1) wait, (2) choose reversible option, (3) accept risk if upside justifies."
 ```
 
 ---
 
-# Phase 8: Synthesis & Decision Support
+# Phase 8: Synthesis
 
 ## 8.1 Refresh Context (MANDATORY - NEVER SKIP)
 
-**Read the FULL decision log file** using the Read tool before ANY synthesis.
+**Read FULL log** before ANY synthesis.
 
-**Why this is critical**: By this phase, earlier discovery findings have degraded due to context rot (U-shaped attention curve). The log file contains ALL findings written throughout the workflow. Reading the full file immediately before synthesis:
-- Moves all findings to context END (highest attention zone)
-- Converts holistic synthesis (poor LLM performance) into dense recent content (high LLM performance)
-- Restores details that would otherwise be "lost in the middle"
+**Why**: Earlier findings degraded (context rot). Log contains ALL findings. Reading moves them to context END (highest attention). Never skip—synthesis accuracy depends on it.
 
-**If log file exceeds context limits**: Read in sections, prioritizing: (1) Decision Characteristics, (2) Ranked Factors with Thresholds, (3) Elimination Rounds, (4) Research Findings for finalists only.
+If log exceeds context: prioritize (1) Characteristics, (2) Ranked Factors, (3) Elimination, (4) Finalist research.
 
-**Never skip this step** - synthesis accuracy depends on it.
+## 8.2 Temporal Perspective (10-10-10)
 
-## 8.2 Temporal Perspective Check (10-10-10)
-
-This technique is grounded in Construal Level Theory—distant futures are processed more abstractly, helping counteract present bias. Anticipated regret is robustly validated in decision research.
+Grounded in Construal Level Theory—distant futures processed abstractly, counters present bias.
 
 ```markdown
-**Let's check for regret potential:**
+**Regret check:**
 
-**10 minutes after choosing {Option A}:**
-- How do you feel? Relief? Excitement? Doubt?
+**10 min after {A}**: Relief? Excitement? Doubt?
+**10 months in**: Challenges? Benefits?
+**10 years**: Wish you'd been bolder? Value security?
 
-**10 months into {Option A}:**
-- What challenges are you facing?
-- What benefits are you enjoying?
-
-**10 years from now:**
-- Looking back, would you wish you'd been bolder?
-- Or would you value the security?
-
-**Which regret is worse**: {risk of A} or {risk of not-A}?
+**Which regret worse**: {risk of A} or {risk of not-A}?
 ```
 
-**Affective forecasting note**: People accurately predict direction of emotions but overestimate intensity (~50%) and duration. If imagining a "catastrophic" outcome, it will likely feel more manageable than you predict.
+**Affective forecasting**: Direction accurate, but intensity (~50%) and duration overestimated. "Catastrophic" outcomes feel more manageable than predicted.
 
-**Using 10-10-10 results**:
-- If strong negative prediction at ANY timeframe → flag as concern in recommendation
-- If 10-year regret is "wish I'd been bolder" → bias toward higher-risk/higher-reward option
-- If 10-year regret is "wish I'd been safer" → bias toward conservative option
-- Conflicting timeframes (short-term pain, long-term gain) → explicitly note the trade-off in recommendation
+**Using results**:
+- Strong negative ANY timeframe → flag concern
+- 10-year "wish bolder" → bias higher-risk/reward
+- 10-year "wish safer" → bias conservative
+- Conflicting timeframes (short pain, long gain) → explicitly note trade-off
 
 ## 8.3 Subjective Evaluation Guidance
 
-For factors that can't be researched:
-
+For unresearchable factors:
 ```markdown
-**For {subjective factor}, here's how to evaluate:**
-
-**Action**: {what to do - e.g., "Visit in person", "Talk to current users"}
-**Ask**: {specific questions}
-**Watch for**: {signals to notice}
-**Red flags**: {warning signs}
+**For {factor}:**
+- **Action**: {what to do}
+- **Ask**: {questions}
+- **Watch for**: {signals}
+- **Red flags**: {warnings}
 ```
 
 ## 8.4 Final Synthesis
@@ -884,92 +646,68 @@ For factors that can't be researched:
 ## Decision Analysis: {Topic}
 
 ### Recommendation
-
-**#1 Choice: {Option}**
-{2-3 sentence rationale tied to user's #1 priority}
+**#1: {Option}**
+{2-3 sentences tied to #1 priority}
 
 ### Top 3 Comparison
-
 | Factor | #1: {A} | #2: {B} | #3: {C} |
 |--------|---------|---------|---------|
 | Category | {cat} | {cat} | {cat} |
-| {Priority 1} | {value} | {value} | {value} |
-| {Priority 2} | {value} | {value} | {value} |
-| {Priority 3} | {value} | {value} | {value} |
+| {Priority 1} | {v} | {v} | {v} |
 
 ### Why #1 Wins
-- Best on your top priority of {X}
-- Meets your constraint of {Y}
-- {Stakeholder} alignment (if applicable)
+- Best on {X}
+- Meets {Y}
+- {Stakeholder} alignment
 
-### Why #1's Category Wins (if categories exist)
-- {Comparison against other categories}
-- {What you'd give up choosing different category}
+### Why #1's Category Wins
+- {vs other categories}
 
-### When Would {#2} Be Better?
-- {Scenario where #2 wins}
+### When #2 Better?
+- {scenario}
 
 ### Trade-Offs Accepted
 - Choosing #1 means accepting {weakness}
-- You're trading {what #2 offers} for {what #1 offers}
+- Trading {#2 offers} for {#1 offers}
 
 ### Sensitivity
-Recommendation changes if:
-- {condition}
+Changes if: {conditions}
 
-### Gut Check Reconciliation
-{If gut reaction recorded earlier conflicts with recommendation}:
-- You mentioned feeling {drawn to / off about} {option}
-- Analysis recommends {different option}
-- Possible explanations: {user may be picking up on unlisted factors / analysis may be missing subjective fit}
-- **Before finalizing**: Can you articulate what your gut was responding to?
+### Gut Reconciliation
+{If conflict}: You felt {X}, analysis says {Y}. Possible: picking up unlisted factors. Before finalizing: articulate what gut responds to?
 
 ### Risk Assessment
 - **Reversibility**: {for #1}
-- **Downside if wrong**: {impact}
-- **Confidence**: {High/Medium/Low} because {reason}
+- **Downside**: {if wrong}
+- **Confidence**: {H/M/L} because {reason}
 
-### Temporal Perspective (10-10-10)
+### 10-10-10
 - **10 min**: {prediction}
 - **10 months**: {prediction}
 - **10 years**: {prediction}
-- **Regret flag**: {any concern surfaced, or "None"}
+- **Regret flag**: {concern or None}
 ```
 
 ## 8.5 Tie-Breaking
 
-**If top 2 genuinely close** (difference on #1 priority is <10% for numeric factors, or both rated similarly on subjective factors with no clear winner):
+If top 2 close (<10% numeric diff on #1 priority, or similar on subjective factors):
 
 ```json
-{
-  "questions": [
-    {
-      "question": "{A} and {B} are very close. What matters more: {Factor where A wins} or {Factor where B wins}?",
-      "header": "Tie-Breaker",
-      "options": [
-        { "label": "{Factor X}", "description": "Favors {A}" },
-        { "label": "{Factor Y}", "description": "Favors {B}" },
-        { "label": "Gut says A", "description": "Intuition often reflects unarticulated priorities" },
-        { "label": "Gut says B", "description": "Intuition often reflects unarticulated priorities" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
+{"questions":[{"question":"{A} and {B} very close. What matters more: {Factor A wins} or {Factor B wins}?","header":"Tie-Breaker","options":[{"label":"{Factor X}","description":"Favors {A}"},{"label":"{Factor Y}","description":"Favors {B}"},{"label":"Gut says A","description":"Intuition reflects unarticulated priorities"},{"label":"Gut says B","description":"Intuition reflects unarticulated priorities"}],"multiSelect":false}]}
 ```
 
 ---
 
 # Phase 9: Finalize
 
-## 9.1 Update Log Status
+## 9.1 Update Log
 
 ```markdown
 ## Status
 COMPLETE
 
 ## Final Recommendation
-{#1 choice with brief rationale}
+{#1 with rationale}
 
 ## Decision Completed
 {timestamp}
@@ -977,15 +715,9 @@ COMPLETE
 
 ## 9.2 Mark All Todos Complete
 
-## 9.3 Output Final Recommendation
+## 9.3 Output
 
-Present complete Decision Analysis including:
-- Clear #1 recommendation
-- Top 3 comparison
-- Why #1 wins (and why its category wins)
-- Trade-offs accepted
-- Confidence level
-- Temporal perspective check
+Present: #1 recommendation, Top 3 comparison, why #1 wins (+ category), trade-offs, confidence, 10-10-10.
 
 ---
 
@@ -993,11 +725,11 @@ Present complete Decision Analysis including:
 
 | Type | Examples | Approach |
 |------|----------|----------|
-| **External** | Product, investment, service | Full research flow |
-| **Self-knowledge** | Career direction, relationship, values | Skip research - answer is internal. Use discovery to clarify values, then framework to structure decision |
-| **Hybrid** | Career change to new field, relocation | Research external facts; note which parts need user's judgment |
+| **External** | Product, investment | Full research |
+| **Self-knowledge** | Career direction, values | Skip research—answer internal |
+| **Hybrid** | Career change, relocation | Research facts; note what needs judgment |
 
-**For self-knowledge decisions**: Skip Phases 5-6 (research, elimination). Use discovered values and priorities to facilitate user's own decision through structured reflection.
+**Self-knowledge**: Skip Phases 5-6. Use discovery for values, framework for structured reflection.
 
 ---
 
@@ -1005,19 +737,19 @@ Present complete Decision Analysis including:
 
 | Scenario | Action |
 |----------|--------|
-| **No options provided** | Run option discovery research first |
-| **All options eliminated** | Show which threshold eliminated most; ask which is flexible |
-| **Single option survives** | Winner by elimination; proceed to abbreviated synthesis |
-| **Too many survivors (5+)** | Continue elimination with Important factors until 2-4 remain |
-| **Research insufficient** | Reasoning mode, Medium confidence, explicit uncertainty |
-| **User wants to skip discovery** | 2-3 critical questions minimum, document assumptions |
-| **Stakeholders disagree** | Surface conflict, ask whose preference takes precedence |
-| **Stakeholder veto deadlock** | All options fail veto → ask whether to relax constraint or find new options |
-| **User corrects earlier answer** | Update log; if constraints changed → re-research; if priorities only → re-rank |
-| **Interrupted session** | Resume from checkpoint in log |
-| **Empty $ARGUMENTS** | Ask what decision they're facing |
-| **"Just decide for me"** | Still ask Core 3 (need, timeline, constraints) |
-| **Self-knowledge decision** | Skip research; use discovery for values clarification |
+| No options | Run discovery research |
+| All eliminated | Show which threshold eliminated most; ask which flexible |
+| Single survivor | Winner by elimination; abbreviated synthesis |
+| 5+ survivors | Continue with Important factors until 2-4 |
+| Research insufficient | Reasoning mode, Medium confidence, explicit uncertainty |
+| User skips | 2-3 critical questions, document assumptions |
+| Stakeholders disagree | Surface conflict, ask whose preference precedent |
+| Veto deadlock | Ask: relax constraint or new options? |
+| User corrects | Update log; constraints changed → re-research; priorities → re-rank |
+| Interrupted | Resume from checkpoint |
+| Empty $ARGUMENTS | Ask what decision |
+| "Just decide for me" | Still ask Core 3 (need, timeline, constraints) |
+| Self-knowledge | Skip research; discovery for values |
 
 ---
 
@@ -1025,26 +757,26 @@ Present complete Decision Analysis including:
 
 | Principle | Rule |
 |-----------|------|
-| **Quality over speed** | Better to take longer and get it right |
-| **Exhaustive discovery** | Keep probing until nothing new surfaces |
-| **Market context for thresholds** | User can't set realistic thresholds without context |
-| **Find options, don't just evaluate** | If user doesn't provide options, discover them |
-| **Sequential elimination** | Most important factor first, narrate each cut |
-| **Pairwise comparisons** | "A vs B" clearer than abstract scoring |
-| **Sensitivity analysis** | Know what would change your mind |
-| **Temporal perspective check** | Catches temporal blind spots via 10-10-10 |
-| **External memory** | Write everything to log; refresh before synthesis |
+| Quality > speed | Better slow and right |
+| Exhaustive discovery | Probe until nothing new |
+| Market context | User can't set thresholds without context |
+| Find options | If not provided, discover them |
+| Sequential elimination | Most important factor first, narrate each |
+| Pairwise comparisons | "A vs B" clearer than scoring |
+| Sensitivity analysis | Know what changes mind |
+| 10-10-10 | Catches temporal blind spots |
+| External memory | Write everything; refresh before synthesis |
 
 ---
 
-# Generally Avoid (Unless It Serves User Better)
+# Generally Avoid
 
 | Avoid | Unless |
 |-------|--------|
-| Accepting first answer | User meets 3+ pre-processed signs as defined in "Fast Path: Pre-Processed Decisions" section |
-| Thresholds without market context | User explicitly claims prior research OR demonstrates domain knowledge by mentioning specific brands/models/specifications without prompting |
-| Skipping elimination narration | Only 2 options remain |
-| Synthesizing without log refresh | Never skip this |
-| Claiming High confidence | Research data is strong (3+ independent sources agree on key facts) AND priorities are clear (user confirmed ranking) |
+| Accepting first answer | 3+ pre-processed signs |
+| Thresholds without context | User claims prior research OR shows domain knowledge |
+| Skipping elimination narration | Only 2 options |
+| Synthesizing without refresh | Never skip |
+| Claiming High confidence | 3+ sources agree AND priorities clear |
 
-**The test**: Would a skilled human decision coach do this? If yes, you can too.
+**The test**: Would skilled human coach do this? If yes, you can too.

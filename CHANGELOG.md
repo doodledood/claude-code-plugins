@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.5.1 - `/decide` skill: optimize information density (37% token reduction):
+  - Compressed verbose prose to terse bullet points and tables
+  - Minified JSON examples while preserving structure
+  - Combined redundant todo items with write-discipline note
+  - Verified lossless: all semantic content preserved (3 verification iterations)
 - [life-ops] v1.5.0 - `/decide` skill: strengthen existing options discovery (Phase 4.1):
   - Add explicit AskUserQuestion before research to surface user's existing options
   - Session analysis showed users often have options in mind but don't mention unprompted
