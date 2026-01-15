@@ -16,7 +16,9 @@ Guide users through personal decisions by understanding their situation first, t
 
 **Decision log file**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory for tracking discovery and decisions.
 
-**Resume capability**: If $ARGUMENTS contains an existing decision log path, read it and continue from the last checkpoint.
+**Resume capability**: If $ARGUMENTS contains an existing decision log path, read it and continue from the last checkpoint. Checkpoint = last completed todo item. To resume: read the log file, find todos, identify first unchecked item, continue from that phase. If a section is partially written, re-do that section from the start.
+
+**Required tools**: AskUserQuestion, Read, Write, TodoWrite, Skill. **Optional tools**: Task (for Opus fallback). If required tools are unavailable, inform user and exit.
 
 ---
 
@@ -30,14 +32,29 @@ Guide users through personal decisions by understanding their situation first, t
 - **Financial impact**: How significant relative to user's situation?
 - **Stakeholders affected**: Who else is impacted?
 
+**Discovery areas reference**:
+- **Core 3**: Underlying need, Time horizon & uncertainty, Key constraints
+- **Core 5**: Core 3 + Success criteria + Potential regrets (10-10-10)
+- **EBA additions**: Stakeholders, Satisficing thresholds, Decision characteristics
+
 | Stakes | Examples | Discovery Depth | Research Level |
 |--------|----------|-----------------|----------------|
-| **Low** | Product choice, small purchase | Quick (Core 3 areas) | medium |
-| **Medium** | Significant purchase, minor life change | Standard (Core 5 areas) | thorough |
-| **High** | Career change, major purchase, relationship | Deep (Core 5 + all EBA additions) | very thorough |
-| **Life-changing** | Marriage, relocation, major health decision | Comprehensive (all areas, multiple rounds) | very thorough + multi-wave |
+| **Low** | Product choice, small purchase (<$500) | Quick (Core 3) | medium |
+| **Medium** | Significant purchase ($500-$10K), minor life change | Standard (Core 5) | thorough |
+| **High** | Career change, major purchase (>$10K), relationship decision | Deep (Core 5 + all EBA additions) | very thorough |
+| **Life-changing** | Marriage, relocation, major health decision | Comprehensive (all areas, then 1-2 follow-up rounds - see below) | very thorough (research-web auto-continues) |
 
-**Auto-detection**: Infer stakes from query. Can be overridden by user.
+**Life-changing multi-round discovery**: After completing initial discovery of all areas, ask: "Now that we've discussed everything, has anything shifted? Are there factors you want to reconsider?" If user provides new information, update relevant log sections and adjust research brief accordingly. Repeat once more if major shifts occurred.
+
+**Note**: Research Level values (medium, thorough, very thorough) correspond directly to the thoroughness parameter passed to research-web skill.
+
+**Stakes determination order**:
+1. Check if user explicitly states stakes level (e.g., "this is a low-stakes decision", "this is life-changing") - if yes, use that level
+2. Otherwise, apply auto-detection rules (first match wins):
+   - **Life-changing**: Keywords like marriage, divorce, relocation, major surgery, having children
+   - **High**: Keywords like career, job change, house purchase, investment >$10K, relationship ending
+   - **Medium**: Keywords like significant purchase, car, appliance, vacation, subscription
+   - **Low**: Keywords like product comparison, purchase under $500, which one, simple choice
 
 State: `**Stakes**: {level} — {reason}` then proceed.
 
@@ -49,13 +66,13 @@ State: `**Stakes**: {level} — {reason}` then proceed.
 
 Run: `date +%Y%m%d-%H%M%S` for filename timestamp and `date '+%Y-%m-%d %H:%M:%S'` for human-readable.
 
-**Topic-slug format**: Extract 2-4 key terms (nouns identifying the decision; exclude articles, prepositions, generic words like "best", "should"), lowercase, hyphens. Example: "should I buy MacBook Pro or wait for M5" → `macbook-pro-m5-timing`
+**Topic-slug format**: Extract 2-4 key terms (nouns identifying the decision; exclude articles, prepositions, generic words like "best", "should"), lowercase, hyphens, alphanumeric only. If fewer than 2 key terms can be extracted, use "decision-{timestamp}" as fallback. Example: "should I buy MacBook Pro or wait for M5" → `macbook-pro-m5-timing`, "should I quit?" → `quit-job` or `decision-20260115`
 
 **Starter todos** (expand as discovery reveals new areas):
 
 ```
+- [ ] Assess stakes (before log creation - needed for log header)
 - [ ] Create decision log file
-- [ ] Assess stakes
 - [ ] Write stakes assessment to log
 - [ ] Discover: Underlying need
 - [ ] Write underlying need to log
@@ -132,7 +149,9 @@ IN_PROGRESS
 
 # Phase 2: Situation Discovery
 
-**CRITICAL**: Use AskUserQuestion tool for ALL questions. Never plain text questions. Free text always available via "Other" option.
+**CRITICAL**: Use AskUserQuestion tool for ALL questions. If AskUserQuestion tool is unavailable, fall back to plain text questions with numbered options the user can respond to by number.
+
+**"Other" option**: AskUserQuestion automatically includes an "Other (free text)" option. When user selects Other, their free text response should be treated as a new answer to consider and written to the log.
 
 **Mental model**: Understand the PERSON's situation, not just their stated requirements. Probe underlying needs, uncover hidden constraints, anticipate regrets.
 
@@ -177,6 +196,8 @@ Key questions:
 - How certain are these timelines? (ask for probability if appropriate)
 
 **Handle "I don't know"**: If user can't provide probabilities, rephrase: "On a scale of very unlikely to very likely, how possible is it that you'd need to change course in 5 years?"
+
+**Using probabilities**: When user provides probability estimates, include them in the research brief and use them in sensitivity analysis. Higher uncertainty (30-70% range) suggests recommending reversible options; lower uncertainty (<30% or >70%) allows commitment to optimized choice.
 
 **AskUserQuestion example**:
 ```
@@ -249,8 +270,9 @@ questions: [
 - How will you feel in 10 years?
 
 **Questions**:
-- What would make you regret choosing Option A?
-- What would make you regret choosing Option B?
+If user has mentioned specific options (e.g., "should I do X or Y"), ask regret questions about those. If options aren't yet known, ask generally:
+- What would make you regret the more conservative choice?
+- What would make you regret the bolder choice?
 - What's the worst case for each path?
 
 ## EBA-Influenced Additions (for medium+ stakes)
@@ -262,9 +284,13 @@ questions: [
 - What are THEIR constraints and preferences?
 - Whose preferences take priority if they conflict?
 
+**Veto power handling**: If a stakeholder has veto power and their preferences conflict with yours, their constraint becomes a hard requirement. Options that violate it are eliminated regardless of how well they meet your preferences.
+
 ### 2.7 Satisficing Thresholds (for high+ stakes)
 
 For EACH important factor, ask: "What's the MINIMUM acceptable level? Not the ideal - just what you could live with."
+
+**Clarification**: The minimum acceptable is the threshold below which you would reject an option entirely, even if it excels in other areas. Example: "I need at least 3 years warranty - anything less is a deal-breaker."
 
 This prevents optimization paralysis and enables elimination by aspects.
 
@@ -279,16 +305,18 @@ Infer or ask:
 
 Discovery is complete when ALL THREE are true:
 
-1. **Checklist complete**: All required areas captured with sufficient depth
-   - Low stakes: Underlying need, Time horizon, Constraints (Core 3)
-   - Medium stakes: All Core 5
-   - High/Life-changing: Core 5 + all EBA additions
+1. **Checklist complete**: All required areas for the stakes level have been asked and answered:
+   - Low stakes: Underlying need, Time horizon, Constraints (Core 3) - each answered
+   - Medium stakes: All Core 5 - each answered
+   - High/Life-changing: Core 5 + all EBA additions - each answered
 
-2. **Confidence reached**: No more questions that would materially change research direction. Ask yourself: "If I learn something new now, would it change what I research?"
+2. **Confidence reached**: You could write a research brief where changing any answer would change which options you research OR how you'd rank the results. Test: "If I learned the user's {factor} was different, would I research different options or weight factors differently?" If no such questions remain, confidence is reached.
 
 3. **User signal** (optional): User can indicate "that's enough, let's research" at any point
 
-**If user wants to skip discovery**: Push back with 2-3 CRITICAL questions - those where wrong assumptions would waste research or lead to wrong recommendation. Document remaining assumptions clearly.
+**If user wants to skip discovery**: Acknowledge their desire to move faster, then explain that 2-3 key questions will prevent wasted research. A "critical question" is one where a wrong assumption would either (a) cause you to research irrelevant options, or (b) lead to a recommendation that violates an unstated constraint. Ask those questions using AskUserQuestion, then proceed. Document remaining assumptions in the log.
+
+**Critical question selection**: From the Core 3 areas (underlying need, time horizon, constraints), ask the one question from each area most likely to reveal option-eliminating information. Example: For a purchase decision, ask about budget (constraint) and intended use (underlying need).
 
 ---
 
@@ -319,6 +347,8 @@ After discovery is complete, generate a precise research brief.
 2. {Second factor} - Minimum acceptable: {threshold}
 3. {Third factor} - Minimum acceptable: {threshold}
 ...
+
+**Priority ranking rule**: Factors are listed in order of importance to the user. Factor #1 is the most important; when options tie on factor #1, use factor #2 as tiebreaker, and so on.
 
 ### Constraints
 - Must have: {Non-negotiables}
@@ -374,7 +404,7 @@ RESEARCH BRIEF:
 INSTRUCTIONS:
 - Use WebSearch tool extensively
 - Research multiple angles: features, pricing, reviews, comparisons
-- Look for recent information (current date: {YYYY-MM-DD})
+- Look for recent information (current date: {fill from Phase 1.1 timestamp})
 - Find case studies or experiences from people in similar situations
 - Return findings with source citations
 - Organize by the user's priority factors
@@ -384,12 +414,12 @@ INSTRUCTIONS:
 
 ## When Answer Isn't on Web
 
-If research returns insufficient results (topic too niche, too personal, no data available):
+If research returns insufficient results (fewer than 3 sources that directly address at least one of the user's stated priority factors, OR topic involves private personal circumstances like relationship dynamics, OR research-web explicitly indicates insufficient coverage):
 
 1. **Acknowledge limitations**: "I couldn't find specific research on {X}, but based on general principles and your situation..."
 2. **Switch to reasoning mode**: Use general knowledge + user's discovered situation
-3. **Provide framework-based recommendation** with lower confidence
-4. **Be explicit about uncertainty**: "Without specific data, my confidence is lower, but based on {reasoning}..."
+3. **Provide framework-based recommendation** with Medium confidence (instead of High)
+4. **Be explicit about uncertainty**: State "Confidence: Medium - recommendation based on general principles rather than specific research data"
 
 **Write research results summary to decision log** before proceeding.
 
@@ -417,7 +447,7 @@ This restores:
 
 1. **Filter options** through user's satisficing thresholds
 2. **Eliminate options** that violate deal-breakers
-3. **Rank remaining** by user's priority order
+3. **Rank remaining** by user's priority order (factor #1 first, then #2 as tiebreaker, etc.)
 4. **Apply stakeholder constraints** (if applicable)
 
 ## 5.3 Generate Decision Analysis
@@ -463,11 +493,18 @@ This recommendation would change to #2 if:
 - **10 years**: {how you'll likely feel}
 ```
 
+**Confidence level definitions**:
+- **High**: Specific research data supports recommendation; user's priorities are clear; options are clearly differentiated
+- **Medium**: Limited research data OR some priority ambiguity OR options are close on key factors
+- **Low**: Minimal research data available; recommendation based primarily on general reasoning
+
 ## 5.4 Tie-Breaking (if options are genuinely close)
 
-If top 2-3 options are within margin:
+**Definition of "genuinely close"**: The top 2-3 options differ by less than 10% of the better option's score on the #1 priority factor (e.g., if Option A scores 95 and Option B scores 88, that's 7.4% difference - not a tie), OR for qualitative #1 priorities, you cannot complete this sentence with a substantive difference: "Option A is better on [#1 priority] because ___"
 
-**Identify the specific question that would differentiate them**, then ask via AskUserQuestion:
+If options are genuinely close:
+
+**Identify the specific factor that would differentiate them**, then ask via AskUserQuestion:
 
 ```
 questions: [
@@ -528,14 +565,17 @@ Present the Decision Analysis from 5.3 to the user, including:
 | Scenario | Action |
 |----------|--------|
 | **research-web unavailable** | Use Opus agent fallback with WebSearch |
-| **Answer not on web** | Switch to reasoning mode, acknowledge lower confidence |
-| **User's situation too unique** | Framework-based recommendation with explicit assumptions |
-| **User wants to skip discovery** | Push back with 2-3 critical questions, then proceed |
-| **User says "just decide for me"** | Still ask minimum questions to avoid obvious mistakes |
+| **Answer not on web** | Switch to reasoning mode, set confidence to Medium, acknowledge in output |
+| **User's situation too unique** | Framework-based recommendation with Medium confidence and explicit assumptions |
+| **User wants to skip discovery** | Acknowledge desire, explain value of 2-3 critical questions, ask those questions via AskUserQuestion, proceed |
+| **User says "just decide for me"** | Still ask Core 3 questions (underlying need, timeline, constraints) to avoid obvious mistakes |
 | **Interrupted session** | If $ARGUMENTS contains log path, resume from checkpoint |
-| **Stakeholders disagree** | Surface conflict, help user think through whose preferences win |
+| **Stakeholders disagree** | Surface conflict, ask user whose preferences take precedence, document in log |
 | **All options eliminated** | Suggest relaxing lowest-priority threshold, ask which constraint is most flexible |
-| **User corrects earlier answer** | Update log, check if downstream decisions affected |
+| **User corrects earlier answer** | Update log with correction. If correction changes: (a) constraints or deal-breakers → re-run research with updated brief; (b) factor priorities only → re-rank existing options without new research; (c) minor clarification → note in log and continue |
+| **Partial research failure** | If research-web returns but with insufficient data, proceed to "When Answer Isn't on Web" path; do not retry with Opus fallback unless explicitly requested |
+| **Empty $ARGUMENTS** | Ask user "What decision would you like help with?" via AskUserQuestion before proceeding to Phase 0 |
+| **User provides specific options** | Research focuses on user's stated options first. If research reveals significantly better alternatives not mentioned, surface them as "Also worth considering" after addressing the original options |
 
 ---
 
@@ -544,14 +584,14 @@ Present the Decision Analysis from 5.3 to the user, including:
 | Principle | Rule |
 |-----------|------|
 | Situation first | Understand the person before collecting criteria |
-| AskUserQuestion always | Never plain text questions - tool provides free text via "Other" |
+| AskUserQuestion preferred | Use AskUserQuestion tool; only fall back to plain text with numbered options if tool unavailable |
 | Write after each step | Decision log is external memory - write findings immediately |
 | Probe underlying needs | "What's driving that?" - don't take requirements at face value |
 | Stakes-calibrated depth | Low decisions need less discovery than life-changing ones |
 | Satisficing over optimizing | Minimum acceptable thresholds prevent paralysis |
 | Refresh before synthesis | Read full log before applying framework |
-| Clear recommendation | Always rank with #1, even when close - use tie-breakers |
-| Acknowledge uncertainty | When confidence is low, say so explicitly |
+| Clear recommendation | Always rank with #1 after tie-breakers resolved - present tie-breaker questions before declaring final #1 if options are genuinely close |
+| Acknowledge uncertainty | When confidence is Medium or Low, state so explicitly with reason |
 
 ---
 
@@ -559,9 +599,9 @@ Present the Decision Analysis from 5.3 to the user, including:
 
 - Ask questions without AskUserQuestion tool
 - Skip writing findings to decision log
-- Proceed to research without completing situation discovery
+- Proceed to research without completing required discovery areas for the stakes level
 - Synthesize without reading full decision log first
 - Give recommendation without clear #1 ranking
 - Ignore user's stated constraints or priorities
-- Skip tie-breaker when options are genuinely close
-- Pretend to have confidence when data is insufficient
+- Skip tie-breaker when top options are equal on #1 priority factor
+- Claim High confidence when research data is limited or options are close
