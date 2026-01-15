@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.4.0 - Research-validated improvements to `/decide` skill:
+  - Add gut check phase: captures intuition as data before analysis (research shows emotion is essential, not enemy, of good decisions)
+  - Reposition 10-10-10 as "Temporal Perspective Check": theoretically grounded in Construal Level Theory (no direct empirical validation exists for 10-10-10 specifically)
+  - Add affective forecasting calibration: note that people overestimate emotional intensity ~50%
+  - Add consideration set quality check before finalist analysis
 - [life-ops] v1.3.0 - Complete rewrite of `/decide` skill for decision QUALITY over speed:
   - Integrates EBA (Elimination By Aspects) methodology with sequential elimination rounds
   - Adds exhaustive /spec-style discovery with edge-case hunting and factor scaffolding

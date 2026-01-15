@@ -150,7 +150,8 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 - [ ] Verify discovery completion
 - [ ] Structuring: Factor ranking
 - [ ] Structuring: Threshold setting with market context
-- [ ] Write ranked factors and thresholds to log
+- [ ] Structuring: Gut check (capture intuition as data)
+- [ ] Write ranked factors, thresholds, and gut reactions to log
 - [ ] Option Discovery: Identify or research options
 - [ ] Write options to log
 - [ ] Research: Deep research on options
@@ -165,7 +166,7 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 - [ ] Refresh context: read full decision log    ← CRITICAL: must complete before synthesis
 - [ ] Synthesize: Pairwise comparisons
 - [ ] Synthesize: Sensitivity analysis
-- [ ] Synthesize: 10-10-10 regret check
+- [ ] Synthesize: Temporal perspective check (10-10-10)
 - [ ] Synthesize: Final recommendation
 - [ ] Write decision analysis to log
 - [ ] Output final recommendation to user
@@ -204,6 +205,11 @@ Started: {YYYY-MM-DD HH:MM:SS}
 
 #### Bonus (nice to have)
 - {factor}
+
+### Gut Check (Before Analysis)
+- Drawn to: {option and why, if any}
+- Repelled by: {option and why, if any}
+- Domain experience: {has user made similar decisions before?}
 
 ### Edge Cases Identified
 - {what could go wrong} → {how we're handling it}
@@ -279,7 +285,7 @@ Would flip to {other} if:
 - {condition 1}
 - {condition 2}
 
-## 10-10-10 Regret Check
+## Temporal Perspective Check (10-10-10)
 - **10 minutes** after choosing {recommendation}: {prediction}
 - **10 months** in: {prediction}
 - **10 years** from now: {prediction}
@@ -505,6 +511,34 @@ Based on ranking and thresholds:
 
 Write structured list to log.
 
+## 3.4 Gut Check (Before Analysis)
+
+Before elimination, capture intuition as data using AskUserQuestion:
+
+```json
+{
+  "questions": [
+    {
+      "question": "Before we analyze, what does your gut say? Any option you're drawn to or repelled by?",
+      "header": "Gut Check",
+      "options": [
+        { "label": "Drawn to {Option A}", "description": "Something feels right about this one" },
+        { "label": "Drawn to {Option B}", "description": "Something feels right about this one" },
+        { "label": "Repelled by {Option}", "description": "Something feels off about this one" },
+        { "label": "No strong feeling", "description": "Neutral across options" }
+      ],
+      "multiSelect": true
+    }
+  ]
+}
+```
+
+**Use this as data, not conclusion**: Note gut reactions in log. If final analysis contradicts gut, surface the conflict:
+- "Analysis points to {A}, but you mentioned being drawn to {B}. Worth exploring what your intuition is picking up on."
+- "Analysis points to {A}, but you said something felt off about it. Before deciding, can you articulate what's bothering you?"
+
+**When to weight intuition more**: If user has extensive experience in this decision domain (has made similar decisions before with feedback on outcomes), intuition carries more signal.
+
 ---
 
 # Phase 4: Option Discovery
@@ -700,6 +734,10 @@ Target: 2-4 finalists for deep comparison. If more remain after all non-negotiab
 
 # Phase 7: Finalist Analysis
 
+**Consideration set quality matters more than evaluation sophistication.** Before deep analysis, verify:
+- Do finalists include different approaches/categories? (prevents narrow framing)
+- Did you stop option search too early? (people consistently stop too soon)
+
 ## 7.1 Deep Dive on Finalists
 
 For each finalist, conduct targeted research using "thorough" level (same thoroughness as Phase 5 for this stakes level):
@@ -773,7 +811,9 @@ If fragile: "Your situation has significant uncertainty. Consider: (1) waiting u
 
 **Never skip this step** - synthesis accuracy depends on it.
 
-## 8.2 10-10-10 Regret Framework
+## 8.2 Temporal Perspective Check (10-10-10)
+
+This technique is grounded in Construal Level Theory—distant futures are processed more abstractly, helping counteract present bias. Anticipated regret is robustly validated in decision research.
 
 ```markdown
 **Let's check for regret potential:**
@@ -791,6 +831,8 @@ If fragile: "Your situation has significant uncertainty. Consider: (1) waiting u
 
 **Which regret is worse**: {risk of A} or {risk of not-A}?
 ```
+
+**Affective forecasting note**: People accurately predict direction of emotions but overestimate intensity (~50%) and duration. If imagining a "catastrophic" outcome, it will likely feel more manageable than you predict.
 
 **Using 10-10-10 results**:
 - If strong negative prediction at ANY timeframe → flag as concern in recommendation
@@ -850,12 +892,19 @@ For factors that can't be researched:
 Recommendation changes if:
 - {condition}
 
+### Gut Check Reconciliation
+{If gut reaction recorded earlier conflicts with recommendation}:
+- You mentioned feeling {drawn to / off about} {option}
+- Analysis recommends {different option}
+- Possible explanations: {user may be picking up on unlisted factors / analysis may be missing subjective fit}
+- **Before finalizing**: Can you articulate what your gut was responding to?
+
 ### Risk Assessment
 - **Reversibility**: {for #1}
 - **Downside if wrong**: {impact}
 - **Confidence**: {High/Medium/Low} because {reason}
 
-### 10-10-10 Check
+### Temporal Perspective (10-10-10)
 - **10 min**: {prediction}
 - **10 months**: {prediction}
 - **10 years**: {prediction}
@@ -911,7 +960,7 @@ Present complete Decision Analysis including:
 - Why #1 wins (and why its category wins)
 - Trade-offs accepted
 - Confidence level
-- 10-10-10 check
+- Temporal perspective check
 
 ---
 
@@ -958,7 +1007,7 @@ Present complete Decision Analysis including:
 | **Sequential elimination** | Most important factor first, narrate each cut |
 | **Pairwise comparisons** | "A vs B" clearer than abstract scoring |
 | **Sensitivity analysis** | Know what would change your mind |
-| **10-10-10 regret check** | Catches temporal blind spots |
+| **Temporal perspective check** | Catches temporal blind spots via 10-10-10 |
 | **External memory** | Write everything to log; refresh before synthesis |
 
 ---
