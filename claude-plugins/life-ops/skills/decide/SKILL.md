@@ -299,6 +299,8 @@ Then → research (if external) or elimination (if enough data).
 
 **Approach**: Understand the PERSON. Keep probing until nothing new surfaces.
 
+**Proactive stance**: YOU generate factors, edge cases, and hidden considerations using domain knowledge. Don't wait for user to think of everything—they hired a decision coach to surface what they'd miss on their own.
+
 **Question style**: Default AskUserQuestion. Switch to natural language if: (1) user requests conversational, (2) 2+ free-text responses, (3) question about personal history/emotions.
 
 ## 2.1 Underlying Need
@@ -317,24 +319,28 @@ Then → research (if external) or elimination (if enough data).
 
 ## 2.3 Factor Scaffolding
 
-**Don't just ask "what matters"** - provide scaffolding:
+**Don't ask "what matters?"** - YOU propose factors first. Use domain knowledge to generate 8-12 concrete factors for this specific decision type.
 
+**Proactive scaffolding** (generate these BEFORE asking user):
 ```
-"For {decision type}, typically matters:
+"For {specific decision}, these factors typically matter:
 
 **Usually Critical:**
-- {Factor}: Because {why}
+- {Concrete factor 1}: {Why it matters for THIS decision}
+- {Concrete factor 2}: {Specific impact}
 
 **Often Important:**
-- {Factor}: Affects {outcome}
+- {Factor 3-5}: {Decision-specific reasoning}
 
-**Sometimes Overlooked:**
-- {Factor}: People forget this impacts {result}
+**Commonly Overlooked:**
+- {Factor 6-8}: {Why people miss this}
 
-What resonates? What's missing?"
+Which resonate? Which don't apply? What's missing?"
 ```
 
-Build comprehensive list—don't stop at first answer.
+**Factor generation sources**: Your knowledge of this domain, common regrets in similar decisions, expert frameworks, long-term considerations users forget.
+
+**After user responds**: Probe each selected factor for threshold. Then ask: "Anything else that would make you regret this decision?" Add 2-3 more rounds until nothing new.
 
 ## 2.4 Edge Cases (medium+ stakes)
 
@@ -346,9 +352,19 @@ Questions: What could go wrong? What would make this fail? Most worried about? W
 
 ## 2.5 Hidden Factors (medium+ stakes)
 
-**Question**: "What would make you doubt this in 5 years? What would you wish you'd known?"
+**YOU surface these proactively** - don't wait for user to think of them:
 
-Surfaces: Regulatory/legal, tax, lock-in, ongoing vs upfront costs, exit costs, secondary effects.
+| Category | Proactively Check |
+|----------|-------------------|
+| Financial | Ongoing costs, exit costs, opportunity cost, tax implications, insurance |
+| Lock-in | Switching costs, contracts, ecosystem dependencies, resale value |
+| Time | Maintenance burden, learning curve, time-to-value, depreciation |
+| Risk | Regulatory changes, market shifts, technology obsolescence |
+| Second-order | Impact on other goals, relationship effects, lifestyle constraints |
+
+**Ask**: "I want to surface factors you might not have considered: {list 3-4 relevant from above}. Any of these matter?"
+
+**Then**: "What would make you doubt this in 5 years?"
 
 **Follow-up**: "How important is {factor} vs others? Minimum acceptable?"
 

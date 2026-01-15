@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.5.3 - `/decide` skill: proactive factor discovery:
+  - Add "proactive stance" directive: generate factors using domain knowledge, don't wait for user
+  - Factor scaffolding now requires 8-12 concrete factors BEFORE asking user
+  - Hidden factors section now has category table (financial, lock-in, time, risk, second-order)
+  - Explicit instruction to surface factors user would miss on their own
 - [life-ops] v1.5.2 - `/decide` skill: enforce mandatory todo list creation:
   - Add prominent ⚠️ MANDATORY section near top requiring todo list before any user interaction
   - Update Core Loop to show TodoList as explicit first step
