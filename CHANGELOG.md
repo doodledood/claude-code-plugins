@@ -8,6 +8,16 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.3.0 - Complete rewrite of `/decide` skill for decision QUALITY over speed:
+  - Integrates EBA (Elimination By Aspects) methodology with sequential elimination rounds
+  - Adds exhaustive /spec-style discovery with edge-case hunting and factor scaffolding
+  - Option discovery phase: finds options when user doesn't provide them
+  - Market context for threshold setting (basic/solid/premium benchmarks)
+  - Pairwise trade-off comparisons for finalists ("A gives X but costs Y")
+  - Sensitivity analysis ("recommendation flips if...")
+  - 10-10-10 regret framework
+  - Maintains memento pattern (external decision log, refresh before synthesis)
+  - Cross-category representation rule for comprehensive comparison
 - [life-ops] v1.2.0 - Comprehensive discovery improvements for `/decide` skill:
   - Add Hidden Factors Probe ("What would make you doubt this in 5 years?") to surface overlooked considerations
   - Add Phase 4.5 Post-Research Gap Check as iterative loop: research → identify gaps → ask user → if critical factors → follow-up research → repeat (max 3 rounds)
