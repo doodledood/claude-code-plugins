@@ -8,6 +8,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.6.0 - `/decide` skill: optimize for decision QUALITY and TRUST:
+  - Add decision framing check (Phase 2.1): verify user is asking the right question before diving deep
+  - Add comprehensiveness checkpoint (Phase 2.7): active verification checklist, explicit user confirmation required
+  - Add pre-mortem stress test (Phase 8.3): actively try to break recommendation before finalizing
+  - Enhanced final synthesis with trust-building elements: comprehensiveness summary, eliminated options audit, explicit confidence criteria, "what we didn't explore" section
+  - High-stakes override: shortcuts require explicit user consent for high/life-changing decisions
+  - Updated todo template with new steps (framing check, comprehensiveness checkpoint, pre-mortem)
 - [life-ops] v1.5.3 - `/decide` skill: proactive factor discovery:
   - Add "proactive stance" directive: generate factors using domain knowledge, don't wait for user
   - Factor scaffolding now requires 8-12 concrete factors BEFORE asking user

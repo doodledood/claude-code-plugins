@@ -120,14 +120,15 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 ```
 - [ ] Phase 0 (foundation, stakeholders, characteristics)
 - [ ] Create log file + write foundation
+- [ ] Discovery: Decision framing check → write to log
 - [ ] Discovery: Underlying need → write to log
 - [ ] Discovery: Time horizon & uncertainty → write to log
-- [ ] Discovery: Factor scaffolding → write to log
+- [ ] Discovery: Factor scaffolding (8-12 factors) → write to log
 - [ ] Discovery: Edge cases → write to log
-- [ ] Discovery: Hidden factors probe → write to log
+- [ ] Discovery: Hidden factors probe (all 5 categories) → write to log
 - [ ] Discovery: Stakeholder constraints (if applicable) → write to log
 - [ ] (expand: additional rounds until nothing new)
-- [ ] Verify discovery complete
+- [ ] Comprehensiveness checkpoint: verify coverage with user → write to log
 - [ ] Structuring: Factor ranking + threshold setting + gut check → write to log
 - [ ] Option Discovery: Ask user's existing options FIRST
 - [ ] Option Discovery: Research → write to log
@@ -137,8 +138,9 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 - [ ] Sequential Elimination → write to log
 - [ ] Finalist Analysis → write to log
 - [ ] Refresh context: read full log ← CRITICAL before synthesis
+- [ ] Pre-mortem stress test → write to log
 - [ ] Synthesize: Pairwise + sensitivity + 10-10-10 + recommendation → write to log
-- [ ] Output final recommendation
+- [ ] Output final recommendation with comprehensiveness summary
 ```
 
 **(Write to log immediately after each step—never batch writes)**
@@ -260,7 +262,7 @@ IN_PROGRESS
 
 # Coach's Discretion
 
-**Goal: help them decide, not complete every phase.**
+**Goal: help them decide well, not complete every phase.**
 
 | User Arrives With | Detection | Adaptation |
 |-------------------|-----------|------------|
@@ -270,7 +272,11 @@ IN_PROGRESS
 | Pre-processed | Already compared, wants confirmation | Fast path: verify → blind spots → recommend |
 | Urgency | "Need to decide today" | Focus non-negotiables, quick elimination |
 
-**Stakes set floor**: Low → lighter. High → thorough. But if "low stakes" clearly matters deeply (words like "stressed", "anxious", 2+ follow-ups on same concern), adapt upward.
+**⚠️ HIGH/LIFE-CHANGING STAKES OVERRIDE**: For high or life-changing stakes, **shortcuts require explicit user consent**:
+- "This is a {stakes} decision. I recommend full discovery even though you've done prior research. Skip comprehensive analysis? [Yes, I accept reduced confidence / No, do it thoroughly]"
+- If user consents to skip: Document in log, set confidence to Medium max, note "User opted for abbreviated analysis" in final output.
+
+**Stakes set floor**: Low → lighter. High/Life-changing → full thoroughness regardless of pre-processing signs.
 
 **When adapting**: Modify todos—mark skipped as "[Skipped - {reason}]".
 
@@ -303,7 +309,16 @@ Then → research (if external) or elimination (if enough data).
 
 **Question style**: Default AskUserQuestion. Switch to natural language if: (1) user requests conversational, (2) 2+ free-text responses, (3) question about personal history/emotions.
 
-## 2.1 Underlying Need
+## 2.1 Decision Framing & Underlying Need
+
+**Before diving into factors, verify the question itself is right.**
+
+**Framing check**: Is user asking the right question? Common reframes:
+- "Which X should I buy?" → "Do I need X at all?" / "Buy vs rent/lease?"
+- "Should I take job A or B?" → "Should I change jobs?" / "What do I actually want?"
+- "Where should I move?" → "Should I move?" / "What problem does moving solve?"
+
+**Ask**: "Before we go deep: is '{user's framing}' the right question, or might there be a better way to frame this decision?"
 
 **Goal**: WHY, not WHAT.
 
@@ -372,18 +387,38 @@ Questions: What could go wrong? What would make this fail? Most worried about? W
 
 For each with veto: deal-breakers → non-negotiable. Strong preferences → important factors. Document conflicts.
 
-## 2.7 Discovery Completion
+## 2.7 Comprehensiveness Checkpoint (ACTIVE VERIFICATION)
 
-Complete when ALL true:
-1. Factor list comprehensive—user can't add more
-2. Edge cases explored
-3. Hidden factors probed
-4. Stakeholder constraints captured
-5. User signals move forward (after underlying need + time horizon + factor scaffolding covered) OR 3 consecutive probes yield nothing new
+**Don't passively wait for "nothing new"—actively verify coverage.**
 
-**Main probes** (count toward 3): (1) Underlying need, (2) Time horizon, (3) Factor scaffolding, (4) Edge cases, (5) Hidden factors, (6) Stakeholder constraints. Follow-ups within same category don't count.
+**Checklist** (must confirm ALL before proceeding):
+| Area | Verified? | How |
+|------|-----------|-----|
+| Decision framing | ☐ | Asked if right question |
+| Underlying need | ☐ | Know WHY, not just WHAT |
+| Time horizon | ☐ | When needed, what changes |
+| Factors (8-12) | ☐ | Proactively generated + user additions |
+| Factor thresholds | ☐ | Minimums for each important factor |
+| Edge cases | ☐ | What could go wrong |
+| Hidden factors | ☐ | Financial/lock-in/time/risk/second-order |
+| Stakeholder constraints | ☐ | If applicable |
 
-**User wants to skip**: Acknowledge, explain 2-3 critical questions prevent waste, ask those, document assumptions.
+**Explicit verification ask**:
+```
+"Before we move to options, let me verify we've covered everything:
+- Decision framing: {confirmed question}
+- Core need: {underlying why}
+- Key factors: {list top 5-7}
+- Must-haves: {non-negotiables with thresholds}
+- Risks considered: {edge cases}
+- Hidden factors checked: {which categories}
+
+**Is anything missing?** Any factor that, if we ignored it, you'd regret later?"
+```
+
+**Only proceed when user confirms** or explicitly says "that's comprehensive enough."
+
+**User wants to skip**: "I understand urgency. But skipping discovery → wrong recommendation. Let me ask the 3 most critical questions—takes 2 minutes, prevents wasted analysis." Ask those, document assumptions, note reduced confidence.
 
 ---
 
@@ -663,7 +698,34 @@ Grounded in Construal Level Theory—distant futures processed abstractly, count
 - 10-year "wish safer" → bias conservative
 - Conflicting timeframes (short pain, long gain) → explicitly note trade-off
 
-## 8.3 Subjective Evaluation Guidance
+## 8.3 Pre-Mortem Stress Test (REQUIRED for medium+ stakes)
+
+**Before recommending, actively try to BREAK the recommendation.**
+
+**Pre-mortem prompt** (imagine it's 1 year later and the decision failed):
+```
+"Let me stress-test my emerging recommendation ({Option}):
+
+**If this choice fails, the most likely reasons are:**
+1. {Concrete failure mode}
+2. {Hidden assumption that could be wrong}
+3. {External factor that could change}
+
+**What would have to be true for {Option} to be WRONG?**
+- {Condition 1}
+- {Condition 2}
+
+**Devil's advocate for #2 ({runner-up}):**
+- {Strongest argument for #2 over #1}
+- {What #1 advocates might be missing}
+"
+```
+
+**If pre-mortem reveals serious vulnerability**: Surface to user before finalizing. "My analysis leans {A}, but the pre-mortem revealed {risk}. How do you weigh this?"
+
+**Purpose**: Catches overconfidence, surfaces assumptions, builds trust through transparency.
+
+## 8.4 Subjective Evaluation Guidance
 
 For unresearchable factors:
 ```markdown
@@ -674,14 +736,29 @@ For unresearchable factors:
 - **Red flags**: {warnings}
 ```
 
-## 8.4 Final Synthesis
+## 8.5 Final Synthesis
+
+**Structure optimized for TRUST**: User should see everything considered, why options were eliminated, and what could change the recommendation.
 
 ```markdown
 ## Decision Analysis: {Topic}
 
+### What We Analyzed (Comprehensiveness Summary)
+- **Decision framing**: {confirmed question}
+- **Factors evaluated**: {count} ({list top 5-7})
+- **Options considered**: {count total} ({count} eliminated, {count} finalists)
+- **Hidden factors checked**: Financial ✓, Lock-in ✓, Time ✓, Risk ✓, Second-order ✓
+- **Research depth**: {thoroughness level}, {source count} sources
+
 ### Recommendation
 **#1: {Option}**
 {2-3 sentences tied to #1 priority}
+
+### Eliminated Options Audit
+| Option | Eliminated By | Value vs Threshold | Would Return If |
+|--------|---------------|-------------------|-----------------|
+| {B} | {Factor #1} | {X} vs min {Y} | Threshold → {Z} |
+| {C} | {Factor #2} | {X} vs min {Y} | {condition} |
 
 ### Top 3 Comparison
 | Factor | #1: {A} | #2: {B} | #3: {C} |
@@ -694,35 +771,45 @@ For unresearchable factors:
 - Meets {Y}
 - {Stakeholder} alignment
 
-### Why #1's Category Wins
-- {vs other categories}
-
-### When #2 Better?
-- {scenario}
+### Pre-Mortem Results
+**If #1 fails, likely because**: {top failure mode}
+**#1 is WRONG if**: {condition that would invalidate}
+**Devil's advocate for #2**: {strongest counter-argument}
 
 ### Trade-Offs Accepted
 - Choosing #1 means accepting {weakness}
 - Trading {#2 offers} for {#1 offers}
 
-### Sensitivity
-Changes if: {conditions}
+### Sensitivity & Stability
+- **Changes if**: {conditions}
+- **Stability**: {Stable/Moderate/Fragile}
 
-### Gut Reconciliation
-{If conflict}: You felt {X}, analysis says {Y}. Possible: picking up unlisted factors. Before finalizing: articulate what gut responds to?
+### Confidence Assessment
+**{High/Medium/Low}**
 
-### Risk Assessment
-- **Reversibility**: {for #1}
-- **Downside**: {if wrong}
-- **Confidence**: {H/M/L} because {reason}
+| Criterion | Met? |
+|-----------|------|
+| 3+ sources agree on key facts | {Y/N} |
+| User priorities clear and stable | {Y/N} |
+| Pre-mortem found no critical vulnerabilities | {Y/N} |
+| No major data gaps | {Y/N} |
+
+**High** = All 4 met. **Medium** = 2-3 met. **Low** = 0-1 met.
+
+### What We Didn't Fully Explore
+- {Area}: {why - time/data unavailable/user chose to skip}
+- {Impact on confidence}: {how this affects certainty}
 
 ### 10-10-10
 - **10 min**: {prediction}
 - **10 months**: {prediction}
 - **10 years**: {prediction}
-- **Regret flag**: {concern or None}
+
+### Final Check
+**Anything missing?** If you think of a factor we didn't consider, or an option we should have evaluated, say so now—better to revisit than regret.
 ```
 
-## 8.5 Tie-Breaking
+## 8.6 Tie-Breaking
 
 If top 2 close (<10% numeric diff on #1 priority, or similar on subjective factors):
 
