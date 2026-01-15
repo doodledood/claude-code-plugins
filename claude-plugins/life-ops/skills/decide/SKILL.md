@@ -152,7 +152,8 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 - [ ] Structuring: Threshold setting with market context
 - [ ] Structuring: Gut check (capture intuition as data)
 - [ ] Write ranked factors, thresholds, and gut reactions to log
-- [ ] Option Discovery: Identify or research options
+- [ ] Option Discovery: Ask about user's existing options FIRST
+- [ ] Option Discovery: Research (include user's options + discover new)
 - [ ] Write options to log
 - [ ] Research: Deep research on options
 - [ ] Write research findings to log
@@ -543,12 +544,36 @@ Before elimination, capture intuition as data using AskUserQuestion:
 
 # Phase 4: Option Discovery
 
-## 4.1 Check User-Provided Options
+## 4.1 Check User's Existing Options (BEFORE Research)
 
-If user provided options:
-- Record them in log
-- Ask: "Are there other options you've considered?"
-- Ask: "Are you open to alternatives you might not have thought of?"
+**FIRST**, explicitly ask what options the user already has in mind:
+
+```json
+{
+  "questions": [
+    {
+      "question": "Are there specific options you're already considering or have heard about?",
+      "header": "Your Options",
+      "options": [
+        { "label": "Yes, specific ones", "description": "I have particular options in mind" },
+        { "label": "A few ideas", "description": "Some possibilities but not firm" },
+        { "label": "No, start fresh", "description": "Research what's available" },
+        { "label": "Mix - mine + discover", "description": "Include mine and find others" }
+      ],
+      "multiSelect": false
+    }
+  ]
+}
+```
+
+**If user has specific options** (answered "Yes" or "A few ideas" or "Mix"):
+- Ask: "Which options are you considering?" (natural language follow-up)
+- Record them in log BEFORE any research
+- Research MUST include these options, not just discovered alternatives
+
+**If user answered "No, start fresh"**: Proceed directly to 4.2 Option Discovery.
+
+**Why this matters**: Users often have options they're comparing but don't mention unprompted. Missing them leads to wasted research and corrections later. The session analysis that prompted this addition showed a user who had specific Israeli funds in mind (Kesem KTF, Kesem Hedged) but wasn't asked—leading to major rework when their options weren't in the initial research.
 
 **Category assignment**: Group options by their fundamental approach to solving the problem. Examples: for "which laptop" → brand or tier (budget/midrange/premium); for "career decision" → industry or role type; for "investment" → asset class. If unclear, ask: "Should I group these by {suggested grouping} or another way?" Categories are optional—skip if all options are essentially the same type.
 

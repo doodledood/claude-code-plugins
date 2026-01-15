@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.5.0 - `/decide` skill: strengthen existing options discovery (Phase 4.1):
+  - Add explicit AskUserQuestion before research to surface user's existing options
+  - Session analysis showed users often have options in mind but don't mention unprompted
+  - Prevents wasted research and corrections when user's preferred options weren't included
+  - Updated todo list template to split option discovery into "ask user first" + "research" steps
 - [life-ops] v1.4.0 - Research-validated improvements to `/decide` skill:
   - Add gut check phase: captures intuition as data before analysis (research shows emotion is essential, not enemy, of good decisions)
   - Reposition 10-10-10 as "Temporal Perspective Check": theoretically grounded in Construal Level Theory (no direct empirical validation exists for 10-10-10 specifically)
