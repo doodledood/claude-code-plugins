@@ -12,6 +12,15 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 
 **Optimized for**: Quality > speed. Thoroughness > efficiency.
 
+**Time calibration** (set expectations early):
+| Stakes | Typical Time | Depth |
+|--------|-------------|-------|
+| Low | 10-15 min | Core discovery + quick research |
+| Medium | 20-30 min | Full discovery + thorough research |
+| High/Life-changing | 45-60+ min | Exhaustive discovery + very thorough research |
+
+**Tell user upfront**: "This is a {stakes} decision. For quality results, expect ~{time}. Want to proceed, or compress for faster (lower confidence) recommendation?"
+
 **Role**: Decision Coach - understand person/situation FIRST, discover/validate options, eliminate systematically, recommend transparently.
 
 **Core Loop**: **TodoList** → Foundation → Discovery → Structuring → Options → Research → Elimination → Finalists → **Refresh** → Synthesis → Finalize
@@ -55,6 +64,12 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 | very thorough | 15+ | 5+ | Expert sources, note disagreements |
 
 **Conflicting sources**: Note disagreement, use more authoritative/recent source, or flag for user if unclear.
+
+**Source independence check**: "3+ sources agree" only counts if sources are INDEPENDENT:
+- Multiple sites citing same manufacturer spec = 1 source
+- Multiple reviews using same testing methodology = correlated sources
+- Primary sources (expert, manufacturer, study) count more than aggregators
+- For High confidence: require at least one PRIMARY source, not just aggregators echoing each other
 
 ---
 
@@ -135,6 +150,7 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 - [ ] Research: Deep research → write to log
 - [ ] Post-research gap check → write to log
 - [ ] (expand: if critical gaps → follow-up + write to log)
+- [ ] Research Completeness Matrix: verify all factor-option cells → write to log
 - [ ] Sequential Elimination → write to log
 - [ ] Finalist Analysis → write to log
 - [ ] Refresh context: read full log ← CRITICAL before synthesis
@@ -210,6 +226,13 @@ Started: {YYYY-MM-DD HH:MM:SS}
 ### {Option}
 - {Factor}: {value} {source}
 
+## Factor Coverage Matrix
+| Factor (Priority) | Threshold | Opt A | Opt B | Opt C |
+|-------------------|-----------|-------|-------|-------|
+| {Factor 1} (#1) | ≥{X} | {val} | {val} | {val} |
+
+**Data gaps resolved**: {list any assumptions made}
+
 ## Elimination Rounds
 
 ### Round 1: {Factor} (Priority #1)
@@ -272,6 +295,13 @@ IN_PROGRESS
 | Pre-processed | Already compared, wants confirmation | Fast path: verify → blind spots → recommend |
 | Urgency | "Need to decide today" | Focus non-negotiables, quick elimination |
 
+**⚠️ MANDATORY: Underlying Need + Option Set Check (NEVER SKIP)**: Even with all shortcuts, ALWAYS verify:
+1. **Underlying need**: "What's the underlying problem you're solving? What would be different if this decision resolved perfectly?"
+2. **Option set completeness**: "You mentioned {X, Y}. Quick check: are these definitely the ONLY good options, or worth 60 seconds brainstorming alternatives?"
+- If framing might be wrong → STOP shortcuts, full discovery
+- If option set might be incomplete → Add 2-3 alternative options/categories before research
+- Articulate users often have RIGHT framing but INCOMPLETE option sets
+
 **⚠️ HIGH/LIFE-CHANGING STAKES OVERRIDE**: For high or life-changing stakes, **shortcuts require explicit user consent**:
 - "This is a {stakes} decision. I recommend full discovery even though you've done prior research. Skip comprehensive analysis? [Yes, I accept reduced confidence / No, do it thoroughly]"
 - If user consents to skip: Document in log, set confidence to Medium max, note "User opted for abbreviated analysis" in final output.
@@ -309,9 +339,9 @@ Then → research (if external) or elimination (if enough data).
 
 **Question style**: Default AskUserQuestion. Switch to natural language if: (1) user requests conversational, (2) 2+ free-text responses, (3) question about personal history/emotions.
 
-## 2.1 Decision Framing & Underlying Need
+## 2.1 Decision Framing & Underlying Need (MUST COMPLETE BEFORE 2.3)
 
-**Before diving into factors, verify the question itself is right.**
+**This section must be DEEPLY explored before generating any factors.** Factor scaffolding (2.3) MUST be tailored to the underlying need discovered here, not the surface request.
 
 **Framing check**: Is user asking the right question? Common reframes:
 - "Which X should I buy?" → "Do I need X at all?" / "Buy vs rent/lease?"
@@ -320,9 +350,21 @@ Then → research (if external) or elimination (if enough data).
 
 **Ask**: "Before we go deep: is '{user's framing}' the right question, or might there be a better way to frame this decision?"
 
-**Goal**: WHY, not WHAT.
+**Goal**: WHY, not WHAT. Probe until you understand the ROOT problem, not the surface request.
 
-**Probe**: When user states requirement, ask: "What's driving that? Flexibility if alternative serves underlying need better?"
+**Probe sequence**:
+1. "What's driving this decision? What problem are you trying to solve?"
+2. "If this decision magically resolved perfectly, what would be different in your life?"
+3. "What's driving that? Flexibility if alternative serves underlying need better?"
+
+**Anti-anchoring check**: If user arrived with specific options (e.g., "MacBook vs Dell"), explicitly ask: "You mentioned {options}—but stepping back, what underlying need would either of these serve? Are there other ways to meet that need?"
+
+**⚠️ Sunk cost probe (ASK EARLY)**: Before factor generation, check for prior investment:
+- "Have you already invested significant time/money researching any specific option? (Test drives, applications, site visits, etc.)"
+- If yes: Document which option. Throughout analysis, watch for bias toward this option. In gut check (3.4), explicitly note: "You mentioned investing heavily in {X}—let's verify your preference isn't anchoring bias."
+- Purpose: Catching sunk cost EARLY prevents it from contaminating factor generation, thresholds, and research framing
+
+**Only proceed to 2.2 when**: You can articulate the underlying need in a sentence that doesn't reference the surface options (e.g., "Need: reliable tool for software development that projects professionalism" not "Need: laptop").
 
 ## 2.2 Time Horizon & Uncertainty
 
@@ -334,9 +376,13 @@ Then → research (if external) or elimination (if enough data).
 
 ## 2.3 Factor Scaffolding
 
+**Prerequisite**: Underlying need (2.1) must be articulated before this section. Factors must serve the UNDERLYING NEED, not the surface request.
+
 **Don't ask "what matters?"** - YOU propose factors first. Use domain knowledge to generate 8-12 concrete factors for this specific decision type.
 
-**Proactive scaffolding** (generate these BEFORE asking user):
+**Tailor to underlying need**: If underlying need is "reliable tool for software development that projects professionalism," factors should include "professional appearance in client meetings" even though user asked about laptops.
+
+**Proactive scaffolding** (generate these AFTER understanding underlying need):
 ```
 "For {specific decision}, these factors typically matter:
 
@@ -453,6 +499,17 @@ Your minimum acceptable? Not ideal—what you could live with."
 
 **Threshold = elimination criterion**: Below → eliminated regardless of other strengths.
 
+**⚠️ Qualitative factors**: Not all factors can be meaningfully quantified. For factors like "work-life balance," "company culture," "aesthetic appeal":
+- Use **descriptive thresholds** instead: "Must feel welcoming when I visit" / "Must not require regular weekend work"
+- Ask user to describe their minimum in their own words, not numbers
+- In elimination, evaluate against the descriptive threshold, not a false numeric proxy
+
+**Qualitative evaluation decision rule**:
+- **Clear pass**: >80% of signals suggest option meets threshold → PASS
+- **Clear fail**: >80% of signals suggest option fails threshold → FAIL
+- **Ambiguous** (20-80%): Flag for user with specific evidence: "Option A has mixed signals on {factor}: {evidence for pass} vs {evidence for fail}. Your call?"
+- Don't ask user for EVERY qualitative evaluation—only when genuinely ambiguous
+
 **Research context if needed**:
 ```
 Task(subagent_type:"vibe-workflow:web-researcher",prompt:"quick - Typical ranges for {factor} in {category}? Basic/mid/premium benchmarks.",description:"Market context")
@@ -477,6 +534,10 @@ Before elimination, capture intuition:
 **Use as data, not conclusion**: If analysis contradicts gut, surface: "Analysis → {A}, but you felt {B}. Worth exploring what intuition picked up."
 
 **Weight intuition more**: If user has domain experience (prior decisions with outcome feedback).
+
+**Sunk cost check integration**: If sunk cost was detected in 2.1 (prior investment) AND user is now drawn to that same option:
+- Explicitly note: "In discovery you mentioned investing heavily in {X}, and your gut leans toward {X}. Let's verify this isn't anchoring bias—what specifically makes {X} feel right beyond your prior research investment?"
+- Don't re-ask about investment (already captured in 2.1)
 
 ---
 
@@ -535,6 +596,13 @@ Return by category with descriptions.",description:"Discover options")
 
 Before research: "Right options to research? Add or remove any?"
 
+**Option interdependence check**: Many decisions have options that aren't independent:
+- "Can any of these be combined? (e.g., component from A + component from B)"
+- "Does knowing Option A's terms affect Option B's negotiating leverage?"
+- "Is there a 'wait and see' option that preserves flexibility?"
+
+If interdependence exists: Note in log, consider hybrid options, adjust analysis to account for leverage/sequencing.
+
 ---
 
 # Phase 5: Research
@@ -579,6 +647,31 @@ Scan for factors that: are important (multiple sources), NOT discussed in discov
 3. Set confidence Medium
 4. Be explicit about uncertainty
 
+## 5.4 Research Completeness Matrix (REQUIRED before Elimination)
+
+**Before elimination, verify data exists for every option × important factor combination.**
+
+```markdown
+## Factor Coverage Matrix
+| Factor (Priority) | Threshold | Opt A | Opt B | Opt C |
+|-------------------|-----------|-------|-------|-------|
+| {Factor 1} (#1) | ≥{X} | ✓ {val} | ✓ {val} | ? |
+| {Factor 2} (#2) | ≥{Y} | ✓ {val} | ? | ✓ {val} |
+```
+
+**If ANY cell is missing for Non-Negotiable or Important factors**:
+1. Targeted follow-up research: `Task(subagent_type:"vibe-workflow:web-researcher", prompt:"quick - Find {Factor} value for {Option} specifically", description:"Fill matrix gap")`
+2. If still unavailable after follow-up:
+   ```json
+   {"questions":[{"question":"No reliable data for {Option}'s {Factor}. How should I proceed?","header":"Data Gap","options":[{"label":"Assume meets threshold","description":"Optimistic - keep in consideration"},{"label":"Assume fails threshold","description":"Conservative - eliminate option"},{"label":"Skip this option entirely","description":"Can't evaluate without this data"}],"multiSelect":false}]}
+   ```
+3. Document user's choice in log with rationale
+4. **CRITICAL**: Mark assumed values as `{value}*` in matrix with footnote: `*assumed, not verified`
+
+**In elimination rounds**: When an option's PASS relies on assumed value, flag it: "Option B passes {Factor} threshold based on ASSUMPTION (unverified). This elimination decision rests on unverified data. [Proceed / Get real data first]"
+
+**Write matrix to log before proceeding to elimination.**
+
 ---
 
 # Phase 6: Sequential Elimination
@@ -606,7 +699,19 @@ Threshold: {min}
 
 Explain: "Eliminating {Option} because {factor}={value}, below your min of {threshold}. Leaves us with {list}."
 
-## 6.3 Finalist Count Edge Cases
+## 6.3 Near-Miss Protection (PREVENTS EBA FLAW)
+
+**Problem EBA creates**: Option marginally below threshold on Factor #1 gets eliminated even if vastly superior on Factors 2-10. This systematically excludes potentially best options.
+
+**Near-miss rule**: If an option is within 10-15% of threshold on the eliminating factor:
+1. Flag as "Near-Miss" instead of immediate elimination
+2. Before proceeding: "Option {X} missed your {Factor} threshold by {small margin}. But it's strong on {other factors}. Worth keeping for holistic comparison, or strict threshold?"
+3. If user keeps: Include in finalists for pairwise comparison, explicitly noting the threshold violation
+4. Document: "Near-miss on {Factor}, kept for holistic comparison per user preference"
+
+**When to apply**: Only for quantitative factors with clear margins. Qualitative factors don't have "near-miss" - they either meet descriptive threshold or don't.
+
+## 6.4 Finalist Count Edge Cases
 
 | Count | Action |
 |-------|--------|
@@ -723,7 +828,16 @@ Grounded in Construal Level Theory—distant futures processed abstractly, count
 
 **If pre-mortem reveals serious vulnerability**: Surface to user before finalizing. "My analysis leans {A}, but the pre-mortem revealed {risk}. How do you weigh this?"
 
-**Purpose**: Catches overconfidence, surfaces assumptions, builds trust through transparency.
+**⚠️ Resurrection check**: If pre-mortem reveals a vulnerability that an ELIMINATED option would have avoided:
+1. Check the Eliminated Options Audit - which option avoided this failure mode?
+2. Ask user: "Pre-mortem revealed {vulnerability}. {Eliminated Option X} would avoid this but was eliminated because {reason}. Worth reconsidering? [Resurrect X for comparison / Accept vulnerability / Adjust threshold]"
+3. If resurrect: **Do FULL finalist analysis for resurrected option** (same depth as Phase 7.1) before comparison—otherwise comparison is unfair (A has deep research, X doesn't)
+
+**⚠️ Resurrection limits** (prevent infinite loops):
+- Maximum 1 resurrection per decision
+- After resurrection + re-analysis, if new pre-mortem reveals ANOTHER vulnerability: document but don't offer second resurrection. Say: "Pre-mortem revealed {new issue}. Since we already resurrected one option, proceeding with current recommendation. The logged vulnerabilities can inform your post-decision monitoring."
+
+**Purpose**: Catches overconfidence, surfaces assumptions, builds trust through transparency. Resurrection mechanism ensures pre-mortem can actually change the recommendation, not just surface concerns too late.
 
 ## 8.4 Subjective Evaluation Guidance
 
@@ -747,8 +861,16 @@ For unresearchable factors:
 - **Decision framing**: {confirmed question}
 - **Factors evaluated**: {count} ({list top 5-7})
 - **Options considered**: {count total} ({count} eliminated, {count} finalists)
-- **Hidden factors checked**: Financial ✓, Lock-in ✓, Time ✓, Risk ✓, Second-order ✓
 - **Research depth**: {thoroughness level}, {source count} sources
+- **Data coverage**: {X}/{Y} factor-option cells verified (see matrix)
+
+### Hidden Factors Discovered
+| Factor | Category | Impact on Decision |
+|--------|----------|-------------------|
+| {e.g., Ecosystem lock-in} | Lock-in | {e.g., Eliminated Option A} |
+| {e.g., Ongoing maintenance cost} | Financial | {e.g., Added to Important factors} |
+
+*(If no hidden factors surfaced: "Hidden factors probe (all 5 categories) found no additional concerns beyond stated factors.")*
 
 ### Recommendation
 **#1: {Option}**
@@ -783,6 +905,11 @@ For unresearchable factors:
 ### Sensitivity & Stability
 - **Changes if**: {conditions}
 - **Stability**: {Stable/Moderate/Fragile}
+
+### Gut Check Reconciliation
+- **Initial intuition**: {Drawn to X / Repelled by Y / Neutral}
+- **Analysis result**: {Aligned with gut / Contradicted gut}
+- **Resolution**: {If aligned: "Analysis confirms intuition." / If contradicted: "Analysis favors {A} over gut preference {B} because {specific factor/data}. Your gut may be picking up on {possible unlisted factor}—worth examining before finalizing."}
 
 ### Confidence Assessment
 **{High/Medium/Low}**
@@ -871,6 +998,9 @@ Present: #1 recommendation, Top 3 comparison, why #1 wins (+ category), trade-of
 | Empty $ARGUMENTS | Ask what decision |
 | "Just decide for me" | Still ask Core 3 (need, timeline, constraints) |
 | Self-knowledge | Skip research; discovery for values |
+| **User not ready to decide** | Valid outcome. Document: "Decision deferred pending {what}. When ready, resume from log: {path}" |
+| **User rejects reframe but is destabilized** | "You've said you want to stick with {original question}. Proceeding—but noting this uncertainty may affect confidence." |
+| **Analysis reveals "wait" is best** | "Wait and see" can be the recommendation. Document triggers for when to re-engage |
 
 ---
 

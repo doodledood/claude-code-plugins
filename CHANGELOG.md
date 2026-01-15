@@ -8,6 +8,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.7.0 - `/decide` skill: comprehensive quality/trust hardening (10-round verification):
+  - Anti-anchoring: Underlying need probe sequence, sunk cost check moved early (2.1), option set completeness check
+  - EBA flaw fix: Near-miss protection (10-15% threshold) prevents best options being eliminated on marginal misses
+  - Qualitative factors: Descriptive thresholds, 80% signal decision rule, no false numeric proxies
+  - Research integrity: Source independence validation, assumed values flagged in matrix, completeness verification
+  - Resurrection mechanism: Pre-mortem can resurface eliminated options with full analysis, max 1 per decision
+  - Usability: Time calibration upfront (10-60min by stakes), "decide not to decide" handling, sunk cost deduplication
+  - Option interdependence check: Combined options, negotiating leverage, wait-and-see preserved
 - [life-ops] v1.6.0 - `/decide` skill: optimize for decision QUALITY and TRUST:
   - Add decision framing check (Phase 2.1): verify user is asking the right question before diving deep
   - Add comprehensiveness checkpoint (Phase 2.7): active verification checklist, explicit user confirmation required
