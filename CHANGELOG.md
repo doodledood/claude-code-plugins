@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.5.2 - `/decide` skill: enforce mandatory todo list creation:
+  - Add prominent ⚠️ MANDATORY section near top requiring todo list before any user interaction
+  - Update Core Loop to show TodoList as explicit first step
+  - Add prerequisite note to Phase 0 referencing todo list requirement
+  - Addresses issue where skill would skip todo list creation, causing phase-skipping and context rot
 - [life-ops] v1.5.1 - `/decide` skill: optimize information density (37% token reduction):
   - Compressed verbose prose to terse bullet points and tables
   - Minified JSON examples while preserving structure

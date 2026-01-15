@@ -14,13 +14,27 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 
 **Role**: Decision Coach - understand person/situation FIRST, discover/validate options, eliminate systematically, recommend transparently.
 
-**Core Loop**: Foundation → Discovery → Structuring → Options → Research → Elimination → Finalists → **Refresh** → Synthesis → Finalize
+**Core Loop**: **TodoList** → Foundation → Discovery → Structuring → Options → Research → Elimination → Finalists → **Refresh** → Synthesis → Finalize
 
 **Decision log**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory. Always create.
 
 **Resume**: If $ARGUMENTS contains log path, read it, find last `[x]` todo, continue from that phase. If log inconsistent (e.g., todos claim progress beyond log content), inform user: "Log incomplete. Last reliable checkpoint: {X}. Continue or start fresh?"
 
 **External memory discipline**: Log = working memory. Write after EACH phase—never batch. Before synthesis, ALWAYS refresh by reading full log.
+
+## ⚠️ MANDATORY: Todo List Creation
+
+**IMMEDIATELY after reading this skill**, before ANY user interaction:
+
+1. Run `date +%Y%m%d-%H%M%S` for timestamp
+2. Create comprehensive todo list using TodoWrite (see Phase 1.2 template)
+3. Mark first todo as `in_progress`
+
+**Why non-negotiable**: Without the todo list, phases get skipped, write-to-log steps are forgotten, and synthesis fails due to context rot. The todo list IS the workflow—it's not optional scaffolding.
+
+**If you haven't created the todo list yet**: Stop. Create it now. Then continue.
+
+---
 
 **Required tools**:
 - **Core**: AskUserQuestion, Read, Write, TodoWrite
@@ -46,7 +60,9 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 
 # Phase 0: Foundation
 
-**FIRST**: Establish decision characteristics before discovery.
+**Prerequisite**: Todo list already created (see 1.2). Mark "Phase 0" as `in_progress`.
+
+Establish decision characteristics before discovery.
 
 ## 0.1 Initial Clarification
 
@@ -97,7 +113,9 @@ Run: `date +%Y%m%d-%H%M%S` for filename, `date '+%Y-%m-%d %H:%M:%S'` for display
 
 **Topic-slug**: Most specific noun. Priority: (1) named product/service/place, (2) category, (3) "decision". Max 4 terms, lowercase, hyphens. Examples: "buy MacBook or wait"→`macbook-timing`; "move to Berlin"→`berlin-relocation`
 
-## 1.2 Create Todo List
+## 1.2 Create Todo List (MANDATORY FIRST ACTION)
+
+**⚠️ CREATE THIS IMMEDIATELY** - before asking the user anything. This is the skeleton that prevents phase-skipping and context rot.
 
 ```
 - [ ] Phase 0 (foundation, stakeholders, characteristics)
