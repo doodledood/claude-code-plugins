@@ -8,6 +8,16 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [prompt-engineering] v1.8.2 - Refine `optimize-prompt-goal` skill for precision:
+  - Defined "goal effectiveness" as alignment + likelihood of achieving outcomes
+  - Added Required tools section documenting Task and TodoWrite dependencies
+  - Clarified input detection priority and file path fallback behavior
+  - Added empty file, binary file, and Write tool failure edge cases
+  - Replaced pseudocode loop with clearer prose format
+  - Added verifier failure retry semantics and Task tool mid-workflow handling
+  - Defined sensible defaults priority order (safety > completeness > clarity)
+  - Clarified "Preserve intent" with explicit contradiction criteria
+  - Added document order clarification for goal conflict resolution
 - [prompt-engineering] v1.8.1 - Refine `prompt-goal-verifier` agent for precision:
   - Added explicit priority tier definitions with full type mapping
   - Defined 4-criterion flagging threshold (specific harm, reproducible, actionable, net positive)
