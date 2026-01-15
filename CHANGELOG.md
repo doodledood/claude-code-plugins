@@ -8,6 +8,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [prompt-engineering] v1.8.1 - Refine `prompt-goal-verifier` agent for precision:
+  - Added explicit priority tier definitions with full type mapping
+  - Defined 4-criterion flagging threshold (specific harm, reproducible, actionable, net positive)
+  - Added low-confidence goal handling (goal-independent vs goal-dependent issues)
+  - Added guidance for edge cases: multiple goals, no-instruction prompts, example-only prompts
+  - Replaced vague thresholds with concrete criteria
+  - Standardized type names to singular form
 - [prompt-engineering] v1.8.0 - New `/optimize-prompt-goal` skill for goal effectiveness optimization:
   - Iteratively optimizes prompts to better achieve their stated goals
   - New `prompt-goal-verifier` agent checks 11 issue types across 3 dimensions:

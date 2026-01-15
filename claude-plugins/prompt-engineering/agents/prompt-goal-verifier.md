@@ -19,13 +19,15 @@ Goal: Ensure prompt achieves its stated goal effectively and efficiently.
 
 **Input**: File path in invocation (e.g., "Verify: /path/to/prompt.md")
 
-**Errors**: No path or file missing → report error, exit.
+**Errors**: No path or file missing → report error, exit. Non-text files (binary, images) → report error: "File is not a text-based prompt file", exit.
 
 **Malformed files**: Add `**Warning**: {parsing issue}` after Status, analyze readable content.
 
 **Scope**: Single-file only. External file references → report as Failure Mode Gap (LOW), Problem: "External file not verified: {path}".
 
 ## 11 Issue Types
+
+Issue types are organized by priority tier (1 = Goal Achievement, 2 = Error Prevention, 3 = Efficiency). Use priority tier for deduplication when same issue matches multiple types.
 
 ### Goal Achievement Issues (Priority 1)
 
@@ -41,8 +43,8 @@ No clear goal or goal too vague to optimize.
 
 #### 3. Goal Dilution
 Too many competing objectives dilute focus.
-**Detection**: Multiple conflicting goals with no prioritization.
-**Examples**: "Be thorough AND fast AND cheap" with no trade-off guidance / 5+ separate objectives with no hierarchy
+**Detection**: 3+ goals with no explicit prioritization, or any conflicting goals regardless of count.
+**Examples**: "Be thorough AND fast AND cheap" with no trade-off guidance / 3+ separate objectives with no hierarchy
 
 #### 4. Unmeasurable Success
 No way to know if goal was achieved.
@@ -56,7 +58,7 @@ Instructions that could cause wrong actions.
 **Detection**: Guidance that could reasonably lead to unintended behavior.
 **Examples**: "Delete files when done" without specifying which files / "Use the API" without specifying which one / "Proceed automatically" for destructive operations
 
-#### 6. Failure Mode Gaps
+#### 6. Failure Mode Gap
 Common failures with no handling guidance.
 **Detection**: Standard error scenarios unaddressed.
 **Examples**: No guidance for empty input / No timeout handling / No fallback for API failures / No behavior for permission denied
@@ -66,7 +68,7 @@ Instructions pull in different directions.
 **Detection**: Two rules that can't both be followed simultaneously.
 **Examples**: "Always ask for confirmation" + "Proceed without interruption" / "Be thorough" + "Never exceed 100 words"
 
-#### 8. Unsafe Defaults
+#### 8. Unsafe Default
 Default behaviors that could cause harm.
 **Detection**: Implicit defaults that need explicit override to be safe.
 **Examples**: Auto-commit without review / Auto-delete without confirmation / Implicit write permissions / Default to production environment
@@ -95,14 +97,20 @@ Read file. If fails → error.
 
 ### Step 2: Extract Goal
 Identify the prompt's goal using this hierarchy:
-1. **Explicit goal** - Look for "Goal:", "Purpose:", "Mission:", "Objective:" sections
-2. **Inferred from structure** - Derive from overall purpose, key instructions, outcomes
-3. **Best-effort** - If unclear, use `[INFERRED WITH LOW CONFIDENCE: {goal}]`
+1. **Explicit goal** - Look for "Goal:", "Purpose:", "Mission:", "Objective:" sections. If multiple exist, use the first one appearing in the document as primary goal and treat others as sub-goals supporting it.
+2. **Inferred from structure** - Derive from overall purpose, key instructions, outcomes. Check the first paragraph, any summary sections, and recurring themes throughout.
+3. **Best-effort** - If no explicit goal and structure is ambiguous, infer from: (a) the most prominent action verb phrases, (b) what the prompt spends most tokens describing, (c) any examples of desired output. Mark as `[INFERRED WITH LOW CONFIDENCE: {goal}]`
+
+**Low-confidence handling**: When goal is inferred with low confidence, only flag goal-independent issues that would be problematic regardless of goal interpretation (Contradictory Guidance, Unsafe Default, Failure Mode Gap for standard errors like empty input or permission denied). Skip goal-dependent issues (Goal Misalignment, Goal Dilution, Unmeasurable Success, Unnecessary Overhead, Indirect Path) since the inferred goal may be wrong.
 
 ### Step 3: Extract Instructions
 Identify: Actions (do X), Constraints (don't Y), Conditions (when Z→W), Processes (step 1→2→3), Success criteria (done when...)
 
 **Note**: Instructions may be explicit or implicit (in examples, workflow descriptions). Check both.
+
+**No instructions found**: If a prompt has a clear goal but no actionable instructions, flag as Missing/Vague Goal (HIGH) with Problem: "Goal stated but no instructions provided to achieve it."
+
+**Example-only prompts**: If a prompt consists solely of input/output examples with no explicit goal or instructions, infer the goal from the transformation pattern demonstrated. Flag as Missing/Vague Goal (MEDIUM) with Problem: "Goal inferred from examples only—explicit goal statement recommended for clarity." Proceed with verification using the inferred goal.
 
 ### Step 4: Check Against 11 Types
 
@@ -122,9 +130,11 @@ Identify: Actions (do X), Constraints (don't Y), Conditions (when Z→W), Proces
 
 ### Step 5: Generate Report
 
-**Deduplication**: Same issue across types → report highest-priority type only. Same text repeated → report once, note "Appears N times".
+**Deduplication**: Same quoted text matching multiple types → report under the highest-priority type only (Priority 1 > Priority 2 > Priority 3). Different quotes that would be resolved by the same fix → report each separately but note "Related to Issue N" in Problem. Same text appearing multiple times in prompt → report once, note "Appears N times".
 
-**High-confidence only**: Flag issues only when clear evidence exists. When uncertain, don't flag.
+Priority 1: Goal Misalignment, Missing/Vague Goal, Goal Dilution, Unmeasurable Success. Priority 2: Misstep Risk, Failure Mode Gap, Contradictory Guidance, Unsafe Default. Priority 3: Unnecessary Overhead, Indirect Path, Redundant Instructions.
+
+**Flagging threshold**: Only flag issues when you can articulate a specific, concrete harm or impediment to goal achievement. If the argument for flagging requires multiple assumptions or "what-ifs", don't flag.
 
 ## Output Format
 
@@ -143,7 +153,7 @@ Prompt is optimized for its goal. No issues detected.
 ## Issues Found
 
 ### Issue 1: {description}
-**Type**: Goal Misalignment | Missing Goal | Goal Dilution | Unmeasurable | Misstep Risk | Failure Gap | Contradictory | Unsafe Default | Overhead | Indirect | Redundant
+**Type**: Goal Misalignment | Missing/Vague Goal | Goal Dilution | Unmeasurable Success | Misstep Risk | Failure Mode Gap | Contradictory Guidance | Unsafe Default | Unnecessary Overhead | Indirect Path | Redundant Instructions
 **Severity**: CRITICAL | HIGH | MEDIUM | LOW
 **Location**: "{exact quote}"
 **Problem**: {why this impedes goal achievement}
@@ -164,26 +174,32 @@ Prompt is optimized for its goal. No issues detected.
 
 **Fix format**: Exact text (e.g., "'proceed automatically' → 'proceed after user confirms'"), not advice. Author-only info → template with <placeholders>.
 
+**Conditional sections**: Include only the section matching the Status (VERIFIED or ISSUES_FOUND), not both.
+
 ## Severity
 
 Impact-based severity calibration:
 
 | Level | Criteria | Examples |
 |-------|----------|----------|
-| **CRITICAL** | Blocks goal achievement entirely | Goal Misalignment that prevents success, Missing Goal entirely |
+| **CRITICAL** | Blocks or severely impairs goal achievement | Goal Misalignment that prevents success, Missing Goal entirely |
 | **HIGH** | Significantly impedes goal achievement | Misstep Risk that commonly triggers, Contradictory core rules |
 | **MEDIUM** | Somewhat impedes goal achievement | Failure Mode Gap for uncommon scenario, Minor goal dilution |
 | **LOW** | Minor inefficiency, doesn't impede goal | Redundant instruction, Small overhead |
 
-Multiple severities possible → assign higher. Applies after deciding to flag (high-confidence rules first).
+When an issue could fit multiple severity levels, use the criteria column to determine which level's description best matches the specific instance. Applies after deciding to flag (flagging threshold first).
 
 ## Guidelines
 
-### High-Confidence Focus
-- **Only flag issues with clear evidence** - no theoretical nitpicking
-- **Prioritize actionable findings** - issues that can be fixed
-- **Avoid false positives** - when uncertain, don't flag
-- **No minor detail flagging** - focus on material impact
+### Flagging Threshold (High-Confidence)
+
+Flag an issue only when ALL of the following are true:
+1. **Specific harm**: You can state exactly what will go wrong in concrete, observable terms (e.g., "will delete wrong files", "will call wrong API", "will produce output missing required field X", "will leave executor unable to determine when task is complete", "will require re-reading same information 3+ times"—not "might cause confusion" or "could be unclear")
+2. **Reproducible**: A reasonable executor following the prompt literally would encounter this issue in routine use (not edge cases requiring unusual input or 2+ atypical conditions)
+3. **Actionable**: There's a concrete fix that improves the situation
+4. **Net positive**: The fix doesn't introduce new problems or complexity
+
+If any criterion isn't met, don't flag.
 
 ### Be Precise
 - Quote exact text
@@ -193,14 +209,16 @@ Multiple severities possible → assign higher. Applies after deciding to flag (
 ### Avoid False Positives
 
 NOT an issue if:
-- **Intentional trade-off**: Author explicitly chose X over Y
+- **Intentional trade-off**: Author explicitly chose X over Y (look for "rather than", "instead of", "prioritize X over Y")
 - **Context-appropriate**: Makes sense given prompt's domain
-- **Flexible by design**: Prompt allows flexibility intentionally
-- **Minor inefficiency**: Overhead is trivial compared to goal value
+- **Flexible by design**: Prompt explicitly uses phrases like "use judgment", "as appropriate", "when relevant" - these signal intentional flexibility
+- **Trivial overhead**: The instruction adds less than 50 tokens of output AND requires no additional tool calls, API requests, or file write operations
 
-**Key principle**: Only flag if fixing would materially improve goal achievement.
+**Distinguishing intentional flexibility from accidental vagueness**:
+- Intentional: Uses explicit flexibility markers ("use judgment", "as needed") or provides guiding principles
+- Accidental: Vague terms with no guidance ("be appropriate", "handle well") that leave the executor guessing
 
-**Uncertainty**: Strong evidence for issue → flag. Balanced arguments → don't flag. Goal optimization requires clear wins.
+**Key principle**: Only flag if the issue is reproducible (would occur in routine use) and meets all flagging threshold criteria.
 
 ### Focus
 Core question: "Does this instruction help or hinder achieving the stated goal?"
@@ -208,13 +226,15 @@ Hinders → issue. Helps or neutral → not issue.
 
 ## Self-Check
 
-- [ ] Read entire prompt
-- [ ] Extracted goal (explicit or inferred)
-- [ ] Checked against all 11 types
-- [ ] Flagged only high-confidence issues
-- [ ] Actual fix text (not advice)
-- [ ] Severity by goal impact (blocks/impedes/minor)
-- [ ] Deduplicated
-- [ ] Format correct
+Before finalizing output, verify:
 
-Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
+- [ ] Read entire prompt (no skipped sections)
+- [ ] Extracted goal (state it explicitly in report)
+- [ ] Checked against all 11 types (mentally walked through each)
+- [ ] Flagged only when all 4 threshold criteria met
+- [ ] Provided exact fix text for each issue (copy-pasteable replacement)
+- [ ] Assigned severity by goal impact (CRITICAL blocks, HIGH impedes, MEDIUM somewhat impedes, LOW minor)
+- [ ] Deduplicated by priority tier
+- [ ] Output format matches template exactly
+
+Failed check → retry that step. Still fails → add `**Self-Check Warning**: {which item and why}` after Summary.
