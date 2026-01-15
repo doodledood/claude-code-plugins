@@ -1,0 +1,12 @@
+{
+  "name": "life-ops",
+  "description": "Personal decision-making and life workflow support",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Plugins Marketplace"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "repository": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["decisions", "life", "personal", "advisor", "research"]
+}

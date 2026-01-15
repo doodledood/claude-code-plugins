@@ -57,6 +57,14 @@
       "version": "1.0.0",
       "category": "development",
       "keywords": ["frontend", "design", "ui", "ux", "animation", "interactive"]
+    },
+    {
+      "name": "life-ops",
+      "source": "./claude-plugins/life-ops",
+      "description": "Personal decision-making advisor - helps you make confident choices through situation discovery, targeted research, and structured analysis",
+      "version": "1.0.0",
+      "category": "productivity",
+      "keywords": ["decisions", "life", "personal", "advisor", "research", "decision-making"]
     }
   ]
 }

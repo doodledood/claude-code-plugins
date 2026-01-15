@@ -20,6 +20,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems, author voice capture. |
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
+| `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
 
 ## Plugin Details
 
@@ -40,6 +41,9 @@ Two modes: `/review-prompt` (read-only analysis) and `/refine-prompt` (iterative
 
 ### frontend-design
 Frontend design patterns including scrollytelling (scroll-driven storytelling with pinned sections, progressive reveals, parallax effects).
+
+### life-ops
+Personal decision-making advisor. `/decide` guides you through situation discovery (underlying needs, time horizons, constraints), conducts targeted research, and applies a decision framework to produce ranked recommendations with tie-breakers.
 
 ## Contributing
 

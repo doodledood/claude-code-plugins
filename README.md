@@ -112,6 +112,12 @@ Frontend design patterns for distinctive, non-generic UI experiences.
 
 - `scrollytelling` - Scroll-driven storytelling with pinned sections, progressive reveals, and parallax effects
 
+### life-ops
+
+Personal decision-making advisor. Understands your situation first, then researches and recommends.
+
+- `/decide` - Situation discovery → targeted research → decision framework → ranked recommendation
+
 ## Repository Structure
 
 ```
@@ -124,7 +130,8 @@ claude-code-plugins/
 │   ├── vibe-extras/           # Git, docs, cleanup utilities
 │   ├── solo-dev/              # Customer profiles, brand, design docs
 │   ├── prompt-engineering/    # Prompt analysis and refinement
-│   └── frontend-design/       # Frontend design patterns
+│   ├── frontend-design/       # Frontend design patterns
+│   └── life-ops/              # Personal decision-making advisor
 └── README.md
 ```
 
