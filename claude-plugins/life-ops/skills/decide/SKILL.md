@@ -14,7 +14,7 @@ Guide users through personal decisions by understanding their situation first, t
 
 **Loop**: Assess stakes → Discover situation → Generate research brief → Execute research → Apply decision framework → Recommend (with tie-breakers if needed)
 
-**Decision log file**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory for tracking discovery and decisions.
+**Decision log file**: `/tmp/decide-{YYYYMMDD-HHMMSS}-{topic-slug}.md` - external memory for tracking discovery and decisions. Always create.
 
 **Resume capability**: If $ARGUMENTS contains an existing decision log path, read it and continue from the last checkpoint. Checkpoint = last completed todo item. To resume: read the log file, find todos, identify first unchecked item, continue from that phase. If a section is partially written, re-do that section from the start.
 
@@ -57,6 +57,24 @@ Guide users through personal decisions by understanding their situation first, t
    - **Low**: Keywords like product comparison, purchase under $500, which one, simple choice
 
 State: `**Stakes**: {level} — {reason}` then proceed.
+
+---
+
+# Coach's Discretion
+
+**The goal is helping them decide, not completing every phase.**
+
+These phases are guidance, not rigid requirements. Adapt based on what the user actually needs:
+
+| User Arrives With... | Adaptation |
+|---------------------|------------|
+| Rich context already provided | Condense discovery to verification questions |
+| Clear pre-thinking done | Focus on gaps and blind spots, not full walkthrough |
+| Preference for conversational flow | Use natural questions; reserve AskUserQuestion for structured choices |
+| Self-knowledge decision (career, relationship, life change) | Skip research entirely—answer is internal |
+| Simple choice with obvious criteria | Lighter discovery, but still use the log |
+
+**Stakes set a floor, not a ceiling**: Low stakes means you can go lighter. High stakes means you should be thorough. But if a "low stakes" choice clearly matters deeply to this user, adapt upward. If a "high stakes" decision is simple because the user already did the work, don't force unnecessary phases.
 
 ---
 
@@ -147,9 +165,37 @@ IN_PROGRESS
 
 ---
 
+# Fast Path: Pre-Processed Decisions
+
+Before full discovery, check if the user has already done significant thinking.
+
+**Signs the user is pre-processed**:
+- They've clearly identified the options ("choosing between X and Y")
+- They've articulated criteria ("mainly care about A and B")
+- They've explained their situation already
+- They're asking for confirmation, not exploration
+
+**If pre-processed, use condensed discovery**:
+
+1. **Verify understanding**: "So you're choosing between X and Y, and your main priorities are A and B—is that right?"
+2. **Probe for hidden constraints**: "Anything that would immediately eliminate one of these options?"
+3. **Check blind spots**: "Have you considered [likely overlooked factor given their situation]?"
+4. **Assess need for research**: "Do you need data on these options, or do you already know enough to decide?"
+
+Then proceed to research (if external decision) or decision framework (if self-knowledge decision).
+
+**Skip this fast path** if the user seems uncertain, conflicted, or hasn't articulated clear options/criteria.
+
+---
+
 # Phase 2: Situation Discovery
 
-**CRITICAL**: Use AskUserQuestion tool for ALL questions. If AskUserQuestion tool is unavailable, fall back to plain text questions with numbered options the user can respond to by number.
+**Question approach**:
+- Use AskUserQuestion when presenting structured choices (2-4 clear options the user should pick from)
+- Use natural conversational questions when exploring open-ended topics or following up on something the user said
+- If the user already provided context that answers a question, acknowledge it rather than re-asking
+- If the user requests conversational flow ("just ask me directly"), adapt accordingly
+- Fall back to plain text with numbered options only if AskUserQuestion tool is unavailable
 
 **"Other" option**: AskUserQuestion automatically includes an "Other (free text)" option. When user selects Other, their free text response should be treated as a new answer to consider and written to the log.
 
@@ -373,6 +419,22 @@ After discovery is complete, generate a precise research brief.
 
 ---
 
+# Decision Type Check
+
+Before research, classify the decision:
+
+| Type | Examples | Research Approach |
+|------|----------|-------------------|
+| **External** | Product choice, investment, service comparison, purchase | Web research valuable—facts and comparisons exist |
+| **Self-knowledge** | Career direction, relationship decision, life priorities, values clarification | Skip research—the answer is internal, not on the web |
+| **Hybrid** | Career change to new field, relocation to new city | Research external facts (job market, cost of living), but core answer is still internal |
+
+**For self-knowledge decisions**: Skip Phase 4 entirely. The user doesn't need data—they need clarity about their own values, fears, and priorities. Proceed directly to decision framework using discovered situation. Frame the output as "based on what you've told me" rather than "based on research."
+
+**For hybrid decisions**: Research the external facts, but explicitly note which parts are data-driven vs. which require the user's own judgment.
+
+---
+
 # Phase 4: Research Execution
 
 ## Primary Path: research-web Skill
@@ -584,24 +646,29 @@ Present the Decision Analysis from 5.3 to the user, including:
 | Principle | Rule |
 |-----------|------|
 | Situation first | Understand the person before collecting criteria |
-| AskUserQuestion preferred | Use AskUserQuestion tool; only fall back to plain text with numbered options if tool unavailable |
-| Write after each step | Decision log is external memory - write findings immediately |
-| Probe underlying needs | "What's driving that?" - don't take requirements at face value |
+| Adapt questioning style | Use AskUserQuestion for structured choices; natural questions for open exploration |
+| Write after each step | Decision log is external memory—write findings immediately |
+| Probe underlying needs | "What's driving that?"—don't take requirements at face value |
 | Stakes-calibrated depth | Low decisions need less discovery than life-changing ones |
 | Satisficing over optimizing | Minimum acceptable thresholds prevent paralysis |
 | Refresh before synthesis | Read full log before applying framework |
-| Clear recommendation | Always rank with #1 after tie-breakers resolved - present tie-breaker questions before declaring final #1 if options are genuinely close |
+| Clear recommendation | Always rank with #1 after tie-breakers resolved |
 | Acknowledge uncertainty | When confidence is Medium or Low, state so explicitly with reason |
+| Serve the goal | Help them decide—don't let process get in the way |
 
 ---
 
-# Never Do
+# Generally Avoid (Unless It Serves the User Better)
 
-- Ask questions without AskUserQuestion tool
-- Skip writing findings to decision log
-- Proceed to research without completing required discovery areas for the stakes level
-- Synthesize without reading full decision log first
-- Give recommendation without clear #1 ranking
-- Ignore user's stated constraints or priorities
-- Skip tie-breaker when top options are equal on #1 priority factor
-- Claim High confidence when research data is limited or options are close
+| Avoid | Unless |
+|-------|--------|
+| Asking without AskUserQuestion | Natural follow-up flows better, or user prefers conversational style |
+| Skipping log writes | Never—log is your working memory |
+| Skipping discovery areas | User clearly pre-processed those areas already |
+| Researching self-knowledge decisions | Answer is internal—research would waste time |
+| Synthesizing without log refresh | Never—read full log before final output |
+| Giving recommendation without #1 | Genuine tie requires tie-breaker questions first |
+| Ignoring stated constraints | User explicitly says "actually, that's flexible" |
+| Claiming High confidence | Research data is limited or options are close |
+
+**The test**: Would a skilled human decision coach do this? If yes, you can too.
