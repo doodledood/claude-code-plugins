@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-15
 
+- [life-ops] v1.7.1 - `/decide` skill: optimize information density (16% token reduction):
+  - Compressed verbose prose to terse bullets and tables
+  - Minified JSON templates while preserving structure
+  - Consolidated redundant instructions
+  - Verified lossless: all semantic content preserved
 - [life-ops] v1.7.0 - `/decide` skill: comprehensive quality/trust hardening (10-round verification):
   - Anti-anchoring: Underlying need probe sequence, sunk cost check moved early (2.1), option set completeness check
   - EBA flaw fix: Near-miss protection (10-15% threshold) prevents best options being eliminated on marginal misses
