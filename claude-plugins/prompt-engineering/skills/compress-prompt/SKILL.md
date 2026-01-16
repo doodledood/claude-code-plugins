@@ -1,30 +1,36 @@
 ---
 name: compress-prompt
-description: 'Compresses prompts/skills into single dense paragraphs for AI-readable context injection. Maximizes information density while preserving semantic meaning. Use when asked to compress, condense, summarize, or densify a prompt for token efficiency.'
+description: 'Compresses prompts/skills into minimal goal-focused instructions. Applies the Bitter Lesson: trust the model, drop what it already knows, maximize action space. Use when asked to compress, condense, or minimize a prompt.'
 ---
 
 # Compress Prompt
 
-Compress a full prompt or skill into a single dense paragraph **short enough to type inline**. LLMs can "decompress" dense notation back to full meaning.
+Compress a full prompt or skill into a **minimal instruction** that preserves the goal while maximizing model freedom. Trust the model's training—it knows more than your constraints.
 
 ## Overview
 
-**Goal**: Transform any prompt (even thousands of tokens) into ONE short paragraph a user could reasonably type—like a detailed instruction you'd give verbally.
+**Goal**: Transform any prompt into the minimal instruction needed. Not "preserve everything densely"—instead, "what's the least I need to say for the model to succeed?"
+
+**Philosophy (The Bitter Lesson)**:
+- 99% of the work is in the model itself
+- Models are trained on millions of examples—they know patterns you can't anticipate
+- Constraints often LIMIT the model rather than help it
+- Start with maximal capability, then restrict only what's necessary
 
 This skill compresses prompts through:
-1. **Initial Compression** - Aggressively compress using preservation hierarchy
-2. **Verification** - `prompt-compression-verifier` checks semantic fidelity
-3. **Refinement** - Fix issues based on verifier findings, iterate if needed (max 5 iterations)
+1. **Initial Compression** - Aggressively compress, trusting model's training
+2. **Verification** - `prompt-compression-verifier` checks goal clarity and flags over-specification
+3. **Refinement** - Fix critical issues, remove over-specification (max 5 iterations)
 4. **Output** - Display compressed paragraph + stats; optionally write to file
 
 **Loop**: Parse input → Compress → Verify → (Iterate if issues) → Output
 
 **Key principles**:
-- **Inline-typable brevity**: Short enough a user could type it; like a detailed verbal instruction
-- **Single paragraph**: ONE dense paragraph, not reformatted sections
-- **Prioritized preservation**: Core goal/constraints NEVER drop; everything else CAN drop
-- **Semantic encoding**: Dense notation so AI can reconstruct full meaning
-- **AI-readable**: Optimize for LLM parseability over human scannability
+- **Trust the model**: Don't tell it what it already knows from training
+- **Goal over process**: State WHAT, not HOW—let model choose approach
+- **Novel constraints only**: Keep only constraints the model wouldn't naturally follow
+- **Maximize action space**: Fewer constraints = more model freedom = better results
+- **Inline-typable brevity**: Short enough a user could type it verbally
 
 **Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally.
 
@@ -103,40 +109,64 @@ Compress using:
 
 1. **Preservation Hierarchy** (what to KEEP vs DROP):
 
-   | Priority | Content | Action |
-   |----------|---------|--------|
-   | 1 | Core goal/purpose | NEVER drop |
-   | 2 | Hard constraints (must/never/always) | NEVER drop |
-   | 3 | Critical edge cases | Keep if space; condense to pattern |
-   | 4 | Output format requirements | Keep structure, drop examples |
-   | 5 | Examples | DROP entirely or condense to "{pattern}" |
-   | 6 | Explanations/rationale | DROP (LLM can infer) |
-   | 7 | Formatting/style/headers | DROP entirely |
+   | Priority | Content | Action | Rationale |
+   |----------|---------|--------|-----------|
+   | 1 | Core goal/purpose | KEEP | Model needs to know WHAT to do |
+   | 2 | Novel constraints | KEEP | Counter-intuitive rules model wouldn't guess |
+   | 3 | Output artifacts | KEEP (brief) | File paths, format names if non-standard |
+   | 4 | Obvious constraints | DROP | Model does this naturally from training |
+   | 5 | Edge cases | DROP | Model handles edge cases from training |
+   | 6 | Process/phases | DROP | Model chooses its own approach |
+   | 7 | Examples | DROP | Model knows patterns |
+   | 8 | Explanations | DROP | Model can infer rationale |
+   | 9 | Formatting/style | DROP | Model knows professional defaults |
 
-2. **Compression Techniques**:
+2. **The Training Filter** (ask for EACH constraint):
+
+   > "Would a senior developer need to be told this, or would they figure it out?"
+
+   If model's training covers it → DROP. Examples of training-redundant content:
+   - "Handle errors gracefully" → model does this
+   - "Ask clarifying questions if unclear" → model does this
+   - "Be thorough" → model does this
+   - "Consider edge cases" → model does this
+   - "Structure output logically" → model does this
+   - "Use professional tone" → model does this
+   - Common workflow patterns → model knows these
+
+3. **Novel vs Obvious Constraints**:
+
+   | Type | Example | Action |
+   |------|---------|--------|
+   | Novel | "Never suggest implementation during spec phase" | KEEP - counter-intuitive |
+   | Novel | "Write findings to file BEFORE proceeding" | KEEP - specific discipline |
+   | Novel | "Use AskUserQuestion tool, not inline questions" | KEEP - tool-specific |
+   | Obvious | "Be helpful and thorough" | DROP - model default |
+   | Obvious | "Handle empty input" | DROP - model default |
+   | Obvious | "Validate before proceeding" | DROP - model default |
+
+4. **Compression Techniques**:
+   - State goal in first sentence
+   - Add only novel constraints
+   - Specify output artifact if non-obvious
+   - Omit process—let model decide HOW
    - Semicolons chain related statements
-   - Omit articles ("the", "a")
-   - Use arrows for flow: A→B→C
-   - Condense conditionals: "if X→Y; else→Z"
-   - Merge phases into flow: "Phase1(do X)→Phase2(do Y)"
-   - Drop all headers, bullets, structure—flatten to prose
-   - Tables → dense prose: "stakes: low→quick; high→thorough"
-   - Examples → pattern only: "e.g., {X}" not full example
-   - Assume LLM knowledge of common concepts
-   - Code blocks: keep only if essential; otherwise describe pattern
+   - Use arrows sparingly: only for truly sequential dependencies
+   - Drop all structure—flatten to prose
 
-3. **Self-check before writing**:
-   - Is it ONE paragraph? (no headers, no bullets, no structure)
-   - Is it short enough to type inline? (not pages of text)
-   - Would reformatting this back out recover the core workflow?
+5. **Action Space Check** (before finalizing):
+   - Does this leave model FREE to solve the problem its own way?
+   - Am I prescribing process, or just stating the goal?
+   - Could the model achieve this with LESS instruction?
+   - If I removed this constraint, would the model fail? If no → remove it.
 
-**Output format**: Single cohesive paragraph. No bullet points, no headers, no newlines. Short enough a user could type it.
+**Output format**: Single cohesive paragraph. Goal + novel constraints + output artifact. That's it.
 
 **Step 2.3: Verify compression**
 
 Launch prompt-compression-verifier agent via Task tool:
 - subagent_type: "prompt-engineering:prompt-compression-verifier"
-- prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: core goal present, hard constraints preserved, no ambiguity introduced, semantic meaning faithful, critical edge cases captured. Report VERIFIED or ISSUES_FOUND with specific details."
+- prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: goal is clear, novel constraints preserved, action space is open, no over-specification. Flag any training-redundant content that should be removed. Report VERIFIED or ISSUES_FOUND."
 
 **Step 2.4: Handle verifier response**
 
@@ -168,7 +198,7 @@ For each iteration from 1 to 5:
 
 2. **Re-verify**: Launch prompt-compression-verifier agent via Task tool:
    - subagent_type: "prompt-engineering:prompt-compression-verifier"
-   - prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: core goal present, hard constraints preserved, no ambiguity introduced, semantic meaning faithful, critical edge cases captured. Report VERIFIED or ISSUES_FOUND with specific details."
+   - prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: goal is clear, novel constraints preserved, action space is open, no over-specification. Flag any training-redundant content that should be removed. Report VERIFIED or ISSUES_FOUND."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
@@ -231,23 +261,24 @@ Unresolved issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Inline-typable** | Short enough a user could type it; like a verbal instruction |
-| **ONE paragraph** | No headers, no bullets, no structure—flatten everything |
-| **Compress then verify** | Compress aggressively first, verifier catches issues |
-| **Preservation hierarchy** | Goal/constraints NEVER drop; explanations/examples DROP |
-| **AI-readable** | Dense notation acceptable; human readability secondary |
-| **Track progress** | TodoWrite for phases; expand on iteration |
+| **Trust the model** | Don't tell it what it already knows—it's trained on millions of examples |
+| **Goal over process** | State WHAT to achieve, not HOW to do it |
+| **Novel constraints only** | Keep only counter-intuitive rules model wouldn't naturally follow |
+| **Maximize action space** | Fewer constraints = more freedom = better results |
+| **Training filter** | "Would a senior dev need to be told this?" If no → drop |
+| **Inline-typable** | Short enough to type verbally—like instructing a capable colleague |
 | **Non-destructive** | Original file untouched; display output (+ optional file save) |
 
 ## Common Mistakes to Avoid
 
-| Mistake | Fix |
-|---------|-----|
-| Reformatting instead of compressing | DROP structure entirely; one paragraph |
-| Keeping phase headers | Merge into flow: "Phase1→Phase2→Phase3" |
-| Keeping bullet points | Convert to semicolon-separated prose |
-| Keeping full examples | Drop or condense to pattern: "{X}" |
-| Output still thousands of tokens | Be more aggressive; drop more |
+| Mistake | Why It's Wrong | Fix |
+|---------|----------------|-----|
+| Preserving "obvious" constraints | Model does these naturally | Apply training filter—drop them |
+| Keeping process/phases | Constrains model's approach | State goal only, let model decide how |
+| Keeping edge case handling | Model handles edge cases from training | Trust the model |
+| Dense but still long | Preserved too much | Ask "would model fail without this?" |
+| Prescribing tools/methods | Limits action space | State goal, not implementation |
+| "Be thorough/professional" | Training-redundant | Drop entirely |
 
 ## Edge Cases
 
@@ -279,15 +310,24 @@ Unresolved issues:
 
 ## Example Output
 
+**Before (Bitter Lesson approach)**:
 ```
 Compressed: prompts/code-reviewer.md
 
 Original: 1,247 tokens
-Compressed: 156 tokens (87.5% reduction)
+Compressed: 52 tokens (95.8% reduction)
 
 ---
-Code reviewer agent: analyze code for bugs, security issues, performance problems; flag severity (critical/high/medium/low); suggest fixes with code snippets; never approve code with critical issues; output JSON {file, line, issue, severity, fix}; handle empty input by requesting code; for large files process in chunks max 500 lines.
+Review code for bugs, security issues, performance problems. Output JSON {file, line, issue, severity, fix}. Never approve code with critical issues.
 ---
 
-Verification: PASSED (2 iterations)
+Verification: PASSED (1 iteration)
 ```
+
+**What was dropped and why**:
+- "suggest fixes with code snippets" → model does this naturally when finding issues
+- "handle empty input by requesting code" → model handles edge cases from training
+- "for large files process in chunks max 500 lines" → model manages context naturally
+- "flag severity" → implied by severity field in output format
+
+**The only novel constraint kept**: "Never approve code with critical issues" — counter-intuitive (model might default to always providing approval with caveats).

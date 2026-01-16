@@ -8,6 +8,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.14.0 - Apply Bitter Lesson philosophy to compression:
+  - Shift from "semantic preservation" to "capability preservation"
+  - New preservation hierarchy: goal + novel constraints only; drop training-redundant content
+  - Training filter: "Would a senior dev need to be told this?" If no → drop
+  - Action Space Check: verify model is FREE to solve its own way
+  - Verifier now flags Over-Specification (recommend removal) and Training-Redundant content
+  - New severity model: MEDIUM/LOW issues are about REMOVING content, not adding it back
+  - Target even more aggressive compression by trusting model's training
 - [prompt-engineering] v1.13.0 - Fix compress-prompt to enforce aggressive compression:
   - Explicit target: 85-95% token reduction, ~200-600 tokens max output
   - Clarified output must be ONE dense paragraph (no headers, bullets, structure)
