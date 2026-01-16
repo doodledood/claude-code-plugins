@@ -15,7 +15,18 @@ Verify that prompt compression achieves **goal clarity with maximum action space
 - 99% of the work is in the model itself
 - Models are trained on millions of examples—they know more than your constraints
 - Constraints often LIMIT the model rather than help it
-- Good compression = clear goal + novel constraints only + open action space
+- Good compression = clear goal + novel constraints + execution discipline + open action space
+
+**Critical Distinction: Trust Model's KNOWLEDGE, Not Its DISCIPLINE**
+
+| Trust (DROP) | Don't Trust (KEEP) |
+|--------------|-------------------|
+| HOW to do a task (capability) | To write findings before proceeding |
+| Professional defaults | To not declare "done" prematurely |
+| Edge case handling | To remember context after 50k tokens |
+| How to structure output | To self-verify without being told |
+
+Models know HOW to do tasks. But they cut corners, forget context, skip verification, and declare victory too early. **Execution discipline guardrails are NOT over-specification—they address model weaknesses.**
 
 ## Mission
 
@@ -40,14 +51,23 @@ Content ranked by what MUST vs SHOULD vs CAN be dropped:
 |----------|--------------|------|-----------|
 | 1 | Core goal/purpose | MUST be present | Model needs to know WHAT to do |
 | 2 | Novel constraints | MUST be present | Counter-intuitive rules model wouldn't guess |
+| 2 | Execution discipline | MUST be present | Guardrails against laziness, premature completion, context loss |
 | 3 | Output artifacts | SHOULD be present | File paths, format names if non-standard |
 | 4 | Obvious constraints | CAN be dropped | Model does this from training |
 | 5 | Edge cases | CAN be dropped | Model handles naturally |
-| 6 | Process/phases | CAN be dropped | Model chooses its own approach |
+| 6 | Process/phases (capability) | CAN be dropped | Model chooses its own approach |
 | 7 | Examples | CAN be dropped | Model knows patterns |
 | 8 | Explanations | CAN be dropped | Model infers rationale |
 
 **Key shift**: Missing Priority 4-8 content is NOT an issue—it's expected. Only flag missing Priority 1-2 content.
+
+**Execution Discipline Defined**: Guardrails that address model weaknesses, not capability gaps:
+- "Write findings to file BEFORE proceeding" — prevents context rot
+- "Don't finalize until X, Y, Z confirmed" — prevents premature completion
+- "Read full log before synthesis" — restores lost context
+- "Verify each step before moving on" — prevents skipped verification
+
+These are Priority 2 MUST-KEEP content—do NOT flag as over-specification.
 
 ## Issue Types
 
@@ -85,18 +105,23 @@ Compressed meaning differs from original in a way that changes behavior.
 **Examples**: "Prefer JSON" vs original "Always output JSON"; "review code" vs original "review code for security issues specifically"
 **Severity**: CRITICAL if core behavior; HIGH if notable
 
-#### 5. Over-Specification (NEW - flag for REMOVAL)
+#### 5. Over-Specification (flag for REMOVAL)
 Compressed contains content that constrains model's natural capability.
 **Detection**:
-- Prescribes specific process when goal would suffice
+- Prescribes specific CAPABILITY process when goal would suffice
 - Includes constraints model would follow naturally
-- Limits HOW the model can solve the problem
+- Limits HOW the model can solve the problem (capability, not discipline)
 **Examples**:
 - "Ask clarifying questions" → model does this naturally
 - "Handle errors gracefully" → model does this naturally
-- "Phase 1: do X, Phase 2: do Y" → constrains model's approach
+- "Phase 1: do X, Phase 2: do Y" → constrains model's approach (IF pure capability)
+**NOT over-specification (execution discipline—DO NOT FLAG)**:
+- "Write findings BEFORE proceeding" → prevents context rot
+- "Don't finalize until X verified" → prevents premature completion
+- "Read full log before synthesis" → restores lost context
 **Severity**: MEDIUM—recommend removal to increase action space
 **Action**: Suggest removing this content, not adding it back
+**Critical**: Before flagging process content, ask "Is this addressing model weakness (discipline) or capability gap?" Only flag capability constraints.
 
 #### 6. Training-Redundant Content (NEW - flag for REMOVAL)
 Compressed contains content the model already knows from training.
@@ -118,8 +143,12 @@ Compressed prescribes implementation details that limit how model can achieve th
 **Examples**:
 - "Use grep to search" when any search method works
 - "Create a loop that..." when model could choose approach
-- Detailed step-by-step when goal is sufficient
+- Detailed step-by-step CAPABILITY instructions when goal is sufficient
+**NOT action space restriction (execution discipline—DO NOT FLAG)**:
+- Sequential discipline like "write BEFORE proceeding" — addresses model weakness
+- Verification gates like "don't finalize until confirmed" — prevents premature completion
 **Severity**: MEDIUM—recommend removal to maximize freedom
+**Critical**: Discipline guardrails don't restrict action space—they ensure the model doesn't cut corners. Only flag capability restrictions.
 
 ## Verification Process
 
@@ -152,40 +181,60 @@ Before checking semantics, verify the compressed output meets format requirement
 
 **If goal unclear** → CRITICAL issue "Goal Ambiguity".
 
-### Step 4: Identify Novel Constraints in Original
+### Step 4: Identify Novel Constraints and Execution Discipline in Original
 
-Scan original for constraints that are COUNTER-INTUITIVE—rules the model wouldn't naturally follow:
+Scan original for:
+1. **Novel constraints** — counter-intuitive rules the model wouldn't naturally follow
+2. **Execution discipline** — guardrails against model weaknesses (both are Priority 2)
 
 **Novel constraint indicators**:
 - Goes against typical helpful behavior ("never suggest implementation")
 - Specific tool requirements ("use AskUserQuestion, not inline questions")
-- Counter-intuitive sequencing ("write to file BEFORE proceeding")
 - Domain-specific rules model wouldn't know
 
-**NOT novel** (training-covered):
+**Execution discipline indicators** (KEEP—addresses model weaknesses):
+- "Write findings/results BEFORE proceeding" — prevents context rot
+- "Don't finalize/complete until X verified" — prevents premature completion
+- "Read full log/file before synthesis/output" — restores lost context
+- "Verify/confirm X before moving to Y" — prevents skipped verification
+- "Mark todo complete only after X" — prevents false completion
+
+**NOT novel or discipline** (training-covered—CAN drop):
 - "Be thorough" / "Be helpful"
 - "Handle errors" / "Validate input"
 - "Ask clarifying questions"
 - "Structure output clearly"
 
-**For each novel constraint**: Verify it exists in compressed. If missing → CRITICAL/HIGH issue.
+**For each novel constraint AND discipline guardrail**: Verify it exists in compressed. If missing → CRITICAL/HIGH issue.
 
-### Step 5: Check for Over-Specification (NEW)
+### Step 5: Check for Over-Specification
 
 Scan compressed for content that SHOULD BE REMOVED:
 
 **Over-specification checks**:
-1. Does compressed prescribe process/phases? → Flag for removal
+1. Does compressed prescribe CAPABILITY process/phases? → Flag for removal
 2. Does compressed include "obvious" constraints? → Flag for removal
-3. Does compressed limit HOW model can solve? → Flag for removal
+3. Does compressed limit HOW model can solve (capability)? → Flag for removal
 
-**Training-redundant checks**:
+**EXCEPTION: Execution Discipline is NOT Over-Specification**
+
+Before flagging process-related content, ask: "Is this addressing model weakness or capability gap?"
+
+| Flag for Removal (capability) | DO NOT Flag (discipline) |
+|------------------------------|--------------------------|
+| "Phase 1: Research, Phase 2: Analyze" | "Write findings BEFORE analysis" |
+| "First do X, then do Y, then do Z" | "Don't finalize until X verified" |
+| "Use this specific algorithm" | "Read full log before synthesis" |
+| "Structure output as header then body" | "Verify each step before moving on" |
+
+**Training-redundant checks** (flag for removal):
 - "Ask clarifying questions" → model does this
 - "Handle edge cases" → model does this
 - "Be professional" → model does this
 - Common workflow patterns → model knows these
 
 **For each over-specification**: Flag as MEDIUM issue with "recommend removal".
+**For execution discipline**: Do NOT flag—these are Priority 2 MUST-KEEP.
 
 ### Step 6: Check Action Space
 
@@ -328,6 +377,17 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 **Problem**: Prescribes specific process; model could find better approach
 **Suggested**: Replace with "Output JSON {file, line, issue, fix}" — state output, not process
 
+### Execution Discipline Correctly Kept (VERIFIED - NOT over-specification)
+
+**Compressed**: "Research topic via web search; write findings to log file BEFORE synthesis; read full log before final output; output summary to /tmp/research-*.md."
+**Why good**:
+- Goal clear (research topic)
+- Discipline guardrails present:
+  - "write findings to log file BEFORE synthesis" — prevents context rot
+  - "read full log before final output" — restores lost context
+- These are NOT over-specification—they address model weaknesses
+- Action space open for HOW to research (model chooses approach)
+
 ### Good Compression (VERIFIED)
 
 **Compressed**: "Build requirements spec for $ARGUMENTS via user interview. Write to /tmp/spec-*.md. Define WHAT not HOW. Never suggest implementation."
@@ -358,15 +418,23 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 | What's Present | Why It's Fine |
 |----------------|---------------|
 | Novel constraints | Counter-intuitive rules are essential |
+| Execution discipline | Addresses model weaknesses, not capability gaps |
 | Specific output format | If non-standard, model needs to know |
 | Tool-specific requirements | "Use AskUserQuestion" is novel |
 | Domain-specific rules | Model may not know these |
 
-**Key question**: "Would model fail or behave wrong without this?"
-- If YES → keep it (novel constraint)
-- If NO → remove it (training-covered)
+**Execution discipline examples (NEVER flag as over-specification)**:
+- "Write findings to file BEFORE proceeding"
+- "Don't finalize until X, Y, Z confirmed"
+- "Read full log before synthesis"
+- "Verify constraint before moving on"
 
-**Remember**: The goal is MAXIMUM ACTION SPACE. When in doubt about whether to flag for removal, ask "does this constrain the model?"
+**Key questions**:
+1. "Would model fail or behave wrong without this?" → If YES → keep it (novel constraint)
+2. "Does this address model cutting corners/forgetting/skipping?" → If YES → keep it (execution discipline)
+3. Neither? → remove it (training-covered)
+
+**Remember**: The goal is MAXIMUM ACTION SPACE for CAPABILITY, not for DISCIPLINE. Discipline guardrails are essential—don't flag them.
 
 ## Self-Check
 
@@ -376,12 +444,17 @@ Before finalizing output, verify:
 - [ ] Checked format (single paragraph, inline-typable)
 - [ ] Verified goal clarity (unambiguous what to do/produce)
 - [ ] Identified novel constraints in original
+- [ ] Identified execution discipline in original (write-before, verify-before, read-before patterns)
 - [ ] Verified novel constraints present in compressed
-- [ ] Checked for over-specification (flagged for removal)
+- [ ] Verified execution discipline present in compressed (NOT flagged as over-specification)
+- [ ] Checked for over-specification (flagged for removal—but NOT discipline guardrails)
 - [ ] Checked for training-redundant content (flagged for removal)
-- [ ] Assessed action space (open vs restricted)
+- [ ] Assessed action space (open vs restricted for CAPABILITY, not discipline)
 - [ ] Output format matches template
 
-**Key verification question**: "Does this compressed prompt give the model a clear goal with maximum freedom to achieve it?"
+**Key verification questions**:
+1. "Does this compressed prompt give the model a clear goal with maximum freedom to achieve it?"
+2. "Are discipline guardrails preserved (write-before, verify-before, read-before)?"
+3. "Did I accidentally flag discipline as over-specification?"
 
 Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.

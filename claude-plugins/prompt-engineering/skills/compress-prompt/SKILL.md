@@ -17,6 +17,17 @@ Compress a full prompt or skill into a **minimal instruction** that preserves th
 - Constraints often LIMIT the model rather than help it
 - Start with maximal capability, then restrict only what's necessary
 
+**Critical Distinction: Trust Model's KNOWLEDGE, Not Its DISCIPLINE**
+
+| Trust (DROP) | Don't Trust (KEEP) |
+|--------------|-------------------|
+| HOW to do a task (capability) | To write findings before proceeding |
+| Professional defaults | To not declare "done" prematurely |
+| Edge case handling | To remember context after 50k tokens |
+| How to structure output | To self-verify without being told |
+
+Models know HOW to do tasks. But they cut corners, forget context, skip verification, and declare victory too early. Execution discipline guardrails address model WEAKNESSES, not capability gaps—these must be preserved.
+
 This skill compresses prompts through:
 1. **Initial Compression** - Aggressively compress, trusting model's training
 2. **Verification** - `prompt-compression-verifier` checks goal clarity and flags over-specification
@@ -113,13 +124,20 @@ Compress using:
    |----------|---------|--------|-----------|
    | 1 | Core goal/purpose | KEEP | Model needs to know WHAT to do |
    | 2 | Novel constraints | KEEP | Counter-intuitive rules model wouldn't guess |
+   | 2 | Execution discipline | KEEP | Guardrails against laziness, premature completion, context loss |
    | 3 | Output artifacts | KEEP (brief) | File paths, format names if non-standard |
    | 4 | Obvious constraints | DROP | Model does this naturally from training |
    | 5 | Edge cases | DROP | Model handles edge cases from training |
-   | 6 | Process/phases | DROP | Model chooses its own approach |
+   | 6 | Process/phases (capability) | DROP | Model chooses its own approach |
    | 7 | Examples | DROP | Model knows patterns |
    | 8 | Explanations | DROP | Model can infer rationale |
    | 9 | Formatting/style | DROP | Model knows professional defaults |
+
+   **Execution Discipline Defined**: Guardrails that address model weaknesses, not capability gaps:
+   - "Write findings to file BEFORE proceeding" — prevents context rot
+   - "Don't finalize until X, Y, Z confirmed" — prevents premature completion
+   - "Read full log before synthesis" — restores lost context
+   - "Verify each step before moving on" — prevents skipped verification
 
 2. **The Training Filter** (ask for EACH constraint):
 
@@ -141,11 +159,16 @@ Compress using:
    | Type | Example | Action |
    |------|---------|--------|
    | Novel | "Never suggest implementation during spec phase" | KEEP - counter-intuitive |
-   | Novel | "Write findings to file BEFORE proceeding" | KEEP - specific discipline |
    | Novel | "Use AskUserQuestion tool, not inline questions" | KEEP - tool-specific |
+   | Discipline | "Write findings to file BEFORE proceeding" | KEEP - prevents context rot |
+   | Discipline | "Don't finalize until all tests pass" | KEEP - prevents premature completion |
+   | Discipline | "Read full log before synthesis" | KEEP - restores lost context |
+   | Discipline | "Verify constraint X before moving on" | KEEP - prevents skipped verification |
    | Obvious | "Be helpful and thorough" | DROP - model default |
    | Obvious | "Handle empty input" | DROP - model default |
    | Obvious | "Validate before proceeding" | DROP - model default |
+
+   **Why discipline guardrails are KEPT**: They address model weaknesses (cutting corners, forgetting context, declaring "done" too early), not capability gaps. The model KNOWS how to write to a file—it just won't do it reliably without being told.
 
 4. **Compression Techniques**:
    - State goal in first sentence
@@ -263,10 +286,12 @@ Unresolved issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Trust the model** | Don't tell it what it already knows—it's trained on millions of examples |
+| **Trust the model's knowledge** | Don't tell it what it already knows—it's trained on millions of examples |
+| **Don't trust model's discipline** | Keep guardrails against laziness, premature completion, context loss |
 | **Goal over process** | State WHAT to achieve, not HOW to do it |
 | **Novel constraints only** | Keep only counter-intuitive rules model wouldn't naturally follow |
-| **Maximize action space** | Fewer constraints = more freedom = better results |
+| **Execution discipline** | Keep "write before proceeding", "verify before finalizing", "read before synthesis" |
+| **Maximize action space** | Fewer capability constraints = more freedom = better results |
 | **Training filter** | "Would a competent person need to be told this?" If no → drop |
 | **Inline-typable** | Short enough to type verbally—like instructing a capable colleague |
 | **Non-destructive** | Original file untouched; display output (+ optional file save) |
@@ -276,11 +301,14 @@ Unresolved issues:
 | Mistake | Why It's Wrong | Fix |
 |---------|----------------|-----|
 | Preserving "obvious" constraints | Model does these naturally | Apply training filter—drop them |
-| Keeping process/phases | Constrains model's approach | State goal only, let model decide how |
+| Keeping capability process/phases | Constrains model's approach | State goal only, let model decide how |
+| Dropping discipline guardrails | Model cuts corners without them | Keep "write before proceeding", "verify before finalizing" |
 | Keeping edge case handling | Model handles edge cases from training | Trust the model |
 | Dense but still long | Preserved too much | Ask "would model fail without this?" |
 | Prescribing tools/methods | Limits action space | State goal, not implementation |
 | "Be thorough/professional" | Training-redundant | Drop entirely |
+
+**Key distinction**: "Phase 1: Research, Phase 2: Analyze" is droppable capability process. "Write findings BEFORE analysis" is essential discipline—model will skip it otherwise.
 
 ## Edge Cases
 
