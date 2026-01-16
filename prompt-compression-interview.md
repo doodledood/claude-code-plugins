@@ -95,6 +95,24 @@ This is a fundamentally different use case - not optimization but radical summar
 **Example**: "WWF (wildlife)" not just "WWF" if context doesn't clarify.
 **Implication**: Compression should leverage shared LLM knowledge but not introduce ambiguity.
 
+### D7: Input Format
+**Decision**: File path + inline
+**Rationale**: More flexible - accept both file paths and inline text.
+**Implication**: Need input type detection (file path vs inline content).
+
+### D8: Output Destination
+**Decision**: Display + optional file
+**Rationale**: Display by default, with optional flag to save to file.
+**Implication**: Add `--output path` or similar flag for file output.
+
+### D9: Verification
+**Decision**: Agent verification (follow existing plugin pattern)
+**Rationale**: Use verification loop like other skills in prompt-engineering plugin.
+**Implication**: Need a `prompt-compression-verifier` agent that checks:
+- All high-priority elements preserved
+- No ambiguity introduced
+- Compression is semantically faithful
+
 ---
 
 ## Open Questions
@@ -105,7 +123,7 @@ This is a fundamentally different use case - not optimization but radical summar
 
 ## Spec Evolution
 
-### Draft v3
+### Draft v4
 
 ---
 **name**: compress-prompt
@@ -154,12 +172,35 @@ Highest to lowest priority (drop from bottom when compressing):
 
 ## Input/Output
 
-- **Input**: [TBD - file path only? inline? both?]
-- **Output**: [TBD - display only? save to file? both?]
+**Input**: File path OR inline text
+- File path detection: contains `/` or `\`, OR ends with `.md`, `.txt`, `.yaml`, `.yml`
+- Inline: write to temp file for processing
 
-## Verification
+**Output**: Display to terminal by default
+- Optional `--output <path>` flag to save compressed output to file
+- Always show compression stats (original tokens → compressed tokens, ratio)
 
-[TBD - need verification loop? or simpler single-pass?]
+## Workflow
+
+1. **Input validation** - Parse arguments, detect input type, read content
+2. **Initial compression** - Apply compression techniques with preservation hierarchy
+3. **Verification loop** (max 5 iterations):
+   - Launch `prompt-compression-verifier` agent
+   - Check: high-priority elements preserved, no ambiguity introduced, semantic fidelity
+   - If VERIFIED: proceed to output
+   - If ISSUES_FOUND: refine and re-verify
+4. **Output** - Display compressed paragraph + stats; optionally write to file
+
+## Verifier Agent
+
+`prompt-compression-verifier` checks:
+- [ ] Core goal/purpose present and accurate
+- [ ] Hard constraints/rules preserved
+- [ ] No ambiguous terms introduced
+- [ ] Semantic meaning faithful to original
+- [ ] Critical edge cases captured (if present in original)
+
+Reports: VERIFIED or ISSUES_FOUND with specific missing/problematic elements.
 
 ## Edge Cases
 
