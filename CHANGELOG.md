@@ -8,7 +8,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
-- [prompt-engineering] v1.14.0 - Apply Bitter Lesson philosophy to compression:
+- [prompt-engineering] v1.14.0 - Trust-the-model compression philosophy:
   - Shift from "semantic preservation" to "capability preservation"
   - New preservation hierarchy: goal + novel constraints only; drop training-redundant content
   - Training filter: "Would a competent person doing this task need to be told this?" If no → drop

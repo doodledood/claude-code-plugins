@@ -1,6 +1,6 @@
 ---
 name: compress-prompt
-description: 'Compresses prompts/skills into minimal goal-focused instructions. Applies the Bitter Lesson: trust the model, drop what it already knows, maximize action space. Use when asked to compress, condense, or minimize a prompt.'
+description: 'Compresses prompts/skills into minimal goal-focused instructions. Trusts the model, drops what it already knows, maximizes action space. Use when asked to compress, condense, or minimize a prompt.'
 ---
 
 # Compress Prompt
@@ -11,7 +11,7 @@ Compress a full prompt or skill into a **minimal instruction** that preserves th
 
 **Goal**: Transform any prompt into the minimal instruction needed. Not "preserve everything densely"—instead, "what's the least I need to say for the model to succeed?"
 
-**Philosophy (The Bitter Lesson)**:
+**Philosophy**:
 - 99% of the work is in the model itself
 - Models are trained on millions of examples—they know patterns you can't anticipate
 - Constraints often LIMIT the model rather than help it
@@ -312,7 +312,7 @@ Unresolved issues:
 
 ## Example Output
 
-**Before (Bitter Lesson approach)**:
+**Example**:
 ```
 Compressed: prompts/code-reviewer.md
 

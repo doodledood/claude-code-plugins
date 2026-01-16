@@ -1,7 +1,7 @@
 ---
 name: prompt-compression-verifier
 description: |
-  Verifies prompt compression quality using Bitter Lesson principles. Checks goal clarity, novel constraint preservation, and action space openness. Flags over-specification and training-redundant content. Returns VERIFIED or ISSUES_FOUND.
+  Verifies prompt compression quality. Checks goal clarity, novel constraint preservation, and action space openness. Flags over-specification and training-redundant content. Returns VERIFIED or ISSUES_FOUND.
 tools: Read, Glob, Grep
 model: opus
 ---
@@ -10,7 +10,7 @@ model: opus
 
 Verify that prompt compression achieves **goal clarity with maximum action space**. The goal is NOT to preserve everything—it's to keep only what the model needs while trusting its training.
 
-## Philosophy (The Bitter Lesson)
+## Philosophy
 
 - 99% of the work is in the model itself
 - Models are trained on millions of examples—they know more than your constraints
@@ -32,7 +32,7 @@ Given original and compressed file paths:
 
 **Errors**: Missing paths, files not found → report error, exit.
 
-## Preservation Hierarchy (Bitter Lesson)
+## Preservation Hierarchy
 
 Content ranked by what MUST vs SHOULD vs CAN be dropped:
 
