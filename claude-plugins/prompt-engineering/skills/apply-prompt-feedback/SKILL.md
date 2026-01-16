@@ -10,18 +10,18 @@ Apply user feedback to prompts with calibrated precision—addressing feedback i
 ## Overview
 
 This skill applies feedback through:
-1. **Verification First** - `prompt-feedback-verifier` checks if prompt already incorporates feedback
-2. **Application** - Apply targeted changes based on verifier findings
-3. **Re-verification** - Verify changes, iterate if issues remain (max 5 iterations)
+1. **Initial Application** - Apply feedback to prompt using Application Techniques
+2. **Verification** - `prompt-feedback-verifier` checks for issues (over-fitting, regression, density loss)
+3. **Refinement** - Fix issues based on verifier findings, iterate if needed (max 5 iterations)
 4. **Output** - Atomic replacement only after verification passes
 
-**Loop**: Gather inputs → Verify → (Exit if already optimal) → Apply based on feedback → Re-verify → (Iterate if issues) → Output
+**Loop**: Gather inputs → Copy → Apply feedback → Verify → (Iterate if issues) → Output
 
 **Key principles**:
 - **Just-right application**: Address ALL of feedback, ONLY feedback, nothing more
 - **Information density**: Use minimal text to achieve the change
 - **Regression prevention**: Preserve everything feedback didn't mention
-- **Verifier-driven**: Changes driven by verifier findings, not independent analysis
+- **Verifier validates**: Verifier catches over-fitting, under-fitting, and regressions
 
 **Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally.
 
@@ -33,8 +33,8 @@ Create todos tracking workflow phases:
 
 ```
 - [ ] Input validation
-- [ ] Initial verification (run verifier first)
-- [ ] (expand on ISSUES_FOUND: application iteration 1, 2, 3...)
+- [ ] Initial application (apply feedback, then verify)
+- [ ] (expand on ISSUES_FOUND: refinement iteration 1, 2, 3...)
 - [ ] Output updated prompt
 ```
 
@@ -92,45 +92,51 @@ questions: [
 
 **Mark "Input validation" todo `completed`.**
 
-### Phase 2: Initial Verification
+### Phase 2: Initial Application
 
-**Mark "Initial verification" todo `in_progress`.**
+**Mark "Initial application" todo `in_progress`.**
 
 **Step 2.1: Copy to working path**
 
 Copy original content to working_path using Write tool.
 
-**Step 2.2: Run verifier first**
+**Step 2.2: Apply feedback**
 
-Launch prompt-feedback-verifier agent via Task tool BEFORE any changes:
+Apply the feedback to the prompt using Application Techniques (see below). Write the updated prompt to working_path.
+
+**Key principle**: Apply feedback with just-right calibration—address the full intent without over-fitting or adding unrelated changes.
+
+**Step 2.3: Verify application**
+
+Launch prompt-feedback-verifier agent via Task tool:
 - subagent_type: "prompt-engineering:prompt-feedback-verifier"
 - prompt: "Verify feedback application. File: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
 
-**Step 2.3: Handle verifier response**
+**Step 2.4: Handle verifier response**
 
-- If "VERIFIED": Mark todo completed, proceed to Phase 4 with message: "Prompt already incorporates this feedback. No changes needed."
-- If "ISSUES_FOUND": Mark todo completed, save issues, add "Application iteration 1" todo, proceed to Phase 3
-- If verifier fails: Retry once. If retry fails, report error: "Verification failed - cannot proceed without verifier."
+- If "VERIFIED": Mark todo completed, proceed to Phase 4
+- If "ISSUES_FOUND": Mark todo completed, save issues, add "Refinement iteration 1" todo, proceed to Phase 3
+- If verifier fails: Retry once. If retry fails, proceed to Phase 4 with warning: "Verification failed - manual review recommended."
 
-**Step 2.4: Display findings**
+**Step 2.5: Display findings**
 
 If issues found:
 ```
 Feedback Summary: {summary from verifier}
-Verifier found {count} issues to address. Proceeding with application...
+Verifier found {count} issues. Proceeding with refinement...
 ```
 
-**Mark "Initial verification" todo `completed`.**
+**Mark "Initial application" todo `completed`.**
 
-### Phase 3: Application Loop (Verifier-Driven)
+### Phase 3: Refinement Loop (Verifier-Driven)
 
-**Mark "Application iteration 1" todo `in_progress`.**
+**Mark "Refinement iteration 1" todo `in_progress`.**
 
-**Key principle**: All changes driven by verifier feedback. Only fix issues the verifier reported.
+**Key principle**: All refinements driven by verifier feedback. Only fix issues the verifier reported.
 
 For each iteration from 1 to 5:
 
-1. **Apply changes from verifier feedback**: For each issue, apply the Suggested Fix using Application Techniques (see below). Write to working_path.
+1. **Apply fixes from verifier feedback**: For each issue, apply the Suggested Fix using Application Techniques. Write to working_path.
    - Only address issues the verifier identified
    - If Write tool fails: display error, proceed to Phase 4 with most recent version
 
@@ -140,7 +146,7 @@ For each iteration from 1 to 5:
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
-   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save issues, add "Application iteration {next}" todo, continue
+   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save issues, add "Refinement iteration {next}" todo, continue
    - If "ISSUES_FOUND" and iteration = 5: mark todo completed with note, proceed to Phase 4 with warning
    - If verifier fails: display error, retry once. If retry fails, proceed to Phase 4 with warning: "Verification incomplete - manual review recommended."
 
@@ -245,21 +251,14 @@ Unresolved issues:
 Review the changes manually.
 ```
 
-If already optimal:
-```
-Prompt already incorporates this feedback. No changes needed.
-
-Feedback: {original feedback}
-```
-
 **Mark "Output updated prompt" todo `completed`. Mark all todos complete.**
 
 ## Key Principles
 
 | Principle | Rule |
 |-----------|------|
-| **Verify first** | Run verifier before changes; prompt may already incorporate feedback |
-| **Verifier-driven** | Only fix issues verifier identifies - no independent improvements |
+| **Apply then verify** | Apply feedback first, verifier catches issues |
+| **Verifier-driven refinement** | Refinements only fix issues verifier identifies |
 | **Just-right application** | Address ALL feedback, ONLY feedback |
 | **Information density** | Minimal text to achieve the change; no bloat |
 | **Regression prevention** | Preserve everything feedback didn't mention |
@@ -274,11 +273,9 @@ Feedback: {original feedback}
 | No feedback provided | Use AskUserQuestion to gather feedback |
 | File not found | Re-classify as inline prompt, write to temp file |
 | Empty file | Error: "Cannot apply feedback to empty prompt: {path}" |
-| Already incorporates feedback | Verifier returns VERIFIED → "Prompt already incorporates this feedback." |
 | Vague feedback | Apply reasonable interpretation; verifier will catch over/under-fitting |
 | Conflicting feedback | Apply most recent/prominent request; note conflict in output |
-| Initial verifier fails | Retry once; if fails, Error: "Verification failed - cannot proceed." |
-| Re-verification fails | Retry once; if fails, output with warning |
+| Verifier fails | Retry once; if fails, output with warning: "Verification failed - manual review recommended." |
 | Task tool unavailable | Error: "Task tool required for verification loop." |
 
 ## Example Usage
