@@ -84,11 +84,12 @@ questions: [
 
 **Step 1.5: Store metadata**
 
-- `original_path`: Source file path (or temp path for inline)
+- `source_path`: Source file path (or temp path for inline)
 - `is_inline`: Boolean
 - `original_content`: Full prompt text
 - `feedback`: User's feedback text
-- `working_path`: `/tmp/feedback-applied-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md`
+- `original_path`: `/tmp/feedback-original-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (copy of original for verifier comparison)
+- `working_path`: `/tmp/feedback-modified-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (modified version)
 
 **Mark "Input validation" todo `completed`.**
 
@@ -96,9 +97,11 @@ questions: [
 
 **Mark "Initial application" todo `in_progress`.**
 
-**Step 2.1: Copy to working path**
+**Step 2.1: Create working copies**
 
-Copy original content to working_path using Write tool.
+Using Write tool:
+1. Copy original content to `original_path` (untouched reference for verifier)
+2. Copy original content to `working_path` (will be modified)
 
 **Step 2.2: Apply feedback**
 
@@ -110,7 +113,7 @@ Apply the feedback to the prompt using Application Techniques (see below). Write
 
 Launch prompt-feedback-verifier agent via Task tool:
 - subagent_type: "prompt-engineering:prompt-feedback-verifier"
-- prompt: "Verify feedback application. File: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
+- prompt: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
 
 **Step 2.4: Handle verifier response**
 
@@ -142,7 +145,7 @@ For each iteration from 1 to 5:
 
 2. **Re-verify**: Launch prompt-feedback-verifier agent via Task tool:
    - subagent_type: "prompt-engineering:prompt-feedback-verifier"
-   - prompt: "Verify feedback application. File: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
+   - prompt: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
@@ -220,7 +223,7 @@ Is the fix text provided in Suggested Fix?
 **Step 4.1: Apply changes**
 
 After application complete:
-- For file input: Use Write tool to replace original file with updated content
+- For file input: Use Write tool to copy working_path content to source_path (replaces original)
 - For inline input: Keep at working_path, report location
 
 **Step 4.2: Display results**

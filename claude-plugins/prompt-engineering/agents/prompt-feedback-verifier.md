@@ -12,14 +12,15 @@ Goal: Ensure feedback is applied correctly—addressing the user's intent withou
 
 ## Mission
 
-1. Read prompt via Read tool
-2. Compare against provided feedback
-3. Check for 6 issue types
-4. Report VERIFIED or ISSUES_FOUND
+1. Read BOTH original and modified prompts via Read tool
+2. Parse feedback intent
+3. Compare changes against feedback scope
+4. Check for 6 issue types
+5. Report VERIFIED or ISSUES_FOUND
 
-**Input**: File path and feedback in invocation (e.g., "Verify feedback application. File: /path/to/prompt.md. Feedback: {user feedback}")
+**Input**: Original file, modified file, and feedback in invocation (e.g., "Verify feedback application. Original: /path/to/original.md. Modified: /path/to/modified.md. Feedback: {user feedback}")
 
-**Errors**: No path, file missing, or no feedback → report error, exit.
+**Errors**: Missing paths, files not found, or no feedback → report error, exit.
 
 **Malformed files**: Add `**Warning**: {parsing issue}` after Status, analyze readable content.
 
@@ -74,8 +75,8 @@ Prompt became bloated without proportional value gain.
 
 ## Verification Process
 
-### Step 1: Read Prompt
-Read file. If fails → error.
+### Step 1: Read Both Files
+Read original and modified files via Read tool. If either fails → error.
 
 ### Step 2: Parse Feedback
 Extract feedback intent:
@@ -83,21 +84,30 @@ Extract feedback intent:
 2. **Implicit requests** - Complaints/observations implying change ("X is confusing" → clarify X)
 3. **Scope boundaries** - What feedback does NOT mention (changes to these = over-fitting)
 
-### Step 3: Identify Affected Areas
-Map feedback to specific prompt sections/instructions that should be modified.
+### Step 3: Identify Changes
+Compare original vs modified to identify:
+- **Added text** - New content not in original
+- **Removed text** - Original content now missing
+- **Modified text** - Content that was reworded/restructured
 
-### Step 4: Check Each Issue Type
+### Step 4: Map Changes to Feedback
+For each change, determine:
+- Is this change within feedback scope? (addressing feedback intent)
+- Is this change outside feedback scope? (potential over-fitting)
+- Is removed content related to feedback? (if not, potential regression)
+
+### Step 5: Check Each Issue Type
 
 | Check | Question |
 |-------|----------|
-| Feedback Not Addressed | Is the core feedback intent present in the prompt? |
-| Partial Incorporation | Are ALL aspects of feedback addressed? |
-| Over-Fitting | Were changes made outside feedback scope? |
+| Feedback Not Addressed | Is the core feedback intent present in modified? |
+| Partial Incorporation | Are ALL aspects of feedback addressed in modified? |
+| Over-Fitting | Were changes made outside feedback scope? (compare diff to feedback) |
 | Over-Specification | Is the implementation proportional to feedback? |
-| Regression | Do existing behaviors still work correctly? |
-| Information Density Loss | Did prompt bloat without proportional value? |
+| Regression | Is original content preserved where feedback didn't require change? |
+| Information Density Loss | Did modified bloat vs original without proportional value? |
 
-### Step 5: Generate Report
+### Step 6: Generate Report
 
 **Deduplication**: Same text/multiple types → report under highest-priority type only (Priority 1 > 2 > 3).
 
@@ -107,7 +117,8 @@ Map feedback to specific prompt sections/instructions that should be modified.
 # Feedback Application Verification Result
 
 **Status**: VERIFIED | ISSUES_FOUND
-**File**: {path}
+**Original**: {original_path}
+**Modified**: {modified_path}
 **Feedback Summary**: {1-2 sentence summary of feedback intent}
 
 [If VERIFIED:]
@@ -205,9 +216,10 @@ Core questions:
 
 Before finalizing output, verify:
 
-- [ ] Read entire prompt
+- [ ] Read both original and modified files
 - [ ] Parsed feedback intent (explicit + implicit requests)
-- [ ] Identified feedback scope boundaries
+- [ ] Identified all changes (added, removed, modified text)
+- [ ] Mapped each change to feedback scope (within/outside)
 - [ ] Checked against all 6 types
 - [ ] Flagged only when all threshold criteria met
 - [ ] Provided exact fix text for each issue
