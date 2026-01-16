@@ -63,10 +63,11 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 **Step 1.4: Store metadata**
 
-- `original_path`: Source file path (or temp path for inline)
+- `source_path`: Source file path (or temp path for inline)
 - `is_inline`: Boolean (affects output messaging)
 - `original_content`: Full prompt text
-- `working_path`: `/tmp/optimized-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` where timestamp is local time formatted as digits only (e.g., `20240115143022`)
+- `original_path`: `/tmp/goal-original-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (copy of original for verifier comparison)
+- `working_path`: `/tmp/goal-optimized-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (modified version)
 
 **Mark "Input validation" todo `completed`.**
 
@@ -74,11 +75,13 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 **Mark "Initial verification" todo `in_progress`.**
 
-**Step 2.1: Copy to working path**
+**Step 2.1: Create working copies**
 
-Copy original content to working_path using Write tool (verification needs a file path).
+Using Write tool:
+1. Copy original content to `original_path` (untouched reference for verifier comparison)
+2. Copy original content to `working_path` (will be modified)
 
-**Step 2.2: Run verifier first**
+**Step 2.2: Run verifier first (single file mode)**
 
 Launch prompt-goal-verifier agent via Task tool BEFORE any optimization:
 - subagent_type: "prompt-engineering:prompt-goal-verifier"
@@ -113,9 +116,9 @@ For each iteration from 1 to 5:
    - Only fix issues the verifier identified - do not add your own improvements
    - If Write tool fails: display error "Failed to save optimization iteration {iteration}: {error}" and proceed to Phase 4 using the most recent successfully written version (or original_content if none)
 
-2. **Re-verify**: Launch prompt-goal-verifier agent via Task tool:
+2. **Re-verify (comparison mode)**: Launch prompt-goal-verifier agent via Task tool:
    - subagent_type: "prompt-engineering:prompt-goal-verifier"
-   - prompt: "Verify prompt goal optimization. File: {working_path}. Check for goal misalignment, misstep risks, failure mode gaps, contradictory guidance, unsafe defaults, unnecessary overhead, indirect paths, and redundant instructions. Report VERIFIED or ISSUES_FOUND with specific details."
+   - prompt: "Verify optimization. Original: {original_path}. Modified: {working_path}. Check for goal misalignment, misstep risks, failure mode gaps, contradictory guidance, unsafe defaults, unnecessary overhead, indirect paths, redundant instructions, optimization regressions, and over-optimization. Report VERIFIED or ISSUES_FOUND with specific details."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
@@ -193,7 +196,7 @@ Can fix be inferred from prompt context?
 **Step 4.1: Apply changes**
 
 After optimization complete (verification passed or max iterations reached):
-- For file input: Use Write tool to replace original file with optimized content
+- For file input: `mv {working_path} {source_path}` (atomic replacement)
 - For inline input: Keep at working_path, report location to user
 
 **Step 4.2: Display results**

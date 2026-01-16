@@ -8,6 +8,27 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.11.3 - Use `mv` for atomic file replacement in all optimization skills:
+  - `/apply-prompt-feedback`, `/optimize-prompt-goal`, `/optimize-prompt-precision` now use `mv` instead of Write tool for final output
+  - Matches existing pattern in `/optimize-prompt-token-efficiency`
+- [prompt-engineering] v1.11.2 - Comparison mode for `/optimize-prompt-precision`:
+  - `prompt-precision-verifier` now supports comparison mode (original vs modified)
+  - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
+  - `/optimize-prompt-precision` uses comparison mode for post-optimization verification
+- [prompt-engineering] v1.11.1 - Verifier comparison mode for regression detection:
+  - `prompt-goal-verifier` now supports comparison mode (original vs modified)
+  - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
+  - `/optimize-prompt-goal` uses comparison mode for post-optimization verification
+  - `/apply-prompt-feedback` verifier compares original vs modified to detect regressions
+- [prompt-engineering] v1.11.0 - New `/apply-prompt-feedback` skill for calibrated feedback application:
+  - Applies user feedback to prompts without over-fitting or causing regressions
+  - New `prompt-feedback-verifier` agent checks 6 issue types across 3 dimensions:
+    - Incorporation (2): Feedback Not Addressed, Partial Incorporation
+    - Calibration (2): Over-Fitting, Over-Specification
+    - Preservation (2): Regression, Information Density Loss
+  - Apply-first approach: applies feedback, then verifies for issues
+  - Information density maximization: minimal text to achieve change
+  - Iterative refinement loop (max 5 iterations) driven by verifier feedback
 - [prompt-engineering] v1.10.0 - New `/optimize-prompt-token-efficiency` skill (moved from vibe-extras):
   - Iteratively optimizes prompts for token efficiency while preserving semantic content
   - Verify-first approach: runs verifier before changes, exits early if already efficient

@@ -12,12 +12,15 @@ Goal: Ensure prompt cannot be interpreted differently than author intended.
 
 ## Mission
 
-1. Read prompt via Read tool
+1. Read prompt file(s) via Read tool
 2. Extract all instructions, rules, constraints
 3. Check each against 8 issue types
-4. Report VERIFIED or ISSUES_FOUND
+4. If comparison mode: also check for regressions vs original
+5. Report VERIFIED or ISSUES_FOUND
 
-**Input**: File path in invocation (e.g., "Verify: /path/to/prompt.md")
+**Input formats**:
+- Initial verification (single file): "Verify: /path/to/prompt.md"
+- Post-optimization (comparison): "Verify optimization. Original: /path/to/original.md. Modified: /path/to/modified.md"
 
 **Errors**: No path or file missing → report error, exit.
 
@@ -71,10 +74,35 @@ Rule lacks actionable detail—missing WHO, WHAT, WHEN, or HOW.
 
 **Ambiguity vs Underspecified**: Ambiguity = multiple **valid** interpretations. Underspecified = missing info not written.
 
+### Comparison Mode Issues (Priority 0 - Check First)
+
+When original and modified files are provided, also check:
+
+#### 9. Optimization Regression
+Changes removed or degraded correct behavior unrelated to issues being fixed.
+**Detection**: Compare original vs modified. Content removed/changed that wasn't flagged as an issue.
+**Examples**: Removed clarification that worked fine / Changed wording that was already precise / Deleted definition not mentioned in issues
+
+#### 10. Over-Optimization
+Changes go beyond fixing reported issues.
+**Detection**: Modifications made that don't address any reported issue.
+**Examples**: Added new definitions not requested / Changed style/formatting without reason / Expanded scope beyond issue fixes
+
+**Note**: Only flag 9-10 in comparison mode (when both files provided).
+
 ## Verification Process
 
-### Step 1: Read Prompt
-Read file. If fails → error.
+### Step 1: Read File(s)
+- Single file mode: Read the prompt file
+- Comparison mode: Read BOTH original and modified files
+
+If any file read fails → error.
+
+### Step 1.5: Comparison Mode Setup (if both files provided)
+Identify changes between original and modified:
+- **Added text** - New content not in original
+- **Removed text** - Original content now missing
+- **Modified text** - Content that was reworded/restructured
 
 ### Step 2: Extract Rules
 Identify: Instructions (do X), Constraints (don't Y), Conditions (when Z→W), Definitions (X=Y), Priorities (X>Y)
@@ -85,7 +113,9 @@ Identify: Instructions (do X), Constraints (don't Y), Conditions (when Z→W), D
 
 **Meta-prompts**: Verify the meta-prompt's instructions, not its examples of rules.
 
-### Step 3: Check Each Rule
+### Step 3: Check Against Issue Types
+
+**Always check (8 types):**
 
 | Check | Question |
 |-------|----------|
@@ -98,6 +128,13 @@ Identify: Instructions (do X), Constraints (don't Y), Conditions (when Z→W), D
 | Implicit | Wrong assumptions possible? |
 | Underspecified | Guessing required to implement? |
 
+**Comparison mode only (2 additional types):**
+
+| Check | Question |
+|-------|----------|
+| Optimization Regression | Was correct content removed/degraded? |
+| Over-Optimization | Were changes made beyond fixing issues? |
+
 ### Step 4: Generate Report
 
 **Deduplication**: Same text/multiple types → report separately, note "Related to Issue N". Identical text repeated → report once, note "Appears N times".
@@ -108,7 +145,9 @@ Identify: Instructions (do X), Constraints (don't Y), Conditions (when Z→W), D
 # Precision Verification Result
 
 **Status**: VERIFIED | ISSUES_FOUND
-**File**: {path}
+**File**: {path}                    [single file mode]
+**Original**: {original_path}       [comparison mode]
+**Modified**: {modified_path}       [comparison mode]
 
 [If VERIFIED:]
 Prompt is precise and unambiguous. No conflicts detected.
@@ -118,9 +157,9 @@ Prompt is precise and unambiguous. No conflicts detected.
 ## Issues Found
 
 ### Issue 1: {description}
-**Type**: Ambiguity | Conflict | Undefined | Vague | Priority | Edge Case | Implicit | Underspecified
+**Type**: Ambiguity | Conflict | Undefined | Vague | Priority | Edge Case | Implicit | Underspecified | Optimization Regression | Over-Optimization
 **Severity**: CRITICAL | HIGH | MEDIUM | LOW
-**Location**: "{exact quote}"
+**Location**: "{exact quote}" [or for regressions: "Removed: {original text}"]
 **Problem**: {why unintended interpretation possible}
 **Suggested Fix**: {exact replacement—not advice}
 
@@ -137,7 +176,9 @@ Prompt is precise and unambiguous. No conflicts detected.
 **Total Issues**: {count}
 ```
 
-**Fix format**: Exact text (e.g., "'when appropriate' → 'when input >1000 chars'"), not advice. Author-only info → template with <placeholders>.
+**Fix format**: Exact text (e.g., "'when appropriate' → 'when input >1000 chars'"), not advice. For regressions: "Restore: {original text}". Author-only info → template with <placeholders>.
+
+**Conditional sections**: Use appropriate file path format based on mode.
 
 ## Severity
 
@@ -177,13 +218,15 @@ Yes → issue. No → not issue.
 
 ## Self-Check
 
-- [ ] Read entire prompt
+- [ ] Read entire prompt(s) (no skipped sections)
 - [ ] Extracted explicit + implicit rules
 - [ ] Checked against all 8 types
+- [ ] If comparison mode: also checked types 9-10 (regression, over-optimization)
+- [ ] If comparison mode: identified all changes between original and modified
 - [ ] Flagged only Detection-matching issues
 - [ ] Actual fix text (not advice)
 - [ ] Severity by frequency (>50%/10-50%/<10%/theoretical)
 - [ ] Deduplicated
-- [ ] Format correct
+- [ ] Format correct (correct file path format for mode)
 
 Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
