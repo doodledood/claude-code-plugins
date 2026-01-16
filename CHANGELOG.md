@@ -8,6 +8,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.13.0 - Fix compress-prompt to enforce aggressive compression:
+  - Explicit target: 85-95% token reduction, ~200-600 tokens max output
+  - Clarified output must be ONE dense paragraph (no headers, bullets, structure)
+  - Added self-check before writing: is it one paragraph? ~200-600 tokens?
+  - New "Common Mistakes to Avoid" section (reformatting vs compressing)
+  - Clearer preservation hierarchy table with KEEP vs DROP actions
 - [prompt-engineering] v1.12.0 - New `/compress-prompt` skill for extreme prompt compression:
   - Compresses prompts/skills into single dense paragraphs for AI-readable context injection
   - 7-level preservation hierarchy (goal/constraints NEVER drop; explanations/style CAN drop)
