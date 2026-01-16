@@ -8,16 +8,16 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
-- [prompt-engineering] v1.10.2 - Comparison mode for `/optimize-prompt-precision`:
+- [prompt-engineering] v1.11.2 - Comparison mode for `/optimize-prompt-precision`:
   - `prompt-precision-verifier` now supports comparison mode (original vs modified)
   - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
   - `/optimize-prompt-precision` uses comparison mode for post-optimization verification
-- [prompt-engineering] v1.10.1 - Verifier comparison mode for regression detection:
+- [prompt-engineering] v1.11.1 - Verifier comparison mode for regression detection:
   - `prompt-goal-verifier` now supports comparison mode (original vs modified)
   - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
   - `/optimize-prompt-goal` uses comparison mode for post-optimization verification
   - `/apply-prompt-feedback` verifier compares original vs modified to detect regressions
-- [prompt-engineering] v1.10.0 - New `/apply-prompt-feedback` skill for calibrated feedback application:
+- [prompt-engineering] v1.11.0 - New `/apply-prompt-feedback` skill for calibrated feedback application:
   - Applies user feedback to prompts without over-fitting or causing regressions
   - New `prompt-feedback-verifier` agent checks 6 issue types across 3 dimensions:
     - Incorporation (2): Feedback Not Addressed, Partial Incorporation
@@ -26,6 +26,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
   - Apply-first approach: applies feedback, then verifies for issues
   - Information density maximization: minimal text to achieve change
   - Iterative refinement loop (max 5 iterations) driven by verifier feedback
+- [prompt-engineering] v1.10.0 - New `/optimize-prompt-token-efficiency` skill (moved from vibe-extras):
+  - Iteratively optimizes prompts for token efficiency while preserving semantic content
+  - Verify-first approach: runs verifier before changes, exits early if already efficient
+  - New `prompt-token-efficiency-verifier` agent with dual-mode operation:
+    - Single-file mode: identifies inefficiencies (redundancy, verbosity, compression opportunities)
+    - Two-file mode: verifies compression is lossless by comparing original vs compressed
+  - Techniques: redundancy removal, terse phrasing, filler elimination, structural optimization
+- [vibe-extras] v1.6.0 - Removed `maximize-info-density` skill (moved to prompt-engineering as `/optimize-prompt-token-efficiency`)
 - [prompt-engineering] v1.9.0 - Verify-first approach and rename `/refine-prompt` → `/optimize-prompt-precision`:
   - Rename: `/refine-prompt` → `/optimize-prompt-precision` for consistency with `/optimize-prompt-goal`
   - Run verifier FIRST before any changes - maybe prompt is already optimal
