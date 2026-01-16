@@ -8,6 +8,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.15.0 - Execution Discipline preservation category:
+  - New distinction: trust model's KNOWLEDGE (drop), don't trust model's DISCIPLINE (keep)
+  - Execution discipline = guardrails against laziness, premature completion, context loss, skipping verification
+  - Priority 2 alongside Novel Constraints in preservation hierarchy
+  - Examples: "write findings BEFORE proceeding", "don't finalize until X verified", "read full log before synthesis"
+  - Verifier updated to NOT flag execution discipline as over-specification
+  - Key insight: discipline guardrails address model weaknesses, not capability gaps
 - [prompt-engineering] v1.14.0 - Trust-the-model compression philosophy:
   - Shift from "semantic preservation" to "capability preservation"
   - New preservation hierarchy: goal + novel constraints only; drop training-redundant content
