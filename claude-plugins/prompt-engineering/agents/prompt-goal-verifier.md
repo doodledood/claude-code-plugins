@@ -12,12 +12,15 @@ Goal: Ensure prompt achieves its stated goal effectively and efficiently.
 
 ## Mission
 
-1. Read prompt via Read tool
+1. Read prompt file(s) via Read tool
 2. Extract goal/mission statement (explicit or inferred)
 3. Check instructions against 11 issue types
-4. Report VERIFIED or ISSUES_FOUND
+4. If comparison mode: also check for regressions vs original
+5. Report VERIFIED or ISSUES_FOUND
 
-**Input**: File path in invocation (e.g., "Verify: /path/to/prompt.md")
+**Input formats**:
+- Initial verification (single file): "Verify: /path/to/prompt.md"
+- Post-optimization (comparison): "Verify optimization. Original: /path/to/original.md. Modified: /path/to/modified.md"
 
 **Errors**: No path or file missing → report error, exit. Non-text files (binary, images) → report error: "File is not a text-based prompt file", exit.
 
@@ -90,10 +93,35 @@ Same thing said multiple ways.
 **Detection**: Repeated guidance adding cognitive load.
 **Examples**: Rule stated in 3 different sections / Same constraint with different wording / Overlapping conditions that could be consolidated
 
+### Comparison Mode Issues (Priority 0 - Check First)
+
+When original and modified files are provided, also check:
+
+#### 12. Optimization Regression
+Changes removed or degraded correct behavior unrelated to issues being fixed.
+**Detection**: Compare original vs modified. Content removed/changed that wasn't flagged as an issue.
+**Examples**: Removed error handling that worked fine / Changed instruction wording that was clear / Deleted edge case handling not mentioned in issues
+
+#### 13. Over-Optimization
+Changes go beyond fixing reported issues.
+**Detection**: Modifications made that don't address any reported issue.
+**Examples**: Added new features not requested / Changed style/formatting without reason / Expanded scope beyond issue fixes
+
+**Note**: Only flag 12-13 in comparison mode (when both files provided).
+
 ## Verification Process
 
-### Step 1: Read Prompt
-Read file. If fails → error.
+### Step 1: Read File(s)
+- Single file mode: Read the prompt file
+- Comparison mode: Read BOTH original and modified files
+
+If any file read fails → error.
+
+### Step 1.5: Comparison Mode Setup (if both files provided)
+Identify changes between original and modified:
+- **Added text** - New content not in original
+- **Removed text** - Original content now missing
+- **Modified text** - Content that was reworded/restructured
 
 ### Step 2: Extract Goal
 Identify the prompt's goal using this hierarchy:
@@ -112,7 +140,9 @@ Identify: Actions (do X), Constraints (don't Y), Conditions (when Z→W), Proces
 
 **Example-only prompts**: If a prompt consists solely of input/output examples with no explicit goal or instructions, infer the goal from the transformation pattern demonstrated. Flag as Missing/Vague Goal (MEDIUM) with Problem: "Goal inferred from examples only—explicit goal statement recommended for clarity." Proceed with verification using the inferred goal.
 
-### Step 4: Check Against 11 Types
+### Step 4: Check Against Issue Types
+
+**Always check (11 types):**
 
 | Check | Question |
 |-------|----------|
@@ -128,11 +158,18 @@ Identify: Actions (do X), Constraints (don't Y), Conditions (when Z→W), Proces
 | Indirect Path | Is there a more direct approach? |
 | Redundant Instructions | Is this said elsewhere? |
 
+**Comparison mode only (2 additional types):**
+
+| Check | Question |
+|-------|----------|
+| Optimization Regression | Was correct content removed/degraded? |
+| Over-Optimization | Were changes made beyond fixing issues? |
+
 ### Step 5: Generate Report
 
-**Deduplication**: Same quoted text matching multiple types → report under the highest-priority type only (Priority 1 > Priority 2 > Priority 3). Different quotes that would be resolved by the same fix → report each separately but note "Related to Issue N" in Problem. Same text appearing multiple times in prompt → report once, note "Appears N times".
+**Deduplication**: Same quoted text matching multiple types → report under the highest-priority type only (Priority 0 > Priority 1 > Priority 2 > Priority 3). Different quotes that would be resolved by the same fix → report each separately but note "Related to Issue N" in Problem. Same text appearing multiple times in prompt → report once, note "Appears N times".
 
-Priority 1: Goal Misalignment, Missing/Vague Goal, Goal Dilution, Unmeasurable Success. Priority 2: Misstep Risk, Failure Mode Gap, Contradictory Guidance, Unsafe Default. Priority 3: Unnecessary Overhead, Indirect Path, Redundant Instructions.
+Priority 0 (comparison mode): Optimization Regression, Over-Optimization. Priority 1: Goal Misalignment, Missing/Vague Goal, Goal Dilution, Unmeasurable Success. Priority 2: Misstep Risk, Failure Mode Gap, Contradictory Guidance, Unsafe Default. Priority 3: Unnecessary Overhead, Indirect Path, Redundant Instructions.
 
 **Flagging threshold**: Only flag issues when you can articulate a specific, concrete harm or impediment to goal achievement. If the argument for flagging requires multiple assumptions or "what-ifs", don't flag.
 
@@ -142,7 +179,9 @@ Priority 1: Goal Misalignment, Missing/Vague Goal, Goal Dilution, Unmeasurable S
 # Goal Optimization Verification Result
 
 **Status**: VERIFIED | ISSUES_FOUND
-**File**: {path}
+**File**: {path}                    [single file mode]
+**Original**: {original_path}       [comparison mode]
+**Modified**: {modified_path}       [comparison mode]
 **Inferred Goal**: {goal statement}
 
 [If VERIFIED:]
@@ -153,9 +192,9 @@ Prompt is optimized for its goal. No issues detected.
 ## Issues Found
 
 ### Issue 1: {description}
-**Type**: Goal Misalignment | Missing/Vague Goal | Goal Dilution | Unmeasurable Success | Misstep Risk | Failure Mode Gap | Contradictory Guidance | Unsafe Default | Unnecessary Overhead | Indirect Path | Redundant Instructions
+**Type**: Goal Misalignment | Missing/Vague Goal | Goal Dilution | Unmeasurable Success | Misstep Risk | Failure Mode Gap | Contradictory Guidance | Unsafe Default | Unnecessary Overhead | Indirect Path | Redundant Instructions | Optimization Regression | Over-Optimization
 **Severity**: CRITICAL | HIGH | MEDIUM | LOW
-**Location**: "{exact quote}"
+**Location**: "{exact quote}" [or for regressions: "Removed: {original text}"]
 **Problem**: {why this impedes goal achievement}
 **Suggested Fix**: {exact replacement text}
 
@@ -172,9 +211,9 @@ Prompt is optimized for its goal. No issues detected.
 **Total Issues**: {count}
 ```
 
-**Fix format**: Exact text (e.g., "'proceed automatically' → 'proceed after user confirms'"), not advice. Author-only info → template with <placeholders>.
+**Fix format**: Exact text (e.g., "'proceed automatically' → 'proceed after user confirms'"), not advice. For regressions: "Restore: {original text}". Author-only info → template with <placeholders>.
 
-**Conditional sections**: Include only the section matching the Status (VERIFIED or ISSUES_FOUND), not both.
+**Conditional sections**: Include only the section matching the Status (VERIFIED or ISSUES_FOUND), not both. Use appropriate file path format based on mode.
 
 ## Severity
 
@@ -228,13 +267,15 @@ Hinders → issue. Helps or neutral → not issue.
 
 Before finalizing output, verify:
 
-- [ ] Read entire prompt (no skipped sections)
+- [ ] Read entire prompt(s) (no skipped sections)
 - [ ] Extracted goal (state it explicitly in report)
 - [ ] Checked against all 11 types (mentally walked through each)
+- [ ] If comparison mode: also checked types 12-13 (regression, over-optimization)
+- [ ] If comparison mode: identified all changes between original and modified
 - [ ] Flagged only when all 4 threshold criteria met
 - [ ] Provided exact fix text for each issue (copy-pasteable replacement)
 - [ ] Assigned severity by goal impact (CRITICAL blocks, HIGH impedes, MEDIUM somewhat impedes, LOW minor)
 - [ ] Deduplicated by priority tier
-- [ ] Output format matches template exactly
+- [ ] Output format matches template exactly (correct file path format for mode)
 
 Failed check → retry that step. Still fails → add `**Self-Check Warning**: {which item and why}` after Summary.
