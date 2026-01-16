@@ -5,12 +5,14 @@ description: 'Compresses prompts/skills into single dense paragraphs for AI-read
 
 # Compress Prompt
 
-Compress a full prompt or skill into a single dense paragraph for AI-readable context injection. Maximizes information density so LLMs can "decompress" the full meaning from minimal tokens.
+Compress a full prompt or skill into a single dense paragraph **short enough to type inline**. LLMs can "decompress" dense notation back to full meaning.
 
 ## Overview
 
+**Goal**: Transform any prompt (even thousands of tokens) into ONE short paragraph a user could reasonably type—like a detailed instruction you'd give verbally.
+
 This skill compresses prompts through:
-1. **Initial Compression** - Apply compression techniques with preservation hierarchy
+1. **Initial Compression** - Aggressively compress using preservation hierarchy
 2. **Verification** - `prompt-compression-verifier` checks semantic fidelity
 3. **Refinement** - Fix issues based on verifier findings, iterate if needed (max 5 iterations)
 4. **Output** - Display compressed paragraph + stats; optionally write to file
@@ -18,7 +20,9 @@ This skill compresses prompts through:
 **Loop**: Parse input → Compress → Verify → (Iterate if issues) → Output
 
 **Key principles**:
-- **Prioritized preservation**: Core goal/constraints NEVER drop; examples/explanations CAN drop
+- **Inline-typable brevity**: Short enough a user could type it; like a detailed verbal instruction
+- **Single paragraph**: ONE dense paragraph, not reformatted sections
+- **Prioritized preservation**: Core goal/constraints NEVER drop; everything else CAN drop
 - **Semantic encoding**: Dense notation so AI can reconstruct full meaning
 - **AI-readable**: Optimize for LLM parseability over human scannability
 
@@ -93,28 +97,40 @@ Using Write tool:
 
 **Step 2.2: Apply compression**
 
-Compress the prompt into a single dense paragraph using:
+**⚠️ CRITICAL**: Output must be ONE dense paragraph short enough to type inline. Not reformatted sections. Not bullet points. ONE paragraph you could reasonably type.
 
-1. **Preservation Hierarchy** (highest to lowest priority):
-   - Core goal/purpose (NEVER drop)
-   - Hard constraints/rules (NEVER drop)
-   - Critical edge cases
-   - Output format requirements
-   - Examples (condensed to pattern)
-   - Explanations/rationale (can usually be inferred)
-   - Formatting/style hints (drop first)
+Compress using:
+
+1. **Preservation Hierarchy** (what to KEEP vs DROP):
+
+   | Priority | Content | Action |
+   |----------|---------|--------|
+   | 1 | Core goal/purpose | NEVER drop |
+   | 2 | Hard constraints (must/never/always) | NEVER drop |
+   | 3 | Critical edge cases | Keep if space; condense to pattern |
+   | 4 | Output format requirements | Keep structure, drop examples |
+   | 5 | Examples | DROP entirely or condense to "{pattern}" |
+   | 6 | Explanations/rationale | DROP (LLM can infer) |
+   | 7 | Formatting/style/headers | DROP entirely |
 
 2. **Compression Techniques**:
-   - Use semicolons to chain related statements
-   - Omit articles ("the", "a") where unambiguous
-   - Use common abbreviations (JSON, API, etc.)
+   - Semicolons chain related statements
+   - Omit articles ("the", "a")
+   - Use arrows for flow: A→B→C
+   - Condense conditionals: "if X→Y; else→Z"
+   - Merge phases into flow: "Phase1(do X)→Phase2(do Y)"
+   - Drop all headers, bullets, structure—flatten to prose
+   - Tables → dense prose: "stakes: low→quick; high→thorough"
+   - Examples → pattern only: "e.g., {X}" not full example
    - Assume LLM knowledge of common concepts
-   - Disambiguate only when multiple meanings possible (e.g., "WWF (wildlife)")
-   - Condense examples to pattern representation
-   - Convert tables to dense prose
-   - Preserve code blocks as-is; compress surrounding text
+   - Code blocks: keep only if essential; otherwise describe pattern
 
-**Output format**: Single cohesive paragraph. No bullet points, no headers, no newlines within the paragraph. Length determined by content complexity (no arbitrary limit).
+3. **Self-check before writing**:
+   - Is it ONE paragraph? (no headers, no bullets, no structure)
+   - Is it short enough to type inline? (not pages of text)
+   - Would reformatting this back out recover the core workflow?
+
+**Output format**: Single cohesive paragraph. No bullet points, no headers, no newlines. Short enough a user could type it.
 
 **Step 2.3: Verify compression**
 
@@ -215,13 +231,23 @@ Unresolved issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Compress then verify** | Compress first, verifier catches issues |
-| **Verifier-driven refinement** | Refinements only fix issues verifier identifies |
-| **Preservation hierarchy** | Goal/constraints NEVER drop; explanations/style CAN drop |
-| **Single paragraph** | Output is ONE cohesive paragraph, no structure |
+| **Inline-typable** | Short enough a user could type it; like a verbal instruction |
+| **ONE paragraph** | No headers, no bullets, no structure—flatten everything |
+| **Compress then verify** | Compress aggressively first, verifier catches issues |
+| **Preservation hierarchy** | Goal/constraints NEVER drop; explanations/examples DROP |
 | **AI-readable** | Dense notation acceptable; human readability secondary |
 | **Track progress** | TodoWrite for phases; expand on iteration |
 | **Non-destructive** | Original file untouched; display output (+ optional file save) |
+
+## Common Mistakes to Avoid
+
+| Mistake | Fix |
+|---------|-----|
+| Reformatting instead of compressing | DROP structure entirely; one paragraph |
+| Keeping phase headers | Merge into flow: "Phase1→Phase2→Phase3" |
+| Keeping bullet points | Convert to semicolon-separated prose |
+| Keeping full examples | Drop or condense to pattern: "{X}" |
+| Output still thousands of tokens | Be more aggressive; drop more |
 
 ## Edge Cases
 
