@@ -56,10 +56,11 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 **Step 1.4: Store metadata**
 
-- `original_path`: Source file path (or temp path for inline)
+- `source_path`: Source file path (or temp path for inline)
 - `is_inline`: Boolean (affects output messaging)
 - `original_content`: Full prompt text
-- `working_path`: `/tmp/optimized-precision-{timestamp}.md` for iterations
+- `original_path`: `/tmp/precision-original-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (copy of original for verifier comparison)
+- `working_path`: `/tmp/precision-optimized-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (modified version)
 
 **Mark "Input validation" todo `completed`.**
 
@@ -67,11 +68,13 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 **Mark "Initial verification" todo `in_progress`.**
 
-**Step 2.1: Copy to working path**
+**Step 2.1: Create working copies**
 
-Copy original content to working_path using Write tool (verification needs a file path).
+Using Write tool:
+1. Copy original content to `original_path` (untouched reference for verifier comparison)
+2. Copy original content to `working_path` (will be modified)
 
-**Step 2.2: Run verifier first**
+**Step 2.2: Run verifier first (single file mode)**
 
 Launch prompt-precision-verifier agent via Task tool BEFORE any optimization:
 - subagent_type: "prompt-engineering:prompt-precision-verifier"
@@ -104,9 +107,9 @@ For each iteration from 1 to 5:
 1. **Apply fixes from verifier feedback**: For each issue in the verifier's report, apply the Suggested Fix or use Resolution Strategy (see below) to address it. Write optimized version to working_path.
    - Only fix issues the verifier identified - do not add your own improvements
 
-2. **Re-verify**: Launch prompt-precision-verifier agent via Task tool:
+2. **Re-verify (comparison mode)**: Launch prompt-precision-verifier agent via Task tool:
    - subagent_type: "prompt-engineering:prompt-precision-verifier"
-   - prompt: "Verify prompt precision. File: {working_path}. Check for ambiguities, conflicts, undefined terms, underspecified rules, vague thresholds, priority confusion, edge case gaps, and implicit expectations. Report VERIFIED or ISSUES_FOUND with specific details."
+   - prompt: "Verify optimization. Original: {original_path}. Modified: {working_path}. Check for ambiguities, conflicts, undefined terms, underspecified rules, vague thresholds, priority confusion, edge case gaps, implicit expectations, optimization regressions, and over-optimization. Report VERIFIED or ISSUES_FOUND with specific details."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
@@ -177,13 +180,9 @@ questions: [
 
 **Step 4.1: Apply changes**
 
-If verification passed:
-```bash
-# For file input: replace original
-mv {working_path} {original_path}
-
-# For inline input: keep at working_path, report location
-```
+After optimization complete (verification passed or max iterations reached):
+- For file input: Use Write tool to copy working_path content to source_path (replaces original)
+- For inline input: Keep at working_path, report location
 
 **Step 4.2: Display results**
 

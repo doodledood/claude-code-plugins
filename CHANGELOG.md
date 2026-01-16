@@ -8,6 +8,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.10.2 - Comparison mode for `/optimize-prompt-precision`:
+  - `prompt-precision-verifier` now supports comparison mode (original vs modified)
+  - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
+  - `/optimize-prompt-precision` uses comparison mode for post-optimization verification
 - [prompt-engineering] v1.10.1 - Verifier comparison mode for regression detection:
   - `prompt-goal-verifier` now supports comparison mode (original vs modified)
   - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization
