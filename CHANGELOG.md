@@ -8,6 +8,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.10.0 - New `/apply-prompt-feedback` skill for calibrated feedback application:
+  - Applies user feedback to prompts without over-fitting or causing regressions
+  - New `prompt-feedback-verifier` agent checks 6 issue types across 3 dimensions:
+    - Incorporation (2): Feedback Not Addressed, Partial Incorporation
+    - Calibration (2): Over-Fitting, Over-Specification
+    - Preservation (2): Regression, Information Density Loss
+  - Verify-first approach: checks if prompt already incorporates feedback
+  - Information density maximization: minimal text to achieve change
+  - Iterative refinement loop (max 5 iterations) driven by verifier feedback
 - [prompt-engineering] v1.9.0 - Verify-first approach and rename `/refine-prompt` → `/optimize-prompt-precision`:
   - Rename: `/refine-prompt` → `/optimize-prompt-precision` for consistency with `/optimize-prompt-goal`
   - Run verifier FIRST before any changes - maybe prompt is already optimal
