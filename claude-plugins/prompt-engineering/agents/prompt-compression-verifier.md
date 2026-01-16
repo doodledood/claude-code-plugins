@@ -100,13 +100,15 @@ Compressed contains content that constrains model's natural capability.
 
 #### 6. Training-Redundant Content (NEW - flag for REMOVAL)
 Compressed contains content the model already knows from training.
-**Detection**: Apply the training filter—"Would a senior developer need to be told this?"
+**Detection**: Apply the training filter—"Would a competent person doing this task need to be told this?"
 **Examples**:
 - "Be professional and thorough"
 - "Structure output logically"
 - "Consider edge cases"
 - "Validate input before processing"
-- Common workflow patterns
+- "Weigh pros and cons" (for decisions)
+- "Research before concluding"
+- Common patterns for the task domain
 **Severity**: LOW—recommend removal for brevity
 **Action**: Suggest removing this content, not adding it back
 

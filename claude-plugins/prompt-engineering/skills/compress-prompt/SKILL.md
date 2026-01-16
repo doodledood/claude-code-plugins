@@ -123,7 +123,7 @@ Compress using:
 
 2. **The Training Filter** (ask for EACH constraint):
 
-   > "Would a senior developer need to be told this, or would they figure it out?"
+   > "Would a competent person doing this task need to be told this, or would they figure it out?"
 
    If model's training covers it → DROP. Examples of training-redundant content:
    - "Handle errors gracefully" → model does this
@@ -132,7 +132,9 @@ Compress using:
    - "Consider edge cases" → model does this
    - "Structure output logically" → model does this
    - "Use professional tone" → model does this
-   - Common workflow patterns → model knows these
+   - "Weigh pros and cons" → model does this for decisions
+   - "Research before concluding" → model does this
+   - Common patterns for the task domain → model knows these
 
 3. **Novel vs Obvious Constraints**:
 
@@ -265,7 +267,7 @@ Unresolved issues:
 | **Goal over process** | State WHAT to achieve, not HOW to do it |
 | **Novel constraints only** | Keep only counter-intuitive rules model wouldn't naturally follow |
 | **Maximize action space** | Fewer constraints = more freedom = better results |
-| **Training filter** | "Would a senior dev need to be told this?" If no → drop |
+| **Training filter** | "Would a competent person need to be told this?" If no → drop |
 | **Inline-typable** | Short enough to type verbally—like instructing a capable colleague |
 | **Non-destructive** | Original file untouched; display output (+ optional file save) |
 
