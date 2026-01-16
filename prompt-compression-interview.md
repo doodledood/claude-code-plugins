@@ -73,6 +73,28 @@ This is a fundamentally different use case - not optimization but radical summar
 - Semantic: Encode densely so AI can "decompress" meaning
 **Implication**: Hierarchical importance filtering + dense encoding techniques. Not distillation (which loses details).
 
+### D4: Preservation Hierarchy
+**Decision**: Accepted proposed hierarchy
+1. Core goal/purpose
+2. Hard constraints/rules
+3. Critical edge cases
+4. Output format requirements
+5. Examples (condensed to pattern)
+6. Explanations/rationale (can usually be inferred)
+7. Formatting/style hints
+**Implication**: Compression algorithm should process in this order, dropping lower tiers when space-constrained.
+
+### D5: Compression Notation
+**Decision**: Natural dense prose
+**Rationale**: Extremely terse but grammatical English. Readable by both AI and humans with effort.
+**Example**: "Validate input; reject empty; return JSON {status, data}; on error include trace."
+
+### D6: Implicit Context
+**Decision**: Assume LLM knowledge, BUT keep precise when ambiguous
+**Rationale**: Don't explain common concepts, but disambiguate when needed.
+**Example**: "WWF (wildlife)" not just "WWF" if context doesn't clarify.
+**Implication**: Compression should leverage shared LLM knowledge but not introduce ambiguity.
+
 ---
 
 ## Open Questions
@@ -83,7 +105,7 @@ This is a fundamentally different use case - not optimization but radical summar
 
 ## Spec Evolution
 
-### Draft v2
+### Draft v3
 
 ---
 **name**: compress-prompt
@@ -106,27 +128,29 @@ Compress a full prompt or skill into a single dense paragraph for AI-readable co
 
 - **Output format**: Single cohesive paragraph (no hard word limit - length follows content complexity)
 - **Compression approach**: Prioritized preservation + semantic encoding
-  - MUST preserve: [TBD - hierarchy]
-  - CAN lose: [TBD - hierarchy]
 - **Target audience**: AI-readable (dense notation acceptable, human readability secondary)
 
 ## Preservation Hierarchy
 
-[TBD - what elements get priority?]
-1. Core goal/purpose?
-2. Hard constraints/rules?
-3. Edge cases?
-4. Examples?
-5. Explanations?
-6. Formatting hints?
+Highest to lowest priority (drop from bottom when compressing):
+
+1. **Core goal/purpose** - What the prompt fundamentally does (NEVER drop)
+2. **Hard constraints/rules** - Non-negotiable behaviors (NEVER drop)
+3. **Critical edge cases** - Behaviors that prevent failure modes
+4. **Output format requirements** - Structure of expected output
+5. **Examples** - Condensed to pattern, not full text
+6. **Explanations/rationale** - Can usually be inferred by AI
+7. **Formatting/style hints** - Tone, verbosity preferences (drop first)
 
 ## Compression Techniques
 
-[TBD - specific techniques]:
-- Abbreviations and shorthand?
-- Implicit context assumptions?
-- Notation systems (arrows, semicolons)?
-- Reference compression ("like X but Y")?
+**Natural dense prose**: Extremely terse but grammatical English.
+- Use semicolons to chain related statements
+- Omit articles ("the", "a") where unambiguous
+- Use common abbreviations (JSON, API, etc.)
+- Assume LLM knowledge of common concepts
+- Disambiguate only when multiple meanings possible (e.g., "WWF (wildlife)")
+- Condense examples to pattern representation
 
 ## Input/Output
 
