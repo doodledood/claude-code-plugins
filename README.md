@@ -101,10 +101,11 @@ Foundational documents for solo developers and small teams. Define once, referen
 
 ### prompt-engineering
 
-Analyze and refine prompts for clarity and precision.
+Analyze and optimize prompts for clarity, precision, and goal effectiveness.
 
 - `/review-prompt` - Analyze against 10-Layer Architecture framework (read-only)
-- `/refine-prompt` - Iteratively refine for precision, eliminating ambiguities
+- `/optimize-prompt-precision` - Iteratively optimize for precision, eliminating ambiguities
+- `/optimize-prompt-goal` - Iteratively optimize for goal effectiveness
 
 ### frontend-design
 

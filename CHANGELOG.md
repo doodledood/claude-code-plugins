@@ -6,6 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+## 2026-01-16
+
+- [prompt-engineering] v1.9.0 - Verify-first approach and rename `/refine-prompt` → `/optimize-prompt-precision`:
+  - Rename: `/refine-prompt` → `/optimize-prompt-precision` for consistency with `/optimize-prompt-goal`
+  - Run verifier FIRST before any changes - maybe prompt is already optimal
+  - All changes driven by verifier feedback only - no independent analysis
+  - Early exit if verifier returns VERIFIED on first check
+
 ## 2026-01-15
 
 - [prompt-engineering] v1.8.2 - Refine `optimize-prompt-goal` skill for precision:

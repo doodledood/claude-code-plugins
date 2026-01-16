@@ -10,14 +10,14 @@ Iteratively optimize prompt for alignment with stated goal and likelihood of ach
 ## Overview
 
 This skill transforms goal-misaligned prompts into effective ones through:
-1. **Goal Inference** - Extract or infer the prompt's goal/mission
-2. **Analysis** - Identify goal optimization issues (misalignment, misstep risks, inefficiencies)
-3. **Optimization** - Apply targeted fixes
-4. **Verification** - `prompt-goal-verifier` agent checks for remaining issues
-5. **Iteration** - If issues found, optimize again (max 5 iterations - sufficient for convergence in practice)
-6. **Output** - Atomic replacement only after optimization complete
+1. **Verification First** - `prompt-goal-verifier` checks for issues before any changes
+2. **Optimization** - Apply targeted fixes based on verifier feedback
+3. **Re-verification** - Verify fixes, iterate if issues remain (max 5 iterations)
+4. **Output** - Atomic replacement only after verification passes
 
-**Loop**: Read → Infer Goal → Optimize → Verify → (Iterate if issues) → Output
+**Loop**: Read → Verify → (Exit if optimal) → Optimize based on feedback → Re-verify → (Iterate if issues) → Output
+
+**Key principle**: Don't try to optimize in one pass. The verifier drives all changes - if it finds no issues, the prompt is already optimal.
 
 **Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally and proceed without external todo tracking.
 
@@ -30,9 +30,8 @@ Create todos tracking workflow phases. Todos represent areas of work that may ex
 **Starter todos**:
 ```
 - [ ] Input validation
-- [ ] Goal inference and initial analysis
-- [ ] Optimization iteration 1
-- [ ] (expand on ISSUES_FOUND: iteration 2, 3...)
+- [ ] Initial verification (run verifier first)
+- [ ] (expand on ISSUES_FOUND: optimization iteration 1, 2, 3...)
 - [ ] Output optimized prompt
 ```
 
@@ -71,69 +70,56 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 **Mark "Input validation" todo `completed`.**
 
-### Phase 2: Initial Analysis with Goal Inference
+### Phase 2: Initial Verification
 
-**Mark "Goal inference and initial analysis" todo `in_progress`.**
+**Mark "Initial verification" todo `in_progress`.**
 
-**Step 2.1: Read and understand prompt**
+**Step 2.1: Copy to working path**
 
-Read the prompt and document:
-1. **Structure**: Organization (sections, rules, examples, workflow)
-2. **Instructions**: Actions/behaviors specified
-3. **Constraints**: Limitations or rules imposed
+Copy original content to working_path using Write tool (verification needs a file path).
 
-**Step 2.2: Infer goal**
+**Step 2.2: Run verifier first**
 
-Extract the prompt's goal using this hierarchy (stop at first match):
+Launch prompt-goal-verifier agent via Task tool BEFORE any optimization:
+- subagent_type: "prompt-engineering:prompt-goal-verifier"
+- prompt: "Verify prompt goal optimization. File: {working_path}. Check for goal misalignment, misstep risks, failure mode gaps, contradictory guidance, unsafe defaults, unnecessary overhead, indirect paths, and redundant instructions. Report VERIFIED or ISSUES_FOUND with specific details."
 
-1. **Explicit goal** - Look for "Goal:", "Purpose:", "Mission:", "Objective:" sections
-   - If found, use verbatim
-   - If multiple goal sections exist, synthesize into single coherent statement. If goal sections conflict: prefer the most specific statement; if equally specific, prefer the statement appearing earlier in the prompt (for items at the same structural level, use document order - top-to-bottom, left-to-right); note the conflict in the inferred goal.
+**Step 2.3: Handle verifier response**
 
-2. **Inferred from structure** - If no explicit goal, answer:
-   - What is this prompt trying to accomplish?
-   - What outcomes does it optimize for?
-   - What would success look like?
-   - Synthesize answers into a goal statement
+- If "VERIFIED": Mark todo completed, proceed directly to Phase 4 (Output) with message: "Prompt is already goal-optimized. No changes needed."
+- If "ISSUES_FOUND": Mark todo completed, save the issues list, add "Optimization iteration 1" todo and proceed to Phase 3
+- If verifier fails or returns unexpected format: Retry once with identical parameters. If retry fails, report error: "Verification failed - cannot proceed without verifier."
 
-3. **Low-confidence inference** - If the prompt contains no explicit goal AND answers to the inference questions above are speculative rather than supported by prompt content:
-   - Use `[INFERRED WITH LOW CONFIDENCE: {goal}]`
-   - Proceed with best-effort inference
+**Step 2.4: Display verifier findings**
 
-**Step 2.3: Display inferred goal**
-
-Show user the detected goal, then proceed immediately:
+If issues found, show user the verifier's inferred goal and proceed:
 
 ```
-Inferred Goal: {goal statement}
-Proceeding with optimization...
+Inferred Goal: {goal from verifier response}
+Verifier found {count} issues. Proceeding with optimization...
 ```
 
-**Step 2.4: Initial assessment**
+**Mark "Initial verification" todo `completed`.**
 
-Document:
-- Goal clarity: explicit / inferred / low-confidence
-- Obvious issues identifiable without deep analysis: explicit contradictions between instructions, missing handling for stated scenarios, instructions that clearly work against the stated goal
-- Areas likely to need optimization
-
-**Mark "Goal inference and initial analysis" todo `completed`.**
-
-### Phase 3: Optimization Loop
+### Phase 3: Optimization Loop (Verifier-Driven)
 
 **Mark "Optimization iteration 1" todo `in_progress`.**
 
+**Key principle**: All fixes are driven by verifier feedback. Do NOT analyze the prompt independently - only fix the specific issues the verifier reported.
+
 For each iteration from 1 to 5:
 
-1. **Apply fixes**: For each issue type, use Optimization Techniques (see below). Write optimized version to working_path using Write tool.
+1. **Apply fixes from verifier feedback**: For each issue in the verifier's report, apply the Suggested Fix or use Optimization Techniques (see below) to address it. Write optimized version to working_path using Write tool.
+   - Only fix issues the verifier identified - do not add your own improvements
    - If Write tool fails: display error "Failed to save optimization iteration {iteration}: {error}" and proceed to Phase 4 using the most recent successfully written version (or original_content if none)
 
-2. **Verify**: Launch prompt-goal-verifier agent via Task tool:
+2. **Re-verify**: Launch prompt-goal-verifier agent via Task tool:
    - subagent_type: "prompt-engineering:prompt-goal-verifier"
    - prompt: "Verify prompt goal optimization. File: {working_path}. Check for goal misalignment, misstep risks, failure mode gaps, contradictory guidance, unsafe defaults, unnecessary overhead, indirect paths, and redundant instructions. Report VERIFIED or ISSUES_FOUND with specific details."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
-   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, add "Optimization iteration {next}" todo, continue to next iteration
+   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save new issues list, add "Optimization iteration {next}" todo, continue to next iteration
    - If "ISSUES_FOUND" and iteration = 5: mark todo completed with note about unresolved issues, proceed to Phase 4 with warning
    - If verifier fails or returns unexpected format: display error to user, retry the verifier Task call once with identical parameters. If retry fails, proceed to Phase 4 with warning: "Verification incomplete - manual review recommended."
    - If Task tool becomes unavailable during workflow: proceed to Phase 4 with warning: "Verification unavailable - manual review recommended."
@@ -251,11 +237,10 @@ Inferred Goal: {goal statement}
 
 | Principle | Rule |
 |-----------|------|
+| **Verify first** | Always run verifier before any optimization; maybe prompt is already optimal |
+| **Verifier-driven** | Only fix issues the verifier identifies - no independent analysis or improvements |
 | **Track progress** | TodoWrite to track phases; expand todos on iteration |
-| **Always infer goal** | Never ask user to clarify goal; infer from context and proceed |
-| **Display goal** | Show inferred goal to user, but don't wait for confirmation |
-| **Preserve intent** | Don't change what prompt is trying to do; only remove/rewrite instructions that explicitly contradict the goal or produce outcomes opposite to success criteria. When an instruction's purpose is unclear but it does not explicitly contradict the goal, keep it and optimize its integration. |
-| **High-confidence focus** | Only fix clear issues with demonstrable goal impact. For detected issues where the fix is unclear, apply minimal conservative safeguards rather than skipping. |
+| **Preserve intent** | Don't change what prompt is trying to do; only fix issues the verifier flagged |
 | **Verification required** | Never output without verifier checking |
 | **Atomic output** | Original untouched until optimization complete. For file input, original is replaced with optimized content after all iterations (even if warnings remain). |
 
@@ -266,12 +251,12 @@ Inferred Goal: {goal statement}
 | No input provided | Error: "Usage: /optimize-prompt-goal <file-path> OR /optimize-prompt-goal <inline prompt text>" |
 | File not found | Re-classify as inline prompt and write to temp file |
 | Empty file | Error: "Cannot optimize empty prompt. File contains no content: {path}" |
-| Already optimized | Report: "Prompt is already goal-optimized. No changes needed." |
-| Cannot infer goal | Use best-effort inference, note `[INFERRED WITH LOW CONFIDENCE: {goal}]` |
+| Already optimized | Verifier returns VERIFIED on first check → Report: "Prompt is already goal-optimized. No changes needed." |
+| Initial verifier fails | Retry once; if still fails, Error: "Verification failed - cannot proceed without verifier." |
+| Re-verification fails | Display error, retry once; if retry fails, output with warning: "Verification incomplete - manual review recommended." |
 | Severely misaligned | Make best effort over 5 iterations; output with warnings |
 | Very large prompt (>50KB) | Process normally as single unit; no special handling needed |
-| Verifier agent fails | Display error, retry once with identical parameters; if retry fails, output with warning: "Verification incomplete - manual review recommended." |
-| Task tool unavailable mid-workflow | Proceed to output with warning: "Verification unavailable - manual review recommended." |
+| Task tool unavailable | Error: "Task tool required for verification loop." |
 | Write tool fails | Display error, proceed to output with most recent successful version or original_content |
 
 ## Example Usage
