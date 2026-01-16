@@ -12,9 +12,6 @@ Standalone utilities for common development tasks.
 - `/clean-slop` - Remove AI-generated noise (redundant comments, verbose patterns)
 - `/update-claude-md` - Create or maintain CLAUDE.md project instructions
 
-**Skills** (auto-invoked):
-- `maximize-info-density` - Compress docs/prompts losslessly for reduced token usage
-
 ## Installation
 
 ```bash
