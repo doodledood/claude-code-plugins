@@ -1,23 +1,23 @@
 ---
-name: refine-prompt
-description: 'Iteratively refines prompts for precision - eliminates ambiguities, resolves conflicts, adds missing definitions. Use when asked to improve, tighten, clarify, make precise, or refine a prompt.'
+name: optimize-prompt-precision
+description: 'Iteratively optimizes prompts for precision - eliminates ambiguities, resolves conflicts, adds missing definitions. Use when asked to optimize precision, clarify, disambiguate, or make a prompt unambiguous.'
 ---
 
-# Refine Prompt
+# Optimize Prompt Precision
 
-Iteratively improve prompt precision through analysis and verification loops. Primary goal: ensure prompt cannot be interpreted in ways the author doesn't expect.
+Iteratively optimize prompt precision through verification loops. Primary goal: ensure prompt cannot be interpreted in ways the author doesn't expect.
 
 ## Overview
 
 This skill transforms ambiguous prompts into precise ones through:
 1. **Verification First** - `prompt-precision-verifier` checks for issues before any changes
-2. **Refinement** - Apply targeted fixes based on verifier feedback (infer from context when possible, ask user when not)
+2. **Optimization** - Apply targeted fixes based on verifier feedback (infer from context when possible, ask user when not)
 3. **Re-verification** - Verify fixes, iterate if issues remain (max 5 iterations)
 4. **Output** - Atomic replacement only after verification passes
 
-**Loop**: Read → Verify → (Exit if precise) → Refine based on feedback → Re-verify → (Iterate if issues) → Output
+**Loop**: Read → Verify → (Exit if precise) → Optimize based on feedback → Re-verify → (Iterate if issues) → Output
 
-**Key principle**: Don't try to refine in one pass. The verifier drives all changes - if it finds no issues, the prompt is already precise.
+**Key principle**: Don't try to optimize in one pass. The verifier drives all changes - if it finds no issues, the prompt is already precise.
 
 ## Workflow
 
@@ -29,8 +29,8 @@ Create todos tracking workflow phases. List reflects areas of work, not fixed st
 ```
 - [ ] Input validation
 - [ ] Initial verification (run verifier first)
-- [ ] (expand on ISSUES_FOUND: refinement iteration 1, 2, 3...)
-- [ ] Output refined prompt
+- [ ] (expand on ISSUES_FOUND: optimization iteration 1, 2, 3...)
+- [ ] Output optimized prompt
 ```
 
 ### Phase 1: Input Validation
@@ -52,14 +52,14 @@ Extract input from `$ARGUMENTS`. Determine if file path or inline prompt.
 
 - If file path: Check file exists using Read tool
 - If inline: Write to temp file, note original was inline
-- Error if no input provided: "Usage: /refine-prompt <file-path> OR /refine-prompt <inline prompt text>"
+- Error if no input provided: "Usage: /optimize-prompt-precision <file-path> OR /optimize-prompt-precision <inline prompt text>"
 
 **Step 1.4: Store metadata**
 
 - `original_path`: Source file path (or temp path for inline)
 - `is_inline`: Boolean (affects output messaging)
 - `original_content`: Full prompt text
-- `working_path`: `/tmp/refined-{timestamp}.md` for iterations
+- `working_path`: `/tmp/optimized-precision-{timestamp}.md` for iterations
 
 **Mark "Input validation" todo `completed`.**
 
@@ -73,14 +73,14 @@ Copy original content to working_path using Write tool (verification needs a fil
 
 **Step 2.2: Run verifier first**
 
-Launch prompt-precision-verifier agent via Task tool BEFORE any refinement:
+Launch prompt-precision-verifier agent via Task tool BEFORE any optimization:
 - subagent_type: "prompt-engineering:prompt-precision-verifier"
 - prompt: "Verify prompt precision. File: {working_path}. Check for ambiguities, conflicts, undefined terms, underspecified rules, vague thresholds, priority confusion, edge case gaps, and implicit expectations. Report VERIFIED or ISSUES_FOUND with specific details."
 
 **Step 2.3: Handle verifier response**
 
 - If "VERIFIED": Mark todo completed, proceed directly to Phase 4 (Output) with message: "Prompt is already precise. No changes needed."
-- If "ISSUES_FOUND": Mark todo completed, save the issues list, add "Refinement iteration 1" todo and proceed to Phase 3
+- If "ISSUES_FOUND": Mark todo completed, save the issues list, add "Optimization iteration 1" todo and proceed to Phase 3
 - If verifier fails or returns unexpected format: Retry once with identical parameters. If retry fails, report error: "Verification failed - cannot proceed without verifier."
 
 **Step 2.4: Display verifier findings**
@@ -88,20 +88,20 @@ Launch prompt-precision-verifier agent via Task tool BEFORE any refinement:
 If issues found, show user summary and proceed:
 
 ```
-Verifier found {count} precision issues. Proceeding with refinement...
+Verifier found {count} precision issues. Proceeding with optimization...
 ```
 
 **Mark "Initial verification" todo `completed`.**
 
-### Phase 3: Refinement Loop (Verifier-Driven)
+### Phase 3: Optimization Loop (Verifier-Driven)
 
-**Mark "Refinement iteration 1" todo `in_progress`.**
+**Mark "Optimization iteration 1" todo `in_progress`.**
 
 **Key principle**: All fixes are driven by verifier feedback. Do NOT analyze the prompt independently - only fix the specific issues the verifier reported.
 
 For each iteration from 1 to 5:
 
-1. **Apply fixes from verifier feedback**: For each issue in the verifier's report, apply the Suggested Fix or use Resolution Strategy (see below) to address it. Write refined version to working_path.
+1. **Apply fixes from verifier feedback**: For each issue in the verifier's report, apply the Suggested Fix or use Resolution Strategy (see below) to address it. Write optimized version to working_path.
    - Only fix issues the verifier identified - do not add your own improvements
 
 2. **Re-verify**: Launch prompt-precision-verifier agent via Task tool:
@@ -110,7 +110,7 @@ For each iteration from 1 to 5:
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
-   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save new issues list, add "Refinement iteration {next}" todo, continue to next iteration
+   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save new issues list, add "Optimization iteration {next}" todo, continue to next iteration
    - If "ISSUES_FOUND" and iteration = 5: mark todo completed with note about unresolved issues, proceed to Phase 4 with warning
    - If verifier fails or returns unexpected format: display error to user, retry once with identical parameters. If retry fails, proceed to Phase 4 with warning: "Verification incomplete - manual review recommended."
 
@@ -169,11 +169,11 @@ questions: [
 
 **Batch related questions** - If multiple issues need user input, ask up to 4 related questions in one AskUserQuestion call.
 
-**After user answers**: Apply their clarification to the prompt, then continue refinement loop.
+**After user answers**: Apply their clarification to the prompt, then continue optimization loop.
 
 ### Phase 4: Output
 
-**Mark "Output refined prompt" todo `in_progress`.**
+**Mark "Output optimized prompt" todo `in_progress`.**
 
 **Step 4.1: Apply changes**
 
@@ -189,7 +189,7 @@ mv {working_path} {original_path}
 
 If verification passed:
 ```
-Refined: {path}
+Optimized: {path}
 Iterations: {count}
 Status: Precise and unambiguous
 
@@ -199,7 +199,7 @@ Changes applied:
 
 If verification failed after 5 iterations:
 ```
-Refined with warnings: {path}
+Optimized with warnings: {path}
 Iterations: 5
 Status: Some issues may remain
 
@@ -209,9 +209,9 @@ Unresolved issues:
 Review the changes manually.
 ```
 
-**Mark "Output refined prompt" todo `completed`. Mark all todos complete.**
+**Mark "Output optimized prompt" todo `completed`. Mark all todos complete.**
 
-## Refinement Techniques
+## Optimization Techniques
 
 Apply these techniques to fix precision issues:
 
@@ -229,7 +229,7 @@ Apply these techniques to fix precision issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Verify first** | Always run verifier before any refinement; maybe prompt is already precise |
+| **Verify first** | Always run verifier before any optimization; maybe prompt is already precise |
 | **Verifier-driven** | Only fix issues the verifier identifies - no independent analysis or improvements |
 | **Track progress** | TodoWrite to track phases; expand todos on iteration |
 | **Infer first, ask second** | Try to resolve verifier-flagged issues from context before asking user |
@@ -242,7 +242,7 @@ Apply these techniques to fix precision issues:
 
 | Scenario | Handling |
 |----------|----------|
-| No input provided | Error: "Usage: /refine-prompt <file-path> OR /refine-prompt <inline prompt text>" |
+| No input provided | Error: "Usage: /optimize-prompt-precision <file-path> OR /optimize-prompt-precision <inline prompt text>" |
 | File not found | Error: "File not found: {path}" |
 | Already precise | Verifier returns VERIFIED on first check → Report: "Prompt is already precise. No changes needed." |
 | Initial verifier fails | Retry once; if still fails, Error: "Verification failed - cannot proceed without verifier." |
@@ -254,20 +254,20 @@ Apply these techniques to fix precision issues:
 ## Example Usage
 
 ```bash
-# Refine a prompt file
-/refine-prompt prompts/code-reviewer.md
+# Optimize a prompt file for precision
+/optimize-prompt-precision prompts/code-reviewer.md
 
-# Refine inline prompt
-/refine-prompt You are a helpful assistant. Be concise but thorough. Use good judgment.
+# Optimize inline prompt for precision
+/optimize-prompt-precision You are a helpful assistant. Be concise but thorough. Use good judgment.
 
-# Refine a skill file
-/refine-prompt claude-plugins/my-plugin/skills/my-skill/SKILL.md
+# Optimize a skill file for precision
+/optimize-prompt-precision claude-plugins/my-plugin/skills/my-skill/SKILL.md
 ```
 
 ## Example Output
 
 ```
-Refined: prompts/code-reviewer.md
+Optimized: prompts/code-reviewer.md
 Iterations: 2
 Status: Precise and unambiguous
 

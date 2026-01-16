@@ -37,7 +37,7 @@ Standalone utilities that work independently. `/clean-slop` removes AI-generated
 Define customer profiles and brand guidelines once, reference consistently across sessions. Includes author voice capture for content generation.
 
 ### prompt-engineering
-Two modes: `/review-prompt` (read-only analysis) and `/refine-prompt` (iterative refinement with verification).
+Three modes: `/review-prompt` (read-only analysis), `/optimize-prompt-precision` (eliminate ambiguities), `/optimize-prompt-goal` (goal effectiveness).
 
 ### frontend-design
 Frontend design patterns including scrollytelling (scroll-driven storytelling with pinned sections, progressive reveals, parallax effects).
