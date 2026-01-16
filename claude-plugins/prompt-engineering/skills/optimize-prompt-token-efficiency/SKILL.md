@@ -1,11 +1,11 @@
 ---
 name: optimize-prompt-token-efficiency
-description: 'Iteratively optimizes prompts for token efficiency - reduces verbosity, removes redundancy, tightens phrasing while preserving semantic content. Use when asked to compress, shorten, reduce tokens, tighten, or make a prompt more concise.'
+description: 'Iteratively optimizes prompts for token efficiency by maximizing information density - reduces verbosity, removes redundancy, tightens phrasing while preserving semantic content. Use when asked to compress, shorten, reduce tokens, tighten, maximize density, increase information density, or make a prompt more concise.'
 ---
 
 # Optimize Prompt Token Efficiency
 
-Iteratively optimize prompt token efficiency through verification loops. Primary goal: reduce token consumption while preserving all semantic content for AI-consumed prompts (CLAUDE.md, skills, agent prompts, specs).
+Iteratively optimize prompt token efficiency by maximizing information density through verification loops. Primary goal: reduce token consumption while preserving all semantic content for AI-consumed prompts (CLAUDE.md, skills, agent prompts, specs).
 
 ## Overview
 
