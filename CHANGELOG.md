@@ -8,6 +8,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.12.0 - New `/compress-prompt` skill for extreme prompt compression:
+  - Compresses prompts/skills into single dense paragraphs for AI-readable context injection
+  - 7-level preservation hierarchy (goal/constraints NEVER drop; explanations/style CAN drop)
+  - Natural dense prose compression (semicolon-chained, articles omitted, abbreviations used)
+  - New `prompt-compression-verifier` agent checks 5 issue types (Missing Core Goal, Missing Constraint, Missing Edge Case, Semantic Drift, Ambiguity Introduced)
+  - Non-destructive output (display + optional file save)
+  - Verification loop with max 5 iterations
 - [prompt-engineering] v1.11.3 - Use `mv` for atomic file replacement in all optimization skills:
   - `/apply-prompt-feedback`, `/optimize-prompt-goal`, `/optimize-prompt-precision` now use `mv` instead of Write tool for final output
   - Matches existing pattern in `/optimize-prompt-token-efficiency`

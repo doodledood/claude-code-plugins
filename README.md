@@ -106,6 +106,7 @@ Analyze and optimize prompts for clarity, precision, and goal effectiveness.
 - `/review-prompt` - Analyze against 10-Layer Architecture framework (read-only)
 - `/optimize-prompt-precision` - Iteratively optimize for precision, eliminating ambiguities
 - `/optimize-prompt-goal` - Iteratively optimize for goal effectiveness
+- `/compress-prompt` - Compress into single dense paragraph for context injection
 
 ### frontend-design
 
