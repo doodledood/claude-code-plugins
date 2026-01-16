@@ -113,21 +113,36 @@ This is a fundamentally different use case - not optimization but radical summar
 - No ambiguity introduced
 - Compression is semantically faithful
 
+### D10: Skill Name
+**Decision**: compress-prompt
+**Rationale**: Clear, matches plugin naming pattern (optimize-prompt-*, review-prompt).
+
+### D11: Edge Cases
+**Decision**: Accepted proposed handling
+- Empty file → Error
+- Short prompt (<100 tokens) → Warn + compress anyway
+- Code blocks → Preserve as-is
+- Tables → Convert to prose
+- Binary files → Error
+
+### D12: Scope Check
+**Decision**: Spec is complete, nothing to add/remove.
+
 ---
 
 ## Open Questions
 
-(To be populated)
+(None remaining)
 
 ---
 
 ## Spec Evolution
 
-### Draft v4
+### FINAL SPEC (v5)
 
 ---
 **name**: compress-prompt
-**description**: [TBD - need trigger words and when-to-use clarity]
+**description**: 'Compresses prompts/skills into single dense paragraphs for AI-readable context injection. Maximizes information density while preserving semantic meaning. Use when asked to compress, condense, summarize, or densify a prompt for token efficiency.'
 
 # Compress Prompt
 
@@ -204,6 +219,124 @@ Reports: VERIFIED or ISSUES_FOUND with specific missing/problematic elements.
 
 ## Edge Cases
 
-[TBD]
+| Scenario | Handling |
+|----------|----------|
+| Empty file | Error: "Cannot compress empty prompt: {path}" |
+| Short prompt (<100 tokens) | Warning: "Prompt already concise" + compress anyway |
+| Prompt with code blocks | Preserve code blocks as-is; compress surrounding text |
+| Prompt with tables | Convert table semantics to dense prose |
+| Binary/non-text file | Error: "Cannot compress binary file: {path}" |
+| File not found | Re-classify as inline text if plausible, else error |
+| Verification fails after 5 iterations | Output with warning: "Manual review recommended" |
+| Task tool unavailable | Error: "Task tool required for verification loop" |
+
+## Example Usage
+
+```bash
+# Compress a prompt file
+/compress-prompt prompts/code-reviewer.md
+
+# Compress and save to file
+/compress-prompt skills/bug-fixer/SKILL.md --output compressed/bug-fixer.txt
+
+# Compress inline text
+/compress-prompt "You are a helpful assistant that reviews code for bugs..."
+```
+
+## Example Output
+
+```
+Compressed: prompts/code-reviewer.md
+
+Original: 1,247 tokens
+Compressed: 156 tokens (87.5% reduction)
 
 ---
+Code reviewer agent: analyze code for bugs, security issues, performance problems; flag severity (critical/high/medium/low); suggest fixes with code snippets; never approve code with critical issues; output JSON {file, line, issue, severity, fix}; handle empty input by requesting code; for large files process in chunks max 500 lines.
+---
+
+Verification: PASSED (2 iterations)
+```
+
+---
+
+# APPROVAL SUMMARY
+
+## At-a-Glance
+
+| Aspect | Decision |
+|--------|----------|
+| **Skill name** | `compress-prompt` |
+| **Plugin** | prompt-engineering |
+| **Use case** | AI-readable context injection |
+| **Output format** | Single dense paragraph (flexible length) |
+| **Compression style** | Natural dense prose |
+| **Verification** | Agent-based loop (max 5 iterations) |
+| **Input** | File path or inline text |
+| **Output** | Display (+ optional file save) |
+
+## Main Flow (ASCII State Machine)
+
+```
+┌─────────────────┐
+│  Parse Input    │
+│  (file/inline)  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│    Compress     │
+│  (hierarchy +   │
+│   techniques)   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ISSUES_FOUND    ┌─────────────────┐
+│     Verify      │◄────────────────────│     Refine      │
+│   (verifier     │                     │  (fix issues)   │
+│    agent)       │─────────────────────►                 │
+└────────┬────────┘    iter < 5         └─────────────────┘
+         │
+         │ VERIFIED (or iter = 5)
+         ▼
+┌─────────────────┐
+│     Output      │
+│  (display +     │
+│   stats)        │
+└─────────────────┘
+```
+
+## Key Decisions
+
+| # | Decision | Rationale |
+|---|----------|-----------|
+| D1 | AI-readable output | LLM performance degrades with context; compress for token efficiency |
+| D2 | Flexible paragraph length | Quality > arbitrary limits |
+| D3 | Prioritized + semantic | Hierarchy for what to keep; dense encoding for how |
+| D4 | 7-level hierarchy | Goal/constraints NEVER drop; examples/explanations CAN drop |
+| D5 | Natural dense prose | Terse English, semicolon-chained, grammatical |
+| D6 | Assume LLM knowledge | Leverage shared context; disambiguate when needed |
+| D7 | File + inline input | Maximum flexibility |
+| D8 | Display + optional file | Non-destructive default |
+| D9 | Agent verification | Follow plugin pattern; ensure semantic fidelity |
+
+## Requirements Count
+
+| Category | Count |
+|----------|-------|
+| Functional requirements | 8 |
+| Preservation hierarchy levels | 7 |
+| Compression techniques | 6 |
+| Edge cases handled | 8 |
+| Workflow phases | 4 |
+| Verifier checks | 5 |
+
+## Completeness Check
+
+- [x] Could an implementer code it without guessing? **Yes** - all techniques, hierarchy, workflow defined
+- [x] Could a tester write tests from it? **Yes** - edge cases with expected behaviors listed
+- [x] Could a reviewer verify success criteria? **Yes** - verifier checks are explicit
+
+---
+
+**Status**: Ready for implementation approval
