@@ -8,13 +8,13 @@ model: opus
 
 # Prompt Compression Verifier
 
-Verify that prompt compression preserves essential semantic content while achieving **aggressive density** (~200-600 tokens, 85-95% reduction).
+Verify that prompt compression preserves essential semantic content while achieving **inline-typable brevity**—short enough a user could type it.
 
 ## Mission
 
 Given original and compressed file paths:
 1. **Check format**: Is compressed ONE dense paragraph? (no headers, bullets, structure)
-2. **Check density**: Is it ~200-600 tokens? (not thousands)
+2. **Check brevity**: Is it short enough to type inline? (not pages of text)
 3. Extract essential content from original using preservation hierarchy
 4. Verify each essential element exists in compressed version
 5. Check for introduced ambiguity
@@ -44,12 +44,12 @@ Essential content ranked by priority (1 = highest):
 ### 6 Issue Categories
 
 #### 0. Insufficient Compression (CHECK FIRST)
-The compressed output is not aggressive enough—still has structure or too many tokens.
+The compressed output is not aggressive enough—still has structure or isn't inline-typable.
 **Detection**:
 - Contains headers (##, ###, **Phase**, etc.)
 - Contains bullet points or numbered lists
 - Contains multiple paragraphs/newlines
-- Estimated tokens > 700 (compressed.length / 4)
+- Too long to reasonably type inline (pages instead of a paragraph)
 **Severity**: Always CRITICAL—compression failed, must redo
 **Note**: Check this BEFORE other issues. If compression format is wrong, other checks are moot.
 
@@ -96,7 +96,7 @@ Before checking semantics, verify the compressed output meets format requirement
 **Format checks**:
 - Is it ONE paragraph? (no headers like `##`, no `**Phase**`, no bullet `-` or `*`, no numbered `1.`)
 - No multiple paragraphs? (no blank lines splitting content)
-- Estimated tokens ≤ 700? (`compressed.length / 4`)
+- Short enough to type inline? (a paragraph, not pages)
 
 **If format fails** → CRITICAL issue "Insufficient Compression". Stop other checks. The compression must be redone.
 
@@ -275,11 +275,11 @@ Setup (create todo list, init log)→Discovery (probe need, factors)→...
 | Style hints removed | Priority 7 - acceptable loss |
 | Structure flattened to paragraph | Expected output format |
 | Phase details condensed to flow | Expected: "Phase1→Phase2→Phase3" |
-| 85-95% token reduction | Target compression ratio |
+| Massive reduction from original | Aggressive compression is the goal |
 
 **When in doubt**: Flag as MEDIUM. Over-flagging is safer than under-flagging.
 
-**Remember**: The goal is ~200-600 tokens. Aggressive compression is expected and correct.
+**Remember**: The goal is inline-typable brevity. If a user could reasonably type it, it's short enough.
 
 ## Self-Check
 

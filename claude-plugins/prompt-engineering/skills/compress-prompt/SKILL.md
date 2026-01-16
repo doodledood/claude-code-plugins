@@ -5,11 +5,11 @@ description: 'Compresses prompts/skills into single dense paragraphs for AI-read
 
 # Compress Prompt
 
-Compress a full prompt or skill into a single dense paragraph of **a few hundred tokens max**. Target **85-95% token reduction**. LLMs can "decompress" dense notation back to full meaning.
+Compress a full prompt or skill into a single dense paragraph **short enough to type inline**. LLMs can "decompress" dense notation back to full meaning.
 
 ## Overview
 
-**Goal**: Transform any prompt (even 10K+ tokens) into ONE paragraph of ~200-600 tokens while preserving semantic fidelity.
+**Goal**: Transform any prompt (even thousands of tokens) into ONE short paragraph a user could reasonably type—like a detailed instruction you'd give verbally.
 
 This skill compresses prompts through:
 1. **Initial Compression** - Aggressively compress using preservation hierarchy
@@ -20,7 +20,7 @@ This skill compresses prompts through:
 **Loop**: Parse input → Compress → Verify → (Iterate if issues) → Output
 
 **Key principles**:
-- **Aggressive compression**: Target 85-95% reduction; a few hundred tokens max
+- **Inline-typable brevity**: Short enough a user could type it; like a detailed verbal instruction
 - **Single paragraph**: ONE dense paragraph, not reformatted sections
 - **Prioritized preservation**: Core goal/constraints NEVER drop; everything else CAN drop
 - **Semantic encoding**: Dense notation so AI can reconstruct full meaning
@@ -97,7 +97,7 @@ Using Write tool:
 
 **Step 2.2: Apply compression**
 
-**⚠️ CRITICAL**: Output must be ONE dense paragraph of ~200-600 tokens. Not reformatted sections. Not bullet points. ONE paragraph.
+**⚠️ CRITICAL**: Output must be ONE dense paragraph short enough to type inline. Not reformatted sections. Not bullet points. ONE paragraph you could reasonably type.
 
 Compress using:
 
@@ -127,10 +127,10 @@ Compress using:
 
 3. **Self-check before writing**:
    - Is it ONE paragraph? (no headers, no bullets, no structure)
-   - Is it ~200-600 tokens? (not thousands)
+   - Is it short enough to type inline? (not pages of text)
    - Would reformatting this back out recover the core workflow?
 
-**Output format**: Single cohesive paragraph. No bullet points, no headers, no newlines. Target ~200-600 tokens regardless of original size.
+**Output format**: Single cohesive paragraph. No bullet points, no headers, no newlines. Short enough a user could type it.
 
 **Step 2.3: Verify compression**
 
@@ -231,7 +231,7 @@ Unresolved issues:
 
 | Principle | Rule |
 |-----------|------|
-| **Target 85-95% reduction** | A few hundred tokens max, regardless of input size |
+| **Inline-typable** | Short enough a user could type it; like a verbal instruction |
 | **ONE paragraph** | No headers, no bullets, no structure—flatten everything |
 | **Compress then verify** | Compress aggressively first, verifier catches issues |
 | **Preservation hierarchy** | Goal/constraints NEVER drop; explanations/examples DROP |
