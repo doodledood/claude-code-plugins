@@ -56,7 +56,22 @@ This is a fundamentally different use case - not optimization but radical summar
 
 ## Decisions Made
 
-(To be populated)
+### D1: Primary Use Case
+**Decision**: AI-readable context injection
+**Rationale**: User wants a token-efficient version that preserves maximum detail. LLMs perform worse as context grows, so this compression enables using full prompt semantics in constrained contexts.
+**Implication**: Optimize for AI parseability over human scannability. Dense notation acceptable.
+
+### D2: Paragraph Definition
+**Decision**: Flexible density - no hard word/sentence limit
+**Rationale**: "One paragraph" = single cohesive block, length determined by content complexity.
+**Implication**: No arbitrary truncation. Compression quality > arbitrary length constraint.
+
+### D3: Lossy Framing
+**Decision**: Prioritized preservation + Semantic compression (both)
+**Rationale**:
+- Prioritized: Define what MUST vs CAN be lost
+- Semantic: Encode densely so AI can "decompress" meaning
+**Implication**: Hierarchical importance filtering + dense encoding techniques. Not distillation (which loses details).
 
 ---
 
@@ -68,7 +83,7 @@ This is a fundamentally different use case - not optimization but radical summar
 
 ## Spec Evolution
 
-### Draft v1 (Initial)
+### Draft v2
 
 ---
 **name**: compress-prompt
@@ -76,38 +91,51 @@ This is a fundamentally different use case - not optimization but radical summar
 
 # Compress Prompt
 
-Compress a full prompt or skill into a single dense paragraph, capturing maximum information with minimum tokens.
+Compress a full prompt or skill into a single dense paragraph for AI-readable context injection. Maximizes information density so LLMs can "decompress" the full meaning from minimal tokens.
 
 ## Purpose
 
-[TBD - What's the use case?]
-- Memory/summarization for long-running conversations?
-- Quick reference card?
-- Embedding in other prompts as compressed context?
-- Human-readable or AI-readable output?
+**Primary**: Create token-efficient versions of prompts/skills that preserve maximum semantic content. Addresses LLM performance degradation with growing context.
+
+**Use cases**:
+- Inject prompt context into other prompts without consuming full token budget
+- Provide compressed skill summaries for agent decision-making
+- Enable long prompts to fit in constrained contexts
 
 ## Constraints
 
-- **Output length**: One paragraph [TBD - word/sentence limit? "paragraph" definition?]
-- **Preservation priority**: [TBD - what to prioritize: goal, constraints, edge cases, examples?]
-- **Lossy nature**: [TBD - is "lossless as possible" realistic for 90%+ compression? How to frame?]
+- **Output format**: Single cohesive paragraph (no hard word limit - length follows content complexity)
+- **Compression approach**: Prioritized preservation + semantic encoding
+  - MUST preserve: [TBD - hierarchy]
+  - CAN lose: [TBD - hierarchy]
+- **Target audience**: AI-readable (dense notation acceptable, human readability secondary)
+
+## Preservation Hierarchy
+
+[TBD - what elements get priority?]
+1. Core goal/purpose?
+2. Hard constraints/rules?
+3. Edge cases?
+4. Examples?
+5. Explanations?
+6. Formatting hints?
 
 ## Compression Techniques
 
-[TBD - specific techniques for extreme compression]:
-- Dense notation systems?
-- Abbreviations?
+[TBD - specific techniques]:
+- Abbreviations and shorthand?
 - Implicit context assumptions?
-- Hierarchical importance filtering?
+- Notation systems (arrows, semicolons)?
+- Reference compression ("like X but Y")?
 
 ## Input/Output
 
 - **Input**: [TBD - file path only? inline? both?]
-- **Output**: [TBD - replace original? output to new file? display only?]
+- **Output**: [TBD - display only? save to file? both?]
 
 ## Verification
 
-[TBD - need verification loop like other skills? or simpler single-pass?]
+[TBD - need verification loop? or simpler single-pass?]
 
 ## Edge Cases
 
