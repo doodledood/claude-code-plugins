@@ -8,6 +8,9 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-16
 
+- [prompt-engineering] v1.11.3 - Use `mv` for atomic file replacement in all optimization skills:
+  - `/apply-prompt-feedback`, `/optimize-prompt-goal`, `/optimize-prompt-precision` now use `mv` instead of Write tool for final output
+  - Matches existing pattern in `/optimize-prompt-token-efficiency`
 - [prompt-engineering] v1.11.2 - Comparison mode for `/optimize-prompt-precision`:
   - `prompt-precision-verifier` now supports comparison mode (original vs modified)
   - Adds 2 comparison-mode issue types: Optimization Regression, Over-Optimization

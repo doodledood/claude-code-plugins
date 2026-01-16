@@ -181,7 +181,7 @@ questions: [
 **Step 4.1: Apply changes**
 
 After optimization complete (verification passed or max iterations reached):
-- For file input: Use Write tool to copy working_path content to source_path (replaces original)
+- For file input: `mv {working_path} {source_path}` (atomic replacement)
 - For inline input: Keep at working_path, report location
 
 **Step 4.2: Display results**
