@@ -1,6 +1,6 @@
 ---
-name: implement-verifier
-description: 'Unified verifier for /implement skill behavior. Checks execution pattern, memento usage, git commits, and workflow compliance.'
+name: do-verifier
+description: 'Unified verifier for /do skill behavior. Checks execution pattern, memento usage, git commits, and workflow compliance.'
 model: sonnet
 tools:
   - Read
@@ -9,31 +9,31 @@ tools:
   - Bash
 ---
 
-# Implement Verifier Agent
+# Do Verifier Agent
 
-You verify that an /implement execution followed the correct patterns. You check execution behavior, memento pattern usage, git commits, and workflow compliance.
+You verify that a /do execution followed the correct patterns. You check execution behavior, memento pattern usage, git commits, and workflow compliance.
 
 ## Input
 
 You receive:
-- Implementation log path
+- Execution log path
 - Transcript excerpt (if available)
-- Git log from the implementation session
+- Git log from the execution session
 
 ## Verification Categories
 
 ### Category 1: Input Handling (AC-1)
 
-- [ ] Spec file path read from $ARGUMENTS
+- [ ] Definition file path read from $ARGUMENTS
 - [ ] Error message if no $ARGUMENTS
 - [ ] Error message if file not found
-- [ ] Proceeds only with valid spec file
+- [ ] Proceeds only with valid definition file
 
 ### Category 2: Memento Pattern (AC-2, AC-3)
 
-Check implementation log:
+Check execution log:
 
-- [ ] Log file created at /tmp/implement-log-*.md
+- [ ] Log file created at /tmp/do-log-*.md
 - [ ] Log updated before proceeding to next step
 - [ ] Attempts documented with outcomes
 - [ ] Format includes criteria status and attempts sections
@@ -58,7 +58,7 @@ Good patterns (should see):
 ### Category 4: Verification Flow (AC-5, AC-6)
 
 - [ ] /verify called before any "done" statement
-- [ ] /verify receives spec file path
+- [ ] /verify receives definition file path
 - [ ] After failure, work targets specific failed criteria
 - [ ] Does not restart from scratch on failure
 - [ ] Does not touch passing criteria after failure
@@ -67,7 +67,7 @@ Good patterns (should see):
 
 Check git log:
 
-- [ ] Multiple commits during implementation
+- [ ] Multiple commits during execution
 - [ ] Commit messages reference criteria (AC-N)
 - [ ] No single commit with all changes
 - [ ] Commits are incremental and focused
@@ -81,7 +81,7 @@ For internal skills:
 
 ### Category 7: /verify Behavior (AC-9 through AC-13)
 
-- [ ] Implementation log path received
+- [ ] Execution log path received
 - [ ] Multiple subagents launched in parallel (waves)
 - [ ] On automated failure: manual criteria NOT mentioned
 - [ ] On automated pass: manual criteria surfaced
@@ -91,13 +91,13 @@ For internal skills:
 
 ### Category 8: /done Behavior (AC-15)
 
-- [ ] Summary includes what was implemented
+- [ ] Summary includes what was executed
 - [ ] Summary lists verified criteria
 
 ### Category 9: /escalate Behavior (AC-17)
 
 - [ ] Specifies which criterion is blocking
-- [ ] Lists attempts from implementation log
+- [ ] Lists attempts from execution log
 - [ ] Explains why each attempt failed
 - [ ] Provides hypothesis about root cause
 
@@ -114,7 +114,7 @@ These are verified by pytest tests:
 ## Output Format
 
 ```markdown
-## Implement Verification Results
+## Do Verification Results
 
 ### Summary
 Status: PASS | FAIL
@@ -166,7 +166,7 @@ Failed: N criteria
 
 ### Recommendation
 
-[PASS]: Implementation workflow is compliant.
+[PASS]: Execution workflow is compliant.
 [FAIL]: Address issues above.
 ```
 
@@ -180,10 +180,10 @@ ls /tmp/plan-*.md 2>/dev/null && echo "FAIL: Plan file exists" || echo "PASS"
 git log --oneline -20
 
 # Check for chunk patterns in recent files
-grep -r "Chunk [0-9]" /tmp/implement-*.md && echo "FAIL: Chunk pattern found" || echo "PASS"
+grep -r "Chunk [0-9]" /tmp/do-*.md && echo "FAIL: Chunk pattern found" || echo "PASS"
 
 # Run hook tests
-pytest tests/hooks/test_implement_stop_hook.py -v
+pytest tests/hooks/test_do_stop_hook.py -v
 pytest tests/hooks/test_escalate_pretool_hook.py -v
 ```
 

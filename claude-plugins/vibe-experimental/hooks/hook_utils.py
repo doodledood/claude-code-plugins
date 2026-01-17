@@ -12,13 +12,13 @@ from typing import Any
 
 
 @dataclass
-class ImplementFlowState:
-    """State of the /implement workflow from transcript parsing."""
+class DoFlowState:
+    """State of the /do workflow from transcript parsing."""
 
-    has_implement: bool  # /implement was invoked
-    has_verify: bool  # /verify was called after last /implement
-    has_done: bool  # /done was called after last /implement
-    has_escalate: bool  # /escalate was called after last /implement
+    has_do: bool  # /do was invoked
+    has_verify: bool  # /verify was called after last /do
+    has_done: bool  # /done was called after last /do
+    has_escalate: bool  # /escalate was called after last /do
 
 
 def is_skill_invocation(line_data: dict[str, Any], skill_name: str) -> bool:
@@ -74,14 +74,14 @@ def is_user_skill_command(line_data: dict[str, Any], skill_name: str) -> bool:
     return False
 
 
-def parse_implement_flow(transcript_path: str) -> ImplementFlowState:
+def parse_do_flow(transcript_path: str) -> DoFlowState:
     """
-    Parse transcript to determine the state of /implement workflow.
+    Parse transcript to determine the state of /do workflow.
 
-    Tracks the most recent /implement invocation and what happened after it.
-    Each new /implement resets the flow state.
+    Tracks the most recent /do invocation and what happened after it.
+    Each new /do resets the flow state.
     """
-    has_implement = False
+    has_do = False
     has_verify = False
     has_done = False
     has_escalate = False
@@ -97,45 +97,43 @@ def parse_implement_flow(transcript_path: str) -> ImplementFlowState:
                 except json.JSONDecodeError:
                     continue
 
-                # Check for /implement (user command or skill call)
-                if is_user_skill_command(data, "implement") or is_skill_invocation(
-                    data, "implement"
-                ):
-                    # New /implement resets the flow
-                    has_implement = True
+                # Check for /do (user command or skill call)
+                if is_user_skill_command(data, "do") or is_skill_invocation(data, "do"):
+                    # New /do resets the flow
+                    has_do = True
                     has_verify = False
                     has_done = False
                     has_escalate = False
 
-                # Check for /verify after /implement
-                if has_implement and is_skill_invocation(data, "verify"):
+                # Check for /verify after /do
+                if has_do and is_skill_invocation(data, "verify"):
                     has_verify = True
 
-                # Check for /done after /implement
-                if has_implement and is_skill_invocation(data, "done"):
+                # Check for /done after /do
+                if has_do and is_skill_invocation(data, "done"):
                     has_done = True
 
-                # Check for /escalate after /implement
-                if has_implement and is_skill_invocation(data, "escalate"):
+                # Check for /escalate after /do
+                if has_do and is_skill_invocation(data, "escalate"):
                     has_escalate = True
 
     except FileNotFoundError:
-        return ImplementFlowState(
-            has_implement=False,
+        return DoFlowState(
+            has_do=False,
             has_verify=False,
             has_done=False,
             has_escalate=False,
         )
     except OSError:
-        return ImplementFlowState(
-            has_implement=False,
+        return DoFlowState(
+            has_do=False,
             has_verify=False,
             has_done=False,
             has_escalate=False,
         )
 
-    return ImplementFlowState(
-        has_implement=has_implement,
+    return DoFlowState(
+        has_do=has_do,
         has_verify=has_verify,
         has_done=has_done,
         has_escalate=has_escalate,

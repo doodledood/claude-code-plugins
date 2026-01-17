@@ -6,7 +6,7 @@ user-invocable: false
 
 # /done - Completion Marker
 
-You mark successful completion of an /implement workflow. You are called by /verify when all automated criteria pass, not directly by users or /implement.
+You mark successful completion of a /do workflow. You are called by /verify when all automated criteria pass, not directly by users or /do.
 
 ## Input
 
@@ -14,7 +14,7 @@ You mark successful completion of an /implement workflow. You are called by /ver
 
 ## Purpose
 
-1. **Marker in transcript** - stop hook looks for /done after /implement
+1. **Marker in transcript** - stop hook looks for /done after /do
 2. **Completion summary** - tell user what was accomplished
 3. **Enable stop** - without /done, stop is blocked
 
@@ -27,11 +27,11 @@ This skill's existence in the transcript signals completion.
 ### 2. Output Summary
 
 ```markdown
-## Implementation Complete
+## Execution Complete
 
 All acceptance criteria verified passing.
 
-### What Was Implemented
+### What Was Executed
 - [Brief description of changes made]
 - [Key files modified]
 
@@ -50,12 +50,12 @@ All acceptance criteria verified passing.
 
 ---
 
-Implementation verified complete. You may now stop or continue with other work.
+Execution verified complete. You may now stop or continue with other work.
 ```
 
-### 3. Read Implementation Log
+### 3. Read Execution Log
 
-If implementation log path available, read it to populate:
+If execution log path available, read it to populate:
 - What was attempted
 - Key decisions
 - Files modified
@@ -71,13 +71,13 @@ If implementation log path available, read it to populate:
 
 The stop hook checks:
 ```
-if /implement exists in transcript:
-    if /done exists after /implement:
+if /do exists in transcript:
+    if /done exists after /do:
         ALLOW stop
-    elif /escalate exists after /implement:
+    elif /escalate exists after /do:
         ALLOW stop
     else:
         BLOCK stop
 ```
 
-By existing in the transcript after /implement, /done enables stopping.
+By existing in the transcript after /do, /done enables stopping.

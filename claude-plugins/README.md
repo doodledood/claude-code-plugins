@@ -15,7 +15,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | Plugin | What It Does |
 |--------|--------------|
 | `vibe-workflow` | Structured spec → plan → implement workflow with parallel code review. Front-loads requirements to reduce iteration cycles. Includes hooks for session continuity. |
-| `vibe-experimental` | Verification-first workflows. Every criterion has explicit verification; implementation can't stop without verification passing or escalation. |
+| `vibe-experimental` | Verification-first workflows. Every criterion has explicit verification; execution can't stop without verification passing or escalation. |
 | `consultant` | Multi-provider LLM consultations via LiteLLM. Get perspectives from OpenAI, Google, local models without leaving Claude Code. |
 | `vibe-extras` | Git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup. |
 | `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems, author voice capture. |
@@ -29,7 +29,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 Core development workflow with hooks for session continuity. Includes specialized review agents for bugs, types, maintainability, simplicity, coverage, and docs.
 
 ### vibe-experimental
-Verification-first approach: `/spec` builds requirements with explicit verification methods, `/implement` executes autonomously with hooks that block stopping until verification passes or proper escalation.
+Verification-first approach: `/define` builds requirements with explicit verification methods, `/do` executes autonomously with hooks that block stopping until verification passes or proper escalation.
 
 ### consultant
 Requires Python 3.9+ and uv. Supports any LiteLLM provider. Includes `/ask` for single-model queries and `/ask-council` for multi-model ensemble.

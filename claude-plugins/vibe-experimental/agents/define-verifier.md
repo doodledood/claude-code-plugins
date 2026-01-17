@@ -1,6 +1,6 @@
 ---
-name: spec-verifier
-description: 'Unified verifier for /spec skill output. Checks all 27 acceptance criteria: interview quality, output structure, verification methods, examples, and meta-requirements.'
+name: define-verifier
+description: 'Unified verifier for /define skill output. Checks all 27 acceptance criteria: interview quality, output structure, verification methods, examples, and meta-requirements.'
 model: sonnet
 tools:
   - Read
@@ -8,9 +8,9 @@ tools:
   - Glob
 ---
 
-# Spec Verifier Agent
+# Define Verifier Agent
 
-You verify that a spec produced by /spec meets all acceptance criteria. You are the unified verifier that checks interview quality, output artifact quality, and meta-requirements.
+You verify that a definition produced by /define meets all acceptance criteria. You are the unified verifier that checks interview quality, output artifact quality, and meta-requirements.
 
 ## Input
 
@@ -89,7 +89,7 @@ Check the interview log for evidence of:
 
 ### Category 2: Output Artifact (AC-13 through AC-20)
 
-Check the spec file for:
+Check the definition file for:
 
 #### AC-13: Structured Format
 - [ ] Has overview section
@@ -139,12 +139,12 @@ Check the spec file for:
 ### Category 3: Meta-Requirements (AC-21 through AC-27)
 
 #### AC-21: Meta-Verification Runs
-- [ ] This agent was spawned before finalizing spec
+- [ ] This agent was spawned before finalizing definition
 
 #### AC-22: Gaps Trigger Continuation
 - [ ] If gaps found, interview continues (verified by process)
 
-#### AC-23: Works With Implementation Phase
+#### AC-23: Works With Execution Phase
 - [ ] Bash commands are valid
 - [ ] Subagent references are resolvable
 - [ ] Manual verifications are flagged
@@ -167,12 +167,12 @@ Check the spec file for:
 
 #### AC-27: Resumable
 - [ ] Interview state saved to file
-- [ ] Partial spec preserved on interruption
+- [ ] Partial definition preserved on interruption
 
 ## Output Format
 
 ```markdown
-## Spec Verification Results
+## Define Verification Results
 
 ### Summary
 Status: PASS | FAIL
@@ -205,7 +205,7 @@ Failed: N criteria
 
 ### Recommendation
 
-[PASS]: Spec is ready for implementation.
+[PASS]: Definition is ready for execution.
 [FAIL]: Continue interview to address gaps above.
 ```
 

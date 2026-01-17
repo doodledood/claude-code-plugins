@@ -1,26 +1,26 @@
 ---
 name: verify
-description: 'Internal verification runner. Executes all verification methods from spec against codebase. Called by /implement, not directly by users.'
+description: 'Internal verification runner. Executes all verification methods from definition against codebase. Called by /do, not directly by users.'
 user-invocable: false
 ---
 
 # /verify - Verification Runner
 
-You run all verification methods from a spec file against the current codebase state. You are called by /implement, not directly by users.
+You run all verification methods from a definition file against the current codebase state. You are called by /do, not directly by users.
 
 ## Input
 
-`$ARGUMENTS` = "<spec-file-path> <implementation-log-path>"
+`$ARGUMENTS` = "<definition-file-path> <execution-log-path>"
 
-Example: `/tmp/spec-123.md /tmp/implement-log-123.md`
+Example: `/tmp/define-123.md /tmp/do-log-123.md`
 
 ## Process
 
 ### 1. Parse Inputs
 
 Read both files:
-- Spec file: extract all criteria and their verification methods
-- Implementation log: understand what was attempted (for context in subagent checks)
+- Definition file: extract all criteria and their verification methods
+- Execution log: understand what was attempted (for context in subagent checks)
 
 ### 2. Categorize Criteria
 
@@ -48,13 +48,13 @@ Launch in parallel waves (max 5 concurrent):
 
 ```
 Use the Task tool to check criterion AC-N:
-Task("vibe-experimental", "criteria-checker", "Check AC-N: [description]. Context: [relevant files]. Checks: [from spec]")
+Task("vibe-experimental", "criteria-checker", "Check AC-N: [description]. Context: [relevant files]. Checks: [from definition]")
 ```
 
 For each subagent:
 - Provide criterion definition
 - Provide relevant code files
-- Provide implementation log excerpt
+- Provide execution log excerpt
 - Request pass/fail with specific file:line issues
 
 ### 5. Collect Results
@@ -88,7 +88,7 @@ Build results structure:
 ```
 if any automated failed:
     → Return failures only (hide manual)
-    → /implement continues working
+    → /do continues working
 
 elif all automated pass AND manual exists:
     → Return manual criteria
@@ -180,12 +180,12 @@ Context files:
 - [file1]: [what it contains]
 - [file2]: [what it contains]
 
-Implementation log excerpt:
+Execution log excerpt:
 [relevant attempts for this criterion]
 
 Specific checks:
-1. [check from spec]
-2. [check from spec]
+1. [check from definition]
+2. [check from definition]
 
 Output format:
 - PASS or FAIL
@@ -194,7 +194,7 @@ Output format:
 
 ## Critical Rules
 
-1. **Not user-invocable** - only called by /implement
+1. **Not user-invocable** - only called by /do
 2. **Check actual files** - state is codebase, not git history
 3. **Parallel subagents** - waves of 5 for efficiency
 4. **Hide manual on auto-fail** - focus on fixable issues first

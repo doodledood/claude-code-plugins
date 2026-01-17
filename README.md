@@ -123,10 +123,10 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 ### vibe-experimental
 
-Experimental verification-first workflows. Invest heavily in specification with verification built-in, then execute autonomously with enforced verification gates.
+Experimental verification-first workflows. Invest heavily in definition with verification built-in, then execute autonomously with enforced verification gates.
 
-- `/spec` - Verification-first requirements builder with proactive interview
-- `/implement` - Autonomous implementation with enforced verification
+- `/define` - Verification-first requirements builder with proactive interview
+- `/do` - Autonomous execution with enforced verification
 
 **Hooks** prevent premature stopping—can't stop without verification passing or proper escalation.
 
