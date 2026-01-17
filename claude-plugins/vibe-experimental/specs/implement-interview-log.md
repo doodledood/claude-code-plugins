@@ -1,7 +1,7 @@
 # Implement Skill Interview Log
 
 Started: 2026-01-17
-Status: In Progress
+Status: COMPLETE
 
 ---
 
@@ -80,10 +80,32 @@ Stop:
 | 32 | /verify reads impl log | A - yes | Gives context on what was tried |
 | 33 | Tracking attempts | A - impl log | "Tried X for AC-5, failed because Y" |
 | 34 | Implementation log location | A - /tmp/ | /tmp/implement-log-{timestamp}.md |
+| 35 | Subagent selection | A - spec defines | Criterion specifies which subagent |
+| 36 | Subagent parallelization | Wave of 5 | Queue style, configurable max parallel |
+| 37 | Subagent input | A - full context | Criterion + impl log + code, spec-defined |
+| 38 | Subagent output | A - specific | Pass/fail + specific issues with locations |
+| 39 | /implement input | A - spec file only | Codebase (files on disk) IS the state |
+| 40 | Spec file location | A - $ARGUMENTS | Required, cannot implement without spec |
+| 41 | Stop hook tracking | A - scan backwards | Find last /implement, check for /done or /escalate |
+| 42 | Second /implement | A - becomes current | First flow abandoned |
+| 43 | Second impl log | A - new file | Timestamp makes unique, old remains |
+| 44 | Completion summary | A - full summary | What was implemented + criteria verified |
+| 45 | Additional requirements | Memento pattern | MUST use full memento pattern per CLAUDE.md |
 
 ---
 
-## Memento Pattern Requirement
+## State Clarification
+
+**Critical distinction:**
+- **STATE = Codebase (files on disk)** - the truth
+- **Git history = log** - helps understand state faster
+- **Implementation log = log** - helps understand attempts faster
+
+/verify checks actual files, not git history. Logs are proxies for understanding, not the state itself.
+
+---
+
+## Memento Pattern Requirement (MANDATORY)
 
 All skills (/spec, /implement, /verify) must:
 - Write findings to external files before proceeding
@@ -171,21 +193,10 @@ Approach, standards, code quality should ALL be in the spec and verified.
 
 ---
 
-## Open Questions
+## Interview Complete
 
-- Q27: What would make you reject even if technically meets criteria? (User: not sure)
-- Need to explore: verification methods and subagent details
-- Need to explore: how review agents integrate with /verify
+All questions resolved. Ready to write final spec.
 
 ---
 
-## Next Steps
-
-1. Clarify how review agents integrate with /verify
-2. Clarify subagent parallelization
-3. Complete adversarial scenarios
-4. Write final spec
-
----
-
-*Last updated: 2026-01-17 during interview*
+*Completed: 2026-01-17*
