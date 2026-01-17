@@ -8,6 +8,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [vibe-workflow] v2.12.0 - Orthogonality audit: sharpen reviewer boundaries to reduce overlap:
+  - **bugs**: Added deadlocks/livelocks, rewrote Category 7 to focus on observable incorrect behavior, clarified security scope
+  - **coverage**: Fixed wrong agent reference, removed TypeScript-only limitation, made suggestions less prescriptive
+  - **maintainability**: Removed "testability blockers" category (now fully owned by testability), removed "deep call hierarchies" (simplicity owns)
+  - **simplicity**: Added boundary notes for implicit behavior vs bugs, added function length check, clarified indirection scope
+  - **testability**: Narrowed "complex async flows" to timing-dependent code only, added "side effects mixed with return values"
+  - **type-safety**: Removed boolean blindness (API clarity not type safety), replaced complex generics with type predicate correctness
+  - **docs**: Fixed severity contradiction (docs capped at Medium), clarified JSDoc overlap with type-safety
+  - **claude-md**: Removed security from Critical (separate concern), eliminated "implied rules" language, added cross-reviewer deference
 - [vibe-workflow] v2.10.1 - Plan file now includes spec reference (`Spec: {path or "none"}`) when a spec was used
 - [vibe-workflow] v2.10.0 - `/review` now respects CLAUDE.md reviewer configuration:
   - Checks loaded CLAUDE.md files for `## Review Configuration` section
