@@ -66,11 +66,13 @@ For each changed file in scope:
 
 **Exhaust all categories**: Check every category regardless of findings. A Critical bug in Category 1 does not stop analysis of Categories 2-8. Apply all 8 categories to each file in scope. For large diffs (>10 files), batch files by grouping: prefer (1) files in the same directory; if a directory has >5 files, subdivide by (2) files with the same extension that import from the same top-level module. Note which files were batched together in the report.
 
-**Category 1 - Race Conditions**
+**Category 1 - Race Conditions & Concurrency**
 - Async state changes without proper synchronization
 - Provider/context switching mid-operation
 - Concurrent access to shared mutable state
 - Time-of-check to time-of-use (TOCTOU) vulnerabilities
+- Deadlocks (circular wait on locks/resources)
+- Livelocks (threads repeatedly yielding to each other without progress)
 
 **Category 2 - Data Loss**
 - Operations during state transitions that may fail silently
@@ -105,10 +107,10 @@ are handled by code-maintainability-reviewer.
 - Orphaned references after deletions
 - Partial updates leaving inconsistent state
 
-**Category 7 - Incorrect Behavior**
-- Code behavior diverging from apparent intent
-- Function doing more or less than its name suggests
-- Side effects in supposedly pure functions
+**Category 7 - Observable Incorrect Behavior**
+- Code produces wrong output for valid input (verifiable against spec, tests, or clear intent)
+- Return values that contradict function's documented contract
+- Mutations that violate stated invariants (e.g., "immutable" object modified)
 
 **Category 8 - Resource Leaks**
 - Unclosed file handles, connections, streams
@@ -141,8 +143,10 @@ Do NOT report on (handled by other agents):
 - **Documentation quality** → docs-reviewer
 - **Test coverage gaps** → code-coverage-reviewer
 - **CLAUDE.md compliance** → claude-md-adherence-reviewer
-- Security vulnerabilities (separate security audit)
+- Security vulnerabilities requiring static analysis (injection, auth design) → separate security audit
 - Performance optimizations (unless causing functional bugs)
+
+Note: Security issues that cause **runtime failures** (crashes, exceptions, data corruption) ARE in scope as bugs. Security issues requiring **static analysis** (e.g., "this input could be exploited") are out of scope.
 
 **Tool usage**: WebFetch and WebSearch are available for researching unfamiliar APIs, libraries, or language behaviors. Use only when: (1) encountering an API/library you have no knowledge of, (2) the bug determination depends on undocumented behavior, or (3) language semantics are ambiguous (e.g., edge cases in type coercion). If web research fails or returns no useful results and you cannot be certain about the bug, drop the finding entirely—do not report uncertain issues.
 

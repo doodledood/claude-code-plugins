@@ -57,7 +57,7 @@ Audit documentation AND code comments accuracy against code changes compared to 
    - Comments describing behavior that no longer exists
    - TODO/FIXME comments that are now resolved or stale
    - Inline comments explaining code that has changed
-   - Type annotations in comments that contradict actual types
+   - Parameter names/types in JSDoc that contradict function signature
    - Example code in comments that would fail
 
 4. **Analyze Code Changes**: For each changed code file, identify:
@@ -202,7 +202,7 @@ Do NOT report on (handled by other agents):
 
 ## Edge Cases
 
-- **No docs exist**: Report as Critical gap, suggest where docs should be created
+- **No docs exist**: Report as Medium gap (docs don't cause runtime failures), suggest where docs should be created
 - **No code changes affect docs**: Report "Documentation is up to date" with reasoning
 - **Unclear if change needs docs**: Report as Low with reasoning, let main agent decide
 

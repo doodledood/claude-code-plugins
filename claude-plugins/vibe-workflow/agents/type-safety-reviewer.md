@@ -94,15 +94,6 @@ You identify issues across these categories:
   function getUser(userId: UserId): User
   ```
 
-- **Boolean blindness**: Functions with boolean parameters that are unreadable at call sites
-  ```typescript
-  // BAD: What do these booleans mean?
-  createUser(name, true, false, true)
-
-  // GOOD: Self-documenting
-  createUser(name, { sendWelcomeEmail: true, isAdmin: false, requireVerification: true })
-  ```
-
 - **Stringly-typed APIs**: Using strings where enums/unions would prevent typos
   ```typescript
   // BAD: Typos compile fine
@@ -165,7 +156,14 @@ You identify issues across these categories:
   function first<T>(arr: T[]): T | undefined
   ```
 
-- **Overly complex generics**: Type-level gymnastics that hurt readability more than they help
+- **Incorrect type predicates**: Type guards that claim to narrow types but can lie
+  ```typescript
+  // DANGEROUS: Type guard doesn't actually verify all properties
+  function isUser(obj: unknown): obj is User {
+    return typeof obj === 'object' && obj !== null && 'name' in obj;
+    // Missing: age, email, etc. - caller trusts User but gets partial object
+  }
+  ```
 - **Loose constraints**: Generic constraints that allow invalid types
 - **Unnecessary explicit generics**: Specifying types that could be inferred
 
@@ -293,7 +291,7 @@ Do NOT report on (handled by other agents):
 - Unjustified `any` in business logic—compiler can't help you
 - Stringly-typed APIs for finite sets—typos compile fine, fail at runtime
 - Primitive obsession for IDs (userId/orderId both `string`)—wrong ID passed to wrong function
-- Boolean parameters—caller confusion leads to inverted behavior
+- Incorrect type predicates—type guards that don't verify what they claim
 - Non-null assertions (`!`) without evidence—assumes away null, crashes later
 - Missing discriminated unions—invalid state combinations possible
 

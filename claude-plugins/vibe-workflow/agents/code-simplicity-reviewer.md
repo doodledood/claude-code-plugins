@@ -254,9 +254,13 @@ Code that sacrifices readability for brevity or showing off:
   }
   ```
 
+  Note: This is a **clarity** concern—the function does more than its name suggests. If the hidden side effect causes **incorrect behavior** (e.g., analytics.track throws and crashes getUser), that's a bugs-reviewer concern.
+
+- **Long functions**: Functions exceeding ~40-50 lines often indicate multiple responsibilities that could be extracted for clarity
+
 ### 5. Unnecessary Indirection
 
-Layers that add complexity without value:
+Layers that add complexity without value. Focus on **local indirection within a module**—cross-module abstraction layers are maintainability's concern.
 
 - **Pass-through wrappers**: Functions that just call another function
   ```typescript

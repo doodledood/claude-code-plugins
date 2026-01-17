@@ -18,7 +18,7 @@ Code becomes hard to test when you can't verify its behavior without complex set
 1. **High mock count** - Needing 3+ mocks to test a single function
 2. **Logic buried in IO** - Business rules that can only be exercised by calling databases/APIs
 3. **Non-deterministic inputs** - Behavior depends on current time, random values, or external state
-4. **Tight coupling** - Can't instantiate or call the code without bringing in unrelated dependencies
+4. **Unrelated dependencies required** - Can't test the code without mocking components irrelevant to the behavior being verified
 
 ### Why This Matters
 
@@ -106,23 +106,28 @@ function isEligibleForDiscount(user: User) {
 }
 ```
 
-**Complex async flows** - Logic with timing dependencies, retry loops, or interleaved promises that are hard to test deterministically:
+**Timing-dependent code** - Logic that uses real timers or delays, making tests slow or flaky:
 
 ```typescript
-// Testing requires controlling timing, retry counts, and interleaved promise resolution
-async function syncWithRetry(items: Item[]) {
-  for (const item of items) {
-    let retries = 0;
-    while (retries < 3) {
-      await delay(100 * Math.pow(2, retries));  // Timing-dependent
-      try {
-        await api.sync(item);
-        break;
-      } catch {
-        retries++;
-      }
-    }
-  }
+// Tests must wait real time or mock timers
+await delay(100 * Math.pow(2, retries));  // Real delay in retry logic
+
+// Race-dependent behavior
+const [a, b] = await Promise.all([fetchA(), fetchB()]);
+if (a.timestamp > b.timestamp) { /* depends on timing */ }
+```
+
+Note: Complex control flow (nested loops, retry logic) is a **simplicity** concern. The testability concern here is specifically about **non-deterministic timing**.
+
+**Side effects mixed with return values** - Functions that both return a value and mutate external state require tests to verify both:
+
+```typescript
+// Hard to test: must verify both return value AND side effects
+function processAndLog(data: Data): ProcessedData {
+  const result = transform(data);
+  analytics.track('processed', result);  // side effect
+  cache.set(data.id, result);            // another side effect
+  return result;
 }
 ```
 

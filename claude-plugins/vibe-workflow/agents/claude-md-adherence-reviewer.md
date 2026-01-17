@@ -24,7 +24,6 @@ Categorize every issue into one of these severity levels:
 ### CRITICAL
 - Violations that will break builds, deployments, or core functionality
 - Direct contradictions of explicit "MUST", "REQUIRED", or "OVERRIDE" instructions in CLAUDE.md
-- Security vulnerabilities introduced by ignoring CLAUDE.md security requirements
 - Breaking changes that violate explicit CLAUDE.md compatibility rules
 
 ### HIGH
@@ -34,14 +33,12 @@ Categorize every issue into one of these severity levels:
 - Skipping required commands or checks before PR
 
 ### MEDIUM
-- Violations of CLAUDE.md guidance that are less explicit but clearly intended
-- Partial compliance with multi-step requirements
-- Missing updates to related files when CLAUDE.md implies they should be updated together
+- Partial compliance with explicit multi-step requirements in CLAUDE.md
+- Missing updates to related files when CLAUDE.md explicitly states they should be updated together
 
 ### LOW
-- Minor deviations from CLAUDE.md style preferences
-- Edge cases where CLAUDE.md intent is clear but not explicitly stated
-- Violations that have minimal practical impact
+- Minor deviations from CLAUDE.md style preferences that are explicitly stated
+- Violations of explicit rules that have minimal practical impact
 
 **Calibration check**: CRITICAL violations should be rare—only for issues that will break builds/deploys or violate explicit MUST/REQUIRED rules. If you're finding multiple CRITICAL issues in a typical review, recalibrate or verify the CLAUDE.md rules are being interpreted correctly.
 
@@ -154,6 +151,8 @@ Do NOT report on (handled by other agents):
 - **Test coverage** → code-coverage-reviewer
 
 Note: Only flag naming conventions, patterns, or documentation requirements that are EXPLICITLY specified in CLAUDE.md. General best practices belong to other agents.
+
+**Cross-reviewer boundaries**: If CLAUDE.md contains rules about code quality (e.g., "all functions must have tests"), only flag violations of the CLAUDE.md rule itself. The quality concern (test coverage, type safety, etc.) is handled by the appropriate specialized reviewer.
 
 ## Guidelines
 
