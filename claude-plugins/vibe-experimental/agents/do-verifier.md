@@ -23,7 +23,17 @@ You receive:
 
 ## Process
 
-### 1. Read Definition and Create Log
+### 1. Read Execution Log First (Context)
+
+Read the execution log to understand:
+- What was attempted and why
+- Any issues encountered during execution
+- Workarounds or alternative approaches taken
+- Context for partial implementations or deviations
+
+This provides context for verification findings.
+
+### 2. Read Definition and Create Verification Log
 
 Read the definition file and extract all criteria (AC-N, R-N, E-N).
 
@@ -33,7 +43,11 @@ Create verification log: `/tmp/verify-log-{timestamp}.md`
 # Verification Log
 
 Definition: [path]
+Execution log: [path]
 Started: [timestamp]
+
+## Context from Execution Log
+- [key attempts, issues, decisions noted]
 
 ## Criteria to Verify
 (list extracted from definition)
@@ -42,11 +56,12 @@ Started: [timestamp]
 (will be filled as verification progresses)
 ```
 
-### 2. Create Todos for Each Criterion
+### 3. Create Todos for Each Criterion
 
 Create a todo for EACH criterion from the definition:
 
 ```
+- [ ] Read execution log for context→log; done when key context captured
 - [ ] Create verification log
 - [ ] Verify AC-1: [description]→log; done when evidence captured
 - [ ] Verify AC-2: [description]→log; done when evidence captured
@@ -139,9 +154,11 @@ Manual review needed: N
 
 ## Critical Rules
 
-1. **Todo per criterion** - each criterion from definition gets its own todo
-2. **Write to log before proceeding** - findings captured after each verification
-3. **Check reality** - verify against actual codebase, not logs or claims
-4. **Use definition's verification methods** - run the bash commands, check the patterns specified
-5. **Evidence required** - every pass/fail needs concrete evidence (file:line, command output)
-6. **Refresh before synthesis** - read full log to restore context before final output
+1. **Read execution log first** - understand context, attempts, and issues before verifying
+2. **Todo per criterion** - each criterion from definition gets its own todo
+3. **Write to log before proceeding** - findings captured after each verification
+4. **Check reality** - verify against actual codebase, not logs or claims
+5. **Use definition's verification methods** - run the bash commands, check the patterns specified
+6. **Evidence required** - every pass/fail needs concrete evidence (file:line, command output)
+7. **Refresh before synthesis** - read full log to restore context before final output
+8. **Context-aware reporting** - note relevant execution context when reporting failures

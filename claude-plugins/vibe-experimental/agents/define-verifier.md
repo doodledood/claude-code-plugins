@@ -26,7 +26,17 @@ You receive:
 
 ## Process
 
-### 1. Read Definition and Create Log
+### 1. Read Log File First (Context)
+
+Read the interview log to understand:
+- What the user explicitly chose or declined
+- Deliberate scope decisions ("X is out of scope", "we don't need Y")
+- Tradeoffs the user accepted
+- Context for why certain criteria exist or don't
+
+This prevents flagging issues for things the user deliberately decided against.
+
+### 2. Read Definition and Create Verification Log
 
 Read the definition file.
 
@@ -38,13 +48,17 @@ Create verification log: `/tmp/define-verify-log-{timestamp}.md`
 Definition: [path]
 Started: [timestamp]
 
+## User's Deliberate Choices (from interview log)
+- [list explicit scope decisions, declined options, accepted tradeoffs]
+
 ## Findings
 (will be filled as verification progresses)
 ```
 
-### 2. Create Todos for Each Check
+### 3. Create Todos for Each Check
 
 ```
+- [ ] Read interview log for context→log; done when deliberate choices captured
 - [ ] Create verification log
 - [ ] Check: Comprehensiveness→log; done when all dimensions reviewed
 - [ ] Check: Edge cases addressed→log; done when common cases checked
@@ -81,14 +95,15 @@ Check if the definition addresses these dimensions (where applicable):
 ### Comprehensiveness Check
 Dimensions addressed:
 - Feature behavior: [yes/no] - [evidence]
-- Error handling: [yes/no/N/A] - [evidence]
-- Testing: [yes/no] - [evidence]
-- Types/Linting: [yes/no/N/A] - [evidence]
-- Performance: [yes/no/N/A] - [evidence]
-- Security: [yes/no/N/A] - [evidence]
-- Compatibility: [yes/no/N/A] - [evidence]
+- Error handling: [yes/no/N/A/deliberately-scoped-out] - [evidence]
+- Testing: [yes/no/deliberately-scoped-out] - [evidence]
+- Types/Linting: [yes/no/N/A/deliberately-scoped-out] - [evidence]
+- Performance: [yes/no/N/A/deliberately-scoped-out] - [evidence]
+- Security: [yes/no/N/A/deliberately-scoped-out] - [evidence]
+- Compatibility: [yes/no/N/A/deliberately-scoped-out] - [evidence]
 
-Missing dimensions: [list critical gaps]
+User's deliberate exclusions (from log): [list any dimensions user explicitly scoped out]
+Missing dimensions (not deliberately excluded): [list critical gaps]
 Result: PASS | FAIL
 ```
 
@@ -107,13 +122,14 @@ Check for common edge case categories:
 ```markdown
 ### Edge Cases Check
 Categories addressed in definition:
-- Empty/null: [yes/no] - [which criteria]
-- Boundary: [yes/no] - [which criteria]
-- Invalid input: [yes/no] - [which criteria]
-- Concurrent: [yes/no/N/A] - [which criteria]
-- Failure modes: [yes/no] - [which criteria]
+- Empty/null: [yes/no/deliberately-scoped-out] - [which criteria]
+- Boundary: [yes/no/deliberately-scoped-out] - [which criteria]
+- Invalid input: [yes/no/deliberately-scoped-out] - [which criteria]
+- Concurrent: [yes/no/N/A/deliberately-scoped-out] - [which criteria]
+- Failure modes: [yes/no/deliberately-scoped-out] - [which criteria]
 
-Unaddressed edge cases that matter for this work: [list]
+User's deliberate exclusions (from log): [list any edge cases user explicitly scoped out]
+Unaddressed edge cases (not deliberately excluded): [list]
 Result: PASS | FAIL
 ```
 
@@ -220,9 +236,11 @@ Checks failed: N
 
 ## Critical Rules
 
-1. **Think like a reviewer** - would YOU accept a PR that only satisfies these criteria?
-2. **Flag gaps** - missing dimensions/edge cases are failures, not silent passes
-3. **Todo per check** - each check gets its own todo
-4. **Write to log before proceeding** - findings captured after each check
-5. **Refresh before synthesis** - read full log to restore context
-6. **Actionable fixes** - failures must include specific fix guidance
+1. **Read log first** - understand user's deliberate choices before judging
+2. **Respect explicit decisions** - don't flag something user deliberately scoped out
+3. **Think like a reviewer** - would YOU accept a PR that only satisfies these criteria?
+4. **Flag unaddressed gaps** - missing dimensions/edge cases are failures IF not deliberately excluded
+5. **Todo per check** - each check gets its own todo
+6. **Write to log before proceeding** - findings captured after each check
+7. **Refresh before synthesis** - read full log to restore context
+8. **Actionable fixes** - failures must include specific fix guidance
