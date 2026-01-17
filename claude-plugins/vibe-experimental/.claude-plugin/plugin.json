@@ -1,0 +1,11 @@
+{
+  "name": "vibe-experimental",
+  "version": "0.1.0",
+  "description": "Experimental workflows exploring verification-first specs and acceptance-driven development",
+  "keywords": [
+    "experimental",
+    "spec",
+    "verification",
+    "acceptance-criteria"
+  ]
+}
