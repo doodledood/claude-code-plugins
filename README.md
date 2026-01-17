@@ -121,6 +121,15 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 - `/decide` - Situation discovery → targeted research → decision framework → ranked recommendation
 
+### vibe-experimental
+
+Experimental verification-first workflows. Invest heavily in specification with verification built-in, then execute autonomously with enforced verification gates.
+
+- `/spec` - Verification-first requirements builder with proactive interview
+- `/implement` - Autonomous implementation with enforced verification
+
+**Hooks** prevent premature stopping—can't stop without verification passing or proper escalation.
+
 ## Repository Structure
 
 ```
@@ -129,6 +138,7 @@ claude-code-plugins/
 │   └── marketplace.json       # Marketplace configuration
 ├── claude-plugins/
 │   ├── vibe-workflow/         # Spec → plan → implement with code review
+│   ├── vibe-experimental/     # Verification-first experimental workflows
 │   ├── consultant/            # Multi-provider LLM consultations
 │   ├── vibe-extras/           # Git, docs, cleanup utilities
 │   ├── solo-dev/              # Customer profiles, brand, design docs
