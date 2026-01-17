@@ -120,31 +120,31 @@ Relay each model's output verbatim—let the user draw conclusions.
 **Use this template (single model):**
 
 ```
-[ ] Learn the CLI (run --help)
-[ ] Validate requested model (if user specified one)
-[ ] Classify the goal and identify high-risk areas
-[ ] Gather context (files, diffs, documentation)
-[ ] Create temp directory and organize artifacts
-[ ] Construct the prompt
-[ ] Invoke the consultant CLI
-[ ] Monitor session until completion (if timeout)
-[ ] Save CLI output to file
-[ ] Relay output and report file path to user
+[ ] Run CLI --help
+[ ] Validate model (if specified)
+[ ] Classify goal→high-risk areas
+[ ] Gather context→diffs, docs, files
+[ ] Create /tmp/consultant-{slug}-{ts}/
+[ ] Construct prompt→artifacts
+[ ] Invoke CLI (background if slow)
+[ ] Monitor→completion or error
+[ ] Save output→consultant_response.md
+[ ] Relay output + file path
 ```
 
 **For multi-model consultations:**
 
 ```
-[ ] Learn the CLI (run --help)
-[ ] Validate all requested models against available models list
-[ ] Classify the goal and identify high-risk areas
-[ ] Gather context (files, diffs, documentation)
-[ ] Create temp directory and organize artifacts
-[ ] Construct the prompt
-[ ] Launch all CLI calls in background mode (parallel Bash calls with run_in_background: true)
-[ ] Poll all sessions every 30 seconds using BashOutput until completion
-[ ] Save each model's output to consultant_response_<model>.md
-[ ] Relay all outputs and report all file paths
+[ ] Run CLI --help
+[ ] Validate all models against available
+[ ] Classify goal→high-risk areas
+[ ] Gather context→diffs, docs, files
+[ ] Create /tmp/consultant-{slug}-{ts}/
+[ ] Construct prompt (ONCE, identical for all)
+[ ] Launch all CLI calls in parallel (background)
+[ ] Poll BashOutput every 30s→all complete
+[ ] Save each→consultant_response_{model}.md
+[ ] Relay all outputs + file paths
 ```
 
 **Rules:**

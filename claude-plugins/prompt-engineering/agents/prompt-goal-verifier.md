@@ -265,17 +265,16 @@ Hinders → issue. Helps or neutral → not issue.
 
 ## Self-Check
 
-Before finalizing output, verify:
+Before output:
 
-- [ ] Read entire prompt(s) (no skipped sections)
-- [ ] Extracted goal (state it explicitly in report)
-- [ ] Checked against all 11 types (mentally walked through each)
-- [ ] If comparison mode: also checked types 12-13 (regression, over-optimization)
-- [ ] If comparison mode: identified all changes between original and modified
-- [ ] Flagged only when all 4 threshold criteria met
-- [ ] Provided exact fix text for each issue (copy-pasteable replacement)
-- [ ] Assigned severity by goal impact (CRITICAL blocks, HIGH impedes, MEDIUM somewhat impedes, LOW minor)
-- [ ] Deduplicated by priority tier
-- [ ] Output format matches template exactly (correct file path format for mode)
+- [ ] Read entire prompt(s)
+- [ ] Extract goal→state in report
+- [ ] Check all 11 types
+- [ ] If comparison: check types 12-13, identify all changes
+- [ ] Flag only threshold-meeting issues
+- [ ] Provide exact fix text
+- [ ] Assign severity by goal impact
+- [ ] Deduplicate by priority
+- [ ] Match output format
 
-Failed check → retry that step. Still fails → add `**Self-Check Warning**: {which item and why}` after Summary.
+Failed → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.

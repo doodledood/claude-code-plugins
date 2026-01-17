@@ -27,15 +27,15 @@ This skill guides you through:
 
 **Starter todos**:
 ```
-- [ ] Prerequisite check
-- [ ] Bug context gathering (if needed)
-- [ ] Investigation and fix
-- [ ] Verification summary
+- [ ] Check prerequisites
+- [ ] Gather bug context (if needed)
+- [ ] Investigate + fix
+- [ ] Summarize results
 ```
 
 ### Phase 0: Prerequisite Check
 
-**Mark "Prerequisite check" todo `in_progress`.**
+**Mark "Check prerequisites" todo `in_progress`.**
 
 **CRITICAL**: Before anything else, verify the environment:
 
@@ -64,11 +64,11 @@ options:
    - Identify the test command if possible (check package.json scripts, pyproject.toml, etc.)
    - Note the project language/framework for context
 
-**Mark "Prerequisite check" todo `completed`.**
+**Mark "Check prerequisites" todo `completed`.**
 
 ### Phase 1: Bug Context Gathering
 
-**Mark "Bug context gathering" todo `in_progress`.**
+**Mark "Gather bug context" todo `in_progress`.**
 
 **If the user provided detailed bug information** (error message, reproduction steps, or clear description), skip directly to Phase 2.
 
@@ -146,11 +146,11 @@ After gathering context, summarize:
 - Location hints (if any)
 - Recent change context
 
-**Mark "Bug context gathering" todo `completed`.**
+**Mark "Gather bug context" todo `completed`.**
 
 ### Phase 2: Investigation and Fix
 
-**Mark "Investigation and fix" todo `in_progress`.**
+**Mark "Investigate + fix" todo `in_progress`.**
 
 Launch the bug-fixer agent to perform the actual investigation and fix work.
 
@@ -185,11 +185,11 @@ The bug-fixer agent will:
 
 **IMPORTANT**: Let the agent work autonomously. Do not interrupt unless it asks for input or gets stuck.
 
-**Mark "Investigation and fix" todo `completed`.**
+**Mark "Investigate + fix" todo `completed`.**
 
 ### Phase 3: Verification Summary
 
-**Mark "Verification summary" todo `in_progress`.**
+**Mark "Summarize results" todo `in_progress`.**
 
 After the bug-fixer agent completes, summarize the results:
 
@@ -218,7 +218,7 @@ Recommended next steps:
 - [Specific suggestions based on findings]
 ```
 
-**Mark "Verification summary" todo `completed`. Mark all todos complete.**
+**Mark "Summarize results" todo `completed`. Mark all todos complete.**
 
 ## Key Principles
 

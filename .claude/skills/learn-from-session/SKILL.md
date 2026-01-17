@@ -123,18 +123,23 @@ Status: IN_PROGRESS
 **CRITICAL**: Write to log IMMEDIATELY after each finding—never batch writes.
 
 ```
-- [ ] Setup: Create log file, parse session, write overview
-- [ ] Pattern detection: iterations, corrections, deviations, missing questions, post-impl fixes (write each to log)
-- [ ] Skill discovery: extract skills, locate files, write to log
-- [ ] (expand: "Analyze {skill}" for each skill found)
-- [ ] Refresh context: read FULL analysis log
-- [ ] Counterfactual analysis: test each issue, write recommendations
+- [ ] Create log /tmp/session-analysis-{id}-{timestamp}.md
+- [ ] Parse session→log overview
+- [ ] Detect iterations→log
+- [ ] Detect user corrections→log
+- [ ] Detect workflow deviations→log
+- [ ] Detect missing questions→log
+- [ ] Detect post-impl fixes→log
+- [ ] Discover skills used→log
+- [ ] (expand: Analyze {skill}→log for each)
+- [ ] Refresh: read full log
+- [ ] Counterfactual 3/3 test each issue→log
 - [ ] Output final report
 ```
 
 **Expansion**: When skills are discovered, add one todo per skill:
 ```
-- [ ] Analyze {skill-name} skill + write findings to log
+- [ ] Analyze {skill-name}→log
 ```
 
 **Why write-after-each-step matters**: By synthesis, early findings suffer context rot. Writing externalizes findings to a file that persists. The refresh step moves ALL findings to context end (highest attention zone).

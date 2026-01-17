@@ -214,17 +214,17 @@ Core questions:
 
 ## Self-Check
 
-Before finalizing output, verify:
+Before output:
 
-- [ ] Read both original and modified files
-- [ ] Parsed feedback intent (explicit + implicit requests)
-- [ ] Identified all changes (added, removed, modified text)
-- [ ] Mapped each change to feedback scope (within/outside)
-- [ ] Checked against all 6 types
-- [ ] Flagged only when all threshold criteria met
-- [ ] Provided exact fix text for each issue
-- [ ] Assigned severity by impact
-- [ ] Deduplicated by priority tier
-- [ ] Output format matches template
+- [ ] Read both files
+- [ ] Parse feedback intent (explicit + implicit)
+- [ ] Identify changes (added/removed/modified)
+- [ ] Map changes→feedback scope
+- [ ] Check 6 issue types
+- [ ] Flag only threshold-meeting issues
+- [ ] Provide exact fix text
+- [ ] Assign severity
+- [ ] Deduplicate by priority
+- [ ] Match output format
 
-Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
+Failed → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.

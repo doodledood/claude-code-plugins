@@ -279,11 +279,13 @@ Read for files; Grep for content search
 4. **Actionable suggestions** - Every issue must have suggested fix or restoration
 5. **Estimates included** - Token savings or restoration costs
 
-## Self-Check Before Output
+## Self-Check
 
-- [ ] Determined correct mode from prompt
-- [ ] Read all files completely
-- [ ] Identified all issues/gaps
-- [ ] Assigned severity to each
-- [ ] Provided actionable suggestion for each
-- [ ] Included token estimates
+Before output:
+
+- [ ] Determine mode from prompt
+- [ ] Read all files
+- [ ] Identify all issues/gaps
+- [ ] Assign severity
+- [ ] Provide actionable suggestions
+- [ ] Include token estimates

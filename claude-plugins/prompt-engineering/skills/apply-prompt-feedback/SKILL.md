@@ -29,12 +29,12 @@ This skill applies feedback through:
 
 ### Phase 0: Create Todo List (TodoWrite immediately)
 
-Create todos tracking workflow phases:
+Create todos:
 
 ```
-- [ ] Input validation
-- [ ] Initial application→verify
-- [ ] (Expand: refinement iterations on ISSUES_FOUND)
+- [ ] Validate inputs
+- [ ] Apply feedback→verify
+- [ ] (expand: refinement on ISSUES_FOUND)
 - [ ] Output updated prompt
 ```
 

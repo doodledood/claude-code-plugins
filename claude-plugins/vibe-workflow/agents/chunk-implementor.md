@@ -87,12 +87,12 @@ Modified: []
 
 Extract tasks from chunk, create granular todos:
 ```
-[ ] Read context files
-[ ] [Task 1 from chunk]
-[ ] [Task 2 from chunk]
-...
-[ ] [Task N from chunk]
-[ ] Update log with completion summary
+- [ ] Read context files→log
+- [ ] [Task 1]→log
+- [ ] [Task 2]→log
+- [ ] (expand: tasks from chunk)
+- [ ] Refresh: read full log
+- [ ] Write completion summary
 ```
 
 ### Phase 2: Read Context

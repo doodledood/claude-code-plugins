@@ -102,19 +102,16 @@ Todos = areas to explore + write-to-log operations. Start small, expand as disco
 **Starter todos** (expand during exploration):
 ```
 - [ ] Create research file
-- [ ] Core {topic} implementation
-- [ ] Write core findings to research file
-- [ ] {topic} dependencies / callers
-- [ ] Write dependency findings to research file
-- [ ] (expand as discoveries reveal new areas)
-- [ ] (expand: write-to-file after each new area)
-- [ ] Refresh context: read full research file
+- [ ] Core {topic} implementation→log
+- [ ] {topic} dependencies/callers→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full research file
 - [ ] Compile output
 ```
 
-**Critical todos** (never skip):
-- `Write {X} findings to research file` - after EACH exploration area
-- `Refresh context: read full research file` - ALWAYS before compile output
+**Critical discipline** (never skip):
+- `→log` after EACH exploration area
+- `Refresh:` ALWAYS before compile output
 
 ### 1.2 Create research file (skip for quick)
 
@@ -181,30 +178,24 @@ Query: "Find files related to authentication"
 Initial:
 ```
 - [ ] Create research file
-- [ ] Core auth implementation
-- [ ] Write core findings to research file
-- [ ] Auth dependencies / callers
-- [ ] Write dependency findings to research file
-- [ ] (expand as discoveries reveal new areas)
-- [ ] Refresh context: read full research file
-- [ ] Compile final output
+- [ ] Core auth implementation→log
+- [ ] Auth dependencies/callers→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full research file
+- [ ] Compile output
 ```
 
 After exploring core auth (discovered JWT, Redis sessions, OAuth):
 ```
 - [x] Create research file
-- [x] Core auth implementation → AuthService, middleware/auth.ts
-- [x] Write core findings to research file
-- [ ] Auth dependencies / callers
-- [ ] Write dependency findings to research file
-- [ ] JWT token handling
-- [ ] Write JWT findings to research file
-- [ ] Redis session storage
-- [ ] Write Redis findings to research file
-- [ ] OAuth providers
-- [ ] Write OAuth findings to research file
-- [ ] Refresh context: read full research file
-- [ ] Compile final output
+- [x] Core auth implementation→log (found: AuthService, middleware/auth.ts)
+- [ ] Auth dependencies/callers→log
+- [ ] JWT token handling→log
+- [ ] Redis session storage→log
+- [ ] OAuth providers→log
+- [ ] (expand: additional areas)
+- [ ] Refresh: read full research file
+- [ ] Compile output
 ```
 
 ## Phase 3: Compress Output
@@ -220,10 +211,10 @@ Finished: {YYYYMMDD-HHMMSS} | Files: {count} | Search calls: {count}
 
 ### 3.2 Refresh context (MANDATORY)
 
-**CRITICAL**: Complete the "Refresh context: read full research file" todo by reading the FULL research file using the Read tool. This restores ALL findings into context before generating output.
+**CRITICAL**: Complete the "Refresh:" todo by reading the FULL research file using the Read tool. This restores ALL findings into context before generating output.
 
 ```
-- [x] Refresh context: read full research file  ← Must complete BEFORE compile output
+- [x] Refresh: read full research file  ← Must complete BEFORE compile output
 - [ ] Compile output
 ```
 
@@ -333,7 +324,7 @@ Overview = **dense map of the topic area**, not diagnosis or codebase tour.
 1. Create research file at start
 2. Add write-to-file todos after each exploration area
 3. Write findings after EVERY area before moving to next
-4. "Refresh context: read full research file" todo before compile
+4. "Refresh:" todo before compile
 5. Read FULL file before generating output (restores all context)
 
 ## Never Do
@@ -351,7 +342,7 @@ Overview = **dense map of the topic area**, not diagnosis or codebase tour.
 - [ ] Scope boundaries respected (if provided)
 - [ ] Out-of-scope discoveries noted (if any)
 - [ ] Write-to-file todos completed after each exploration area
-- [ ] "Refresh context: read full research file" completed before output
+- [ ] "Refresh:" completed before output
 - [ ] All todos completed (no pending items)
 - [ ] Research file complete (incremental findings after each step)
 - [ ] Depth appropriate (medium stops at first-level deps + 3 callers; thorough includes all direct callers+tests+config; very-thorough transitive up to 100 files)

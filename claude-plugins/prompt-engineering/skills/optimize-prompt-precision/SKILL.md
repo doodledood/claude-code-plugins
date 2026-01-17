@@ -23,13 +23,12 @@ This skill transforms ambiguous prompts into precise ones through:
 
 ### Phase 0: Create Todo List (TodoWrite immediately)
 
-Create todos tracking workflow phases. List reflects areas of work, not fixed steps.
+Create todos:
 
-**Starter todos**:
 ```
-- [ ] Input validation
-- [ ] Initial verification
-- [ ] (Expand: optimization iterations on ISSUES_FOUND)
+- [ ] Validate input
+- [ ] Verify→(exit if precise)
+- [ ] (expand: optimization on ISSUES_FOUND)
 - [ ] Output optimized prompt
 ```
 

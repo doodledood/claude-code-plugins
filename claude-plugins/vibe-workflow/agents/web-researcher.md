@@ -68,19 +68,16 @@ Todos = **areas to research + write-to-log operations**, not fixed steps. Each t
 
 ```
 - [ ] Create research notes file
-- [ ] Problem decomposition & search strategy
-- [ ] Write decomposition to research notes
-- [ ] Primary search angle investigation
-- [ ] Write findings to research notes
-- [ ] (expand: new research areas as discovered)
-- [ ] (expand: write findings after each area)
-- [ ] Refresh context: read full research notes file
+- [ ] Problem decomposition→search strategy→log
+- [ ] Primary search angle→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full research notes file
 - [ ] Finalize findings
 ```
 
-**Critical todos** (never skip):
-- `Write {X} to research notes` - after EACH search batch/phase
-- `Refresh context: read full research notes file` - ALWAYS before finalizing
+**Critical discipline** (never skip):
+- `→log` after EACH search batch/phase
+- `Refresh:` ALWAYS before finalizing
 
 ### Todo Evolution Example
 
@@ -89,51 +86,43 @@ Query: "Best real-time sync options for mobile apps in 2025"
 Initial:
 ```
 - [ ] Create research notes file
-- [ ] Problem decomposition & search strategy
-- [ ] Write decomposition to research notes
-- [ ] Primary search angle investigation
-- [ ] Write findings to research notes
-- [ ] Refresh context: read full research notes file
+- [ ] Problem decomposition→search strategy→log
+- [ ] Primary search angle→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full research notes file
 - [ ] Finalize findings
 ```
 
 After finding multiple categories of solutions:
 ```
 - [x] Create research notes file
-- [x] Problem decomposition & search strategy → identified 4 approaches
-- [x] Write decomposition to research notes
-- [ ] Primary search angle investigation
-- [ ] Write findings to research notes
-- [ ] WebSocket-based solutions (Socket.io, etc.)
-- [ ] Write WebSocket findings to research notes
-- [ ] Firebase/Supabase real-time offerings
-- [ ] Write Firebase/Supabase findings to research notes
-- [ ] GraphQL subscriptions approach
-- [ ] Conflict resolution strategies
-- [ ] Refresh context: read full research notes file
+- [x] Problem decomposition→search strategy→log (found: 4 approaches)
+- [ ] Primary search angle→log
+- [ ] WebSocket-based solutions→log
+- [ ] Firebase/Supabase real-time→log
+- [ ] GraphQL subscriptions→log
+- [ ] Conflict resolution strategies→log
+- [ ] (expand: additional areas)
+- [ ] Refresh: read full research notes file
 - [ ] Finalize findings
 ```
 
 After completing several areas:
 ```
 - [x] Create research notes file
-- [x] Problem decomposition & search strategy
-- [x] Write decomposition to research notes
-- [x] Primary search angle investigation → found key comparison articles
-- [x] Write findings to research notes
-- [x] WebSocket-based solutions → Socket.io, Ably, Pusher compared
-- [x] Write WebSocket findings to research notes
-- [ ] Firebase/Supabase real-time offerings
-- [ ] Write Firebase/Supabase findings to research notes
-- [ ] GraphQL subscriptions approach
-- [ ] Conflict resolution strategies
-- [ ] Mobile-specific performance considerations (newly discovered)
-- [ ] Offline-first sync patterns (newly discovered)
-- [ ] Refresh context: read full research notes file
+- [x] Problem decomposition→search strategy→log
+- [x] Primary search angle→log (found: key comparison articles)
+- [x] WebSocket-based solutions→log (Socket.io, Ably, Pusher)
+- [ ] Firebase/Supabase real-time→log
+- [ ] GraphQL subscriptions→log
+- [ ] Conflict resolution strategies→log
+- [ ] Mobile-specific performance→log (discovered)
+- [ ] Offline-first sync patterns→log (discovered)
+- [ ] Refresh: read full research notes file
 - [ ] Finalize findings
 ```
 
-**Key**: Todos grow as research reveals complexity. Write-to-log todos follow each research area. Never skip the refresh before finalize.
+**Key**: Todos grow as research reveals complexity. `→log` ensures external memory stays current. Never skip refresh before finalize.
 
 ### 1.2 Create research notes file
 
@@ -319,7 +308,7 @@ Finished: {YYYY-MM-DD HH:MM:SS} | Sources: {count} | Sub-questions: {count}
 
 **Todo must show**:
 ```
-- [x] Refresh context: read full research notes file  ← Must be marked complete before finalize
+- [x] Refresh: read full research notes file  ← Must be marked complete before finalize
 - [ ] Finalize findings
 ```
 
@@ -412,7 +401,7 @@ Research complete when ALL true:
 - Keep discoveries as mental notes instead of todos
 - Skip todo list creation
 - Skip write-to-log todos after research areas
-- Finalize without completing "Refresh context: read full research notes file" todo
+- Finalize without completing "Refresh:" todo
 - Present findings without source URLs
 - Rely on single source for claims presented in Summary, Key Findings, or Recommendations (Exception: If extensive searching—3+ query attempts—yields only one source for a sub-question, that finding may be presented with explicit "Single source - not independently verified" caveat)
 - Ignore publication dates

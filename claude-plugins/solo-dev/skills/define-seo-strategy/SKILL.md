@@ -54,14 +54,15 @@ This skill guides you through:
 
 **Starter todos**:
 ```
-- [ ] Prerequisite check (CUSTOMER.md)
-- [ ] Existing strategy detection→log
-- [ ] Input collection→log
+- [ ] Create log /tmp/seo-research-*.md
+- [ ] Prerequisite: verify CUSTOMER.md
+- [ ] Check existing SEO_STRATEGY.md→log
+- [ ] Inputs→log
 - [ ] Research→log
-- [ ] Generate initial draft
-- [ ] Validation→log
-- [ ] Refresh: read full research log
-- [ ] Finalize document
+- [ ] Draft→SEO_STRATEGY.md
+- [ ] Validate→log
+- [ ] Refresh: read full log
+- [ ] Finalize SEO_STRATEGY.md
 ```
 
 **Create research log** at `/tmp/seo-research-{YYYYMMDD-HHMMSS}.md`:

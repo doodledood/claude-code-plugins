@@ -40,14 +40,14 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 
 **Create flat todo list** (granular progress, resumable):
 ```
-[ ] Read context for [Chunk]
+[ ] [Chunk]: read context
 [ ] [Task 1]...[ ] [Task N]
-[ ] Run gates for [Chunk]
-[ ] Commit chunk: [Chunk]
+[ ] [Chunk]: run gates
+[ ] [Chunk]: commit
 ...
-# Unless --no-review, append:
-[ ] Run review on implemented changes
-[ ] (Expand: fix review issues as findings emerge)
+# Unless --no-review:
+[ ] Run review
+[ ] (expand: fix issues as findings emerge)
 ```
 All todos created at once via TodoWrite (status `pending`). If TodoWrite unavailable, use `/tmp/implement-progress.md` with markdown checkboxes: `- [ ] pending`, `- [~] in progress`, `- [x] completed`, with timestamp prefix `[HH:MM:SS]`.
 
@@ -108,10 +108,10 @@ Skip if `--no-review` was set.
 2. If no issues → mark fix placeholder `completed`, done
 3. Expand fix placeholder:
    ```
-   [x] (Expand: fix review issues as findings emerge)
-   [ ] Fix critical/high severity issues
-   [ ] Re-run review to verify fixes
-   [ ] (Expand: additional fix iterations if needed)
+   [x] (expand: fix issues as findings emerge)
+   [ ] Fix critical/high issues
+   [ ] Re-run review
+   [ ] (expand: additional iterations if needed)
    ```
 4. Mark "Fix critical/high" `in_progress` → invoke `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")` → mark `completed`
 5. Mark "Re-run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`

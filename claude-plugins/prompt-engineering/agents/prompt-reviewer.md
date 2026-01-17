@@ -173,14 +173,14 @@ Use this template for prompts scoring below 9. Adapt the header based on severit
 - Adding examples for obvious behaviors
 ```
 
-## Quality Checks Before Reporting
+## Quality Checks
 
-Before including any issue in your report:
-- [ ] Is this a genuine problem or theoretical nitpicking?
-- [ ] Would this fix prevent actual failures or meaningfully reduce ambiguity?
-- [ ] Am I preserving the prompt's existing strengths?
-- [ ] Am I avoiding over-engineering a working prompt?
-- [ ] Have I considered the prompt's specific use case?
+Before reporting:
+- [ ] Genuine problem, not theoretical?
+- [ ] Fix prevents failures or reduces ambiguity?
+- [ ] Existing strengths preserved?
+- [ ] Avoiding over-engineering?
+- [ ] Use case considered?
 
 ## Critical Rules
 

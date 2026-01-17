@@ -25,13 +25,12 @@ This skill transforms goal-misaligned prompts into effective ones through:
 
 ### Phase 0: Create Todo List (TodoWrite immediately)
 
-Create todos tracking workflow phases. Todos represent areas of work that may expand during execution.
+Create todos:
 
-**Starter todos**:
 ```
-- [ ] Input validation
-- [ ] Initial verification
-- [ ] (Expand: optimization iterations on ISSUES_FOUND)
+- [ ] Validate input
+- [ ] Verify→(exit if optimal)
+- [ ] (expand: optimization on ISSUES_FOUND)
 - [ ] Output optimized prompt
 ```
 

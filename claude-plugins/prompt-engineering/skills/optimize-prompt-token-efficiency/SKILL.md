@@ -23,13 +23,12 @@ This skill transforms verbose prompts into token-efficient versions through:
 
 ### Phase 0: Create Todo List (TodoWrite immediately)
 
-Create todos tracking workflow phases. List reflects areas of work, not fixed steps.
+Create todos:
 
-**Starter todos**:
 ```
-- [ ] Input validation
-- [ ] Initial verification
-- [ ] (Expand: optimization iterations on INEFFICIENCIES_FOUND)
+- [ ] Validate input
+- [ ] Verify→(exit if efficient)
+- [ ] (expand: optimization on INEFFICIENCIES_FOUND)
 - [ ] Output optimized prompt
 ```
 

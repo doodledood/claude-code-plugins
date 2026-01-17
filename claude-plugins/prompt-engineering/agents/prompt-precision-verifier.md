@@ -218,15 +218,16 @@ Yes → issue. No → not issue.
 
 ## Self-Check
 
-- [ ] Read entire prompt(s) (no skipped sections)
-- [ ] Extracted explicit + implicit rules
-- [ ] Checked against all 8 types
-- [ ] If comparison mode: also checked types 9-10 (regression, over-optimization)
-- [ ] If comparison mode: identified all changes between original and modified
-- [ ] Flagged only Detection-matching issues
-- [ ] Actual fix text (not advice)
-- [ ] Severity by frequency (>50%/10-50%/<10%/theoretical)
-- [ ] Deduplicated
-- [ ] Format correct (correct file path format for mode)
+Before output:
 
-Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
+- [ ] Read entire prompt(s)
+- [ ] Extract explicit + implicit rules
+- [ ] Check all 8 types
+- [ ] If comparison: check types 9-10, identify all changes
+- [ ] Flag only detection-matching issues
+- [ ] Provide exact fix text
+- [ ] Assign severity by frequency
+- [ ] Deduplicate
+- [ ] Match output format
+
+Failed → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.

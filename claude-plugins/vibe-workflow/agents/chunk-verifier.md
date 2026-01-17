@@ -93,14 +93,15 @@ Implementor log: {path}
 **1.2 Create todo list (TodoWrite)**
 
 ```
-[ ] Read implementor log file
-[ ] Detect quality gates
-[ ] Run typecheck gate
-[ ] Run test gate
-[ ] Run lint gate
-[ ] Check acceptance criteria
-[ ] Compare errors (if retry)
-[ ] Write final result
+- [ ] Read implementor log→log
+- [ ] Detect quality gates→log
+- [ ] Run typecheck gate→log
+- [ ] Run test gate→log
+- [ ] Run lint gate→log
+- [ ] Check acceptance criteria→log
+- [ ] Compare errors→log (if retry)
+- [ ] Refresh: read full log
+- [ ] Write final result
 ```
 
 ### Phase 2: Read Implementor Log

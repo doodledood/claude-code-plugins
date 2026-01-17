@@ -49,12 +49,12 @@ This skill compresses prompts through:
 
 ### Phase 0: Create Todo List (TodoWrite immediately)
 
-Create todos tracking workflow phases:
+Create todos:
 
 ```
-- [ ] Input validation
-- [ ] Initial compression→verify
-- [ ] (Expand: refinement iterations on ISSUES_FOUND)
+- [ ] Validate input
+- [ ] Compress→verify
+- [ ] (expand: refinement on ISSUES_FOUND)
 - [ ] Output compressed prompt
 ```
 

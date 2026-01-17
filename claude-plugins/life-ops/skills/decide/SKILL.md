@@ -126,29 +126,30 @@ Run: `date +%Y%m%d-%H%M%S` (filename), `date '+%Y-%m-%d %H:%M:%S'` (display).
 **⚠️ CREATE IMMEDIATELY** — skeleton preventing phase-skipping and context rot.
 
 ```
-- [ ] Phase 0: foundation→log
-- [ ] Discovery: framing check→log
-- [ ] Discovery: underlying need→log
-- [ ] Discovery: time horizon→log
-- [ ] Discovery: factor scaffolding→log
-- [ ] Discovery: edge cases→log
-- [ ] Discovery: hidden factors→log
-- [ ] Discovery: stakeholder constraints→log
-- [ ] (expand: additional rounds as needed)
+- [ ] Create log /tmp/decide-{timestamp}-{slug}.md
+- [ ] Foundation: stakes, stakeholders, characteristics→log
+- [ ] Framing check→log
+- [ ] Underlying need→log
+- [ ] Time horizon + uncertainty→log
+- [ ] Factor scaffolding (8-12)→log
+- [ ] Edge cases→log
+- [ ] Hidden factors→log
+- [ ] Stakeholder constraints→log
+- [ ] (expand: discovery rounds as needed)
 - [ ] Comprehensiveness checkpoint→log
-- [ ] Structuring: factor ranking + thresholds→log
-- [ ] Option discovery: user options→log
-- [ ] Option discovery: research→log
+- [ ] Factor ranking + thresholds→log
+- [ ] User options→log
+- [ ] Option research→log
 - [ ] Deep research→log
-- [ ] Post-research gap check→log
+- [ ] Gap check→log
 - [ ] (expand: follow-up if gaps)
-- [ ] Research completeness matrix→log
+- [ ] Coverage matrix→log
 - [ ] Sequential elimination→log
 - [ ] Finalist analysis→log
-- [ ] Refresh: read full log    ← CRITICAL
+- [ ] Refresh: read full log
 - [ ] Pre-mortem stress test→log
 - [ ] Synthesize→log
-- [ ] Output final recommendation
+- [ ] Output recommendation
 ```
 
 **(Write to log immediately after each step—never batch)**

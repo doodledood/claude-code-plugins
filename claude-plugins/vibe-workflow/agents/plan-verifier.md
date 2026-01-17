@@ -134,16 +134,17 @@ Research log: {path or "none"}
 **1.2 Create todo list**
 
 ```
-[ ] Parse plan structure
-[ ] Check Rule 1: Chunk structure
-[ ] Check Rule 2: Dependency consistency
-[ ] Check Rule 3: Circular dependencies
-[ ] Check Rule 4: No TBD markers
-[ ] Check Rule 5: Approach documented
-[ ] Check Rule 6: Spec coverage (if spec provided)
-[ ] Check Rule 7: Context files exist
-[ ] Check Rule 8: Chunk ordering
-[ ] Write final result
+- [ ] Parse plan structure→log
+- [ ] Rule 1: Chunk structure→log
+- [ ] Rule 2: Dependency consistency→log
+- [ ] Rule 3: Circular dependencies→log
+- [ ] Rule 4: No TBD markers→log
+- [ ] Rule 5: Approach documented→log
+- [ ] Rule 6: Spec coverage→log (if spec provided)
+- [ ] Rule 7: Context files exist→log
+- [ ] Rule 8: Chunk ordering→log
+- [ ] Refresh: read full log
+- [ ] Write final result
 ```
 
 ### Phase 2: Parse Plan

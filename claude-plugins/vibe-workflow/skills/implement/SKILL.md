@@ -92,19 +92,20 @@ Last updated: [timestamp]
 
 Build todos with 4 items per chunk, plus finalization:
 ```
-[ ] Implement chunk 1: [Name]
-[ ] Verify chunk 1: [Name]
-[ ] (Expand: fix loop for chunk 1 if needed)
-[ ] Commit chunk 1: [Name]
-[ ] Implement chunk 2: [Name]
-[ ] Verify chunk 2: [Name]
-[ ] (Expand: fix loop for chunk 2 if needed)
-[ ] Commit chunk 2: [Name]
+[ ] Chunk 1: implement
+[ ] Chunk 1: verify
+[ ] (expand: fix loop if verification fails)
+[ ] Chunk 1: commit
+[ ] Chunk 2: implement
+[ ] Chunk 2: verify
+[ ] (expand: fix loop if verification fails)
+[ ] Chunk 2: commit
 ...
-[ ] Read progress file for summary
-# Unless --no-review, append:
-[ ] Run review on implemented changes
-[ ] (Expand: fix review issues as findings emerge)
+[ ] Refresh: read progress file
+[ ] Summarize results
+# Unless --no-review:
+[ ] Run review
+[ ] (expand: fix issues as findings emerge)
 ```
 
 All todos created at once via TodoWrite, status `pending`. Fix loop placeholder is marked completed and replaced with implement/verify pairs during Phase 3 (see 3.1).
@@ -236,10 +237,10 @@ When verification fails and retry is possible:
 
 Replace fix loop placeholder todo with specific items:
 ```
-[x] (Expand: fix loop for chunk N if needed) → completed
-[ ] Fix attempt 1: implement chunk N
-[ ] Fix attempt 1: verify chunk N
-[ ] (Expand: additional fix attempts if needed)
+[x] (expand: fix loop if verification fails)
+[ ] Fix attempt 1: implement
+[ ] Fix attempt 1: verify
+[ ] (expand: additional attempts if needed)
 ```
 
 ### 3.2 Analyze Failure
@@ -353,10 +354,10 @@ Skip if `--no-review` was set.
 
 1. Expand fix placeholder:
    ```
-   [x] (Expand: fix review issues as findings emerge)
-   [ ] Fix critical/high severity issues
-   [ ] Re-run review to verify fixes
-   [ ] (Expand: additional fix iterations if needed)
+   [x] (expand: fix issues as findings emerge)
+   [ ] Fix critical/high issues
+   [ ] Re-run review
+   [ ] (expand: additional iterations if needed)
    ```
 2. Mark "Fix critical/high" `in_progress`
 3. Invoke: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")`

@@ -438,23 +438,21 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 
 ## Self-Check
 
-Before finalizing output, verify:
+Before output:
 
-- [ ] Read both original and compressed files
-- [ ] Checked format (single paragraph, inline-typable)
-- [ ] Verified goal clarity (unambiguous what to do/produce)
-- [ ] Identified novel constraints in original
-- [ ] Identified execution discipline in original (write-before, verify-before, read-before patterns)
-- [ ] Verified novel constraints present in compressed
-- [ ] Verified execution discipline present in compressed (NOT flagged as over-specification)
-- [ ] Checked for over-specification (flagged for removal—but NOT discipline guardrails)
-- [ ] Checked for training-redundant content (flagged for removal)
-- [ ] Assessed action space (open vs restricted for CAPABILITY, not discipline)
-- [ ] Output format matches template
+- [ ] Read both files
+- [ ] Check format (single paragraph, inline-typable)
+- [ ] Verify goal clarity
+- [ ] Identify novel constraints + execution discipline in original
+- [ ] Verify both preserved in compressed (discipline NOT flagged)
+- [ ] Flag over-specification→removal (NOT discipline)
+- [ ] Flag training-redundant→removal
+- [ ] Assess action space (capability, not discipline)
+- [ ] Match output format
 
-**Key verification questions**:
-1. "Does this compressed prompt give the model a clear goal with maximum freedom to achieve it?"
-2. "Are discipline guardrails preserved (write-before, verify-before, read-before)?"
-3. "Did I accidentally flag discipline as over-specification?"
+**Key questions**:
+1. Clear goal + maximum freedom?
+2. Discipline guardrails preserved?
+3. Discipline accidentally flagged?
 
-Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
+Failed → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
