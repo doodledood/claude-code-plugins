@@ -1,11 +1,23 @@
 {
   "name": "vibe-experimental",
-  "version": "0.1.0",
-  "description": "Experimental workflows exploring verification-first specs and acceptance-driven development",
+  "version": "0.2.0",
+  "description": "Experimental verification-first workflows. Every criterion has explicit verification; implementation can't stop without verification passing or proper escalation.",
   "keywords": [
     "experimental",
     "spec",
     "verification",
-    "acceptance-criteria"
+    "acceptance-criteria",
+    "autonomous",
+    "implement"
+  ],
+  "hooks": [
+    {
+      "event": "Stop",
+      "script": "hooks/stop_implement_hook.py"
+    },
+    {
+      "event": "PreToolUse",
+      "script": "hooks/pretool_escalate_hook.py"
+    }
   ]
 }
