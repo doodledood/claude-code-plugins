@@ -15,6 +15,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
   - Explains WHY testability matters for each specific finding
   - Suggests improvements without mandating specific patterns
   - Added to `/review` parallel agent suite (now 7-8 agents)
+- [vibe-workflow] v2.9.0 - `/fix-review-issues` now prioritizes CLAUDE.md adherence:
+  - New issue priority order: Bugs > CLAUDE.md Adherence > Type Safety > Coverage > Maintainability > Simplicity > Docs
+  - Phase 1.5 now filters findings that conflict with CLAUDE.md rules (not just plan/spec)
+  - Conflict resolution: user-defined CLAUDE.md rules take precedence over generic reviewer suggestions
+  - Plan creation orders issues by priority for systematic fixing
 - [vibe-workflow] v2.8.1 - claude-md-adherence-reviewer now checks ALL CLAUDE.md sources:
   - Enterprise/Managed level (`/etc/claude-code/CLAUDE.md`, etc.)
   - User level (`~/.claude/CLAUDE.md`)
