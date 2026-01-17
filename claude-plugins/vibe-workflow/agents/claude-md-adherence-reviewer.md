@@ -56,12 +56,37 @@ Categorize every issue into one of these severity levels:
 
    **Scope boundaries**: Focus on application logic. Skip generated files, lock files, and vendored dependencies.
 
-2. **Identify Relevant CLAUDE.md Files**: Locate all CLAUDE.md files that apply to the changed code:
-   - Root CLAUDE.md (applies globally)
-   - CLAUDE.md files in parent directories of changed files
-   - CLAUDE.md files in the same directory as changed files
+2. **Identify ALL Relevant CLAUDE.md Sources**: Claude Code loads instructions from multiple levels. Locate all sources that apply to the changed code:
 
-3. **Extract Applicable Rules**: For each changed file, compile the set of rules that apply from all relevant CLAUDE.md files. Rules from more specific (deeper) CLAUDE.md files may override or extend rules from parent directories.
+   **Enterprise/Managed Level** (highest priority - IT-deployed policies):
+   - Linux: `/etc/claude-code/CLAUDE.md`
+   - macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`
+   - Windows: `C:\Program Files\ClaudeCode\CLAUDE.md`
+
+   **User Level** (personal preferences across all projects):
+   - `~/.claude/CLAUDE.md`
+
+   **Project Level** (shared with team):
+   - `CLAUDE.md` (root) or `.claude/CLAUDE.md` (modern location)
+   - `.claude/rules/*.md` (all markdown files auto-loaded)
+
+   **Local Project Level** (personal overrides, not committed):
+   - `CLAUDE.local.md`
+
+   **Directory Level** (more specific rules):
+   - `CLAUDE.md` files in parent directories of changed files
+   - `CLAUDE.md` files in the same directory as changed files
+
+   **Import References** (files imported within any CLAUDE.md):
+   - Check for `@path/to/file` syntax in CLAUDE.md files and include referenced files
+
+3. **Extract Applicable Rules**: For each changed file, compile the set of rules that apply from all relevant sources. Precedence order (highest to lowest):
+   1. Enterprise/Managed (cannot be overridden)
+   2. Project-level rules
+   3. Local project overrides
+   4. User-level defaults
+
+   More specific (deeper directory) CLAUDE.md files may override or extend rules from parent directories.
 
 4. **Audit Each Change**: For every modification:
    - **Read the full file** using the Read tool—not just the diff. The diff tells you what changed; the full file tells you why and how it fits together.
@@ -144,6 +169,7 @@ Note: Only flag naming conventions, patterns, or documentation requirements that
 
 Before delivering your report, verify:
 - [ ] Scope was clearly established (asked user if unclear)
+- [ ] All CLAUDE.md sources checked (enterprise, user, project, local, directory, imports)
 - [ ] Every flagged issue cites exact CLAUDE.md text with file path
 - [ ] Every issue has correct severity classification
 - [ ] Every issue has an actionable fix suggestion

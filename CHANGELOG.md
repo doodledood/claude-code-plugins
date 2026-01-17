@@ -6,6 +6,16 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+## 2026-01-17
+
+- [vibe-workflow] v2.8.1 - claude-md-adherence-reviewer now checks ALL CLAUDE.md sources:
+  - Enterprise/Managed level (`/etc/claude-code/CLAUDE.md`, etc.)
+  - User level (`~/.claude/CLAUDE.md`)
+  - Project level (`.claude/CLAUDE.md`, `.claude/rules/*.md`)
+  - Local project level (`CLAUDE.local.md`)
+  - Import references (`@path/to/file` syntax)
+  - Updated pre-output checklist to verify all sources were checked
+
 ## 2026-01-16
 
 - [prompt-engineering] v1.15.0 - Execution Discipline preservation category:
