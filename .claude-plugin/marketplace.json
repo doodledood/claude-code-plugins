@@ -65,6 +65,14 @@
       "version": "1.0.0",
       "category": "productivity",
       "keywords": ["decisions", "life", "personal", "advisor", "research", "decision-making"]
+    },
+    {
+      "name": "vibe-experimental",
+      "source": "./claude-plugins/vibe-experimental",
+      "description": "Experimental verification-first workflows. Every criterion has explicit verification; implementation can't stop without verification passing or proper escalation.",
+      "version": "0.2.0",
+      "category": "development",
+      "keywords": ["experimental", "spec", "verification", "acceptance-criteria", "autonomous", "implement"]
     }
   ]
 }
