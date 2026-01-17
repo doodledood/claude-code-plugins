@@ -150,55 +150,54 @@ Skills and agents with multi-phase workflows MUST use the memento pattern. This 
 
 #### Todos as Micro-Prompts
 
-Each todo is a micro-prompt the model executes. Apply compression principles:
-- **Goal + output**: What action, what artifact (`→log`, `→file`)
-- **What to capture**: List specifics (`files, functions, patterns`)
-- **Constraints inline**: Counter-intuitive rules in the todo itself
-- **Drop obvious**: Model knows how to grep, read, write
+Each todo is a micro-prompt. Apply compression—goal + discipline only:
+- **Goal only**: WHAT to achieve, not HOW (model knows how to investigate)
+- **Discipline markers**: `→log` after collection; `refresh:` before synthesis
+- **Drop capability**: Model knows what to capture, how to search, what's relevant
+- **Novel constraints inline**: Only counter-intuitive rules model wouldn't guess
 
 #### The Pattern: Full Specification
 
 **1. Create todo list immediately** with areas to discover, not fixed steps:
 
 ```
-- [ ] create log /tmp/{workflow}-*.md; init with goal + empty sections
-- [ ] decompose $ARGUMENTS→areas; write areas→log
-- [ ] investigate [primary area]; capture files, patterns, dependencies→log
+- [ ] create log /tmp/{workflow}-*.md
+- [ ] decompose $ARGUMENTS→areas→log
+- [ ] investigate [primary area]→log
 - [ ] (expand: areas as discovered)
-- [ ] (expand: write findings→log after each)
-- [ ] refresh: read full log→recent context    ← CRITICAL: never skip
-- [ ] synthesize→final artifact; reference log
+- [ ] refresh: read full log    ← CRITICAL: never skip
+- [ ] synthesize→final artifact
 ```
 
-**2. Embed write-to-log todos after each collection phase**:
+**2. Write to log after each investigation** (discipline, not capability):
 
 ```
-- [x] investigate auth: grep patterns, trace flows; capture files, entry points→log
-- [x] investigate errors: trace throw→catch chains; capture handlers, patterns→log
-- [ ] investigate caching: find cache layers, invalidation; capture TTLs, keys→log
+- [x] investigate auth flow→log
+- [x] investigate error handling→log
+- [ ] investigate caching layer→log
 ```
 
 **3. Expand todos dynamically** as work reveals new areas:
 
 ```
 Before:
-- [ ] investigate API layer; capture endpoints, middleware→log
+- [ ] investigate API layer→log
 - [ ] (expand: areas as discovered)
 
 After (discovered 3 sub-areas):
-- [x] investigate API layer→discovered auth, validation, rate-limiting
-- [ ] investigate auth middleware: trace token flow; capture guards, decorators→log
-- [ ] investigate validation: find schemas, error responses; capture patterns→log
-- [ ] investigate rate-limiting: find limits, bypass rules; capture config→log
+- [x] investigate API layer→log (found: auth, validation, rate-limiting)
+- [ ] investigate auth middleware→log
+- [ ] investigate validation layer→log
+- [ ] investigate rate-limiting→log
 - [ ] (expand: additional areas)
 ```
 
 **4. Refresh context BEFORE synthesis** (non-negotiable):
 
 ```
-- [x] investigate final area; capture findings→log
-- [x] refresh: read full log→recent context    ← Must complete BEFORE synthesize
-- [ ] synthesize: aggregate log findings→final artifact
+- [x] investigate [final area]→log
+- [x] refresh: read full log    ← Must complete BEFORE synthesize
+- [ ] synthesize→final artifact
 ```
 
 **Why the refresh step is critical**: By the synthesis phase, earlier findings have degraded due to context rot. The log file contains ALL findings written throughout the workflow. Reading the full file immediately before output:
@@ -210,11 +209,11 @@ After (discovered 3 sub-areas):
 
 | Phase | Todo Style | Why |
 |-------|------------|-----|
-| Start | `create log /tmp/{x}-*.md; init goal + sections` | External memory + signals incompleteness |
-| Each step | `investigate [area]; capture X, Y, Z→log` | Persists findings; specifies what to capture |
-| Discovery | `(expand: areas as discovered)` | Tracks emerging scope |
-| Before synthesis | `refresh: read full log→recent context` | Restores all context to high-attention zone |
-| End | `synthesize: aggregate findings→artifact` | Clear output target |
+| Start | `create log /tmp/{x}-*.md` | External memory |
+| Each step | `investigate [area]→log` | Goal + discipline marker |
+| Discovery | `(expand: areas as discovered)` | Signals incompleteness |
+| Before synthesis | `refresh: read full log` | Restores context to high-attention zone |
+| End | `synthesize→artifact` | Clear output target |
 
 **Never skip**: The `→log` writes and `refresh: read full log` step. These are the core mechanism that makes synthesis work despite context rot.
 
