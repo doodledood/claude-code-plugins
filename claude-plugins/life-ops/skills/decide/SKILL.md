@@ -126,29 +126,28 @@ Run: `date +%Y%m%d-%H%M%S` (filename), `date '+%Y-%m-%d %H:%M:%S'` (display).
 **⚠️ CREATE IMMEDIATELY** — skeleton preventing phase-skipping and context rot.
 
 ```
-- [ ] Phase 0 (foundation, stakeholders, characteristics)
-- [ ] Create log + write foundation
-- [ ] Discovery: Framing check → log
-- [ ] Discovery: Underlying need → log
-- [ ] Discovery: Time horizon & uncertainty → log
-- [ ] Discovery: Factor scaffolding (8-12) → log
-- [ ] Discovery: Edge cases → log
-- [ ] Discovery: Hidden factors (all 5 categories) → log
-- [ ] Discovery: Stakeholder constraints → log
-- [ ] (expand: additional rounds until nothing new)
-- [ ] Comprehensiveness checkpoint → log
-- [ ] Structuring: Factor ranking + thresholds + gut check → log
-- [ ] Option Discovery: Ask user's options FIRST
-- [ ] Option Discovery: Research → log
-- [ ] Research: Deep research → log
-- [ ] Post-research gap check → log
-- [ ] (expand: if critical gaps → follow-up + log)
-- [ ] Research Completeness Matrix → log
-- [ ] Sequential Elimination → log
-- [ ] Finalist Analysis → log
-- [ ] Refresh context: read full log ← CRITICAL
-- [ ] Pre-mortem stress test → log
-- [ ] Synthesize: Pairwise + sensitivity + 10-10-10 → log
+- [ ] Phase 0: foundation→log
+- [ ] Discovery: framing check→log
+- [ ] Discovery: underlying need→log
+- [ ] Discovery: time horizon→log
+- [ ] Discovery: factor scaffolding→log
+- [ ] Discovery: edge cases→log
+- [ ] Discovery: hidden factors→log
+- [ ] Discovery: stakeholder constraints→log
+- [ ] (expand: additional rounds as needed)
+- [ ] Comprehensiveness checkpoint→log
+- [ ] Structuring: factor ranking + thresholds→log
+- [ ] Option discovery: user options→log
+- [ ] Option discovery: research→log
+- [ ] Deep research→log
+- [ ] Post-research gap check→log
+- [ ] (expand: follow-up if gaps)
+- [ ] Research completeness matrix→log
+- [ ] Sequential elimination→log
+- [ ] Finalist analysis→log
+- [ ] Refresh: read full log    ← CRITICAL
+- [ ] Pre-mortem stress test→log
+- [ ] Synthesize→log
 - [ ] Output final recommendation
 ```
 

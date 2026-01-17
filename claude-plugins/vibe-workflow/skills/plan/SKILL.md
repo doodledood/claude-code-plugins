@@ -32,27 +32,27 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 
 **Starter seeds**:
 ```
-- [ ] Read/infer spec requirements
-- [ ] Codebase research (patterns, files to modify)
-- [ ] Approach identification (if >1 valid approach → trade-off analysis → user decision)
-- [ ] Architecture decisions (within chosen approach)
-- [ ] (expand as research reveals)
-- [ ] Read full research log and spec (context refresh before output)
+- [ ] Spec requirements→log
+- [ ] Codebase research→log
+- [ ] Approach identification→log (if multiple valid)
+- [ ] Architecture decisions→log
+- [ ] (expand: areas as research reveals)
+- [ ] Refresh: read full research log + spec
 - [ ] Finalize chunks
 - [ ] Verify plan (attempt 1/5)
-- [ ] (expand: fix issues and re-verify until PASS or max attempts)
+- [ ] (expand: fix issues, re-verify until PASS)
 ```
 
 **Evolution example** - "Add real-time notifications":
 ```
-- [x] Read spec → 3 types, mobile+web
-- [x] Codebase research → found ws.ts, notification-service.ts, polling in legacy/
-- [x] Approach selection → WebSocket vs polling? User chose WebSocket
-- [ ] Architecture decisions (within WebSocket approach)
-- [ ] Offline storage (IndexedDB vs localStorage)
-- [ ] Sync conflict resolution
-- [ ] Service worker integration
-- [ ] Read full research log and spec (context refresh)
+- [x] Spec requirements→log (3 types, mobile+web)
+- [x] Codebase research→log (found ws.ts, notification-service.ts, polling in legacy/)
+- [x] Approach selection→log (WebSocket vs polling? User chose WebSocket)
+- [ ] Architecture decisions→log
+- [ ] Offline storage→log
+- [ ] Sync conflict resolution→log
+- [ ] Service worker integration→log
+- [ ] Refresh: read full research log + spec
 - [ ] Finalize chunks
 ```
 

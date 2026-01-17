@@ -148,57 +148,56 @@ Skills and agents with multi-phase workflows MUST use the memento pattern. This 
 | **Recency bias** | Models pay highest attention to content at context end | Refresh step moves ALL findings to context end where attention is strongest |
 | **Premature completion** | Agents mark tasks "done" without verification; later instances see partial progress and "declare the job done" | Expansion placeholders signal incompleteness; explicit write-to-log todos ensure nothing is skipped |
 
+#### Todos as Micro-Prompts
+
+Each todo is a micro-prompt. Apply compression—goal + discipline only:
+- **Goal only**: WHAT to achieve, not HOW (model knows how to investigate)
+- **Discipline markers**: `→log` after collection; `refresh:` before synthesis
+- **Drop capability**: Model knows what to capture, how to search, what's relevant
+- **Novel constraints inline**: Only counter-intuitive rules model wouldn't guess
+
 #### The Pattern: Full Specification
 
 **1. Create todo list immediately** with areas to discover, not fixed steps:
 
 ```
-- [ ] Create log file
-- [ ] Initial decomposition & planning
-- [ ] Write decomposition to log file
-- [ ] Primary investigation area
-- [ ] Write findings to log file
-- [ ] (expand: new areas as discovered)
-- [ ] (expand: write findings after each area)
-- [ ] Refresh context: read full log file    ← CRITICAL: never skip
-- [ ] Finalize output
+- [ ] Create log /tmp/{workflow}-*.md
+- [ ] Decompose $ARGUMENTS→areas→log
+- [ ] Investigate [primary area]→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full log    ← CRITICAL: never skip
+- [ ] Synthesize→final artifact
 ```
 
-**2. Embed write-to-log todos after each collection phase**:
+**2. Write to log after each investigation** (discipline, not capability):
 
 ```
-- [x] Research: Feature A
-- [x] Write Feature A findings to log file     ← Immediately after research
-- [x] Research: Feature B
-- [x] Write Feature B findings to log file     ← Never batch writes
-- [ ] Research: Feature C
-- [ ] Write Feature C findings to log file
+- [x] Investigate auth flow→log
+- [x] Investigate error handling→log
+- [ ] Investigate caching layer→log
 ```
 
 **3. Expand todos dynamically** as work reveals new areas:
 
 ```
 Before:
-- [ ] Primary research area
-- [ ] (expand: new areas as discovered)
+- [ ] Investigate API layer→log
+- [ ] (expand: areas as discovered)
 
-After:
-- [x] Primary research area → discovered 3 sub-areas
-- [ ] Sub-area A investigation
-- [ ] Write Sub-area A findings to log file
-- [ ] Sub-area B investigation
-- [ ] Write Sub-area B findings to log file
-- [ ] Sub-area C investigation
-- [ ] Write Sub-area C findings to log file
-- [ ] (expand: any additional areas)
+After (discovered 3 sub-areas):
+- [x] Investigate API layer→log (found: auth, validation, rate-limiting)
+- [ ] Investigate auth middleware→log
+- [ ] Investigate validation layer→log
+- [ ] Investigate rate-limiting→log
+- [ ] (expand: additional areas)
 ```
 
 **4. Refresh context BEFORE synthesis** (non-negotiable):
 
 ```
-- [x] Write final investigation findings to log file
-- [x] Refresh context: read full log file    ← Must complete BEFORE finalize
-- [ ] Finalize output
+- [x] Investigate [final area]→log
+- [x] Refresh: read full log    ← Must complete BEFORE synthesize
+- [ ] Synthesize→final artifact
 ```
 
 **Why the refresh step is critical**: By the synthesis phase, earlier findings have degraded due to context rot. The log file contains ALL findings written throughout the workflow. Reading the full file immediately before output:
@@ -208,15 +207,15 @@ After:
 
 #### Quick Reference
 
-| Phase | Action | Why |
-|-------|--------|-----|
-| Start | Create log file + todos with expansion placeholders | External memory + signals incompleteness |
-| Each step | Write findings to log file before proceeding | Persists findings beyond working memory |
-| Discovery | Expand todos with new areas + write-to-log todos | Tracks emerging scope, ensures no skipped writes |
-| Before synthesis | Read FULL log file | Restores all context to high-attention zone |
-| End | Mark all todos complete | Verification that pattern was followed |
+| Phase | Todo Style | Why |
+|-------|------------|-----|
+| Start | `Create log /tmp/{x}-*.md` | External memory |
+| Each step | `Investigate [area]→log` | Goal + discipline marker |
+| Discovery | `(expand: areas as discovered)` | Signals incompleteness |
+| Before synthesis | `Refresh: read full log` | Restores context to high-attention zone |
+| End | `Synthesize→artifact` | Clear output target |
 
-**Never skip**: The write-to-log and refresh-before-finalize steps. These are the core mechanism that makes synthesis work despite context rot.
+**Never skip**: The `→log` writes and `refresh: read full log` step. These are the core mechanism that makes synthesis work despite context rot.
 
 See `vibe-workflow/skills/spec/SKILL.md`, `vibe-workflow/skills/plan/SKILL.md`, or `vibe-workflow/skills/research-web/SKILL.md` for reference implementations. Note how these implementations follow the pattern without naming it.
 

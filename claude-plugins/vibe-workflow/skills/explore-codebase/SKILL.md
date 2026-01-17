@@ -65,23 +65,22 @@ Run: `date +%Y%m%d-%H%M%S` → for filename and timestamps
 
 ```
 - [ ] Create orchestration file
-- [ ] Topic decomposition & agent planning
-- [ ] Write decomposition to orchestration file
-- [ ] (expand: agent assignments added during decomposition)
+- [ ] Topic decomposition→log
+- [ ] (expand: agent assignments as decomposition reveals)
 - [ ] Launch Wave 1 agents
-- [ ] Collect Agent 1 findings → write to orchestration file
-- [ ] Collect Agent 2 findings → write to orchestration file
-- [ ] (expand: more agent collection todos as needed)
-- [ ] Cross-reference findings → write to orchestration file
-- [ ] Evaluate gaps → write to orchestration file
-- [ ] (expand: if continuing - gap-fill todos)
-- [ ] Refresh context: read full orchestration file
-- [ ] Synthesize unified reading list
+- [ ] Collect Agent 1→log
+- [ ] Collect Agent 2→log
+- [ ] (expand: more agents as needed)
+- [ ] Cross-reference→log
+- [ ] Evaluate gaps→log
+- [ ] (expand: gap-fill if continuing)
+- [ ] Refresh: read full orchestration file
+- [ ] Synthesize→unified reading list
 ```
 
 **Critical todos** (never skip):
-- `Write {X} to orchestration file` - after EACH agent completion
-- `Refresh context: read full orchestration file` - ALWAYS before synthesis
+- `→log` after EACH agent completion
+- `Refresh:` ALWAYS before synthesis
 
 #### 1.2 Create orchestration file
 
@@ -151,16 +150,15 @@ Thoroughness: {level}
 #### 2.3 Expand todos for each agent
 
 ```
-- [x] Topic decomposition & agent planning
-- [x] Write decomposition to orchestration file
-- [ ] Agent 1: Implementation angle
-- [ ] Agent 2: Usage angle
-- [ ] Agent 3: Tests angle
+- [x] Topic decomposition→log
+- [ ] Agent 1: implementation angle
+- [ ] Agent 2: usage angle
+- [ ] Agent 3: tests angle
 - [ ] Launch Wave 1 agents (parallel)
-- [ ] Collect Agent 1 findings → write to orchestration file
-- [ ] Collect Agent 2 findings → write to orchestration file
-- [ ] Collect Agent 3 findings → write to orchestration file
-- [ ] Cross-reference findings → write to orchestration file
+- [ ] Collect Agent 1→log
+- [ ] Collect Agent 2→log
+- [ ] Collect Agent 3→log
+- [ ] Cross-reference→log
 ...
 ```
 

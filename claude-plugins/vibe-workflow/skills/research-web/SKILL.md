@@ -136,42 +136,39 @@ Todos = **research areas to investigate + write-to-log operations**, not fixed s
 
 ```
 - [ ] Create orchestration file
-- [ ] Topic decomposition & research planning
-- [ ] Write decomposition to orchestration file
-- [ ] (expand: research facets added during decomposition - e.g., "Research: {facet 1}")
-- [ ] (expand: Wave 1 agent assignments)
+- [ ] Topic decomposition→log
+- [ ] (expand: research facets as decomposition reveals)
 - [ ] Launch Wave 1 agents
-- [ ] Collect Wave 1 findings → write to orchestration file
-- [ ] Cross-reference findings → write analysis to orchestration file
-- [ ] Evaluate gaps → write gap evaluation to orchestration file
-- [ ] (expand: if continuing - Wave 2+ research todos)
-- [ ] Refresh context: read full orchestration file
-- [ ] Synthesize final output
+- [ ] Collect Wave 1 findings→log
+- [ ] Cross-reference findings→log
+- [ ] Evaluate gaps→log
+- [ ] (expand: Wave 2+ if continuing)
+- [ ] Refresh: read full orchestration file
+- [ ] Synthesize→final output
 ```
 
 **Critical todos** (never skip):
-- `Write {X} to orchestration file` - after EACH phase/agent completion
-- `Refresh context: read full orchestration file` - ALWAYS before synthesis
+- `→log` after EACH phase/agent completion
+- `Refresh:` ALWAYS before synthesis
 
-**Expansion pattern**: As decomposition reveals facets, add specific research todos with write-to-log after each collection:
+**Expansion pattern**: As decomposition reveals facets, add research todos:
 ```
 - [x] Create orchestration file
-- [x] Topic decomposition & research planning
-- [x] Write decomposition to orchestration file
-- [ ] Research: Real-time database landscape 2025
-- [ ] Research: Performance benchmarks
-- [ ] Research: Conflict resolution strategies
-- [ ] Research: Production case studies
+- [x] Topic decomposition→log
+- [ ] Research: real-time database landscape 2025
+- [ ] Research: performance benchmarks
+- [ ] Research: conflict resolution strategies
+- [ ] Research: production case studies
 - [ ] Launch Wave 1 agents (4 parallel)
-- [ ] Collect Agent 1 findings → write to orchestration file
-- [ ] Collect Agent 2 findings → write to orchestration file
-- [ ] Collect Agent 3 findings → write to orchestration file
-- [ ] Collect Agent 4 findings → write to orchestration file
-- [ ] Cross-reference all findings → write analysis to orchestration file
-- [ ] Evaluate gaps → write gap evaluation to orchestration file
-- [ ] (if continuing: Wave 2 research todos with write-to-log)
-- [ ] Refresh context: read full orchestration file
-- [ ] Synthesize final output
+- [ ] Collect Agent 1→log
+- [ ] Collect Agent 2→log
+- [ ] Collect Agent 3→log
+- [ ] Collect Agent 4→log
+- [ ] Cross-reference→log
+- [ ] Evaluate gaps→log
+- [ ] (expand: Wave 2 if continuing)
+- [ ] Refresh: read full orchestration file
+- [ ] Synthesize→final output
 ```
 
 ### 1.2 Create orchestration file (skip for quick)

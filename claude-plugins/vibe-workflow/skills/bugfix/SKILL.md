@@ -27,9 +27,9 @@ This skill guides you through:
 
 **Starter todos**:
 ```
-- [ ] Prerequisite check (git, test config)
+- [ ] Prerequisite check
 - [ ] Bug context gathering (if needed)
-- [ ] Investigation and fix (bug-fixer agent)
+- [ ] Investigation and fix
 - [ ] Verification summary
 ```
 
