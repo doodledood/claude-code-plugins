@@ -41,7 +41,7 @@ Start simple. Escalate if you hit ambiguity.
 - `review-type-safety` - Type safety analysis
 - `review-maintainability` - Code quality and maintainability
 - `review-simplicity` - Over-engineering and cognitive complexity
-- `review-testability` - Functional core / imperative shell pattern violations
+- `review-testability` - Identify code requiring excessive mocking to test
 - `review-coverage` - Test coverage gaps
 - `review-docs` - Documentation completeness
 - `review-claude-md-adherence` - Check adherence to project instructions
@@ -63,7 +63,7 @@ Start simple. Escalate if you hit ambiguity.
 - `code-bugs-reviewer` - Bug detection agent
 - `code-maintainability-reviewer` - Maintainability analysis
 - `code-simplicity-reviewer` - Over-engineering and cognitive complexity analysis
-- `code-testability-reviewer` - Functional core / imperative shell pattern analysis
+- `code-testability-reviewer` - Testability analysis (test friction, mock count)
 - `code-coverage-reviewer` - Coverage gap analysis
 - `type-safety-reviewer` - Type safety analysis
 - `docs-reviewer` - Documentation review
