@@ -1,7 +1,7 @@
 ---
 name: define-verifier
 description: 'Unified verifier for /define skill output. Checks all 27 acceptance criteria: interview quality, output structure, verification methods, examples, and meta-requirements.'
-model: sonnet
+model: opus
 tools:
   - Read
   - Grep
