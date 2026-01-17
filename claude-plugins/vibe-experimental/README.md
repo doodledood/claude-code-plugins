@@ -104,15 +104,6 @@ All skills write to log files before proceeding. This prevents context loss on c
 ### Criteria-Driven (Not Plan-Driven)
 `/implement` works toward acceptance criteria directly, not through plan decomposition. No "Chunk 1", "Chunk 2" - instead "satisfy AC-1", "satisfy AC-2".
 
-## Specs
-
-Design specifications for this plugin:
-
-- `specs/spec-skill-redesign.md` - 27 acceptance criteria for /spec skill
-- `specs/implement-skill-spec.md` - 23 acceptance criteria for /implement system
-- `specs/spec-skill-redesign-subagents.md` - Subagent definitions for spec verification
-- `specs/implement-skill-subagents.md` - Subagent definitions for implement verification
-
 ## Status
 
 **Experimental** - Works in progress. These workflows are more rigorous than the standard vibe-workflow but also more demanding. Use when you want to invest upfront in specification for autonomous execution.
