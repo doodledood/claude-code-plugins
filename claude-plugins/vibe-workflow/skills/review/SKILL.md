@@ -1,64 +1,90 @@
 ---
 name: review
-description: Run all code review agents in parallel (bugs, coverage, maintainability, simplicity, type-safety if typed, CLAUDE.md adherence, docs).
+description: Run all code review agents in parallel (bugs, coverage, maintainability, simplicity, type-safety if typed, CLAUDE.md adherence, docs). Respects CLAUDE.md reviewer configuration.
 ---
 
 Run a comprehensive code review. First detect the codebase type, then launch appropriate agents.
 
-**Flags**: `--autonomous` → skip Step 4 user prompt, return report only (for programmatic invocation)
+**Flags**: `--autonomous` → skip Step 5 user prompt, return report only (for programmatic invocation)
 
-## Step 1: Detect Typed Language
+## Step 1: Check CLAUDE.md for Reviewer Preferences
 
-Before launching agents, check if this is a typed language codebase:
+Check loaded CLAUDE.md content for any guidance about which reviewers to run or skip. CLAUDE.md files are auto-loaded—do NOT search for them.
 
-**TypeScript/JavaScript with types:**
-- `tsconfig.json` exists, OR
-- `.ts`/`.tsx` files in scope
+**Users can express preferences however they want.** Examples:
+- "Skip the docs reviewer, we don't have documentation requirements"
+- "Always run type-safety even though we use plain JS"
+- "Don't run coverage checks"
+- A dedicated section listing reviewers to include/exclude
+- Custom review agents they've defined
 
-**Python with type hints:**
-- `py.typed` marker exists, OR
-- `mypy` or `pyright` in `pyproject.toml`/`setup.cfg`, OR
-- Type annotations visible in `.py` files (`: str`, `-> None`, `Optional[`, `List[`, etc.)
+**Available reviewers** (use your judgment matching user intent):
+- `code-bugs-reviewer` - bugs, logic errors
+- `code-coverage-reviewer` - test coverage
+- `code-maintainability-reviewer` - DRY, dead code, coupling
+- `code-simplicity-reviewer` - over-engineering, complexity
+- `code-testability-reviewer` - testability, mocking friction
+- `claude-md-adherence-reviewer` - CLAUDE.md compliance
+- `docs-reviewer` - documentation accuracy
+- `type-safety-reviewer` - type safety (conditional by default)
 
-**Statically typed languages (always typed):**
-- Java (`.java`), Kotlin (`.kt`), Go (`.go`), Rust (`.rs`), C# (`.cs`), Swift (`.swift`), Scala (`.scala`)
+**If no preferences stated:** Use defaults (all core agents + type-safety if typed codebase).
 
-Quick detection commands:
-```bash
-# TypeScript
-ls tsconfig.json 2>/dev/null || git ls-files '*.ts' '*.tsx' | head -1
+## Step 2: Detect Typed Language
 
-# Python types
-ls py.typed 2>/dev/null || grep -l "mypy\|pyright" pyproject.toml setup.cfg 2>/dev/null | head -1
+Unless `type-safety` is in `Skip Reviewers` or `Required Reviewers`, determine if this is a typed codebase.
 
-# Other typed languages
-git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
-```
+**Check loaded CLAUDE.md content first** (no commands needed):
+- Development commands mention `tsc`, `mypy`, `pyright`, or type-checking
+- Tech stack mentions TypeScript, typed Python, Go, Rust, Java, etc.
+- File extensions mentioned (`.ts`, `.tsx`, `.go`, `.rs`, `.java`, etc.)
 
-## Step 2: Launch Agents
+**Typed if any of these are evident from context:**
+- TypeScript/TSX project
+- Python with type hints (`mypy`, `pyright` in dev commands)
+- Statically typed languages: Go, Rust, Java, Kotlin, C#, Swift, Scala
 
-**Always launch these 7 core agents IN PARALLEL:**
+**Skip type-safety for:**
+- Plain JavaScript (no TypeScript)
+- Untyped Python (no mypy/pyright)
+- Ruby, PHP, shell scripts
 
-1. **code-bugs-reviewer** - Audit for logical bugs, race conditions, edge cases
-2. **code-coverage-reviewer** - Verify test coverage for code changes
-3. **code-maintainability-reviewer** - Check for DRY violations, dead code, coupling
-4. **code-simplicity-reviewer** - Check for over-engineering, premature optimization, cognitive complexity
-5. **code-testability-reviewer** - Identify code requiring excessive mocking to test
-6. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
-7. **docs-reviewer** - Audit documentation and code comments accuracy
+If CLAUDE.md content doesn't make it clear, use your judgment based on files you've seen in context.
 
-**Conditionally launch (only if typed language detected):**
+## Step 3: Launch Agents
 
-8. **type-safety-reviewer** - Audit type safety, any/unknown abuse, invalid states
-   - **Primary:** TypeScript, Python with type hints (agent is optimized for these)
-   - **Also useful for:** Java, Kotlin, Go, Rust, C#, Swift, Scala (core principles apply)
-   - **Skip for:** Plain JavaScript, Ruby, PHP, shell scripts, untyped Python
+**Build the agent list based on CLAUDE.md preferences (Steps 1-2):**
 
-Scope: $ARGUMENTS
+### Core Agents (launch IN PARALLEL):
+
+1. **code-bugs-reviewer** - Logical bugs, race conditions, edge cases
+2. **code-coverage-reviewer** - Test coverage for code changes
+3. **code-maintainability-reviewer** - DRY violations, dead code, coupling
+4. **code-simplicity-reviewer** - Over-engineering, complexity
+5. **code-testability-reviewer** - Testability, mocking friction
+6. **claude-md-adherence-reviewer** - CLAUDE.md compliance
+7. **docs-reviewer** - Documentation accuracy
+
+### Conditional:
+
+8. **type-safety-reviewer** - Type safety, any/unknown abuse
+   - Include if: typed codebase (Step 2) OR user requested it
+   - Skip if: user said to skip it, or untyped codebase
+
+### Custom Agents:
+
+9. **Any custom reviewers the user defined** - Launch with their specified agent/description
+
+**Applying preferences:**
+- Skip any reviewers the user said to exclude
+- Include any reviewers the user said to always run
+- Add any custom reviewers the user defined
+
+**Scope:** $ARGUMENTS
 
 If no arguments provided, all agents should analyze the git diff between the current branch and main/master branch.
 
-## Step 3: Verification Agent (Final Pass)
+## Step 4: Verification Agent (Final Pass)
 
 After all review agents complete, launch an **opus verification agent** to reconcile and validate findings:
 
@@ -111,7 +137,7 @@ Produce a **Final Consolidated Review Report** with:
 - Recommended fix order (dependencies, quick wins first)
 ```
 
-## Step 4: Follow-up Action
+## Step 5: Follow-up Action
 
 **If `--autonomous`**: Skip user prompt, end after presenting report. Caller handles next steps.
 
@@ -133,9 +159,9 @@ options:
 
 ## Execution
 
-1. Run detection commands first (can be parallel)
-2. Based on results, launch either 7 or 8 agents simultaneously in a single message
-3. Do NOT run agents sequentially—always parallel
+1. Check loaded CLAUDE.md content for reviewer configuration and typed language info (Steps 1-2)
+2. Build final agent list: start with core agents, apply skip/required rules, add custom agents
+3. Launch all agents simultaneously in a single message (do NOT run sequentially)
 4. After all agents complete, launch the verification agent with all findings
 5. Present the final consolidated report to the user
 6. Ask user about next steps using AskUserQuestion
