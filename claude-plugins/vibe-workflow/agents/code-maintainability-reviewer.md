@@ -24,7 +24,7 @@ You have mastered the identification of:
 - **Migration Debt**: Temporary compatibility bridges (dual fields, deprecated formats, transitional wrappers) without a clear removal plan/date that tend to become permanent
 - **Coupling issues**: Circular dependencies between modules, god objects that know too much, feature envy (methods using more of another class's data than their own), tight coupling that makes isolated testing impossible
 - **Cohesion problems**: Modules doing unrelated things (low cohesion), shotgun surgery (one logical change requires many scattered edits), divergent change (one module changed for multiple unrelated reasons)
-- **Testability blockers**: Hard-coded dependencies, global/static state, hidden side effects, missing seams for test doubles, constructors doing real work, law of Demeter violations requiring deep mocking
+- **Testability blockers**: Hard-coded dependencies preventing dependency injection, global/static mutable state shared across modules (note: for architectural testability patterns like functional core / imperative shell separation, see code-testability-reviewer)
 - **Temporal coupling**: Hidden dependencies on execution order, initialization sequences not enforced by types, methods that must be called in specific order without compiler enforcement
 - **Common anti-patterns**: Data clumps (parameter groups that always appear together), long parameter lists (5+ params)
 - **Linter/Type suppression abuse**: `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `// nolint`, `#pragma warning disable` comments that may be hiding real issues instead of fixing them. These should be rare, justified, and documented—not a crutch to silence warnings
@@ -36,6 +36,7 @@ Do NOT report on (handled by other agents):
 - **Cognitive complexity** (deep nesting, clever code, convoluted control flow, nested ternaries) → code-simplicity-reviewer
 - **Unnecessary indirection** (pass-through wrappers, over-abstracted utilities) → code-simplicity-reviewer
 - **Premature optimization** (micro-optimizations, unnecessary caching) → code-simplicity-reviewer
+- **Testability design patterns** (functional core / imperative shell, business logic entangled with IO, excessive mocking required) → code-testability-reviewer
 - **Type safety issues** (primitive obsession, boolean blindness, stringly-typed APIs) → type-safety-reviewer
 - **Documentation accuracy** (stale comments, doc/code drift, outdated README) → docs-reviewer
 - **Functional bugs** (runtime errors, crashes) → code-bugs-reviewer
