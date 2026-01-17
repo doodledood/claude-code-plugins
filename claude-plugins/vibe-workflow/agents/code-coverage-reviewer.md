@@ -171,7 +171,7 @@ Do NOT report on (handled by other agents):
 - **Documentation** → docs-reviewer
 - **CLAUDE.md compliance** → claude-md-adherence-reviewer
 
-Note: Testability BLOCKERS (hard-coded dependencies preventing tests) are flagged by code-maintainability-reviewer. This agent focuses on whether tests EXIST for the changed code, not whether code is testable.
+Note: Testability design patterns (functional core / imperative shell, business logic entangled with IO) are handled by code-testability-reviewer. This agent focuses on whether tests EXIST for the changed code, not whether code is designed to be testable.
 
 ## Guidelines
 

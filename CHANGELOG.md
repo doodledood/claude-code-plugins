@@ -8,6 +8,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [vibe-workflow] v2.9.0 - New `/review-testability` skill and `code-testability-reviewer` agent:
+  - Identifies code requiring excessive mocking to test
+  - Severity based on: importance of logic × test friction (not pattern compliance)
+  - Flags: high mock count, logic buried in IO, non-deterministic inputs, tight coupling
+  - Explains WHY testability matters for each specific finding
+  - Suggests improvements without mandating specific patterns
+  - Added to `/review` parallel agent suite (now 7-8 agents)
 - [vibe-workflow] v2.9.0 - `/fix-review-issues` now prioritizes CLAUDE.md adherence:
   - New issue priority order: Bugs > CLAUDE.md Adherence > Type Safety > Coverage > Maintainability > Simplicity > Docs
   - Phase 1.5 now filters findings that conflict with CLAUDE.md rules (not just plan/spec)
