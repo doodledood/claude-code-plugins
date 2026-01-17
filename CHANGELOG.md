@@ -9,12 +9,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 ## 2026-01-17
 
 - [vibe-workflow] v2.9.0 - New `/review-testability` skill and `code-testability-reviewer` agent:
-  - Enforces "functional core, imperative shell" pattern for testable code
-  - Identifies business logic entangled with IO operations
-  - Suggests separation of pure functions from side effects
-  - Flags code requiring excessive mocking to test
+  - Identifies code requiring excessive mocking to test
+  - Severity based on: importance of logic × test friction (not pattern compliance)
+  - Flags: high mock count, logic buried in IO, non-deterministic inputs, tight coupling
+  - Explains WHY testability matters for each specific finding
+  - Suggests improvements without mandating specific patterns
   - Added to `/review` parallel agent suite (now 7-8 agents)
-  - Updated maintainability and coverage reviewers to reference testability reviewer
 
 ## 2026-01-16
 

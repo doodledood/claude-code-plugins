@@ -43,7 +43,7 @@ git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
 2. **code-coverage-reviewer** - Verify test coverage for code changes
 3. **code-maintainability-reviewer** - Check for DRY violations, dead code, coupling
 4. **code-simplicity-reviewer** - Check for over-engineering, premature optimization, cognitive complexity
-5. **code-testability-reviewer** - Check for functional core / imperative shell pattern violations
+5. **code-testability-reviewer** - Identify code requiring excessive mocking to test
 6. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
 7. **docs-reviewer** - Audit documentation and code comments accuracy
 
