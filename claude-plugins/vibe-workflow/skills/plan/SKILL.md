@@ -570,6 +570,8 @@ Each chunk must:
 ```markdown
 # IMPLEMENTATION PLAN: [Feature]
 
+Spec: {spec path or "none"}
+
 [1-2 sentences]
 
 Gates: Type checks (0 errors), Tests (pass), Lint (clean)

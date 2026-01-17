@@ -8,6 +8,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [vibe-workflow] v2.10.1 - Plan file now includes spec reference (`Spec: {path or "none"}`) when a spec was used
 - [vibe-workflow] v2.10.0 - `/review` now respects CLAUDE.md reviewer configuration:
   - Checks loaded CLAUDE.md files for `## Review Configuration` section
   - `Skip Reviewers` - exclude specific reviewers from running
