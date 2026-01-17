@@ -28,13 +28,13 @@ Todos = **areas to discover**, not interview steps. Each todo reminds you what c
 **Starter todos** (seeds only - list grows as discovery reveals new areas):
 
 ```
-- [ ] Determine work type
-- [ ] Context research→log (if code work)
-- [ ] Scope & target users→log
-- [ ] Core requirements→log
+- [ ] Determine work type; done when type classified
+- [ ] Context research→log (if code work); done when patterns understood
+- [ ] Scope & target users→log; done when boundaries clear
+- [ ] Core requirements→log; done when must-haves captured
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
-- [ ] Finalize spec
+- [ ] Finalize spec; done when no [TBD] markers + completeness test passes
 ```
 
 ### Todo Evolution Example
@@ -43,37 +43,37 @@ Query: "Add user notifications feature"
 
 Initial:
 ```
-- [ ] Context research→log
-- [ ] Scope & target users→log
-- [ ] Core requirements→log
+- [ ] Context research→log; done when patterns understood
+- [ ] Scope & target users→log; done when boundaries clear
+- [ ] Core requirements→log; done when must-haves captured
 - [ ] Refresh: read full interview log
-- [ ] Finalize spec
+- [ ] Finalize spec; done when no [TBD] markers + completeness test passes
 ```
 
 After user says "needs to work across mobile and web":
 ```
-- [x] Context research→log (found existing admin alerts system)
-- [ ] Scope & target users→log
-- [ ] Core requirements→log
-- [ ] Mobile notification delivery→log
-- [ ] Web notification delivery→log
-- [ ] Cross-platform sync→log
+- [x] Context research→log; found existing admin alerts system
+- [ ] Scope & target users→log; done when boundaries clear
+- [ ] Core requirements→log; done when must-haves captured
+- [ ] Mobile notification delivery→log; done when push/in-app decided
+- [ ] Web notification delivery→log; done when mechanism chosen
+- [ ] Cross-platform sync→log; done when sync strategy defined
 - [ ] Refresh: read full interview log
-- [ ] Finalize spec
+- [ ] Finalize spec; done when no [TBD] markers + completeness test passes
 ```
 
 After user mentions "also needs email digest option":
 ```
-- [x] Context research→log
-- [x] Scope & target users→log (all active users, v1 MVP)
-- [ ] Core requirements→log
-- [x] Mobile notification delivery→log (push + in-app)
-- [ ] Web notification delivery→log
-- [ ] Cross-platform sync→log
-- [ ] Email digest frequency→log
-- [ ] Email vs real-time prefs→log
+- [x] Context research→log; found existing admin alerts system
+- [x] Scope & target users→log; all active users, v1 MVP
+- [ ] Core requirements→log; done when must-haves captured
+- [x] Mobile notification delivery→log; push + in-app decided
+- [ ] Web notification delivery→log; done when mechanism chosen
+- [ ] Cross-platform sync→log; done when sync strategy defined
+- [ ] Email digest frequency→log; done when timing options decided
+- [ ] Email vs real-time prefs→log; done when preference model clear
 - [ ] Refresh: read full interview log
-- [ ] Finalize spec
+- [ ] Finalize spec; done when no [TBD] markers + completeness test passes
 ```
 
 **Key**: Todos grow as user reveals complexity. Never prune prematurely.

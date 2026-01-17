@@ -64,18 +64,18 @@ Run: `date +%Y%m%d-%H%M%S` → for filename and timestamps
 **Starter todos** (seeds - list grows during decomposition):
 
 ```
-- [ ] Create orchestration file
-- [ ] Topic decomposition→log
+- [ ] Create orchestration file; done when file created
+- [ ] Topic decomposition→log; done when angles identified
 - [ ] (expand: agent assignments as decomposition reveals)
-- [ ] Launch Wave 1 agents
-- [ ] Collect Agent 1→log
-- [ ] Collect Agent 2→log
+- [ ] Launch Wave 1 agents; done when all agents spawned
+- [ ] Collect Agent 1→log; done when findings written
+- [ ] Collect Agent 2→log; done when findings written
 - [ ] (expand: more agents as needed)
-- [ ] Cross-reference→log
-- [ ] Evaluate gaps→log
+- [ ] Cross-reference→log; done when duplicates/conflicts resolved
+- [ ] Evaluate gaps→log; done when gaps classified
 - [ ] (expand: gap-fill if continuing)
 - [ ] Refresh: read full orchestration file
-- [ ] Synthesize→unified reading list
+- [ ] Synthesize→unified reading list; done when all files deduplicated + prioritized
 ```
 
 **Critical todos** (never skip):
@@ -150,15 +150,15 @@ Thoroughness: {level}
 #### 2.3 Expand todos for each agent
 
 ```
-- [x] Topic decomposition→log
-- [ ] Agent 1: implementation angle
-- [ ] Agent 2: usage angle
-- [ ] Agent 3: tests angle
-- [ ] Launch Wave 1 agents (parallel)
-- [ ] Collect Agent 1→log
-- [ ] Collect Agent 2→log
-- [ ] Collect Agent 3→log
-- [ ] Cross-reference→log
+- [x] Topic decomposition→log; angles identified
+- [ ] Agent 1: implementation angle; done when core files found
+- [ ] Agent 2: usage angle; done when callers identified
+- [ ] Agent 3: tests angle; done when test files found
+- [ ] Launch Wave 1 agents (parallel); done when all spawned
+- [ ] Collect Agent 1→log; done when findings written
+- [ ] Collect Agent 2→log; done when findings written
+- [ ] Collect Agent 3→log; done when findings written
+- [ ] Cross-reference→log; done when duplicates/conflicts resolved
 ...
 ```
 

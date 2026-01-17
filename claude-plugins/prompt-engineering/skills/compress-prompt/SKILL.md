@@ -52,10 +52,10 @@ This skill compresses prompts through:
 Create todos tracking workflow phases:
 
 ```
-- [ ] Input validation
-- [ ] Initial compression→verify
+- [ ] Input validation; done when prompt file read successfully
+- [ ] Initial compression→verify; done when verifier returns VERIFIED or issues fixed
 - [ ] (Expand: refinement iterations on ISSUES_FOUND)
-- [ ] Output compressed prompt
+- [ ] Output compressed prompt; done when result displayed + optionally saved
 ```
 
 ### Phase 1: Input Validation
@@ -123,6 +123,7 @@ Compress using:
    | Priority | Content | Action | Rationale |
    |----------|---------|--------|-----------|
    | 1 | Core goal/purpose | KEEP | Model needs to know WHAT to do |
+   | 1 | Acceptance criteria | KEEP | Model needs to know WHAT defines success—RL-trained to satisfy |
    | 2 | Novel constraints | KEEP | Counter-intuitive rules model wouldn't guess |
    | 2 | Execution discipline | KEEP | Guardrails against laziness, premature completion, context loss |
    | 3 | Output artifacts | KEEP (brief) | File paths, format names if non-standard |
@@ -132,6 +133,12 @@ Compress using:
    | 7 | Examples | DROP | Model knows patterns |
    | 8 | Explanations | DROP | Model can infer rationale |
    | 9 | Formatting/style | DROP | Model knows professional defaults |
+
+   **Acceptance Criteria Defined**: Observable conditions that define when the goal is achieved:
+   - "Done when all tests pass" — verifiable completion condition
+   - "Success = output contains X, Y, Z fields" — concrete output requirements
+   - "Complete when user approves" — explicit handoff condition
+   - "Valid if schema validates" — measurable quality gate
 
    **Execution Discipline Defined**: Guardrails that address model weaknesses, not capability gaps:
    - "Write findings to file BEFORE proceeding" — prevents context rot
@@ -185,7 +192,7 @@ Compress using:
    - Could the model achieve this with LESS instruction?
    - If I removed this constraint, would the model fail? If no → remove it.
 
-**Output format**: Single cohesive paragraph. Goal + novel constraints + output artifact. That's it.
+**Output format**: Single cohesive paragraph. Goal + acceptance criteria + novel constraints + output artifact. That's it.
 
 **Step 2.3: Verify compression**
 
@@ -289,6 +296,7 @@ Unresolved issues:
 | **Trust the model's knowledge** | Don't tell it what it already knows—it's trained on millions of examples |
 | **Don't trust model's discipline** | Keep guardrails against laziness, premature completion, context loss |
 | **Goal over process** | State WHAT to achieve, not HOW to do it |
+| **Acceptance criteria** | Keep observable success conditions—model is RL-trained to satisfy these |
 | **Novel constraints only** | Keep only counter-intuitive rules model wouldn't naturally follow |
 | **Execution discipline** | Keep "write before proceeding", "verify before finalizing", "read before synthesis" |
 | **Maximize action space** | Fewer capability constraints = more freedom = better results |
@@ -345,19 +353,23 @@ Unresolved issues:
 Compressed: prompts/code-reviewer.md
 
 Original: 1,247 tokens
-Compressed: 52 tokens (95.8% reduction)
+Compressed: 67 tokens (94.6% reduction)
 
 ---
-Review code for bugs, security issues, performance problems. Output JSON {file, line, issue, severity, fix}. Never approve code with critical issues.
+Review code for bugs, security issues, performance problems; success = all critical issues identified with actionable fixes. Output JSON {file, line, issue, severity, fix}. Never approve code with critical issues.
 ---
 
 Verification: PASSED (1 iteration)
 ```
+
+**What was kept**:
+- **Goal**: "Review code for bugs, security issues, performance problems"
+- **Acceptance criteria**: "success = all critical issues identified with actionable fixes" — defines what success looks like
+- **Output artifact**: "Output JSON {file, line, issue, severity, fix}"
+- **Novel constraint**: "Never approve code with critical issues" — counter-intuitive (model might default to always providing approval with caveats)
 
 **What was dropped and why**:
 - "suggest fixes with code snippets" → model does this naturally when finding issues
 - "handle empty input by requesting code" → model handles edge cases from training
 - "for large files process in chunks max 500 lines" → model manages context naturally
 - "flag severity" → implied by severity field in output format
-
-**The only novel constraint kept**: "Never approve code with critical issues" — counter-intuitive (model might default to always providing approval with caveats).

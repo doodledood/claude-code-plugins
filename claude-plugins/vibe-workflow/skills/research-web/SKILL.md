@@ -135,16 +135,16 @@ Todos = **research areas to investigate + write-to-log operations**, not fixed s
 **Starter todos** (seeds - list grows during decomposition):
 
 ```
-- [ ] Create orchestration file
-- [ ] Topic decomposition→log
+- [ ] Create orchestration file; done when file created
+- [ ] Topic decomposition→log; done when all facets identified
 - [ ] (expand: research facets as decomposition reveals)
-- [ ] Launch Wave 1 agents
-- [ ] Collect Wave 1 findings→log
-- [ ] Cross-reference findings→log
-- [ ] Evaluate gaps→log
+- [ ] Launch Wave 1 agents; done when all agents spawned
+- [ ] Collect Wave 1 findings→log; done when all agents returned
+- [ ] Cross-reference findings→log; done when agreements/conflicts mapped
+- [ ] Evaluate gaps→log; done when gaps classified
 - [ ] (expand: Wave 2+ if continuing)
 - [ ] Refresh: read full orchestration file
-- [ ] Synthesize→final output
+- [ ] Synthesize→final output; done when all findings integrated + sourced
 ```
 
 **Critical todos** (never skip):
@@ -153,22 +153,22 @@ Todos = **research areas to investigate + write-to-log operations**, not fixed s
 
 **Expansion pattern**: As decomposition reveals facets, add research todos:
 ```
-- [x] Create orchestration file
-- [x] Topic decomposition→log
-- [ ] Research: real-time database landscape 2025
-- [ ] Research: performance benchmarks
-- [ ] Research: conflict resolution strategies
-- [ ] Research: production case studies
-- [ ] Launch Wave 1 agents (4 parallel)
-- [ ] Collect Agent 1→log
-- [ ] Collect Agent 2→log
-- [ ] Collect Agent 3→log
-- [ ] Collect Agent 4→log
-- [ ] Cross-reference→log
-- [ ] Evaluate gaps→log
+- [x] Create orchestration file; file created
+- [x] Topic decomposition→log; 4 facets identified
+- [ ] Research: real-time database landscape 2025; done when options cataloged
+- [ ] Research: performance benchmarks; done when latency/throughput data found
+- [ ] Research: conflict resolution strategies; done when CRDT/OT patterns documented
+- [ ] Research: production case studies; done when 3+ cases collected
+- [ ] Launch Wave 1 agents (4 parallel); done when all agents spawned
+- [ ] Collect Agent 1→log; done when findings written
+- [ ] Collect Agent 2→log; done when findings written
+- [ ] Collect Agent 3→log; done when findings written
+- [ ] Collect Agent 4→log; done when findings written
+- [ ] Cross-reference→log; done when agreements/conflicts mapped
+- [ ] Evaluate gaps→log; done when gaps classified
 - [ ] (expand: Wave 2 if continuing)
 - [ ] Refresh: read full orchestration file
-- [ ] Synthesize→final output
+- [ ] Synthesize→final output; done when all findings integrated + sourced
 ```
 
 ### 1.2 Create orchestration file (skip for quick)

@@ -150,8 +150,9 @@ Skills and agents with multi-phase workflows MUST use the memento pattern. This 
 
 #### Todos as Micro-Prompts
 
-Each todo is a micro-prompt. Apply compression—goal + discipline only:
-- **Goal only**: WHAT to achieve, not HOW (model knows how to investigate)
+Each todo is a micro-prompt. Apply compression—goal + acceptance criteria + discipline:
+- **Goal**: WHAT to achieve, not HOW (model knows how to investigate)
+- **Acceptance criteria**: WHAT defines success—models are RL-trained to satisfy these (e.g., `; done when X`)
 - **Discipline markers**: `→log` after collection; `refresh:` before synthesis
 - **Drop capability**: Model knows what to capture, how to search, what's relevant
 - **Novel constraints inline**: Only counter-intuitive rules model wouldn't guess
@@ -162,42 +163,42 @@ Each todo is a micro-prompt. Apply compression—goal + discipline only:
 
 ```
 - [ ] Create log /tmp/{workflow}-*.md
-- [ ] Decompose $ARGUMENTS→areas→log
-- [ ] Investigate [primary area]→log
+- [ ] Decompose $ARGUMENTS→areas→log; done when all areas identified
+- [ ] Investigate [primary area]→log; done when key findings captured
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full log    ← CRITICAL: never skip
-- [ ] Synthesize→final artifact
+- [ ] Synthesize→final artifact; done when artifact complete + validated
 ```
 
 **2. Write to log after each investigation** (discipline, not capability):
 
 ```
-- [x] Investigate auth flow→log
-- [x] Investigate error handling→log
-- [ ] Investigate caching layer→log
+- [x] Investigate auth flow→log; done when flow documented
+- [x] Investigate error handling→log; done when patterns identified
+- [ ] Investigate caching layer→log; done when cache strategy understood
 ```
 
 **3. Expand todos dynamically** as work reveals new areas:
 
 ```
 Before:
-- [ ] Investigate API layer→log
+- [ ] Investigate API layer→log; done when architecture understood
 - [ ] (expand: areas as discovered)
 
 After (discovered 3 sub-areas):
-- [x] Investigate API layer→log (found: auth, validation, rate-limiting)
-- [ ] Investigate auth middleware→log
-- [ ] Investigate validation layer→log
-- [ ] Investigate rate-limiting→log
+- [x] Investigate API layer→log; found: auth, validation, rate-limiting
+- [ ] Investigate auth middleware→log; done when auth flow mapped
+- [ ] Investigate validation layer→log; done when rules documented
+- [ ] Investigate rate-limiting→log; done when limits + behavior understood
 - [ ] (expand: additional areas)
 ```
 
 **4. Refresh context BEFORE synthesis** (non-negotiable):
 
 ```
-- [x] Investigate [final area]→log
+- [x] Investigate [final area]→log; done when findings captured
 - [x] Refresh: read full log    ← Must complete BEFORE synthesize
-- [ ] Synthesize→final artifact
+- [ ] Synthesize→final artifact; done when all findings integrated + validated
 ```
 
 **Why the refresh step is critical**: By the synthesis phase, earlier findings have degraded due to context rot. The log file contains ALL findings written throughout the workflow. Reading the full file immediately before output:
@@ -210,12 +211,14 @@ After (discovered 3 sub-areas):
 | Phase | Todo Style | Why |
 |-------|------------|-----|
 | Start | `Create log /tmp/{x}-*.md` | External memory |
-| Each step | `Investigate [area]→log` | Goal + discipline marker |
+| Each step | `Investigate [area]→log; done when X` | Goal + acceptance criteria + discipline |
 | Discovery | `(expand: areas as discovered)` | Signals incompleteness |
 | Before synthesis | `Refresh: read full log` | Restores context to high-attention zone |
-| End | `Synthesize→artifact` | Clear output target |
+| End | `Synthesize→artifact; done when Y` | Clear output target + success condition |
 
 **Never skip**: The `→log` writes and `refresh: read full log` step. These are the core mechanism that makes synthesis work despite context rot.
+
+**Always include**: Acceptance criteria ("; done when X") so the model knows what success looks like.
 
 See `vibe-workflow/skills/spec/SKILL.md`, `vibe-workflow/skills/plan/SKILL.md`, or `vibe-workflow/skills/research-web/SKILL.md` for reference implementations. Note how these implementations follow the pattern without naming it.
 

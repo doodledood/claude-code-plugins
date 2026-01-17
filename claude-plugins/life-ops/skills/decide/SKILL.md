@@ -126,29 +126,29 @@ Run: `date +%Y%m%d-%H%M%S` (filename), `date '+%Y-%m-%d %H:%M:%S'` (display).
 **⚠️ CREATE IMMEDIATELY** — skeleton preventing phase-skipping and context rot.
 
 ```
-- [ ] Phase 0: foundation→log
-- [ ] Discovery: framing check→log
-- [ ] Discovery: underlying need→log
-- [ ] Discovery: time horizon→log
-- [ ] Discovery: factor scaffolding→log
-- [ ] Discovery: edge cases→log
-- [ ] Discovery: hidden factors→log
-- [ ] Discovery: stakeholder constraints→log
+- [ ] Phase 0: foundation→log; done when decision type + constraints captured
+- [ ] Discovery: framing check→log; done when real question identified
+- [ ] Discovery: underlying need→log; done when root motivation clear
+- [ ] Discovery: time horizon→log; done when decision window understood
+- [ ] Discovery: factor scaffolding→log; done when initial factors listed
+- [ ] Discovery: edge cases→log; done when failure modes identified
+- [ ] Discovery: hidden factors→log; done when unstated criteria surfaced
+- [ ] Discovery: stakeholder constraints→log; done when all parties mapped
 - [ ] (expand: additional rounds as needed)
-- [ ] Comprehensiveness checkpoint→log
-- [ ] Structuring: factor ranking + thresholds→log
-- [ ] Option discovery: user options→log
-- [ ] Option discovery: research→log
-- [ ] Deep research→log
-- [ ] Post-research gap check→log
+- [ ] Comprehensiveness checkpoint→log; done when all factors confirmed
+- [ ] Structuring: factor ranking + thresholds→log; done when priorities assigned
+- [ ] Option discovery: user options→log; done when known options captured
+- [ ] Option discovery: research→log; done when alternatives found
+- [ ] Deep research→log; done when data collected for all factors
+- [ ] Post-research gap check→log; done when gaps identified
 - [ ] (expand: follow-up if gaps)
-- [ ] Research completeness matrix→log
-- [ ] Sequential elimination→log
-- [ ] Finalist analysis→log
+- [ ] Research completeness matrix→log; done when all cells filled
+- [ ] Sequential elimination→log; done when non-viable options removed
+- [ ] Finalist analysis→log; done when remaining options compared
 - [ ] Refresh: read full log    ← CRITICAL
-- [ ] Pre-mortem stress test→log
-- [ ] Synthesize→log
-- [ ] Output final recommendation
+- [ ] Pre-mortem stress test→log; done when risks documented
+- [ ] Synthesize→log; done when recommendation formulated
+- [ ] Output final recommendation; done when user has actionable answer
 ```
 
 **(Write to log immediately after each step—never batch)**

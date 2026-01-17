@@ -32,10 +32,10 @@ This skill applies feedback through:
 Create todos tracking workflow phases:
 
 ```
-- [ ] Input validation
-- [ ] Initial application→verify
+- [ ] Input validation; done when prompt + feedback files read successfully
+- [ ] Initial application→verify; done when verifier returns VERIFIED or issues fixed
 - [ ] (Expand: refinement iterations on ISSUES_FOUND)
-- [ ] Output updated prompt
+- [ ] Output updated prompt; done when updated prompt displayed + optionally saved
 ```
 
 ### Phase 1: Input Validation

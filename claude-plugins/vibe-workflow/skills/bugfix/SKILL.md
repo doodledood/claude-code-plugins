@@ -27,10 +27,10 @@ This skill guides you through:
 
 **Starter todos**:
 ```
-- [ ] Prerequisite check
-- [ ] Bug context gathering (if needed)
-- [ ] Investigation and fix
-- [ ] Verification summary
+- [ ] Prerequisite check; done when git status verified + project context gathered
+- [ ] Bug context gathering (if needed); done when bug summary constructed
+- [ ] Investigation and fix; done when bug-fixer agent completes
+- [ ] Verification summary; done when results reported
 ```
 
 ### Phase 0: Prerequisite Check
