@@ -44,11 +44,12 @@ The discovery questions give you a solid starting point, but **the real magic ha
 **Starter todos**:
 ```
 - [ ] Check for existing CUSTOMER.md
-- [ ] Discovery questions (product, ICP, pain points)
-- [ ] Research (if requested)
-- [ ] (expand as discovery reveals complexity)
+- [ ] Discovery questions→log
+- [ ] Research→log (if requested)
+- [ ] (expand: areas as discovery reveals)
 - [ ] Generate initial draft
-- [ ] Refinement cycles
+- [ ] Refinement cycles→log
+- [ ] Refresh: read full discovery log
 - [ ] Finalize document
 ```
 

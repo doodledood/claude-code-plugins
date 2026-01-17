@@ -28,12 +28,12 @@ Todos = **areas to discover**, not interview steps. Each todo reminds you what c
 **Starter todos** (seeds only - list grows as discovery reveals new areas):
 
 ```
-- [ ] Determine work type (code vs non-code research)
-- [ ] Initial context research (skip for non-code work)
-- [ ] Scope & target users
-- [ ] Core requirements
-- [ ] (expand continuously as answers reveal new areas)
-- [ ] Read full interview log (context refresh before output)
+- [ ] Determine work type
+- [ ] Context research→log (if code work)
+- [ ] Scope & target users→log
+- [ ] Core requirements→log
+- [ ] (expand: areas as discovered)
+- [ ] Refresh: read full interview log
 - [ ] Finalize spec
 ```
 
@@ -43,36 +43,36 @@ Query: "Add user notifications feature"
 
 Initial:
 ```
-- [ ] Initial context research
-- [ ] Scope & target users
-- [ ] Core requirements
-- [ ] Read full interview log (context refresh before output)
+- [ ] Context research→log
+- [ ] Scope & target users→log
+- [ ] Core requirements→log
+- [ ] Refresh: read full interview log
 - [ ] Finalize spec
 ```
 
 After user says "needs to work across mobile and web":
 ```
-- [x] Initial context research → found existing notification system for admin alerts
-- [ ] Scope & target users
-- [ ] Core requirements
-- [ ] Mobile notification delivery (push vs in-app)
-- [ ] Web notification delivery (browser vs in-app)
-- [ ] Cross-platform sync behavior
-- [ ] Read full interview log (context refresh before output)
+- [x] Context research→log (found existing admin alerts system)
+- [ ] Scope & target users→log
+- [ ] Core requirements→log
+- [ ] Mobile notification delivery→log
+- [ ] Web notification delivery→log
+- [ ] Cross-platform sync→log
+- [ ] Refresh: read full interview log
 - [ ] Finalize spec
 ```
 
 After user mentions "also needs email digest option":
 ```
-- [x] Initial context research
-- [x] Scope & target users → all active users, v1 MVP
-- [ ] Core requirements
-- [x] Mobile notification delivery → push + in-app
-- [ ] Web notification delivery
-- [ ] Cross-platform sync behavior
-- [ ] Email digest frequency options
-- [ ] Email vs real-time preferences
-- [ ] Read full interview log (context refresh before output)
+- [x] Context research→log
+- [x] Scope & target users→log (all active users, v1 MVP)
+- [ ] Core requirements→log
+- [x] Mobile notification delivery→log (push + in-app)
+- [ ] Web notification delivery→log
+- [ ] Cross-platform sync→log
+- [ ] Email digest frequency→log
+- [ ] Email vs real-time prefs→log
+- [ ] Refresh: read full interview log
 - [ ] Finalize spec
 ```
 
