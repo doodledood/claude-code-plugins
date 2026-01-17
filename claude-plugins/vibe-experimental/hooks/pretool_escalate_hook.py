@@ -2,20 +2,20 @@
 """
 PreToolUse hook that gates /escalate calls.
 
-Blocks /escalate unless /verify was called first after /implement.
+Blocks /escalate unless /verify was called first after /do.
 This prevents lazy escalation without attempting verification.
 
 Decision matrix:
-- No /implement: BLOCK (no flow to escalate from)
-- /implement + /verify: ALLOW (genuinely tried)
-- /implement only: BLOCK (must verify first)
+- No /do: BLOCK (no flow to escalate from)
+- /do + /verify: ALLOW (genuinely tried)
+- /do only: BLOCK (must verify first)
 """
 from __future__ import annotations
 
 import json
 import sys
 
-from hook_utils import parse_implement_flow
+from hook_utils import parse_do_flow
 
 
 def main() -> None:
@@ -43,16 +43,16 @@ def main() -> None:
     if not transcript_path:
         sys.exit(0)
 
-    state = parse_implement_flow(transcript_path)
+    state = parse_do_flow(transcript_path)
 
-    # No /implement in progress - can't escalate from nothing
-    if not state.has_implement:
+    # No /do in progress - can't escalate from nothing
+    if not state.has_do:
         output = {
             "decision": "block",
-            "reason": "No /implement in progress",
+            "reason": "No /do in progress",
             "systemMessage": (
-                "Cannot escalate - no /implement workflow is active. "
-                "/escalate is only valid during an /implement workflow."
+                "Cannot escalate - no /do workflow is active. "
+                "/escalate is only valid during a /do workflow."
             ),
         }
         print(json.dumps(output))
@@ -62,7 +62,7 @@ def main() -> None:
     if state.has_verify:
         sys.exit(0)
 
-    # /implement was called but /verify was not
+    # /do was called but /verify was not
     output = {
         "decision": "block",
         "reason": "Must verify before escalating",

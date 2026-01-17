@@ -1,7 +1,7 @@
 """
-Tests for vibe-experimental stop_implement_hook.
+Tests for vibe-experimental stop_do_hook.
 
-Tests the stop hook that enforces verification-first workflow for /implement.
+Tests the stop hook that enforces verification-first workflow for /do.
 """
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ EXPERIMENTAL_HOOKS_DIR = (
 
 @pytest.fixture
 def experimental_hook_path() -> Path:
-    """Path to the stop_implement_hook.py script."""
-    return EXPERIMENTAL_HOOKS_DIR / "stop_implement_hook.py"
+    """Path to the stop_do_hook.py script."""
+    return EXPERIMENTAL_HOOKS_DIR / "stop_do_hook.py"
 
 
 @pytest.fixture
@@ -43,19 +43,19 @@ def temp_transcript(tmp_path: Path):
 
 
 @pytest.fixture
-def user_implement_command() -> dict[str, Any]:
-    """User message invoking /implement."""
+def user_do_command() -> dict[str, Any]:
+    """User message invoking /do."""
     return {
         "type": "user",
         "message": {
-            "content": "<command-name>/vibe-experimental:implement</command-name> /tmp/spec.md"
+            "content": "<command-name>/vibe-experimental:do</command-name> /tmp/define.md"
         },
     }
 
 
 @pytest.fixture
-def assistant_skill_implement() -> dict[str, Any]:
-    """Assistant Skill tool call for implement."""
+def assistant_skill_do() -> dict[str, Any]:
+    """Assistant Skill tool call for do."""
     return {
         "type": "assistant",
         "message": {
@@ -63,7 +63,7 @@ def assistant_skill_implement() -> dict[str, Any]:
                 {
                     "type": "tool_use",
                     "name": "Skill",
-                    "input": {"skill": "vibe-experimental:implement", "args": "/tmp/spec.md"},
+                    "input": {"skill": "vibe-experimental:do", "args": "/tmp/define.md"},
                 }
             ]
         },
@@ -80,7 +80,7 @@ def assistant_skill_verify() -> dict[str, Any]:
                 {
                     "type": "tool_use",
                     "name": "Skill",
-                    "input": {"skill": "vibe-experimental:verify", "args": "/tmp/spec.md"},
+                    "input": {"skill": "vibe-experimental:verify", "args": "/tmp/define.md"},
                 }
             ]
         },
@@ -142,10 +142,10 @@ class TestStopHookBlocking:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
     ):
-        """Stop should be blocked when /implement started but no /done or /escalate."""
-        transcript_path = temp_transcript([user_implement_command])
+        """Stop should be blocked when /do started but no /done or /escalate."""
+        transcript_path = temp_transcript([user_do_command])
         hook_input = {"transcript_path": transcript_path}
 
         result = run_hook(experimental_hook_path, hook_input)
@@ -158,11 +158,11 @@ class TestStopHookBlocking:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
     ):
         """Stop should be blocked when /verify was called but returned failures (no /done)."""
-        transcript_path = temp_transcript([user_implement_command, assistant_skill_verify])
+        transcript_path = temp_transcript([user_do_command, assistant_skill_verify])
         hook_input = {"transcript_path": transcript_path}
 
         result = run_hook(experimental_hook_path, hook_input)
@@ -178,13 +178,13 @@ class TestStopHookAllowing:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
         assistant_skill_done: dict[str, Any],
     ):
-        """Stop should be allowed when /done exists after /implement."""
+        """Stop should be allowed when /done exists after /do."""
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_verify,
             assistant_skill_done,
         ])
@@ -199,13 +199,13 @@ class TestStopHookAllowing:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
         assistant_skill_escalate: dict[str, Any],
     ):
-        """Stop should be allowed when /escalate exists after /implement."""
+        """Stop should be allowed when /escalate exists after /do."""
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_verify,
             assistant_skill_escalate,
         ])
@@ -215,12 +215,12 @@ class TestStopHookAllowing:
 
         assert result is None
 
-    def test_allows_no_implement(
+    def test_allows_no_do(
         self,
         experimental_hook_path: Path,
         temp_transcript,
     ):
-        """Stop should be allowed when no /implement in transcript."""
+        """Stop should be allowed when no /do in transcript."""
         transcript_path = temp_transcript([
             {"type": "user", "message": {"content": "Hello"}}
         ])
@@ -232,33 +232,33 @@ class TestStopHookAllowing:
 
 
 class TestStopHookFreshStack:
-    """Tests for fresh stack behavior per /implement."""
+    """Tests for fresh stack behavior per /do."""
 
     def test_fresh_stack(
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_done: dict[str, Any],
     ):
-        """Second /implement should reset flow state."""
-        # First /implement with /done, then second /implement without /done
-        second_implement = {
+        """Second /do should reset flow state."""
+        # First /do with /done, then second /do without /done
+        second_do = {
             "type": "user",
             "message": {
-                "content": "<command-name>/vibe-experimental:implement</command-name> /tmp/spec2.md"
+                "content": "<command-name>/vibe-experimental:do</command-name> /tmp/define2.md"
             },
         }
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_done,
-            second_implement,  # New /implement, no /done after
+            second_do,  # New /do, no /done after
         ])
         hook_input = {"transcript_path": transcript_path}
 
         result = run_hook(experimental_hook_path, hook_input)
 
-        # Should block because second /implement has no /done
+        # Should block because second /do has no /done
         assert result is not None
         assert result["decision"] == "block"
 

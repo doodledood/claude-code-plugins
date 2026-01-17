@@ -1,26 +1,26 @@
 ---
-name: implement
-description: 'Autonomous implementation from spec file. Works toward acceptance criteria, auto-verifies, prevents premature stopping. Use when you have a spec file from /spec and want hands-off implementation.'
+name: do
+description: 'Autonomous execution from definition file. Works toward acceptance criteria, auto-verifies, prevents premature stopping. Use when you have a definition file from /define and want hands-off execution.'
 user-invocable: true
 ---
 
-# /implement - Autonomous Criteria-Driven Implementation
+# /do - Autonomous Criteria-Driven Execution
 
-You are implementing a spec file autonomously. Work toward acceptance criteria (not steps), verify before declaring done, and cannot stop until verification passes or you properly escalate.
+You are executing a definition file autonomously. Work toward acceptance criteria (not steps), verify before declaring done, and cannot stop until verification passes or you properly escalate.
 
 ## Input
 
-`$ARGUMENTS` = spec file path (REQUIRED)
+`$ARGUMENTS` = definition file path (REQUIRED)
 
-Example: `/implement /tmp/spec-1234567890.md`
+Example: `/do /tmp/define-1234567890.md`
 
-If no arguments: Output error "Usage: /implement <spec-file-path>"
+If no arguments: Output error "Usage: /do <definition-file-path>"
 
 ## Process
 
-### 1. Read and Validate Spec
+### 1. Read and Validate Definition
 
-Read the spec file from `$ARGUMENTS`:
+Read the definition file from `$ARGUMENTS`:
 - If file not found → output clear error and stop
 - If file invalid (missing criteria section) → output clear error and stop
 
@@ -32,13 +32,13 @@ Extract:
 
 ### 2. Initialize
 
-Create implementation log: `/tmp/implement-log-{timestamp}.md`
+Create execution log: `/tmp/do-log-{timestamp}.md`
 
 Write initial state:
 ```markdown
-# Implementation Log
+# Execution Log
 
-Spec: [spec file path]
+Definition: [definition file path]
 Started: [timestamp]
 
 ## Criteria Status
@@ -53,7 +53,7 @@ Started: [timestamp]
 
 Create TodoWrite with criteria to satisfy:
 ```
-- [ ] Create implementation log
+- [ ] Create execution log
 - [ ] Satisfy AC-1: [brief description]; done when verified
 - [ ] Satisfy AC-2: [brief description]; done when verified
 - [ ] Satisfy R-1: [ensure not rejected]; done when verified
@@ -79,7 +79,7 @@ For each criterion:
 
 ### 4. Log Before Proceeding
 
-After each significant action, update `/tmp/implement-log-{timestamp}.md`:
+After each significant action, update `/tmp/do-log-{timestamp}.md`:
 
 ```markdown
 ## Attempts
@@ -107,7 +107,7 @@ Make incremental commits:
 When you believe all criteria are addressed:
 
 ```
-Use the Skill tool to verify: Skill("vibe-experimental:verify", "/tmp/spec-{ts}.md /tmp/implement-log-{ts}.md")
+Use the Skill tool to verify: Skill("vibe-experimental:verify", "/tmp/define-{ts}.md /tmp/do-log-{ts}.md")
 ```
 
 ### 7. Handle Verification Results
@@ -141,7 +141,7 @@ Use the Skill tool to escalate: Skill("vibe-experimental:escalate", "AC-N blocki
 
 ## Critical Rules
 
-1. **Spec file required** - fail clearly if not provided
+1. **Definition file required** - fail clearly if not provided
 2. **Criteria-driven** - no plan decomposition, reference AC-N in work
 3. **Log before proceeding** - memento pattern mandatory
 4. **Incremental commits** - small commits with criterion references
@@ -152,7 +152,7 @@ Use the Skill tool to escalate: Skill("vibe-experimental:escalate", "AC-N blocki
 ## Stop Hook Enforcement
 
 A stop hook prevents premature stopping:
-- Can't stop after /implement without /done or /escalate
+- Can't stop after /do without /done or /escalate
 - /done only comes from /verify on success
 - /escalate requires /verify first
 
@@ -162,8 +162,8 @@ If you try to stop prematurely, you'll see:
 ## Example Flow
 
 ```
-1. /implement /tmp/spec-123.md
-2. Read spec, create log, create todos
+1. /do /tmp/define-123.md
+2. Read definition, create log, create todos
 3. Work on AC-1 → log attempt → commit
 4. Work on AC-2 → log attempt → commit
 5. ...

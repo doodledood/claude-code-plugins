@@ -43,12 +43,12 @@ def temp_transcript(tmp_path: Path):
 
 
 @pytest.fixture
-def user_implement_command() -> dict[str, Any]:
-    """User message invoking /implement."""
+def user_do_command() -> dict[str, Any]:
+    """User message invoking /do."""
     return {
         "type": "user",
         "message": {
-            "content": "<command-name>/vibe-experimental:implement</command-name> /tmp/spec.md"
+            "content": "<command-name>/vibe-experimental:do</command-name> /tmp/define.md"
         },
     }
 
@@ -63,7 +63,7 @@ def assistant_skill_verify() -> dict[str, Any]:
                 {
                     "type": "tool_use",
                     "name": "Skill",
-                    "input": {"skill": "vibe-experimental:verify", "args": "/tmp/spec.md"},
+                    "input": {"skill": "vibe-experimental:verify", "args": "/tmp/define.md"},
                 }
             ]
         },
@@ -91,10 +91,10 @@ class TestEscalateHookBlocking:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
     ):
         """/escalate should be blocked when /verify not called first."""
-        transcript_path = temp_transcript([user_implement_command])
+        transcript_path = temp_transcript([user_do_command])
         hook_input = {
             "transcript_path": transcript_path,
             "tool_name": "Skill",
@@ -107,12 +107,12 @@ class TestEscalateHookBlocking:
         assert result["decision"] == "block"
         assert "verify" in result["systemMessage"].lower()
 
-    def test_blocks_no_implement(
+    def test_blocks_no_do(
         self,
         experimental_hook_path: Path,
         temp_transcript,
     ):
-        """/escalate should be blocked when no /implement in progress."""
+        """/escalate should be blocked when no /do in progress."""
         transcript_path = temp_transcript([
             {"type": "user", "message": {"content": "Hello"}}
         ])
@@ -126,7 +126,7 @@ class TestEscalateHookBlocking:
 
         assert result is not None
         assert result["decision"] == "block"
-        assert "no /implement" in result["systemMessage"].lower()
+        assert "no /do" in result["systemMessage"].lower()
 
 
 class TestEscalateHookAllowing:
@@ -136,12 +136,12 @@ class TestEscalateHookAllowing:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
     ):
         """/escalate should be allowed after /verify was called."""
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_verify,
         ])
         hook_input = {
@@ -159,10 +159,10 @@ class TestEscalateHookAllowing:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
     ):
         """Hook should not block non-Skill tool calls."""
-        transcript_path = temp_transcript([user_implement_command])
+        transcript_path = temp_transcript([user_do_command])
         hook_input = {
             "transcript_path": transcript_path,
             "tool_name": "Bash",
@@ -177,10 +177,10 @@ class TestEscalateHookAllowing:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
     ):
         """Hook should not block other skill calls."""
-        transcript_path = temp_transcript([user_implement_command])
+        transcript_path = temp_transcript([user_do_command])
         hook_input = {
             "transcript_path": transcript_path,
             "tool_name": "Skill",
@@ -199,12 +199,12 @@ class TestEscalateHookEdgeCases:
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
     ):
         """Should work with short skill name 'escalate' (no plugin prefix)."""
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_verify,
         ])
         hook_input = {
@@ -230,7 +230,7 @@ class TestEscalateHookEdgeCases:
 
         result = run_hook(experimental_hook_path, hook_input)
 
-        # Missing transcript means no /implement, so should block
+        # Missing transcript means no /do, so should block
         assert result is not None
         assert result["decision"] == "block"
 
@@ -249,25 +249,25 @@ class TestEscalateHookEdgeCases:
         # No path means fail open
         assert result is None
 
-    def test_verify_resets_on_new_implement(
+    def test_verify_resets_on_new_do(
         self,
         experimental_hook_path: Path,
         temp_transcript,
-        user_implement_command: dict[str, Any],
+        user_do_command: dict[str, Any],
         assistant_skill_verify: dict[str, Any],
     ):
-        """New /implement should reset /verify state."""
-        second_implement = {
+        """New /do should reset /verify state."""
+        second_do = {
             "type": "user",
             "message": {
-                "content": "<command-name>/vibe-experimental:implement</command-name> /tmp/spec2.md"
+                "content": "<command-name>/vibe-experimental:do</command-name> /tmp/define2.md"
             },
         }
-        # First /implement + /verify, then second /implement (no /verify after)
+        # First /do + /verify, then second /do (no /verify after)
         transcript_path = temp_transcript([
-            user_implement_command,
+            user_do_command,
             assistant_skill_verify,
-            second_implement,
+            second_do,
         ])
         hook_input = {
             "transcript_path": transcript_path,
@@ -277,6 +277,6 @@ class TestEscalateHookEdgeCases:
 
         result = run_hook(experimental_hook_path, hook_input)
 
-        # Should block because second /implement has no /verify after
+        # Should block because second /do has no /verify after
         assert result is not None
         assert result["decision"] == "block"

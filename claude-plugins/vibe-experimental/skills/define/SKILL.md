@@ -1,12 +1,12 @@
 ---
-name: spec
-description: 'Verification-first requirements builder. Creates exhaustive specs where every criterion has an explicit verification method. Use when starting new features, refactors, or any work requiring clear done criteria.'
+name: define
+description: 'Verification-first requirements builder. Creates exhaustive definitions where every criterion has an explicit verification method. Use when starting new features, refactors, or any work requiring clear done criteria.'
 user-invocable: true
 ---
 
-# /spec - Verification-First Requirements Builder
+# /define - Verification-First Requirements Builder
 
-You are building a requirements spec using a verification-first approach. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
+You are building a requirements definition using a verification-first approach. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
 
 ## Input
 
@@ -16,7 +16,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Output
 
-Spec file: `/tmp/spec-{timestamp}.md`
+Definition file: `/tmp/define-{timestamp}.md`
 
 ## Process
 
@@ -25,7 +25,7 @@ Spec file: `/tmp/spec-{timestamp}.md`
 Create todos and log file:
 
 ```
-- [ ] Create log /tmp/spec-interview-{timestamp}.md
+- [ ] Create log /tmp/define-interview-{timestamp}.md
 - [ ] Gather positive criteria (feature, quality, architecture)
 - [ ] Gather negative criteria (rejection conditions)
 - [ ] Explore edge cases exhaustively
@@ -37,8 +37,8 @@ Create todos and log file:
 - [ ] Refine vague criteria to specific
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
-- [ ] Run meta-verification via spec-verifier agent
-- [ ] Write final spec file
+- [ ] Run meta-verification via define-verifier agent
+- [ ] Write final definition file
 ```
 
 ### 2. Proactive LLM-Driven Interview
@@ -155,7 +155,7 @@ Use findings to:
 
 ### 5. Write to Log (After Each Phase)
 
-After each interview phase, write findings to `/tmp/spec-interview-{timestamp}.md`:
+After each interview phase, write findings to `/tmp/define-interview-{timestamp}.md`:
 
 ```markdown
 ## Positive Criteria
@@ -189,14 +189,14 @@ After each interview phase, write findings to `/tmp/spec-interview-{timestamp}.m
 
 ### 6. Meta-Verification
 
-Before finalizing, spawn spec-verifier agent:
+Before finalizing, spawn define-verifier agent:
 
 ```
-Use the Task tool to verify the spec:
-Task("vibe-experimental", "spec-verifier", read the interview log at /tmp/spec-interview-{timestamp}.md and verify all acceptance criteria are met)
+Use the Task tool to verify the definition:
+Task("vibe-experimental", "define-verifier", read the interview log at /tmp/define-interview-{timestamp}.md and verify all acceptance criteria are met)
 ```
 
-The spec-verifier checks:
+The define-verifier checks:
 - All interview techniques used
 - All criteria have verification methods
 - No vague terms remain
@@ -206,18 +206,18 @@ The spec-verifier checks:
 
 If gaps found → continue interview to fill them.
 
-### 7. Write Final Spec
+### 7. Write Final Definition
 
-Only after meta-verification passes, write `/tmp/spec-{timestamp}.md`:
+Only after meta-verification passes, write `/tmp/define-{timestamp}.md`:
 
 ```markdown
-# Spec: [Task Description]
+# Definition: [Task Description]
 
 Generated: [date]
-Interview Log: /tmp/spec-interview-{timestamp}.md
+Interview Log: /tmp/define-interview-{timestamp}.md
 
 ## Overview
-[1-2 sentences describing what this spec covers]
+[1-2 sentences describing what this definition covers]
 
 ## Acceptance Criteria
 
@@ -284,18 +284,18 @@ Checks:
 
 ### 8. Complete
 
-Output the spec file path:
+Output the definition file path:
 ```
-Spec complete: /tmp/spec-{timestamp}.md
+Definition complete: /tmp/define-{timestamp}.md
 
-To implement: /implement /tmp/spec-{timestamp}.md
+To do: /do /tmp/define-{timestamp}.md
 ```
 
 ## Resuming Interrupted Interview
 
 If interview is interrupted, it can be resumed:
 
-1. Check for existing log: `ls /tmp/spec-interview-*.md`
+1. Check for existing log: `ls /tmp/define-interview-*.md`
 2. Read the log to understand what's been covered
 3. Update todos to mark completed phases
 4. Continue from next incomplete phase
@@ -304,14 +304,14 @@ The log file preserves all gathered criteria, examples, and risks.
 
 ## Amendment Protocol
 
-Specs support amendments during implementation if genuine gaps are discovered:
+Definitions support amendments during execution if genuine gaps are discovered:
 
 - Criteria have unique IDs (AC-1, R-1, E-1) for reference
 - Amendments reference original: "AC-3.1 amends AC-3"
-- Track amendments in spec with date and reason
+- Track amendments in definition with date and reason
 - Format: `## Amendments\n- AC-3.1 (2026-01-17): [reason] - [new criterion]`
 
-This allows /implement to request spec changes when codebase reality conflicts with criteria.
+This allows /do to request definition changes when codebase reality conflicts with criteria.
 
 ## Critical Rules
 
@@ -320,5 +320,5 @@ This allows /implement to request spec changes when codebase reality conflicts w
 3. **No vague terms** - "clean", "good", "proper" must be defined
 4. **No placeholders** - no TBD, TODO, "figure out later"
 5. **Examples are concrete** - actual code, not descriptions
-6. **Meta-verification before finalize** - spec not done until it passes
+6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory

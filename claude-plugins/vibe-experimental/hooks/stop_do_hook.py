@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """
-Stop hook that enforces verification-first workflow for /implement.
+Stop hook that enforces verification-first workflow for /do.
 
-Blocks stop attempts unless /done or /escalate was called after /implement.
+Blocks stop attempts unless /done or /escalate was called after /do.
 This prevents the LLM from declaring "done" without verification.
 
 Decision matrix:
-- No /implement: ALLOW (not in flow)
-- /implement + /done: ALLOW (verified complete)
-- /implement + /escalate: ALLOW (properly escalated)
-- /implement only: BLOCK (must verify first)
-- /implement + /verify only: BLOCK (verify returned failures, keep working)
+- No /do: ALLOW (not in flow)
+- /do + /done: ALLOW (verified complete)
+- /do + /escalate: ALLOW (properly escalated)
+- /do only: BLOCK (must verify first)
+- /do + /verify only: BLOCK (verify returned failures, keep working)
 """
 from __future__ import annotations
 
 import json
 import sys
 
-from hook_utils import parse_implement_flow
+from hook_utils import parse_do_flow
 
 
 def main() -> None:
@@ -33,10 +33,10 @@ def main() -> None:
     if not transcript_path:
         sys.exit(0)
 
-    state = parse_implement_flow(transcript_path)
+    state = parse_do_flow(transcript_path)
 
-    # Not in /implement flow - allow stop
-    if not state.has_implement:
+    # Not in /do flow - allow stop
+    if not state.has_do:
         sys.exit(0)
 
     # /done was called - verified complete, allow stop
@@ -47,13 +47,13 @@ def main() -> None:
     if state.has_escalate:
         sys.exit(0)
 
-    # /implement was called but neither /done nor /escalate
+    # /do was called but neither /done nor /escalate
     # Block with guidance
     output = {
         "decision": "block",
-        "reason": "Implementation not verified",
+        "reason": "Execution not verified",
         "systemMessage": (
-            "Cannot stop - /implement workflow is incomplete. "
+            "Cannot stop - /do workflow is incomplete. "
             "Run /verify to check acceptance criteria. "
             "If all criteria pass, /verify will call /done. "
             "If genuinely stuck after /verify, call /escalate with evidence."

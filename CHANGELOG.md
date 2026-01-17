@@ -6,9 +6,18 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.3.0 - Rename skills for clarity and broader applicability:
+  - `/spec` → `/define` - Verification-first requirements builder (works for any task, not just code)
+  - `/implement` → `/do` - Autonomous execution from definition (task-agnostic naming)
+  - Renamed agents: `spec-verifier` → `define-verifier`, `implement-verifier` → `do-verifier`
+  - Renamed hook: `stop_implement_hook.py` → `stop_do_hook.py`
+  - Updated all internal references (DoFlowState, has_do, parse_do_flow, etc.)
+  - Updated tests to reflect new naming
+  - All functionality preserved, only terminology changed
+
 - [vibe-experimental] v0.2.0 - Implement verification-first workflow system:
-  - 5 skills: `/spec` (user-invocable), `/implement` (user-invocable), `/verify`, `/done`, `/escalate` (internal)
-  - 3 agents: `spec-verifier` (27 AC checks), `implement-verifier` (23 AC checks), `criteria-checker`
+  - 5 skills: `/define` (user-invocable), `/do` (user-invocable), `/verify`, `/done`, `/escalate` (internal)
+  - 3 agents: `define-verifier` (27 AC checks), `do-verifier` (23 AC checks), `criteria-checker`
   - 2 hooks: stop hook (blocks without /done or /escalate), PreToolUse hook (blocks /escalate without /verify)
   - Enforced flow: can't stop without verification passing or proper escalation
   - Every criterion must have explicit verification method (bash, subagent, or manual)

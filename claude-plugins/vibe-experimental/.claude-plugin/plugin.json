@@ -1,19 +1,19 @@
 {
   "name": "vibe-experimental",
-  "version": "0.2.0",
-  "description": "Experimental verification-first workflows. Every criterion has explicit verification; implementation can't stop without verification passing or proper escalation.",
+  "version": "0.3.0",
+  "description": "Experimental verification-first workflows. Every criterion has explicit verification; execution can't stop without verification passing or proper escalation.",
   "keywords": [
     "experimental",
-    "spec",
+    "define",
     "verification",
     "acceptance-criteria",
     "autonomous",
-    "implement"
+    "do"
   ],
   "hooks": [
     {
       "event": "Stop",
-      "script": "hooks/stop_implement_hook.py"
+      "script": "hooks/stop_do_hook.py"
     },
     {
       "event": "PreToolUse",
