@@ -7,50 +7,28 @@ Run a comprehensive code review. First detect the codebase type, then launch app
 
 **Flags**: `--autonomous` → skip Step 5 user prompt, return report only (for programmatic invocation)
 
-## Step 1: Check CLAUDE.md Reviewer Configuration
+## Step 1: Check CLAUDE.md for Reviewer Preferences
 
-Before launching agents, check if any loaded CLAUDE.md files contain reviewer configuration. CLAUDE.md files are auto-loaded into context—do NOT search for them.
+Check loaded CLAUDE.md content for any guidance about which reviewers to run or skip. CLAUDE.md files are auto-loaded—do NOT search for them.
 
-**Look for a `## Review Configuration` or `## Code Review` section in loaded CLAUDE.md content that specifies:**
+**Users can express preferences however they want.** Examples:
+- "Skip the docs reviewer, we don't have documentation requirements"
+- "Always run type-safety even though we use plain JS"
+- "Don't run coverage checks"
+- A dedicated section listing reviewers to include/exclude
+- Custom review agents they've defined
 
-```markdown
-## Review Configuration
+**Available reviewers** (use your judgment matching user intent):
+- `code-bugs-reviewer` - bugs, logic errors
+- `code-coverage-reviewer` - test coverage
+- `code-maintainability-reviewer` - DRY, dead code, coupling
+- `code-simplicity-reviewer` - over-engineering, complexity
+- `code-testability-reviewer` - testability, mocking friction
+- `claude-md-adherence-reviewer` - CLAUDE.md compliance
+- `docs-reviewer` - documentation accuracy
+- `type-safety-reviewer` - type safety (conditional by default)
 
-### Skip Reviewers
-<!-- Reviewers to never run in this project -->
-- type-safety (untyped codebase)
-- docs (no documentation requirements)
-
-### Required Reviewers
-<!-- Always run these, even if normally conditional -->
-- type-safety
-
-### Custom Reviewers
-<!-- Project-specific review agents to add -->
-- name: security-reviewer
-  agent: security-audit-agent
-  description: Check for OWASP vulnerabilities
-- name: api-consistency
-  agent: api-review-agent
-  description: Verify API follows REST conventions
-```
-
-**Configuration precedence:**
-1. `Skip Reviewers` - Remove these from the agent list entirely
-2. `Required Reviewers` - Add these even if detection would skip them
-3. `Custom Reviewers` - Append these to the agent list
-
-**Valid reviewer names for skip/required:**
-- `bugs` or `code-bugs-reviewer`
-- `coverage` or `code-coverage-reviewer`
-- `maintainability` or `code-maintainability-reviewer`
-- `simplicity` or `code-simplicity-reviewer`
-- `testability` or `code-testability-reviewer`
-- `claude-md-adherence` or `claude-md-adherence-reviewer`
-- `docs` or `docs-reviewer`
-- `type-safety` or `type-safety-reviewer`
-
-**If no configuration found:** Proceed with default behavior (all core agents + type-safety if typed).
+**If no preferences stated:** Use defaults (all core agents + type-safety if typed codebase).
 
 ## Step 2: Detect Typed Language
 
@@ -75,35 +53,32 @@ If CLAUDE.md content doesn't make it clear, use your judgment based on files you
 
 ## Step 3: Launch Agents
 
-**Build the final agent list by applying CLAUDE.md configuration (if found):**
+**Build the agent list based on CLAUDE.md preferences (Steps 1-2):**
 
-### Default Core Agents (launch IN PARALLEL unless skipped):
+### Core Agents (launch IN PARALLEL):
 
-1. **code-bugs-reviewer** - Audit for logical bugs, race conditions, edge cases
-2. **code-coverage-reviewer** - Verify test coverage for code changes
-3. **code-maintainability-reviewer** - Check for DRY violations, dead code, coupling
-4. **code-simplicity-reviewer** - Check for over-engineering, premature optimization, cognitive complexity
-5. **code-testability-reviewer** - Identify code requiring excessive mocking to test
-6. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
-7. **docs-reviewer** - Audit documentation and code comments accuracy
+1. **code-bugs-reviewer** - Logical bugs, race conditions, edge cases
+2. **code-coverage-reviewer** - Test coverage for code changes
+3. **code-maintainability-reviewer** - DRY violations, dead code, coupling
+4. **code-simplicity-reviewer** - Over-engineering, complexity
+5. **code-testability-reviewer** - Testability, mocking friction
+6. **claude-md-adherence-reviewer** - CLAUDE.md compliance
+7. **docs-reviewer** - Documentation accuracy
 
-### Conditional Agent:
+### Conditional:
 
-8. **type-safety-reviewer** - Audit type safety, any/unknown abuse, invalid states
-   - **Include if:** Listed in `Required Reviewers`, OR typed language detected (Step 2)
-   - **Exclude if:** Listed in `Skip Reviewers`
-   - **Primary:** TypeScript, Python with type hints (agent is optimized for these)
-   - **Also useful for:** Java, Kotlin, Go, Rust, C#, Swift, Scala (core principles apply)
-   - **Skip for:** Plain JavaScript, Ruby, PHP, shell scripts, untyped Python
+8. **type-safety-reviewer** - Type safety, any/unknown abuse
+   - Include if: typed codebase (Step 2) OR user requested it
+   - Skip if: user said to skip it, or untyped codebase
 
-### Custom Agents (from CLAUDE.md):
+### Custom Agents:
 
-9. **Any agents listed in `Custom Reviewers`** - Launch these with the specified agent name and description
+9. **Any custom reviewers the user defined** - Launch with their specified agent/description
 
-**Applying configuration:**
-- Remove any agent listed in `Skip Reviewers` from the final list
-- Add `type-safety-reviewer` if listed in `Required Reviewers` (even if detection would skip it)
-- Append all `Custom Reviewers` to the final list
+**Applying preferences:**
+- Skip any reviewers the user said to exclude
+- Include any reviewers the user said to always run
+- Add any custom reviewers the user defined
 
 **Scope:** $ARGUMENTS
 
