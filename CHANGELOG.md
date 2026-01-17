@@ -15,6 +15,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
   - Explains WHY testability matters for each specific finding
   - Suggests improvements without mandating specific patterns
   - Added to `/review` parallel agent suite (now 7-8 agents)
+- [vibe-workflow] v2.8.1 - claude-md-adherence-reviewer now checks ALL CLAUDE.md sources:
+  - Enterprise/Managed level (`/etc/claude-code/CLAUDE.md`, etc.)
+  - User level (`~/.claude/CLAUDE.md`)
+  - Project level (`.claude/CLAUDE.md`, `.claude/rules/*.md`)
+  - Local project level (`CLAUDE.local.md`)
+  - Import references (`@path/to/file` syntax)
+  - Updated pre-output checklist to verify all sources were checked
 
 ## 2026-01-16
 
