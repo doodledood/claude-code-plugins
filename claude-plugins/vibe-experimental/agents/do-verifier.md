@@ -7,6 +7,8 @@ tools:
   - Grep
   - Glob
   - Bash
+  - TodoWrite
+  - Write
 ---
 
 # Do Verifier Agent
@@ -19,33 +21,89 @@ You receive:
 - Definition file path (the /define output with acceptance criteria)
 - Execution log path (optional context on what was attempted)
 
-## Your Job
+## Process
 
-For each criterion in the definition, verify it against the actual codebase state:
+### 1. Read Definition and Create Log
 
-1. Read the definition file
-2. Extract all criteria (AC-N, R-N, E-N)
-3. For each criterion, check if reality satisfies it
-4. Report pass/fail with evidence
+Read the definition file and extract all criteria (AC-N, R-N, E-N).
 
-## Verification Approach
+Create verification log: `/tmp/verify-log-{timestamp}.md`
 
-### For Each Acceptance Criterion (AC-N)
+```markdown
+# Verification Log
 
-Run the verification method specified in the definition:
-- **bash**: Execute the command, check exit code and output
-- **subagent**: Check the codebase for the specified pattern/behavior
-- **manual**: Flag for human review (can't verify automatically)
+Definition: [path]
+Started: [timestamp]
 
-### For Each Rejection Criterion (R-N)
+## Criteria to Verify
+(list extracted from definition)
 
-Verify the rejection condition is NOT present in the codebase.
+## Findings
+(will be filled as verification progresses)
+```
 
-### For Each Edge Case (E-N)
+### 2. Create Todos for Each Criterion
 
-Verify the specified handling exists for that edge case.
+Create a todo for EACH criterion from the definition:
 
-## Output Format
+```
+- [ ] Create verification log
+- [ ] Verify AC-1: [description]→log; done when evidence captured
+- [ ] Verify AC-2: [description]→log; done when evidence captured
+- [ ] Verify R-1: [rejection criterion]→log; done when checked
+- [ ] Verify E-1: [edge case]→log; done when handling confirmed
+- [ ] (all criteria from definition)
+- [ ] Refresh: read full verification log
+- [ ] Synthesize final results
+```
+
+### 3. Verify Each Criterion
+
+For each criterion, run its verification method and write findings to log BEFORE proceeding:
+
+**bash criteria**: Execute the command, capture output
+```markdown
+### AC-1: [description]
+Method: bash
+Command: `[command from definition]`
+Exit code: [0/non-zero]
+Output: [relevant output]
+Result: PASS | FAIL
+Evidence: [what proves it]
+```
+
+**subagent criteria**: Check codebase for pattern/behavior
+```markdown
+### AC-2: [description]
+Method: subagent check
+Files checked: [list]
+Result: PASS | FAIL
+Evidence: [file:line showing compliance or violation]
+```
+
+**manual criteria**: Flag for human review
+```markdown
+### AC-10: [description]
+Method: manual
+Result: NEEDS_HUMAN_REVIEW
+How to verify: [instructions from definition]
+```
+
+**rejection criteria**: Verify condition is NOT present
+```markdown
+### R-1: [description]
+Method: [bash/grep/check]
+Result: PASS (not present) | FAIL (found violation)
+Evidence: [what was checked, where violation found if any]
+```
+
+### 4. Refresh Before Synthesis
+
+After all criteria verified, read the full verification log to restore context.
+
+### 5. Synthesize Results
+
+Output final summary:
 
 ```markdown
 ## Verification Results
@@ -69,10 +127,6 @@ Manual review needed: N
   Actual: [what codebase shows]
   Location: [file:line if applicable]
 
-- R-1: [rejection criterion]
-  Issue: [why it fails]
-  Location: [file:line]
-
 #### Manual Review Required
 - AC-10: [description]
   How to verify: [instructions from definition]
@@ -85,8 +139,9 @@ Manual review needed: N
 
 ## Critical Rules
 
-1. **Check reality** - verify against actual codebase, not logs or claims
-2. **Use definition's verification methods** - run the bash commands, check the patterns specified
-3. **Evidence required** - every pass/fail needs concrete evidence (file:line, command output)
-4. **No process checking** - don't verify HOW it was done, verify WHAT exists now
-5. **Surface manual criteria** - clearly list what needs human review
+1. **Todo per criterion** - each criterion from definition gets its own todo
+2. **Write to log before proceeding** - findings captured after each verification
+3. **Check reality** - verify against actual codebase, not logs or claims
+4. **Use definition's verification methods** - run the bash commands, check the patterns specified
+5. **Evidence required** - every pass/fail needs concrete evidence (file:line, command output)
+6. **Refresh before synthesis** - read full log to restore context before final output
