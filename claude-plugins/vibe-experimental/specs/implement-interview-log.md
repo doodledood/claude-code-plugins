@@ -71,6 +71,33 @@ Stop:
 | 22 | Code state means | A - working tree | Including uncommitted changes |
 | 23 | /verify capabilities | A - both | Commands AND parallel subagents |
 | 24 | Verification timeout | A - per-criterion | Higher timeout with retries |
+| 25 | Pre-mortem concerns | Loops + premature stop | Main worries |
+| 26 | Disappointed scenarios | Code quality | Solution: review agents in spec |
+| 28 | Review agents in /verify | A - unified | Review criteria IN spec, reviewers ARE verifiers |
+| 29 | Standard reviews | A - user decides | Spec specifies which reviews matter |
+| 30 | Avoiding redundant work | C - both | Actionable feedback AND track attempts |
+| 31 | Files /implement maintains | C - both | Implementation log AND meaningful commits |
+| 32 | /verify reads impl log | A - yes | Gives context on what was tried |
+| 33 | Tracking attempts | A - impl log | "Tried X for AC-5, failed because Y" |
+| 34 | Implementation log location | A - /tmp/ | /tmp/implement-log-{timestamp}.md |
+
+---
+
+## Memento Pattern Requirement
+
+All skills (/spec, /implement, /verify) must:
+- Write findings to external files before proceeding
+- Prevents context loss on compaction
+- /verify can read implementation log + code for fuller picture
+
+### /implement maintains:
+- `/tmp/implement-log-{timestamp}.md` - what was done, tried, blockers
+- Meaningful git commits with descriptive messages
+
+### /verify reads:
+- Spec file (criteria, verification methods)
+- Implementation log (attempts, what was tried)
+- Current code state (working tree)
 
 ---
 
