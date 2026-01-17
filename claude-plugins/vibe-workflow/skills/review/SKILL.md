@@ -1,15 +1,60 @@
 ---
 name: review
-description: Run all code review agents in parallel (bugs, coverage, maintainability, simplicity, type-safety if typed, CLAUDE.md adherence, docs).
+description: Run all code review agents in parallel (bugs, coverage, maintainability, simplicity, type-safety if typed, CLAUDE.md adherence, docs). Respects CLAUDE.md reviewer configuration.
 ---
 
 Run a comprehensive code review. First detect the codebase type, then launch appropriate agents.
 
-**Flags**: `--autonomous` → skip Step 4 user prompt, return report only (for programmatic invocation)
+**Flags**: `--autonomous` → skip Step 5 user prompt, return report only (for programmatic invocation)
 
-## Step 1: Detect Typed Language
+## Step 1: Check CLAUDE.md Reviewer Configuration
 
-Before launching agents, check if this is a typed language codebase:
+Before launching agents, check if any loaded CLAUDE.md files contain reviewer configuration. CLAUDE.md files are auto-loaded into context—do NOT search for them.
+
+**Look for a `## Review Configuration` or `## Code Review` section in loaded CLAUDE.md content that specifies:**
+
+```markdown
+## Review Configuration
+
+### Skip Reviewers
+<!-- Reviewers to never run in this project -->
+- type-safety (untyped codebase)
+- docs (no documentation requirements)
+
+### Required Reviewers
+<!-- Always run these, even if normally conditional -->
+- type-safety
+
+### Custom Reviewers
+<!-- Project-specific review agents to add -->
+- name: security-reviewer
+  agent: security-audit-agent
+  description: Check for OWASP vulnerabilities
+- name: api-consistency
+  agent: api-review-agent
+  description: Verify API follows REST conventions
+```
+
+**Configuration precedence:**
+1. `Skip Reviewers` - Remove these from the agent list entirely
+2. `Required Reviewers` - Add these even if detection would skip them
+3. `Custom Reviewers` - Append these to the agent list
+
+**Valid reviewer names for skip/required:**
+- `bugs` or `code-bugs-reviewer`
+- `coverage` or `code-coverage-reviewer`
+- `maintainability` or `code-maintainability-reviewer`
+- `simplicity` or `code-simplicity-reviewer`
+- `testability` or `code-testability-reviewer`
+- `claude-md-adherence` or `claude-md-adherence-reviewer`
+- `docs` or `docs-reviewer`
+- `type-safety` or `type-safety-reviewer`
+
+**If no configuration found:** Proceed with default behavior (all core agents + type-safety if typed).
+
+## Step 2: Detect Typed Language
+
+Unless `type-safety` is in `Skip Reviewers` or `Required Reviewers`, check if this is a typed language codebase:
 
 **TypeScript/JavaScript with types:**
 - `tsconfig.json` exists, OR
@@ -35,9 +80,11 @@ ls py.typed 2>/dev/null || grep -l "mypy\|pyright" pyproject.toml setup.cfg 2>/d
 git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
 ```
 
-## Step 2: Launch Agents
+## Step 3: Launch Agents
 
-**Always launch these 7 core agents IN PARALLEL:**
+**Build the final agent list by applying CLAUDE.md configuration (if found):**
+
+### Default Core Agents (launch IN PARALLEL unless skipped):
 
 1. **code-bugs-reviewer** - Audit for logical bugs, race conditions, edge cases
 2. **code-coverage-reviewer** - Verify test coverage for code changes
@@ -47,18 +94,29 @@ git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
 6. **claude-md-adherence-reviewer** - Verify compliance with CLAUDE.md project standards
 7. **docs-reviewer** - Audit documentation and code comments accuracy
 
-**Conditionally launch (only if typed language detected):**
+### Conditional Agent:
 
 8. **type-safety-reviewer** - Audit type safety, any/unknown abuse, invalid states
+   - **Include if:** Listed in `Required Reviewers`, OR typed language detected (Step 2)
+   - **Exclude if:** Listed in `Skip Reviewers`
    - **Primary:** TypeScript, Python with type hints (agent is optimized for these)
    - **Also useful for:** Java, Kotlin, Go, Rust, C#, Swift, Scala (core principles apply)
    - **Skip for:** Plain JavaScript, Ruby, PHP, shell scripts, untyped Python
 
-Scope: $ARGUMENTS
+### Custom Agents (from CLAUDE.md):
+
+9. **Any agents listed in `Custom Reviewers`** - Launch these with the specified agent name and description
+
+**Applying configuration:**
+- Remove any agent listed in `Skip Reviewers` from the final list
+- Add `type-safety-reviewer` if listed in `Required Reviewers` (even if detection would skip it)
+- Append all `Custom Reviewers` to the final list
+
+**Scope:** $ARGUMENTS
 
 If no arguments provided, all agents should analyze the git diff between the current branch and main/master branch.
 
-## Step 3: Verification Agent (Final Pass)
+## Step 4: Verification Agent (Final Pass)
 
 After all review agents complete, launch an **opus verification agent** to reconcile and validate findings:
 
@@ -111,7 +169,7 @@ Produce a **Final Consolidated Review Report** with:
 - Recommended fix order (dependencies, quick wins first)
 ```
 
-## Step 4: Follow-up Action
+## Step 5: Follow-up Action
 
 **If `--autonomous`**: Skip user prompt, end after presenting report. Caller handles next steps.
 
@@ -133,10 +191,11 @@ options:
 
 ## Execution
 
-1. Run detection commands first (can be parallel)
-2. Based on results, launch either 7 or 8 agents simultaneously in a single message
-3. Do NOT run agents sequentially—always parallel
-4. After all agents complete, launch the verification agent with all findings
-5. Present the final consolidated report to the user
-6. Ask user about next steps using AskUserQuestion
-7. If user chooses to fix, invoke /fix-review-issues with appropriate scope
+1. Check loaded CLAUDE.md content for reviewer configuration (Step 1)
+2. Run typed language detection commands if needed (can be parallel)
+3. Build final agent list: start with core agents, apply skip/required rules, add custom agents
+4. Launch all agents simultaneously in a single message (do NOT run sequentially)
+5. After all agents complete, launch the verification agent with all findings
+6. Present the final consolidated report to the user
+7. Ask user about next steps using AskUserQuestion
+8. If user chooses to fix, invoke /fix-review-issues with appropriate scope

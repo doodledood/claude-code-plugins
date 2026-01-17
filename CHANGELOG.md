@@ -8,6 +8,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [vibe-workflow] v2.10.0 - `/review` now respects CLAUDE.md reviewer configuration:
+  - Checks loaded CLAUDE.md files for `## Review Configuration` section
+  - `Skip Reviewers` - exclude specific reviewers from running
+  - `Required Reviewers` - force-include reviewers (e.g., type-safety for untyped projects)
+  - `Custom Reviewers` - add project-specific review agents
+  - CLAUDE.md files are auto-loaded into context, no searching required
 - [vibe-workflow] v2.9.0 - New `/review-testability` skill and `code-testability-reviewer` agent:
   - Identifies code requiring excessive mocking to test
   - Severity based on: importance of logic × test friction (not pattern compliance)
