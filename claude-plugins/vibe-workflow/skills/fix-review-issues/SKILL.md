@@ -49,9 +49,31 @@ options:
 2. Group issues by category
 3. Count totals by severity
 
-### Phase 1.5: Validate Findings Against Plan/Spec
+### Phase 1.5: Validate Findings Against Higher-Priority Sources
 
-**Before confirming scope, check if findings conflict with the implementation plan or spec.**
+**Before confirming scope, filter findings that conflict with higher-priority sources (CLAUDE.md, Plan, Spec).**
+
+#### Step 1: Check for CLAUDE.md Adherence Conflicts
+
+Review all findings from non-adherence reviewers (simplicity, maintainability, type-safety, docs, coverage) against CLAUDE.md adherence findings:
+
+1. For each CLAUDE.md adherence finding, identify what rule/guideline it enforces
+2. Check if other reviewers suggest changes that would **violate** that rule:
+   - **Simplicity** suggests inlining code → but CLAUDE.md requires helper functions for that pattern → REMOVE simplicity finding
+   - **Maintainability** suggests consolidating files → but CLAUDE.md specifies file structure → REMOVE maintainability finding
+   - **Type-safety** suggests stricter types → but CLAUDE.md allows flexibility for that case → REMOVE type-safety finding
+3. Report filtered findings:
+   ```
+   ## Findings Filtered (Conflict with CLAUDE.md Rules)
+
+   The following issues were removed because they conflict with CLAUDE.md project rules:
+   - [Simplicity issue]: Filtered—CLAUDE.md rule X specifies this pattern
+   - [Maintainability issue]: Filtered—CLAUDE.md requires this structure
+   ```
+
+**Why this matters:** CLAUDE.md contains user-defined rules specific to this project. Generic reviewer suggestions that contradict explicit user rules should be discarded—the user's decisions take precedence.
+
+#### Step 2: Check for Plan/Spec Conflicts
 
 Search for plan and spec files:
 ```bash
@@ -114,7 +136,16 @@ placeholder: "e.g., src/auth/ or src/utils.ts, src/helpers.ts"
 
 ### Phase 3: Create Fix Plan
 
-Use the Skill tool to create the implementation plan: Skill("vibe-workflow:plan", "Fix these review issues: [summary of issues within confirmed scope]")
+**Order issues by priority** before creating the plan (see Issue Priority Order section):
+1. Bugs first
+2. CLAUDE.md Adherence issues
+3. Type Safety
+4. Coverage
+5. Maintainability
+6. Simplicity
+7. Docs
+
+Use the Skill tool to create the implementation plan: Skill("vibe-workflow:plan", "Fix these review issues in priority order (bugs → CLAUDE.md adherence → type safety → coverage → maintainability → simplicity → docs): [summary of issues within confirmed scope, grouped by priority]")
 
 Once the plan is approved, note the plan file path (typically `/tmp/plan-*.md`) and proceed to execution.
 
@@ -139,8 +170,33 @@ options:
   - "Done - I'll verify manually"
 ```
 
+## Issue Priority Order
+
+When fixing issues, follow this priority hierarchy:
+
+| Priority | Category | Rationale |
+|----------|----------|-----------|
+| **1** | Bugs | Correctness issues that cause incorrect behavior—always fix first |
+| **2** | CLAUDE.md Adherence | User-defined project rules take precedence over generic best practices |
+| **3** | Type Safety | Prevents runtime errors and improves reliability |
+| **4** | Coverage | Tests protect against regressions |
+| **5** | Maintainability | Long-term code health |
+| **6** | Simplicity | Nice-to-have improvements |
+| **7** | Docs | Lowest priority unless blocking other work |
+
+**Why CLAUDE.md adherence is high priority**: The CLAUDE.md file contains user-defined rules specific to this project. When other reviewers (simplicity, maintainability, etc.) suggest changes that conflict with CLAUDE.md guidelines, the user's explicit rules win. Fixing CLAUDE.md adherence issues early prevents wasted effort fixing issues that would later be undone.
+
+### Conflict Resolution
+
+When reviewer findings conflict with each other:
+
+1. **CLAUDE.md vs other reviewers**: CLAUDE.md adherence wins. If simplicity reviewer says "inline this helper" but CLAUDE.md specifies "use helper functions for X pattern"—keep the helper.
+2. **Plan/Spec vs reviewers**: Plan/Spec wins (handled in Phase 1.5). Intentional architectural decisions aren't mistakes.
+3. **Between equal-priority reviewers**: Defer to the verification agent's reconciliation from `/review`.
+
 ## Key Principles
 
+- **Respect User Rules**: CLAUDE.md adherence issues take precedence—these are explicit user decisions that override generic reviewer suggestions
 - **Respect the Plan**: Filter out findings that contradict the implementation plan or spec—these are intentional decisions, not mistakes
 - **User Control**: Confirm scope before making changes
 - **Reduce Cognitive Load**: Use AskUserQuestion for decisions, recommended option first
