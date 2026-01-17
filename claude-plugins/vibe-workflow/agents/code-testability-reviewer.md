@@ -63,6 +63,16 @@ for (const item of order.items) {
 }
 ```
 
+**Deep mock chains** - Mocks returning mocks, creating brittle test setup even with few top-level dependencies:
+
+```typescript
+// Even though there's only 1 mock (repo), the chain creates fragile tests
+// Any refactor to internal structure breaks the mock setup
+when(mockRepo.find(id)).thenReturn(mockEntity);
+when(mockEntity.getDetails()).thenReturn(mockDetails);
+when(mockDetails.validate()).thenReturn(result);
+```
+
 ### Moderate Test Friction (Medium severity)
 
 **Constructor IO** - Classes that connect to services or fetch data in constructors:
@@ -93,6 +103,26 @@ function processOrder(order: Order) {
 function isEligibleForDiscount(user: User) {
   const now = new Date();  // Test behavior changes based on when you run it
   return user.memberSince < new Date(now.getFullYear() - 1, now.getMonth());
+}
+```
+
+**Complex async flows** - Logic with timing dependencies, retry loops, or interleaved promises that are hard to test deterministically:
+
+```typescript
+// Testing requires controlling timing, retry counts, and interleaved promise resolution
+async function syncWithRetry(items: Item[]) {
+  for (const item of items) {
+    let retries = 0;
+    while (retries < 3) {
+      await delay(100 * Math.pow(2, retries));  // Timing-dependent
+      try {
+        await api.sync(item);
+        break;
+      } catch {
+        retries++;
+      }
+    }
+  }
 }
 ```
 
