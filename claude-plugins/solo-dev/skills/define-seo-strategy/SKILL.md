@@ -55,11 +55,12 @@ This skill guides you through:
 **Starter todos**:
 ```
 - [ ] Prerequisite check (CUSTOMER.md)
-- [ ] Existing strategy detection
-- [ ] Input collection
-- [ ] Research (industry, competitors, platforms)
+- [ ] Existing strategy detection→log
+- [ ] Input collection→log
+- [ ] Research→log
 - [ ] Generate initial draft
-- [ ] Validation (executive summary, platforms, roadmap)
+- [ ] Validation→log
+- [ ] Refresh: read full research log
 - [ ] Finalize document
 ```
 

@@ -53,8 +53,8 @@ Create todos tracking workflow phases:
 
 ```
 - [ ] Input validation
-- [ ] Initial compression (compress, then verify)
-- [ ] (expand on ISSUES_FOUND: refinement iteration 1, 2, 3...)
+- [ ] Initial compression→verify
+- [ ] (Expand: refinement iterations on ISSUES_FOUND)
 - [ ] Output compressed prompt
 ```
 

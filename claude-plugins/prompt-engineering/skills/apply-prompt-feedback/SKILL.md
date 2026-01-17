@@ -33,8 +33,8 @@ Create todos tracking workflow phases:
 
 ```
 - [ ] Input validation
-- [ ] Initial application (apply feedback, then verify)
-- [ ] (expand on ISSUES_FOUND: refinement iteration 1, 2, 3...)
+- [ ] Initial application→verify
+- [ ] (Expand: refinement iterations on ISSUES_FOUND)
 - [ ] Output updated prompt
 ```
 

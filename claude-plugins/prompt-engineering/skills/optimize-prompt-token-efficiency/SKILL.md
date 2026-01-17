@@ -28,8 +28,8 @@ Create todos tracking workflow phases. List reflects areas of work, not fixed st
 **Starter todos**:
 ```
 - [ ] Input validation
-- [ ] Initial verification (run verifier first)
-- [ ] (expand on INEFFICIENCIES_FOUND: optimization iteration 1, 2, 3...)
+- [ ] Initial verification
+- [ ] (Expand: optimization iterations on INEFFICIENCIES_FOUND)
 - [ ] Output optimized prompt
 ```
 
