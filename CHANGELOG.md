@@ -8,6 +8,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [prompt-engineering] v1.16.0 - Add acceptance criteria to compress-prompt preservation hierarchy:
+  - Acceptance criteria now Priority 1 alongside core goal (models are RL-trained to satisfy goals)
+  - Updated prompt-compression-verifier with new "Missing Acceptance Criteria" issue type (1b)
+  - Updated examples to show acceptance criteria being preserved
+  - Key insight: WHAT (goal) + WHAT defines success (acceptance criteria) must be kept; only HOW is dropped
 - [vibe-workflow] v2.12.0 - Orthogonality audit: sharpen reviewer boundaries to reduce overlap:
   - **bugs**: Added deadlocks/livelocks, rewrote Category 7 to focus on observable incorrect behavior, clarified security scope
   - **coverage**: Fixed wrong agent reference, removed TypeScript-only limitation, made suggestions less prescriptive

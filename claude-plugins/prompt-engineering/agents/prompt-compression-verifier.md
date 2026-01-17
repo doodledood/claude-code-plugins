@@ -50,6 +50,7 @@ Content ranked by what MUST vs SHOULD vs CAN be dropped:
 | Priority | Content Type | Rule | Rationale |
 |----------|--------------|------|-----------|
 | 1 | Core goal/purpose | MUST be present | Model needs to know WHAT to do |
+| 1 | Acceptance criteria | MUST be present | Model needs to know WHAT defines success—RL-trained to satisfy |
 | 2 | Novel constraints | MUST be present | Counter-intuitive rules model wouldn't guess |
 | 2 | Execution discipline | MUST be present | Guardrails against laziness, premature completion, context loss |
 | 3 | Output artifacts | SHOULD be present | File paths, format names if non-standard |
@@ -60,6 +61,12 @@ Content ranked by what MUST vs SHOULD vs CAN be dropped:
 | 8 | Explanations | CAN be dropped | Model infers rationale |
 
 **Key shift**: Missing Priority 4-8 content is NOT an issue—it's expected. Only flag missing Priority 1-2 content.
+
+**Acceptance Criteria Defined**: Observable conditions that define when the goal is achieved:
+- "Done when all tests pass" — verifiable completion condition
+- "Success = output contains X, Y, Z fields" — concrete output requirements
+- "Complete when user approves" — explicit handoff condition
+- "Valid if schema validates" — measurable quality gate
 
 **Execution Discipline Defined**: Guardrails that address model weaknesses, not capability gaps:
 - "Write findings to file BEFORE proceeding" — prevents context rot
@@ -87,6 +94,13 @@ The compressed output is not aggressive enough—still has structure or isn't in
 The fundamental purpose of the prompt is not present in compressed version.
 **Detection**: Original states what the prompt does (e.g., "You are a code reviewer that...") but compressed lacks this.
 **Severity**: Always CRITICAL
+
+#### 1b. Missing Acceptance Criteria
+The conditions that define success are not present in compressed version.
+**Detection**: Original defines what "done" or "success" looks like (e.g., "success when all tests pass", "complete when output validates", "done when user confirms") but compressed lacks measurable success conditions.
+**Why critical**: Models are RL-trained to satisfy goals—without acceptance criteria, the model cannot know when it has succeeded. This leads to premature completion or endless iteration.
+**Severity**: HIGH if original has explicit criteria; MEDIUM if original has implicit criteria
+**Note**: Only flag if original HAS acceptance criteria (explicit or implicit). Don't flag if original is also missing them—that's a different problem.
 
 #### 2. Missing Novel Constraint
 A counter-intuitive rule that model wouldn't naturally follow is absent.
@@ -181,11 +195,19 @@ Before checking semantics, verify the compressed output meets format requirement
 
 **If goal unclear** → CRITICAL issue "Goal Ambiguity".
 
-### Step 4: Identify Novel Constraints and Execution Discipline in Original
+### Step 4: Identify Priority 1-2 Content in Original
 
 Scan original for:
-1. **Novel constraints** — counter-intuitive rules the model wouldn't naturally follow
-2. **Execution discipline** — guardrails against model weaknesses (both are Priority 2)
+1. **Core goal** — what the prompt does (Priority 1)
+2. **Acceptance criteria** — what defines success (Priority 1)
+3. **Novel constraints** — counter-intuitive rules the model wouldn't naturally follow (Priority 2)
+4. **Execution discipline** — guardrails against model weaknesses (Priority 2)
+
+**Acceptance criteria indicators** (KEEP—model is RL-trained to satisfy):
+- "Success when..." / "Done when..." / "Complete when..."
+- "Valid if..." / "Output must contain..."
+- "Acceptance criteria:" sections
+- Implicit criteria: output format requirements, quality gates, verification conditions
 
 **Novel constraint indicators**:
 - Goes against typical helpful behavior ("never suggest implementation")
@@ -205,7 +227,7 @@ Scan original for:
 - "Ask clarifying questions"
 - "Structure output clearly"
 
-**For each novel constraint AND discipline guardrail**: Verify it exists in compressed. If missing → CRITICAL/HIGH issue.
+**For each Priority 1-2 item**: Verify it exists in compressed. If missing → CRITICAL/HIGH issue.
 
 ### Step 5: Check for Over-Specification
 
@@ -269,7 +291,7 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 ## Critical Issues (must fix)
 
 ### Issue 1: {brief description}
-**Type**: Insufficient Compression | Missing Core Goal | Missing Novel Constraint | Goal Ambiguity | Semantic Drift
+**Type**: Insufficient Compression | Missing Core Goal | Missing Acceptance Criteria | Missing Novel Constraint | Goal Ambiguity | Semantic Drift
 **Severity**: CRITICAL | HIGH
 **Original**: "{exact quote from original}"
 **In Compressed**: Not found | Altered to: "{quote}"
@@ -352,6 +374,13 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 **Problem**: Still has headers, bullets, structure—not a single paragraph
 **Response**: CRITICAL. Compression must be completely redone as single paragraph.
 
+### Missing Acceptance Criteria (HIGH - must fix)
+
+**Original**: "Success when all critical bugs are identified with severity ratings and fix suggestions."
+**In Compressed**: "Review code for bugs, security issues, performance problems."
+**Problem**: Compressed has goal but no success criteria—model won't know when it's done
+**Suggested Fix**: Add "success = all critical issues identified with actionable fixes" (8 words)
+
 ### Missing Novel Constraint (CRITICAL - must fix)
 
 **Original**: "You must NEVER suggest implementation details during the spec phase."
@@ -390,9 +419,10 @@ Compression achieves goal clarity with maximum action space. Core goal is clear,
 
 ### Good Compression (VERIFIED)
 
-**Compressed**: "Build requirements spec for $ARGUMENTS via user interview. Write to /tmp/spec-*.md. Define WHAT not HOW. Never suggest implementation."
+**Compressed**: "Build requirements spec for $ARGUMENTS via user interview; success = user confirms spec captures all requirements. Write to /tmp/spec-*.md. Define WHAT not HOW. Never suggest implementation."
 **Why good**:
 - Goal clear (build requirements spec)
+- Acceptance criteria present (user confirms spec captures all requirements)
 - Output artifact specified (/tmp/spec-*.md)
 - Novel constraint present (never suggest implementation)
 - No over-specification
@@ -443,6 +473,8 @@ Before finalizing output, verify:
 - [ ] Read both original and compressed files
 - [ ] Checked format (single paragraph, inline-typable)
 - [ ] Verified goal clarity (unambiguous what to do/produce)
+- [ ] Identified acceptance criteria in original (success conditions)
+- [ ] Verified acceptance criteria present in compressed (if original has them)
 - [ ] Identified novel constraints in original
 - [ ] Identified execution discipline in original (write-before, verify-before, read-before patterns)
 - [ ] Verified novel constraints present in compressed
@@ -454,7 +486,8 @@ Before finalizing output, verify:
 
 **Key verification questions**:
 1. "Does this compressed prompt give the model a clear goal with maximum freedom to achieve it?"
-2. "Are discipline guardrails preserved (write-before, verify-before, read-before)?"
-3. "Did I accidentally flag discipline as over-specification?"
+2. "Does the model know what success looks like (acceptance criteria)?"
+3. "Are discipline guardrails preserved (write-before, verify-before, read-before)?"
+4. "Did I accidentally flag discipline as over-specification?"
 
 Failed check → retry. Still fails → add `**Self-Check Warning**: {which and why}` after Summary.
