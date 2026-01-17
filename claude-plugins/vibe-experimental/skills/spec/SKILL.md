@@ -118,6 +118,12 @@ ALWAYS use AskUserQuestion with:
 - First option = recommended (with "(Recommended)" suffix)
 - Descriptions explain tradeoffs
 - Batch related questions (don't ask one at a time)
+- Provide context for why you're asking (helps user give better answers)
+
+When asking, briefly explain the purpose:
+- "I'm asking about edge cases because these often surface implicit requirements..."
+- "Rejection criteria help catch issues the LLM might otherwise miss..."
+- "This pre-mortem question surfaces risks you might not think of directly..."
 
 Example:
 ```
@@ -284,6 +290,28 @@ Spec complete: /tmp/spec-{timestamp}.md
 
 To implement: /implement /tmp/spec-{timestamp}.md
 ```
+
+## Resuming Interrupted Interview
+
+If interview is interrupted, it can be resumed:
+
+1. Check for existing log: `ls /tmp/spec-interview-*.md`
+2. Read the log to understand what's been covered
+3. Update todos to mark completed phases
+4. Continue from next incomplete phase
+
+The log file preserves all gathered criteria, examples, and risks.
+
+## Amendment Protocol
+
+Specs support amendments during implementation if genuine gaps are discovered:
+
+- Criteria have unique IDs (AC-1, R-1, E-1) for reference
+- Amendments reference original: "AC-3.1 amends AC-3"
+- Track amendments in spec with date and reason
+- Format: `## Amendments\n- AC-3.1 (2026-01-17): [reason] - [new criterion]`
+
+This allows /implement to request spec changes when codebase reality conflicts with criteria.
 
 ## Critical Rules
 
