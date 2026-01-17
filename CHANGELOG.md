@@ -6,6 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.2.0 - Implement verification-first workflow system:
+  - 5 skills: `/spec` (user-invocable), `/implement` (user-invocable), `/verify`, `/done`, `/escalate` (internal)
+  - 3 agents: `spec-verifier` (27 AC checks), `implement-verifier` (23 AC checks), `criteria-checker`
+  - 2 hooks: stop hook (blocks without /done or /escalate), PreToolUse hook (blocks /escalate without /verify)
+  - Enforced flow: can't stop without verification passing or proper escalation
+  - Every criterion must have explicit verification method (bash, subagent, or manual)
+  - 19 new tests for hook behavior
+
 ## 2026-01-17
 
 - [vibe-workflow] v2.13.0 - Add acceptance criteria to all todo examples across skills:
