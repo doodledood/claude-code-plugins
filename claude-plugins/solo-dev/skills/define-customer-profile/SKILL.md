@@ -43,14 +43,14 @@ The discovery questions give you a solid starting point, but **the real magic ha
 
 **Starter todos**:
 ```
-- [ ] Check for existing CUSTOMER.md
-- [ ] Discovery questions→log
-- [ ] Research→log (if requested)
+- [ ] Check for existing CUSTOMER.md; done when existing file read or absence confirmed
+- [ ] Discovery questions→log; done when user answers captured
+- [ ] Research→log (if requested); done when research findings logged
 - [ ] (expand: areas as discovery reveals)
-- [ ] Generate initial draft
-- [ ] Refinement cycles→log
+- [ ] Generate initial draft; done when draft created
+- [ ] Refinement cycles→log; done when user approves direction
 - [ ] Refresh: read full discovery log
-- [ ] Finalize document
+- [ ] Finalize document; done when CUSTOMER.md written
 ```
 
 **Create discovery log** at `/tmp/customer-discovery-{YYYYMMDD-HHMMSS}.md`:

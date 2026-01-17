@@ -32,28 +32,28 @@ Todos = **areas to research/decide**, not steps. Expand when research reveals: (
 
 **Starter seeds**:
 ```
-- [ ] Spec requirements→log
-- [ ] Codebase research→log
-- [ ] Approach identification→log (if multiple valid)
-- [ ] Architecture decisions→log
+- [ ] Spec requirements→log; done when all requirements extracted
+- [ ] Codebase research→log; done when patterns + integration points found
+- [ ] Approach identification→log (if multiple valid); done when trade-offs documented
+- [ ] Architecture decisions→log; done when all decisions captured
 - [ ] (expand: areas as research reveals)
 - [ ] Refresh: read full research log + spec
-- [ ] Finalize chunks
-- [ ] Verify plan (attempt 1/5)
+- [ ] Finalize chunks; done when all chunks have acceptance criteria
+- [ ] Verify plan (attempt 1/5); done when PASS or issues fixed
 - [ ] (expand: fix issues, re-verify until PASS)
 ```
 
 **Evolution example** - "Add real-time notifications":
 ```
-- [x] Spec requirements→log (3 types, mobile+web)
-- [x] Codebase research→log (found ws.ts, notification-service.ts, polling in legacy/)
-- [x] Approach selection→log (WebSocket vs polling? User chose WebSocket)
-- [ ] Architecture decisions→log
-- [ ] Offline storage→log
-- [ ] Sync conflict resolution→log
-- [ ] Service worker integration→log
+- [x] Spec requirements→log; 3 types, mobile+web extracted
+- [x] Codebase research→log; found ws.ts, notification-service.ts, polling in legacy/
+- [x] Approach selection→log; WebSocket vs polling? User chose WebSocket
+- [ ] Architecture decisions→log; done when all decisions captured
+- [ ] Offline storage→log; done when storage strategy decided
+- [ ] Sync conflict resolution→log; done when conflict handling defined
+- [ ] Service worker integration→log; done when sw role clarified
 - [ ] Refresh: read full research log + spec
-- [ ] Finalize chunks
+- [ ] Finalize chunks; done when all chunks have acceptance criteria
 ```
 
 Note: Approach selection shows **user decision**—not auto-decided. Found two valid approaches, presented trade-offs, user chose.

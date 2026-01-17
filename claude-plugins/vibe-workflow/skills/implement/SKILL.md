@@ -92,18 +92,18 @@ Last updated: [timestamp]
 
 Build todos with 4 items per chunk, plus finalization:
 ```
-[ ] Implement chunk 1: [Name]
-[ ] Verify chunk 1: [Name]
+[ ] Implement chunk 1: [Name]; done when implementor returns success
+[ ] Verify chunk 1: [Name]; done when verifier returns PASS
 [ ] (Expand: fix loop for chunk 1 if needed)
-[ ] Commit chunk 1: [Name]
-[ ] Implement chunk 2: [Name]
-[ ] Verify chunk 2: [Name]
+[ ] Commit chunk 1: [Name]; done when commit SHA captured
+[ ] Implement chunk 2: [Name]; done when implementor returns success
+[ ] Verify chunk 2: [Name]; done when verifier returns PASS
 [ ] (Expand: fix loop for chunk 2 if needed)
-[ ] Commit chunk 2: [Name]
+[ ] Commit chunk 2: [Name]; done when commit SHA captured
 ...
 [ ] Read progress file for summary
 # Unless --no-review, append:
-[ ] Run review on implemented changes
+[ ] Run review on implemented changes; done when review complete
 [ ] (Expand: fix review issues as findings emerge)
 ```
 

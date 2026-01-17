@@ -8,6 +8,18 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## 2026-01-17
 
+- [vibe-workflow] v2.13.0 - Add acceptance criteria to all todo examples across skills:
+  - Updated spec, plan, implement, research-web, explore-codebase, bugfix skills
+  - Todos now include "; done when X" acceptance criteria
+  - Example: `- [ ] Investigate API layer→log; done when architecture understood`
+- [solo-dev] v1.19.0 - Add acceptance criteria to todo examples:
+  - Updated define-customer-profile and define-seo-strategy skills
+- [life-ops] v1.8.0 - Add acceptance criteria to /decide skill todos:
+  - All 23 todo items now have explicit success conditions
+- [CLAUDE.md] Updated "Todos as Micro-Prompts" section with acceptance criteria:
+  - New principle: Acceptance criteria define what success looks like (RL-trained models need these)
+  - Updated Quick Reference table and all todo examples
+  - New pattern: `- [ ] Goal→log; done when X`
 - [prompt-engineering] v1.16.0 - Add acceptance criteria to compress-prompt preservation hierarchy:
   - Acceptance criteria now Priority 1 alongside core goal (models are RL-trained to satisfy goals)
   - Updated prompt-compression-verifier with new "Missing Acceptance Criteria" issue type (1b)

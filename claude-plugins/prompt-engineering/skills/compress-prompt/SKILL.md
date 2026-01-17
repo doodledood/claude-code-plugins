@@ -52,10 +52,10 @@ This skill compresses prompts through:
 Create todos tracking workflow phases:
 
 ```
-- [ ] Input validation
-- [ ] Initial compression→verify
+- [ ] Input validation; done when prompt file read successfully
+- [ ] Initial compression→verify; done when verifier returns VERIFIED or issues fixed
 - [ ] (Expand: refinement iterations on ISSUES_FOUND)
-- [ ] Output compressed prompt
+- [ ] Output compressed prompt; done when result displayed + optionally saved
 ```
 
 ### Phase 1: Input Validation
