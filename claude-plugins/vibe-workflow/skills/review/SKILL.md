@@ -54,31 +54,24 @@ Before launching agents, check if any loaded CLAUDE.md files contain reviewer co
 
 ## Step 2: Detect Typed Language
 
-Unless `type-safety` is in `Skip Reviewers` or `Required Reviewers`, check if this is a typed language codebase:
+Unless `type-safety` is in `Skip Reviewers` or `Required Reviewers`, determine if this is a typed codebase.
 
-**TypeScript/JavaScript with types:**
-- `tsconfig.json` exists, OR
-- `.ts`/`.tsx` files in scope
+**Check loaded CLAUDE.md content first** (no commands needed):
+- Development commands mention `tsc`, `mypy`, `pyright`, or type-checking
+- Tech stack mentions TypeScript, typed Python, Go, Rust, Java, etc.
+- File extensions mentioned (`.ts`, `.tsx`, `.go`, `.rs`, `.java`, etc.)
 
-**Python with type hints:**
-- `py.typed` marker exists, OR
-- `mypy` or `pyright` in `pyproject.toml`/`setup.cfg`, OR
-- Type annotations visible in `.py` files (`: str`, `-> None`, `Optional[`, `List[`, etc.)
+**Typed if any of these are evident from context:**
+- TypeScript/TSX project
+- Python with type hints (`mypy`, `pyright` in dev commands)
+- Statically typed languages: Go, Rust, Java, Kotlin, C#, Swift, Scala
 
-**Statically typed languages (always typed):**
-- Java (`.java`), Kotlin (`.kt`), Go (`.go`), Rust (`.rs`), C# (`.cs`), Swift (`.swift`), Scala (`.scala`)
+**Skip type-safety for:**
+- Plain JavaScript (no TypeScript)
+- Untyped Python (no mypy/pyright)
+- Ruby, PHP, shell scripts
 
-Quick detection commands:
-```bash
-# TypeScript
-ls tsconfig.json 2>/dev/null || git ls-files '*.ts' '*.tsx' | head -1
-
-# Python types
-ls py.typed 2>/dev/null || grep -l "mypy\|pyright" pyproject.toml setup.cfg 2>/dev/null | head -1
-
-# Other typed languages
-git ls-files '*.java' '*.kt' '*.go' '*.rs' '*.cs' '*.swift' '*.scala' | head -1
-```
+If CLAUDE.md content doesn't make it clear, use your judgment based on files you've seen in context.
 
 ## Step 3: Launch Agents
 
@@ -191,11 +184,10 @@ options:
 
 ## Execution
 
-1. Check loaded CLAUDE.md content for reviewer configuration (Step 1)
-2. Run typed language detection commands if needed (can be parallel)
-3. Build final agent list: start with core agents, apply skip/required rules, add custom agents
-4. Launch all agents simultaneously in a single message (do NOT run sequentially)
-5. After all agents complete, launch the verification agent with all findings
-6. Present the final consolidated report to the user
-7. Ask user about next steps using AskUserQuestion
-8. If user chooses to fix, invoke /fix-review-issues with appropriate scope
+1. Check loaded CLAUDE.md content for reviewer configuration and typed language info (Steps 1-2)
+2. Build final agent list: start with core agents, apply skip/required rules, add custom agents
+3. Launch all agents simultaneously in a single message (do NOT run sequentially)
+4. After all agents complete, launch the verification agent with all findings
+5. Present the final consolidated report to the user
+6. Ask user about next steps using AskUserQuestion
+7. If user chooses to fix, invoke /fix-review-issues with appropriate scope
