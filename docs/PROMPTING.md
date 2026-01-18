@@ -308,6 +308,116 @@ After making changes, verify by:
 
 ---
 
+## Principle 8: Leverage Code-Specific Training
+
+**Training reality**: Modern LLMs receive specialized code training including Fill-in-the-Middle (FIM), execution-feedback RL, and SWE-RL on real repositories. This creates specific strengths for code tasks.
+
+### Do This
+
+**Provide surrounding context (both prefix AND suffix)**:
+
+Models are trained with FIM to understand code that comes AFTER the insertion point, not just before. When asking for code changes, show what surrounds it:
+
+```
+I need to add validation between these two sections:
+
+# BEFORE (prefix):
+def process_order(order_id: str, items: list[Item]) -> Order:
+    order = Order(id=order_id)
+
+# ADD VALIDATION HERE
+
+# AFTER (suffix):
+    for item in items:
+        order.add_item(item)
+    return order
+```
+
+**Allow iterative debugging with real error messages**:
+
+Models are trained via RLEF to improve from execution feedback. Don't just say "it doesn't work"—provide the actual error:
+
+```
+The code you wrote produces this error:
+
+TypeError: 'NoneType' object is not iterable
+  File "main.py", line 42, in process_batch
+    for item in results:
+
+The `fetch_results()` call on line 41 is returning None.
+Fix the code to handle this case.
+```
+
+**Frame tasks as real issues, not toy problems**:
+
+SWE-RL training uses real GitHub issues. Structure requests like issue descriptions:
+
+```
+## Problem
+The user search endpoint returns duplicate results when the query contains
+special characters.
+
+## Steps to Reproduce
+1. Call GET /api/users?q=john%20doe
+2. Observe that "John Doe" appears twice in results
+
+## Expected Behavior
+Each user should appear only once.
+
+## Relevant Files
+- src/api/users.py (search endpoint)
+- src/services/search.py (search logic)
+```
+
+**Provide architectural/dependency context**:
+
+Models were trained on project-level corpora organized by dependency order:
+
+```
+Project structure:
+- src/models/user.py (User dataclass - no dependencies)
+- src/repositories/user_repo.py (depends on models/user.py)
+- src/services/user_service.py (depends on repositories/user_repo.py)
+- src/api/users.py (depends on services/user_service.py) <- YOU ARE HERE
+
+The service layer handles business logic. The API layer only handles
+HTTP concerns (request parsing, response formatting).
+```
+
+**Use test output as feedback signal**:
+
+```
+Run the tests. If they fail, read the error output and fix the issues.
+Continue until all tests pass.
+```
+
+This leverages the iterative refinement pattern from RLEF training.
+
+### Don't Do This
+
+```
+"Write a function that does X"
+(No context about surrounding code, project structure, or constraints)
+
+"It's broken, fix it"
+(No error message or reproduction steps)
+
+"Here's a file, improve it"
+(No information about dependencies, patterns, or what "improvement" means)
+```
+
+### Code-Specific Quick Reference
+
+| Training | Prompting Pattern |
+|----------|------------------|
+| FIM (prefix + suffix) | Show code BEFORE and AFTER the insertion point |
+| RLEF (execution feedback) | Provide actual error messages; allow iteration |
+| SWE-RL (real issues) | Frame tasks like GitHub issues with reproduction steps |
+| Project-level pre-training | Provide dependency graph; show related files |
+| Multi-language training | Specify language conventions if non-obvious |
+
+---
+
 ## Meta-Principle: Structure Over Instruction
 
 **The fundamental insight**: LLMs follow structure more reliably than instruction. Structure creates token-level patterns that guide generation; instructions are just content to be processed.
@@ -335,6 +445,9 @@ After making changes, verify by:
 | Constitutional AI | Explicit principles; self-evaluation prompts |
 | Statistical knowledge | Provide examples; supply domain facts; ask for uncertainties |
 | Tool use training | Make tool needs explicit; reduce choice paralysis |
+| FIM code training | Show prefix AND suffix context; frame as insertion |
+| Execution-feedback RL | Provide real errors; allow iterative debugging |
+| SWE-RL training | Frame tasks as real issues; provide repo context |
 
 ---
 
@@ -376,6 +489,54 @@ Before finalizing, verify:
 [PRINCIPLE 3: Critical constraints at END]
 IMPORTANT: Only report real bugs. Do not suggest stylistic improvements,
 performance optimizations, or "nice to haves". If no bugs exist, say "No bugs found."
+```
+
+---
+
+## Example: Code Task with Code-Specific Principles
+
+**Bad prompt**:
+```
+Add input validation to my endpoint.
+```
+
+**Good prompt** (leveraging code training):
+
+```
+[PRINCIPLE 8: Frame as real issue with context]
+## Problem
+The /api/orders endpoint accepts invalid order data, causing crashes downstream.
+
+## Current Code (prefix)
+@router.post("/orders")
+async def create_order(request: OrderRequest) -> Order:
+    # VALIDATION NEEDED HERE
+
+## What Comes After (suffix)
+    order = await order_service.create(
+        user_id=request.user_id,
+        items=request.items
+    )
+    return order
+
+[PRINCIPLE 8: Provide architectural context]
+Project structure:
+- src/models/order.py (Order, OrderRequest pydantic models)
+- src/services/order_service.py (business logic, expects valid data)
+- src/api/orders.py <- YOU ARE HERE
+
+Validation should happen at API layer. Service assumes valid input.
+
+[PRINCIPLE 6: Domain facts]
+We use Pydantic for validation. Raise HTTPException(400) for invalid input.
+Required: user_id must exist, items must be non-empty, each item.quantity > 0.
+
+[PRINCIPLE 8: Allow iteration]
+After writing the validation, I'll run the tests. If they fail, I'll share the
+error output so you can fix it.
+
+[PRINCIPLE 3: Critical constraint at END]
+IMPORTANT: Only add validation logic. Don't modify the service call or return statement.
 ```
 
 ---
