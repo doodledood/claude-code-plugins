@@ -19,7 +19,7 @@ This plugin implements a verification-first approach to Claude Code workflows. T
 
 | Skill | Called By | Purpose |
 |-------|-----------|---------|
-| `/verify` | `/do` | Runs all verification methods against codebase |
+| `/verify` | `/do` | Spawns parallel criteria-checker agents for verification |
 | `/done` | `/verify` | Completion marker that enables stop |
 | `/escalate` | `/do` | Structured escalation with evidence |
 
@@ -63,8 +63,8 @@ This plugin implements a verification-first approach to Claude Code workflows. T
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        /do SKILL                                 │
-│  - Works toward criteria (no plan decomposition)                │
-│  - Memento pattern mandatory                                    │
+│  - Works toward criteria (LLM decides how)                      │
+│  - Logs attempts after each work todo completes                 │
 │  - Calls /verify when ready                                     │
 │  - Can call /escalate when genuinely stuck                      │
 └─────────────────────────────────────────────────────────────────┘
@@ -73,9 +73,10 @@ This plugin implements a verification-first approach to Claude Code workflows. T
             ▼                                   ▼
 ┌─────────────────────────┐       ┌─────────────────────────┐
 │       /verify           │       │      /escalate          │
-│  Runs all verifications │       │  Structured evidence    │
-│  → failures: continue   │       │  → allows stop          │
-│  → all pass: call /done │       └─────────────────────────┘
+│  Spawns criteria-checker│       │  Structured evidence    │
+│  agents in parallel     │       │  → allows stop          │
+│  → failures: continue   │       └─────────────────────────┘
+│  → all pass: call /done │
 └─────────────────────────┘
             │
             ▼
@@ -89,7 +90,10 @@ This plugin implements a verification-first approach to Claude Code workflows. T
 ## Key Design Principles
 
 ### Verification-First
-Every criterion must have an explicit verification method (bash command, subagent check, or manual flag). No vague criteria like "code should be clean."
+Every criterion must have an explicit verification method (bash command, codebase check, or manual flag). No vague criteria like "code should be clean."
+
+### Parallel Verification
+`/verify` spawns `criteria-checker` agents in parallel (up to 10 concurrent, configurable via `--parallel=N`). Each agent handles one criterion—either bash command or codebase pattern check.
 
 ### Enforced Flow
 Hooks prevent premature stopping:
@@ -97,11 +101,11 @@ Hooks prevent premature stopping:
 - Can't `/escalate` without calling `/verify` first
 - Forces genuine verification before completion
 
-### Memento Pattern
-All skills write to log files before proceeding. This prevents context loss on compaction and enables verification to understand what was attempted.
+### Criteria-Driven Execution
+`/do` trusts the LLM to work toward criteria—criteria define success, the LLM decides how. No prescriptive steps or plans, just todos with embedded logging discipline (`→log`) and success conditions (`; done when X`).
 
-### Criteria-Driven (Not Plan-Driven)
-`/do` works toward acceptance criteria directly, not through plan decomposition. No "Chunk 1", "Chunk 2" - instead "satisfy AC-1", "satisfy AC-2".
+### Logging for Context
+Logs capture key decisions, blockers, and solutions after each work todo completes. This enables verification to understand what was attempted and prevents context loss.
 
 ## Status
 
