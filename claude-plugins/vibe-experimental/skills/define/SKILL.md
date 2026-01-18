@@ -123,150 +123,175 @@ For any vague criterion:
 
 ### 2b. Latent Criteria Discovery
 
-These techniques surface criteria users CAN'T articulate until forced to choose or react. Use ALL of these - they catch what standard interviewing misses.
+These techniques surface criteria users CAN'T articulate until forced to choose or react. They apply to ANY output type - code, research, docs, designs, analysis.
+
+**Efficiency principle**: Don't ask every question for every task. Pick 3-5 techniques most relevant to the task type. The goal is comprehensive criteria in ~10-15 minutes of user interaction, not exhaustive interrogation.
+
+| Task Type | Priority Techniques |
+|-----------|---------------------|
+| Code/refactor | Tradeoffs, boundaries, pattern anchoring, conceptual grouping |
+| Research/analysis | Tradeoffs, depth spectrum, reaction sampling |
+| Documentation | Audience spectrum, reaction sampling, tradeoffs |
+| Design/architecture | Conceptual grouping, tradeoffs, extreme aversion |
 
 #### Tradeoff Forcing
-Present competing values, force a choice:
+Present competing values, force a choice. Works for ANY domain:
+
+**Coding example:**
 ```
-questions: [
-  {
-    question: "When these conflict, which wins?",
-    header: "Tradeoff",
-    options: [
-      { label: "Smaller files", description: "Split concepts to stay under ~200 lines" },
-      { label: "Complete concepts", description: "Keep related code together, even if larger" },
-      { label: "Context-dependent", description: "I'll specify when each applies" }
-    ],
-    multiSelect: false
-  }
-]
+question: "When file size and conceptual completeness conflict, which wins?"
+options:
+- { label: "Smaller files", description: "Split to stay under ~200 lines" }
+- { label: "Complete concepts", description: "Keep together even if larger" }
 ```
 
-Common tradeoffs to probe:
-- File size vs conceptual completeness
-- DRY vs explicit/readable
-- Flexibility vs simplicity
-- Performance vs maintainability
-- Strict typing vs pragmatic any/unknown
+**Research example:**
+```
+question: "When depth and breadth conflict, which wins?"
+options:
+- { label: "Go deep", description: "Thoroughly explore fewer sources" }
+- { label: "Go broad", description: "Survey more sources, less depth each" }
+- { label: "Depends on topic", description: "Specify in Other" }
+```
+
+**Docs example:**
+```
+question: "When brevity and completeness conflict, which wins?"
+options:
+- { label: "Keep it short", description: "Readers can ask follow-ups" }
+- { label: "Be thorough", description: "Cover edge cases upfront" }
+```
+
+Common tradeoffs to probe (pick relevant ones):
+- Depth vs breadth (research, docs)
+- Brevity vs completeness (docs, analysis)
+- Speed vs rigor (any)
+- Flexibility vs simplicity (code, design)
+- Convention vs optimization (code)
+- Comprehensive vs focused (research)
 
 #### Extreme Aversion
-Find which direction they'd rather err:
+Find which direction they'd rather err. Universally applicable:
+
+**Coding:**
 ```
-questions: [
-  {
-    question: "Which extreme is WORSE?",
-    header: "Preference",
-    options: [
-      { label: "Over-abstracted", description: "Too many tiny functions, hard to follow flow" },
-      { label: "Under-abstracted", description: "Long functions, repeated patterns" }
-    ],
-    multiSelect: false
-  }
-]
+question: "Which extreme is WORSE?"
+options:
+- { label: "Over-abstracted", description: "Too many tiny pieces, hard to follow" }
+- { label: "Under-abstracted", description: "Long, repetitive, but traceable" }
 ```
 
-Reveals implicit preferences when both extremes technically meet criteria.
+**Research:**
+```
+question: "Which extreme is WORSE?"
+options:
+- { label: "Over-hedged", description: "Too many caveats, unclear conclusions" }
+- { label: "Over-confident", description: "Strong claims, may miss nuance" }
+```
+
+**Docs:**
+```
+question: "Which extreme is WORSE?"
+options:
+- { label: "Too technical", description: "Accurate but intimidating" }
+- { label: "Too simplified", description: "Accessible but imprecise" }
+```
 
 #### Reaction Sampling
-Generate concrete artifacts, ask for gut reaction:
-```
-"Here's a possible error message style:"
-> Error E4012: Connection failed at localhost:5432. Verify database configuration.
+Generate concrete artifacts, ask for gut reaction. Show 2-3 examples varying in style:
 
-questions: [
-  {
-    question: "Your reaction to this style?",
-    header: "Style",
-    options: [
-      { label: "Accept as-is", description: "This matches what I want" },
-      { label: "Too formal/verbose", description: "Want friendlier or shorter" },
-      { label: "Too terse", description: "Need more detail or guidance" },
-      { label: "Wrong format entirely", description: "Will describe in Other" }
-    ],
-    multiSelect: false
-  }
-]
-```
+**Coding:** Show error message styles, function signatures, code structure
+**Research:** Show paragraph styles, citation density, conclusion strength
+**Docs:** Show explanation approaches, example density, tone
 
-Show 2-3 concrete examples varying in style/structure. Reactions reveal preferences that "good error messages" doesn't capture.
+```
+"Here's a possible style for [artifact type]:"
+> [concrete example]
+
+question: "Your reaction?"
+options:
+- { label: "Accept as-is", description: "Matches what I want" }
+- { label: "Too [X]", description: "Want less of this quality" }
+- { label: "Not enough [Y]", description: "Want more of this quality" }
+- { label: "Wrong approach", description: "Describe in Other" }
+```
 
 #### Boundary Mapping
-Multi-select to map rejection boundaries explicitly:
+Multi-select to map hard limits. Adapt to domain:
+
+**Coding:**
 ```
-questions: [
-  {
-    question: "Which would cause you to REJECT a PR? (Select all that apply)",
-    header: "Boundaries",
-    options: [
-      { label: "Functions > 50 lines", description: "Without exception" },
-      { label: "Files > 400 lines", description: "Without exception" },
-      { label: "More than 3 nesting levels", description: "Complexity limit" },
-      { label: "Missing error handling", description: "On any fallible operation" }
-    ],
-    multiSelect: true
-  }
-]
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "Functions > 50 lines", description: "No exceptions" }
+- { label: "Missing error handling", description: "On any fallible op" }
+- { label: "No tests for new code", description: "Coverage required" }
 ```
 
-Creates explicit numeric/structural boundaries.
+**Research:**
+```
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "No primary sources", description: "Must have direct evidence" }
+- { label: "Missing key papers", description: "Seminal works required" }
+- { label: "Unsupported claims", description: "Every claim needs citation" }
+```
+
+**Docs:**
+```
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "No working examples", description: "Must have runnable code" }
+- { label: "Assumes expert knowledge", description: "Must define terms" }
+- { label: "Missing troubleshooting", description: "Must cover common errors" }
+```
 
 #### Pattern Anchoring
-Use existing code as preference reference:
+Use existing artifacts as preference reference:
+
 ```
-questions: [
-  {
-    question: "Which existing code is closest to what you want here?",
-    header: "Reference",
-    options: [
-      { label: "Like src/auth/", description: "Layered, explicit, heavily typed" },
-      { label: "Like src/utils/", description: "Flat, minimal, pragmatic" },
-      { label: "Like [external project]", description: "Name it in Other" },
-      { label: "Something new", description: "Describe in Other" }
-    ],
-    multiSelect: false
-  }
-]
+question: "Which existing [artifact] is closest to what you want?"
+options:
+- { label: "[Internal reference A]", description: "[Its key characteristics]" }
+- { label: "[Internal reference B]", description: "[Its key characteristics]" }
+- { label: "External reference", description: "Name it in Other" }
+- { label: "Something new", description: "Describe in Other" }
 ```
 
-Explore codebase first to find pattern anchors. External references (React, Django, etc.) also work.
+Explore codebase/existing docs first to find anchors.
 
 #### Conceptual Grouping Probe
-For architecture/refactoring, test mental model boundaries:
+For architecture, organization, or structure decisions:
+
+**Coding:**
 ```
-questions: [
-  {
-    question: "Should auth and session management be in the SAME module?",
-    header: "Grouping",
-    options: [
-      { label: "Yes, same module", description: "They're conceptually unified" },
-      { label: "No, separate", description: "Distinct responsibilities" },
-      { label: "Depends on size", description: "Specify threshold in Other" }
-    ],
-    multiSelect: false
-  }
-]
+question: "Should auth and session management be in the SAME module?"
 ```
 
-Ask 3-5 grouping questions to map the user's conceptual topology. Different people draw different boundaries.
+**Research:**
+```
+question: "Should methodology and results be in the SAME section?"
+```
+
+**Docs:**
+```
+question: "Should setup and configuration be in the SAME guide?"
+```
+
+Ask 3-5 grouping questions to map mental model. Skip if task has no structural decisions.
 
 #### Spectrum Positioning
-For subjective dimensions, find where they sit:
-```
-questions: [
-  {
-    question: "Where on the verbosity spectrum?",
-    header: "Verbosity",
-    options: [
-      { label: "Minimal", description: "Terse names, few comments, implicit" },
-      { label: "Moderate", description: "Clear names, comments on non-obvious" },
-      { label: "Explicit", description: "Verbose names, thorough JSDoc, defensive" }
-    ],
-    multiSelect: false
-  }
-]
-```
+Find position on subjective dimensions. Pick 2-3 relevant spectrums:
 
-Use for: verbosity, abstraction level, error handling strictness, test coverage depth.
+**Universal spectrums:**
+- Verbosity: minimal → moderate → explicit
+- Formality: casual → professional → academic
+- Detail: high-level → balanced → granular
+
+**Domain-specific:**
+- Code: abstraction level, type strictness, error handling
+- Research: hedging, citation density, scope
+- Docs: technical depth, example density, assumed knowledge
 
 ### 3. Question Format
 
@@ -332,38 +357,37 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 ### Tradeoffs Documented
 | Dimension | When conflicting, prefer | Rationale |
 |-----------|-------------------------|-----------|
-| File size vs concepts | Complete concepts | "I can scroll, but split concepts confuse me" |
-| DRY vs explicit | Explicit | "Hate hunting for abstractions" |
+| [e.g., depth vs breadth] | [preference] | [user's reasoning] |
+| [e.g., brevity vs completeness] | [preference] | [user's reasoning] |
 
 ### Boundaries (hard limits)
-- Functions: max 50 lines
-- Files: max 400 lines
-- Nesting: max 3 levels
+- [e.g., "No unsupported claims" for research]
+- [e.g., "Functions max 50 lines" for code]
+- [e.g., "Must have working examples" for docs]
 - (none if no hard limits specified)
 
 ### Extreme Aversions
-- More averse to: over-abstraction (prefer slightly long over too fragmented)
-- More averse to: verbose errors (prefer terse)
+- More averse to: [extreme A] (prefer erring toward [extreme B])
+- [e.g., "over-hedged" → prefer slightly bold over too cautious]
 
 ### Pattern References
-- Primary reference: src/auth/ (layered, explicit style)
-- Anti-reference: src/legacy/ (avoid this style)
+- Primary reference: [existing artifact] ([key characteristics])
+- Anti-reference: [artifact to avoid] ([why])
 
 ### Conceptual Groupings
-- auth + sessions → SAME module
-- validation + schemas → SEPARATE modules
+- [concept A] + [concept B] → SAME/SEPARATE
 - (capture user's mental model boundaries)
+- (skip if no structural decisions in task)
 
 ### Spectrum Positions
-- Verbosity: moderate
-- Error handling: strict
-- Test coverage: thorough
+- [e.g., Formality]: [position]
+- [e.g., Detail level]: [position]
+- [e.g., Technical depth]: [position]
 
 ### Reaction Samples
 | Artifact shown | Reaction | Criterion captured |
 |---------------|----------|-------------------|
-| Error msg style A | "Too robotic" | AC-12: errors use friendly tone |
-| Code structure B | "Accepted" | (validates existing criteria) |
+| [concrete example] | [reaction] | [resulting criterion] |
 
 ## Adversarial Examples
 ### Accepted
@@ -441,17 +465,16 @@ When criteria conflict, these preferences apply:
 
 | Dimension | Preference | Context |
 |-----------|------------|---------|
-| File size vs concepts | Prefer complete concepts | Can exceed 200 lines if keeps concept unified |
-| DRY vs explicit | Prefer explicit | Repetition OK if improves readability |
+| [from interview] | [preference] | [when it applies] |
 
 ## Boundaries (Hard Limits)
 - id: B-1
-  limit: "Functions must be ≤50 lines"
-  verify: bash | `find . -name "*.ts" -exec awk '/^(export )?(async )?function/{start=NR} /^}$/{if(NR-start>50) print FILENAME":"start}' {} \;`
+  limit: "[hard limit from interview]"
+  verify: [method]
 
 ## Pattern References
-- Follow: src/auth/ (layered, explicit, typed)
-- Avoid: src/legacy/ (implicit, untyped patterns)
+- Follow: [reference artifact] ([key characteristics])
+- Avoid: [anti-pattern] ([why])
 
 ## Edge Cases
 - id: E-1
@@ -531,8 +554,9 @@ This allows /do to request definition changes when codebase reality conflicts wi
 2. **Every criterion has verification** - no exceptions
 3. **No vague terms** - "clean", "good", "proper" must be defined
 4. **No placeholders** - no TBD, TODO, "figure out later"
-5. **Examples are concrete** - actual code, not descriptions
+5. **Examples are concrete** - actual code/artifacts, not descriptions
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
-8. **Surface latent criteria** - use ALL latent discovery techniques (tradeoffs, boundaries, reactions, etc.)
+8. **Surface latent criteria efficiently** - use 3-5 techniques relevant to task type, not exhaustive interrogation
 9. **Vary adversarial examples on multiple dimensions** - don't just show 2 similar alternatives
+10. **Balance thoroughness with efficiency** - target ~10-15 min of user interaction, not hours

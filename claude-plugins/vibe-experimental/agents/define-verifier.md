@@ -171,31 +171,44 @@ Result: PASS | FAIL
 
 **Latent criteria discovered**
 
-Check that techniques for surfacing implicit criteria were used:
+Check that techniques for surfacing implicit criteria were used. Required techniques vary by task type:
 
-| Technique | Required | Look for in log |
-|-----------|----------|-----------------|
-| Tradeoff forcing | Yes | "Tradeoffs Documented" section with ≥2 tradeoffs |
-| Extreme aversion | Yes | "Extreme Aversions" section |
-| Reaction sampling | Yes | "Reaction Samples" table with ≥2 artifacts |
-| Boundary mapping | If applicable | "Boundaries" section with numeric limits |
-| Pattern anchoring | If applicable | "Pattern References" section |
-| Conceptual grouping | For refactors | "Conceptual Groupings" section |
-| Spectrum positioning | Yes | "Spectrum Positions" section with ≥2 dimensions |
+| Task Type | Required Techniques |
+|-----------|---------------------|
+| Code/refactor | Tradeoffs (≥1), boundaries OR pattern anchoring |
+| Research/analysis | Tradeoffs (≥1), spectrum positioning (≥1) |
+| Documentation | Tradeoffs (≥1), reaction sampling OR spectrum |
+| Design/architecture | Tradeoffs (≥1), conceptual grouping |
+| Any task | At least 2 latent criteria techniques total |
+
+**Efficiency check**: The goal is comprehensive criteria in reasonable time, not exhaustive interrogation. 3-5 techniques used appropriately is better than 7 techniques used superficially.
+
+| Technique | Look for in log |
+|-----------|-----------------|
+| Tradeoff forcing | "Tradeoffs Documented" section with ≥1 tradeoff |
+| Extreme aversion | "Extreme Aversions" section |
+| Reaction sampling | "Reaction Samples" table with ≥1 artifact |
+| Boundary mapping | "Boundaries" section with limits |
+| Pattern anchoring | "Pattern References" section |
+| Conceptual grouping | "Conceptual Groupings" section |
+| Spectrum positioning | "Spectrum Positions" section with ≥1 dimension |
 
 ```markdown
 ### Latent Criteria Discovery
+Task type: [code/research/docs/design/other]
+
 Techniques used:
-- Tradeoff forcing: [yes/no] - [evidence: N tradeoffs documented]
-- Extreme aversion: [yes/no] - [evidence]
-- Reaction sampling: [yes/no] - [evidence: N artifacts shown]
-- Boundary mapping: [yes/no/N/A] - [evidence: N hard limits]
+- Tradeoff forcing: [yes/no] - [evidence]
+- Extreme aversion: [yes/no/N/A] - [evidence]
+- Reaction sampling: [yes/no/N/A] - [evidence]
+- Boundary mapping: [yes/no/N/A] - [evidence]
 - Pattern anchoring: [yes/no/N/A] - [evidence]
 - Conceptual grouping: [yes/no/N/A] - [evidence]
-- Spectrum positioning: [yes/no] - [evidence: N dimensions]
+- Spectrum positioning: [yes/no/N/A] - [evidence]
 
-Missing techniques (not marked N/A): [list]
-Result: PASS (all required used) | FAIL
+Total techniques used: [N]
+Required for task type met: [yes/no]
+Result: PASS | FAIL
 ```
 
 **No placeholders**
@@ -263,7 +276,7 @@ Checks failed: N
 | No vague terms | No undefined "clean", "good", etc. |
 | Rejection criteria | Has ≥3 R-N criteria |
 | Examples | ≥2 accepted + ≥2 rejected, concrete, varying dimensions |
-| Latent criteria | Required techniques used: tradeoffs, aversions, reactions, spectrums |
+| Latent criteria | ≥2 techniques used; task-type requirements met |
 | No placeholders | No TBD, TODO, "unclear" |
 | No conflicts | No contradicting criteria |
 | Valid bash | All bash commands parse correctly |
