@@ -28,8 +28,7 @@ This plugin implements a verification-first approach to Claude Code workflows. T
 | Agent | Purpose |
 |-------|---------|
 | `define-verifier` | Unified verifier for /define output (27 acceptance criteria) |
-| `do-verifier` | Unified verifier for /do behavior (23 acceptance criteria) |
-| `criteria-checker` | Generic checker for code patterns against definition criteria |
+| `criteria-checker` | Read-only verification agent for single criteria (bash + codebase checks) |
 
 ## Hooks
 

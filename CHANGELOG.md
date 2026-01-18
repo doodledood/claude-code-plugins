@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.3.2 - Parallel verification via criteria-checker agents:
+  - /verify now spawns criteria-checker agents in parallel (up to --parallel=N, default 10)
+  - criteria-checker handles BOTH bash and codebase checks (added Bash tool)
+  - criteria-checker is read-only—checks, doesn't modify
+  - Removed do-verifier agent (unused)
+  - Cleaner separation: /verify orchestrates, criteria-checker executes
+
 - [vibe-experimental] v0.3.1 - Trust LLM to work toward criteria:
   - Simplified "Work Toward Criteria" section—criteria define success, LLM decides the path
   - Todos now follow CLAUDE.md pattern: goal + `→log` discipline + `; done when X`
