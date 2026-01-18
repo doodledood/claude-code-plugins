@@ -427,8 +427,8 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 Before finalizing, verify the definition is complete:
 
 ```
-Use the Task tool to spawn define-verifier:
-Task(subagent_type="define-verifier", prompt="Verify /tmp/define-interview-{timestamp}.md")
+Use the Task tool to spawn a verification agent:
+Task(subagent_type="general-purpose", prompt="Read the define-verifier agent at claude-plugins/vibe-experimental/agents/define-verifier.md and follow its instructions to verify the definition at /tmp/define-interview-{timestamp}.md")
 ```
 
 The verifier checks three requirements:
