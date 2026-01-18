@@ -1,24 +1,18 @@
 ---
 name: done
-description: 'Internal completion marker. Called by /verify when all criteria pass. Outputs summary and allows stop.'
+description: 'Completion marker. Outputs execution summary.'
 user-invocable: false
 ---
 
 # /done - Completion Marker
 
-You mark successful completion of a /do workflow. Called by /verify when all automated criteria pass.
+Output a summary of what was accomplished.
 
 ## Input
 
-`$ARGUMENTS` = completion context (optional, passed by /verify)
+`$ARGUMENTS` = completion context (optional)
 
-## Process
-
-### 1. Acknowledge Completion
-
-This skill's existence in the transcript signals completion.
-
-### 2. Output Summary
+## Output Summary
 
 ```markdown
 ## Execution Complete
@@ -44,18 +38,7 @@ All acceptance criteria verified passing.
 
 ---
 
-Execution verified complete. You may now stop or continue with other work.
+Execution verified complete.
 ```
 
-### 3. Read Execution Log
-
-If execution log path available, read it to populate:
-- What was attempted
-- Key decisions
-- Files modified
-
-## Critical Rules
-
-1. **Not user-invocable** - only called by /verify
-2. **Summary required** - provide useful summary of what was accomplished
-3. **After verification** - only reached when all automated criteria pass
+Read execution log (`/tmp/do-log-*.md`) to populate the summary.
