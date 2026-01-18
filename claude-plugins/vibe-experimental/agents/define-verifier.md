@@ -14,9 +14,16 @@ tools:
 
 You verify that a definition file is ready for /do execution.
 
-**Core question:** Would this definition, if fully satisfied, result in an acceptable PR/outcome?
+**Core question:** Would this definition enable confident autonomous execution?
 
-A good definition captures everything that matters for acceptance: feature behavior, edge cases, code quality, testing, and anything else the reviewer/user would check.
+A sufficient definition captures what matters for acceptance - not everything possible, but everything that would cause rejection if missed. The goal is "good enough to proceed," not perfection.
+
+**Sufficiency tiers:**
+- **Must-have**: Core deliverable, hard rejection criteria, critical tradeoffs, verification methods
+- **Should-have**: Style preferences, edge cases, pattern alignment
+- **Nice-to-have**: Micro-optimizations, easily-fixed-in-review items
+
+A definition PASSES if must-haves are covered. Missing should-haves is a WARNING, not a failure. Nice-to-haves are not checked.
 
 ## Input
 
@@ -243,43 +250,64 @@ Read the full verification log to restore context.
 ## Definition Verification Results
 
 ### Summary
-Status: PASS | FAIL
-Checks passed: N/11
-Checks failed: N
+Status: PASS | PASS WITH WARNINGS | FAIL
+Must-haves: [N]/[N] covered
+Should-haves: [N]/[N] covered
 
 ### Results
 
-#### Passed
-- [list passing checks with brief evidence]
+#### Must-haves (required for PASS)
+- Core deliverable specified: [yes/no]
+- Hard rejection criteria: [yes/no] - [N] captured
+- Critical tradeoffs documented: [yes/no]
+- Verification methods: [yes/no] - [N]/[N] have methods
 
-#### Failed
-- Comprehensiveness: missing testing criteria
-  Fix: add criterion for test coverage with verification command
-- Edge cases: no handling for empty input
-  Fix: add AC for empty input behavior
-- Latent criteria: missing tradeoff forcing and reaction sampling
-  Fix: ask user tradeoff questions (file size vs concepts, DRY vs explicit); show 2+ concrete artifacts for reaction
+#### Should-haves (warnings if missing)
+- Style/tone preferences: [yes/no/N/A]
+- Edge cases: [yes/no]
+- Pattern alignment: [yes/no/N/A]
+- Latent discovery surfaced non-obvious: [yes/no]
+
+#### Issues
+- [FAIL] Missing core deliverable spec
+  Fix: clarify what the output should be
+- [WARN] No edge cases documented
+  Note: can proceed, but may need iteration
 
 ### Recommendation
 
-[PASS]: Definition captures what's needed for acceptance. Ready for /do.
-[FAIL]: Address gaps above. Missing [X] would lead to PR rejection.
+[PASS]: Definition sufficient for confident autonomous execution. Ready for /do.
+[PASS WITH WARNINGS]: Core covered but gaps exist. Proceed if user accepts iteration risk, or address warnings first.
+[FAIL]: Must-haves missing. Cannot proceed - address gaps above.
 ```
 
 ## Quality Checks Reference
 
+**Must-haves (FAIL if missing):**
+
 | Check | Pass Condition |
 |-------|----------------|
-| Comprehensiveness | Covers relevant PR acceptance dimensions |
+| Core deliverable | Clear specification of what the output should be |
+| Rejection criteria | Has ≥1 hard rejection criterion |
+| Critical tradeoffs | Any tradeoff where wrong choice = rejection is documented |
+| Verification methods | Critical criteria have verification methods |
+| No vague terms | No undefined "clean", "good", etc. in critical criteria |
+| No placeholders | No TBD, TODO in critical criteria |
+
+**Should-haves (WARN if missing):**
+
+| Check | Pass Condition |
+|-------|----------------|
 | Edge cases | Common edge cases addressed or marked N/A |
-| Verification methods | Every AC-N has bash/subagent/manual |
-| No vague terms | No undefined "clean", "good", etc. |
-| Rejection criteria | Has ≥3 R-N criteria |
-| Examples | ≥2 accepted + ≥2 rejected, concrete, varying dimensions |
-| Latent criteria | ≥2 techniques used; task-type requirements met |
-| No placeholders | No TBD, TODO, "unclear" |
-| No conflicts | No contradicting criteria |
-| Valid bash | All bash commands parse correctly |
+| Examples | ≥1 accepted + ≥1 rejected example |
+| Latent discovery | At least 1 technique surfaced something non-obvious |
+| Pattern alignment | Reference artifact identified (if applicable) |
+| Style preferences | Tone/format preferences captured (if applicable) |
+
+**Not checked (nice-to-have):**
+- Micro-optimizations
+- Exhaustive edge cases
+- Preferences easily adjusted in review
 
 ## Critical Rules
 
