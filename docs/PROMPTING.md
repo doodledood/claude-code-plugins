@@ -310,13 +310,13 @@ After making changes, verify by:
 
 ## Principle 8: Leverage Code-Specific Training
 
-**Training reality**: Modern LLMs receive specialized code training including Fill-in-the-Middle (FIM), execution-feedback RL, and SWE-RL on real repositories. This creates specific strengths for code tasks.
+**Training reality**: Modern LLMs receive specialized code training through execution-feedback RL, SWE-RL on real repositories, and exposure to massive code corpora. Some models (DeepSeek-Coder, StarCoder, CodeLlama) also have Fill-in-the-Middle (FIM) training—but general models like Claude and GPT-4 do not.
 
 ### Do This
 
 **Provide surrounding context (both prefix AND suffix)**:
 
-Models are trained with FIM to understand code that comes AFTER the insertion point, not just before. When asking for code changes, show what surrounds it:
+Showing what comes AFTER the insertion point helps any LLM understand the task better—it clarifies patterns, shows what the code needs to connect to, and reduces ambiguity. This works for all models, not just FIM-trained ones:
 
 ```
 I need to add validation between these two sections:
@@ -416,6 +416,8 @@ This leverages the iterative refinement pattern from RLEF training.
 | Project-level pre-training | Provide dependency graph; show related files |
 | Multi-language training | Specify language conventions if non-obvious |
 
+**Note on FIM**: Fill-in-the-Middle training applies to specialized code models (DeepSeek-Coder, StarCoder, CodeLlama). General models like Claude and GPT-4 are not FIM-trained—but showing surrounding context still helps them understand insertion tasks better.
+
 ---
 
 ## Meta-Principle: Structure Over Instruction
@@ -445,7 +447,7 @@ This leverages the iterative refinement pattern from RLEF training.
 | Constitutional AI | Explicit principles; self-evaluation prompts |
 | Statistical knowledge | Provide examples; supply domain facts; ask for uncertainties |
 | Tool use training | Make tool needs explicit; reduce choice paralysis |
-| FIM code training | Show prefix AND suffix context; frame as insertion |
+| Surrounding code context | Show prefix AND suffix; helps all models understand insertion tasks |
 | Execution-feedback RL | Provide real errors; allow iterative debugging |
 | SWE-RL training | Frame tasks as real issues; provide repo context |
 
