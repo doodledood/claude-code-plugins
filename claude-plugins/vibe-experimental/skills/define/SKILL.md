@@ -398,15 +398,66 @@ questions: [
 | Documentation | docs-reviewer | QG-DOCS |
 | CLAUDE.md adherence | claude-md-adherence-reviewer | QG-CLAUDE |
 
-For each selected category, add a criterion:
+For each selected category, add a criterion with appropriate threshold:
+
 ```yaml
+# Most reviewers use HIGH+ threshold
 - id: QG-BUGS
-  category: code-quality
   description: "No HIGH or CRITICAL bugs introduced"
   verify:
     method: subagent
     agent: code-bugs-reviewer
     pass_if: no_high_or_critical
+
+- id: QG-TYPES
+  description: "No HIGH or CRITICAL type safety issues"
+  verify:
+    method: subagent
+    agent: type-safety-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-MAINT
+  description: "No HIGH or CRITICAL maintainability issues"
+  verify:
+    method: subagent
+    agent: code-maintainability-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-SIMPLE
+  description: "No HIGH or CRITICAL simplicity issues"
+  verify:
+    method: subagent
+    agent: code-simplicity-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-COVERAGE
+  description: "No HIGH or CRITICAL coverage gaps"
+  verify:
+    method: subagent
+    agent: code-coverage-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-TESTABILITY
+  description: "No HIGH or CRITICAL testability issues"
+  verify:
+    method: subagent
+    agent: code-testability-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-CLAUDE
+  description: "No HIGH or CRITICAL CLAUDE.md violations"
+  verify:
+    method: subagent
+    agent: claude-md-adherence-reviewer
+    pass_if: no_high_or_critical
+
+# Docs reviewer is capped at MEDIUM, so use MEDIUM+ threshold
+- id: QG-DOCS
+  description: "No MEDIUM or higher documentation issues"
+  verify:
+    method: subagent
+    agent: docs-reviewer
+    pass_if: no_medium_or_higher
 ```
 
 Write selections to interview log under `## Code Quality Gates`.
@@ -602,14 +653,14 @@ Fails because: [specific reason linked to criterion]
     agent: code-bugs-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-TYPES
-  description: "No HIGH or CRITICAL type safety issues"
+- id: QG-DOCS
+  description: "No MEDIUM or higher documentation issues"
   verify:
     method: subagent
-    agent: type-safety-reviewer
-    pass_if: no_high_or_critical
+    agent: docs-reviewer
+    pass_if: no_medium_or_higher
 
-[etc. for each selected gate]
+[etc. for each selected gate - see mapping table above]
 
 ## Task-Specific Subagents
 [Only if generic verification isn't sufficient]

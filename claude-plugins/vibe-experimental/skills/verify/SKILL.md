@@ -98,12 +98,17 @@ Standard structure:
 
 #### For subagent results (from reviewer agents)
 
-Parse the reviewer's report for CRITICAL and HIGH severity issues:
+Parse the reviewer's report based on the criterion's `pass_if` threshold from the definition file:
 
-1. Look for `#### [CRITICAL]` or `#### [HIGH]` section headers
-2. Extract each issue's location, description, and suggested fix
-3. If ANY CRITICAL or HIGH issues found → criterion FAILS
-4. If no CRITICAL/HIGH issues → criterion PASSES
+| pass_if value | Parse for | FAIL if |
+|---------------|-----------|---------|
+| `no_high_or_critical` | `#### [CRITICAL]` and `#### [HIGH]` | Any CRITICAL or HIGH found |
+| `no_medium_or_higher` | `#### [CRITICAL]`, `#### [HIGH]`, `#### [MEDIUM]` | Any MEDIUM+ found |
+
+1. Read the `pass_if` field from the criterion definition
+2. Look for severity headers matching the threshold
+3. Extract each issue's location, description, and suggested fix
+4. Apply threshold: issues at or above threshold → criterion FAILS
 
 Convert to same structure:
 ```
@@ -213,7 +218,5 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 3. **Hide manual on auto-fail** - focus on fixable issues first
 4. **Actionable feedback** - pass through file:line, expected vs actual from agents
 5. **Call /done on success** - trigger completion
-6. **Subagent threshold** - for QG-* criteria:
-   - Most reviewers: FAIL = any CRITICAL or HIGH issues
-   - QG-DOCS (docs-reviewer): FAIL = any MEDIUM or higher (docs are capped at MEDIUM severity)
-7. **Return all issues** - for failed QG-* criteria, include all failing issues so /do can fix them
+6. **Respect pass_if threshold** - for QG-* criteria, read `pass_if` from definition to determine fail threshold
+7. **Return all issues** - for failed QG-* criteria, include all issues at/above threshold so /do can fix them
