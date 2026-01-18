@@ -181,7 +181,7 @@ Check that techniques for surfacing implicit criteria were used. Required techni
 | Design/architecture | Tradeoffs (≥1), conceptual grouping |
 | Any task | At least 2 latent criteria techniques total |
 
-**Efficiency check**: The goal is comprehensive criteria in reasonable time, not exhaustive interrogation. 3-5 techniques used appropriately is better than 7 techniques used superficially.
+**Quality check**: Techniques should be used substantively, not superficially. A tradeoff with one shallow question is worse than probing until the preference is clear.
 
 | Technique | Look for in log |
 |-----------|-----------------|

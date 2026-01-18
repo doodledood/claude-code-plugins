@@ -125,7 +125,10 @@ For any vague criterion:
 
 These techniques surface criteria users CAN'T articulate until forced to choose or react. They apply to ANY output type - code, research, docs, designs, analysis.
 
-**Efficiency principle**: Don't ask every question for every task. Pick 3-5 techniques most relevant to the task type. The goal is comprehensive criteria in ~10-15 minutes of user interaction, not exhaustive interrogation.
+**Completeness over speed**: Invest in thorough criteria discovery - it pays off in autonomous execution quality. Use all techniques relevant to the task type. Stop when:
+- Additional questions yield only marginal new criteria
+- User signals "I think we've covered it"
+- Key dimensions for the task type have been probed and documented
 
 | Task Type | Priority Techniques |
 |-----------|---------------------|
@@ -557,6 +560,6 @@ This allows /do to request definition changes when codebase reality conflicts wi
 5. **Examples are concrete** - actual code/artifacts, not descriptions
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
-8. **Surface latent criteria efficiently** - use 3-5 techniques relevant to task type, not exhaustive interrogation
+8. **Surface latent criteria thoroughly** - use all techniques relevant to task type until diminishing returns
 9. **Vary adversarial examples on multiple dimensions** - don't just show 2 similar alternatives
-10. **Balance thoroughness with efficiency** - target ~10-15 min of user interaction, not hours
+10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution
