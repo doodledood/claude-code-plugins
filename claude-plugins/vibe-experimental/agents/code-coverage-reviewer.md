@@ -106,18 +106,31 @@ List functions/files with sufficient coverage in a concise format:
 ✅ <filepath>: <function_name> - covered (positive, edge, error)
 ```
 
-#### Missing Coverage (Detailed)
+#### Coverage Gaps by Severity
 
-For each gap, provide:
+For each gap, use this format:
 
 ```
-❌ <filepath>: <function_name>
-   Missing: [positive cases | edge cases | error handling]
+#### [SEVERITY] <function_name> missing test coverage
+**Location**: `<filepath>:<line_range>`
+**Missing**: positive cases | edge cases | error handling
+**Risk**: Why this gap matters (what could break)
+**Suggested Tests**:
+- <scenario 1: description with example input → expected output>
+- <scenario 2: description with example input → expected output>
+- <scenario 3: error condition → expected error behavior>
+```
 
-   Scenarios to cover:
-   - <scenario 1: description with example input → expected output>
-   - <scenario 2: description with example input → expected output>
-   - <scenario 3: error condition → expected error behavior>
+Example:
+```
+#### [HIGH] calculateDiscount missing error case tests
+**Location**: `src/pricing/discount.ts:45-78`
+**Missing**: error handling for invalid inputs
+**Risk**: Function throws on negative values but no tests verify this behavior
+**Suggested Tests**:
+- Negative amount → should throw InvalidAmountError
+- Amount exceeding max → should cap at maximum discount
+- Null customer tier → should default to base discount
 ```
 
 Note: Focus on WHAT scenarios need testing, not HOW to write the tests. The developer knows their testing framework and conventions better than you.
@@ -139,7 +152,30 @@ IF no test file exists for changed file:
   → Flag as CRITICAL gap, recommend test file creation first
 ```
 
-**Calibration check**: CRITICAL coverage gaps should be rare—reserved for completely untested business logic or missing test files for new modules. If you're marking multiple items as CRITICAL (🔴), recalibrate. Most coverage gaps are important but not critical.
+## Severity Classification
+
+**Critical**: Coverage gaps that block merge
+- No test file exists for a new module with business logic
+- Core business logic (auth, payments, data mutations) with zero test coverage
+- Functions with complex conditionals and no tests at all
+
+**High**: Coverage gaps that should be fixed before merge
+- New public functions without any test coverage
+- Modified business logic without updated tests
+- Missing error case coverage for functions that can throw
+- Functions with multiple code paths but only happy-path tested
+
+**Medium**: Coverage gaps to address soon
+- Missing edge case tests (empty arrays, boundary values)
+- Partial coverage of new conditional branches
+- Missing tests for non-critical utility functions
+
+**Low**: Minor coverage improvements
+- Additional edge cases that would polish coverage
+- Tests for simple getters/transformations
+- Coverage for unlikely error paths
+
+**Calibration check**: CRITICAL coverage gaps should be rare—reserved for completely untested business logic or missing test files for new modules. If you're marking multiple items as CRITICAL, recalibrate. Most coverage gaps are HIGH or MEDIUM.
 
 ## Quality Standards
 
@@ -211,7 +247,12 @@ Always structure your final report with these sections:
 
 1. **Summary**: X files analyzed, Y functions reviewed, Z coverage gaps found
 2. **Adequate Coverage**: Brief list of well-covered items
-3. **Coverage Gaps**: Detailed breakdown with suggested tests
-4. **Priority Recommendations**: Top 3 most critical tests to add
+3. **Coverage Gaps by Severity**: Issues grouped by CRITICAL, HIGH, MEDIUM, LOW using the `#### [SEVERITY]` format
+4. **Statistics**:
+   - Critical: [count]
+   - High: [count]
+   - Medium: [count]
+   - Low: [count]
+5. **Priority Recommendations**: Top 3 most critical tests to add
 
 If no gaps are found, provide a brief confirmation that coverage appears adequate with a summary of what was verified.

@@ -213,5 +213,7 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 3. **Hide manual on auto-fail** - focus on fixable issues first
 4. **Actionable feedback** - pass through file:line, expected vs actual from agents
 5. **Call /done on success** - trigger completion
-6. **Subagent threshold** - for QG-* criteria, FAIL = any CRITICAL or HIGH issues
-7. **Return all issues** - for failed QG-* criteria, include all HIGH+ issues so /do can fix them
+6. **Subagent threshold** - for QG-* criteria:
+   - Most reviewers: FAIL = any CRITICAL or HIGH issues
+   - QG-DOCS (docs-reviewer): FAIL = any MEDIUM or higher (docs are capped at MEDIUM severity)
+7. **Return all issues** - for failed QG-* criteria, include all failing issues so /do can fix them
