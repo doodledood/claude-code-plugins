@@ -6,21 +6,13 @@ user-invocable: false
 
 # /escalate - Structured Escalation
 
-You handle escalation when /do is genuinely stuck on a criterion. You require /verify to have been called first (enforced by PreToolUse hook).
+You handle escalation when /do is genuinely stuck on a criterion. Requires /verify to have been called first.
 
 ## Input
 
 `$ARGUMENTS` = escalation context
 
 Example: "AC-4 blocking after 3 attempts" or "Manual criteria AC-10, AC-11 need human review"
-
-## PreToolUse Hook
-
-A hook blocks /escalate unless /verify was called after the most recent /do:
-- Prevents lazy escalation without attempting verification
-- Ensures genuine effort before giving up
-
-If hook blocks, user sees: "Must call /verify before /escalate"
 
 ## Process
 
@@ -143,19 +135,6 @@ Lazy escalations are NOT acceptable:
 ## Critical Rules
 
 1. **Not user-invocable** - only called by /do
-2. **Requires /verify first** - PreToolUse hook enforces
+2. **Requires /verify first** - must attempt verification before escalating
 3. **Structured evidence** - not lazy "help me" requests
-4. **Enables stop** - stop hook allows stop when /escalate exists
-5. **Options provided** - give human actionable choices
-
-## Stop Hook Behavior
-
-The stop hook checks:
-```
-if /do exists in transcript:
-    if /escalate exists after /do:
-        ALLOW stop
-    ...
-```
-
-By existing in the transcript after /do (and after /verify), /escalate enables stopping.
+4. **Options provided** - give human actionable choices

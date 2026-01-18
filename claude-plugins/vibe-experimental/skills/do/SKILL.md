@@ -111,7 +111,7 @@ If you've tried 3+ approaches and can't satisfy a criterion:
 Use the Skill tool to escalate: Skill("vibe-experimental:escalate", "AC-N blocking after 3 attempts")
 ```
 
-/escalate requires /verify to have been called first (enforced by hook).
+/escalate requires /verify to have been called first.
 
 ## Critical Rules
 
@@ -121,16 +121,6 @@ Use the Skill tool to escalate: Skill("vibe-experimental:escalate", "AC-N blocki
 4. **Must call /verify** - can't declare done without verification
 5. **Target failures** - on failure, fix specific criteria, don't restart
 6. **Proper escalation** - /escalate only after /verify, with evidence
-
-## Stop Hook Enforcement
-
-A stop hook prevents premature stopping:
-- Can't stop after /do without /done or /escalate
-- /done only comes from /verify on success
-- /escalate requires /verify first
-
-If you try to stop prematurely, you'll see:
-"Cannot stop - run /verify first. If stuck, /escalate after /verify."
 
 ## Example Flow
 

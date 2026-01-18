@@ -6,17 +6,11 @@ user-invocable: false
 
 # /done - Completion Marker
 
-You mark successful completion of a /do workflow. You are called by /verify when all automated criteria pass, not directly by users or /do.
+You mark successful completion of a /do workflow. Called by /verify when all automated criteria pass.
 
 ## Input
 
 `$ARGUMENTS` = completion context (optional, passed by /verify)
-
-## Purpose
-
-1. **Marker in transcript** - stop hook looks for /done after /do
-2. **Completion summary** - tell user what was accomplished
-3. **Enable stop** - without /done, stop is blocked
 
 ## Process
 
@@ -63,21 +57,5 @@ If execution log path available, read it to populate:
 ## Critical Rules
 
 1. **Not user-invocable** - only called by /verify
-2. **Signals completion** - stop hook allows stop when /done exists
-3. **Summary required** - don't just exist, provide useful summary
-4. **After verification** - only reached when all automated criteria pass
-
-## Stop Hook Behavior
-
-The stop hook checks:
-```
-if /do exists in transcript:
-    if /done exists after /do:
-        ALLOW stop
-    elif /escalate exists after /do:
-        ALLOW stop
-    else:
-        BLOCK stop
-```
-
-By existing in the transcript after /do, /done enables stopping.
+2. **Summary required** - provide useful summary of what was accomplished
+3. **After verification** - only reached when all automated criteria pass
