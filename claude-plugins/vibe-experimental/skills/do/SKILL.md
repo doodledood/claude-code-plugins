@@ -60,13 +60,16 @@ Create TodoWrite with criteria to satisfy:
 - [ ] (expand: sub-tasks as discovered)
 - [ ] Call /verify; done when all criteria verified
 - [ ] (expand: fix failures from /verify—loop until pass)
+- [ ] Refresh log + output summary; done when user sees final status
 ```
 
 ### 3. Work Toward Criteria
 
 Work to satisfy the criteria. You decide how—the criteria define success, not the path to it.
 
-Log format for attempts:
+Log significant attempts only—key decisions, blockers hit, solutions found. Not every minor action.
+
+Log format:
 ```markdown
 ### AC-1: [description]
 - Attempt 1: [what you tried]
@@ -134,8 +137,9 @@ If you try to stop prematurely, you'll see:
 ```
 1. /do /tmp/define-123.md
 2. Read definition, create log, create todos
-3. Work toward criteria (logging attempts as you go)
+3. Work toward criteria (logging significant attempts)
 4. Skill("vibe-experimental:verify", "...")
 5. If failures → fix specific criteria → retry verify
-6. All pass → /verify calls /done → stop allowed
+6. All pass → /verify calls /done
+7. Refresh log → output summary → stop allowed
 ```
