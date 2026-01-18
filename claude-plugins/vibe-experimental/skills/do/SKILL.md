@@ -67,7 +67,7 @@ Create TodoWrite with criteria to satisfy:
 
 Work to satisfy the criteria. You decide how—the criteria define success, not the path to it.
 
-Log significant attempts only—key decisions, blockers hit, solutions found. Not every minor action.
+Log when completing each work todo—capture key decisions, blockers hit, solutions found.
 
 Log format:
 ```markdown
