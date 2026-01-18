@@ -58,7 +58,6 @@ Create TodoWrite with criteria to satisfy:
 - [ ] Satisfy AC-2: [brief]→log; done when implemented + attempt logged
 - [ ] Satisfy R-1: [brief]→log; done when not violated + attempt logged
 - [ ] (expand: sub-tasks as discovered)
-- [ ] Refresh: read full log
 - [ ] Call /verify; done when all criteria verified
 - [ ] (expand: fix failures from /verify—loop until pass)
 ```
@@ -136,8 +135,7 @@ If you try to stop prematurely, you'll see:
 1. /do /tmp/define-123.md
 2. Read definition, create log, create todos
 3. Work toward criteria (logging attempts as you go)
-4. Refresh: read full log
-5. Skill("vibe-experimental:verify", "...")
-6. If failures → fix specific criteria → retry verify
-7. All pass → /verify calls /done → stop allowed
+4. Skill("vibe-experimental:verify", "...")
+5. If failures → fix specific criteria → retry verify
+6. All pass → /verify calls /done → stop allowed
 ```
