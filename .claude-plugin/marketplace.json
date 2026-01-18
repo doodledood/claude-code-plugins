@@ -5,74 +5,16 @@
     "email": "doodledood@github.com"
   },
   "metadata": {
-    "description": "A curated marketplace of Claude Code plugins for agentic development workflows, featuring tools for architecture, knowledge management, and development automation",
-    "version": "1.0.0",
-    "pluginRoot": "./claude-plugins"
+    "description": "A curated marketplace of Claude Code plugins for agentic development workflows"
   },
   "plugins": [
-    {
-      "name": "consultant",
-      "source": "./claude-plugins/consultant",
-      "description": "Flexible multi-provider LLM consultations using Python/LiteLLM - includes consultant agent, review/bug-investigation commands, and consultant skill for deep AI-powered code analysis across 100+ models",
-      "version": "1.9.0",
-      "category": "development",
-      "keywords": ["consultant", "code-review", "code-analysis", "analysis", "architecture", "bug-investigation", "ai-analysis", "litellm", "multi-provider"]
-    },
-    {
-      "name": "prompt-engineering",
-      "source": "./claude-plugins/prompt-engineering",
-      "description": "Tools for reviewing, analyzing, refining, and optimizing LLM prompts for clarity, precision, goal effectiveness, and token efficiency",
-      "version": "1.16.0",
-      "category": "development",
-      "keywords": ["prompt-engineering", "prompts", "llm", "optimization", "prompt-design", "token-efficiency", "compression"]
-    },
-    {
-      "name": "vibe-workflow",
-      "source": "./claude-plugins/vibe-workflow",
-      "description": "Ship high-quality code faster with less back-and-forth",
-      "version": "2.13.0",
-      "category": "development",
-      "keywords": ["vibe-coding", "workflow", "autonomous", "quality-gates", "code-review", "maintainability", "planning", "implementation-plan"]
-    },
-    {
-      "name": "solo-dev",
-      "source": "./claude-plugins/solo-dev",
-      "description": "Toolkit for solo developers to build, manage, and grow their business - customer profiling, brand guidelines, design system, SEO strategy, content creation, and more",
-      "version": "1.19.0",
-      "category": "productivity",
-      "keywords": ["solo-dev", "indie-hacker", "solopreneur", "author-voice", "customer-profile", "brand-guidelines", "design-guidelines", "design-system", "ux-audit", "icp", "productivity", "business", "seo", "geo", "seo-strategy", "ai-citations"]
-    },
-    {
-      "name": "vibe-extras",
-      "source": "./claude-plugins/vibe-extras",
-      "description": "Standalone utilities that complement the core development workflow",
-      "version": "1.6.0",
-      "category": "development",
-      "keywords": ["utilities", "git", "rebase", "documentation", "cleanup", "slop", "history-rewrite"]
-    },
-    {
-      "name": "frontend-design",
-      "source": "./claude-plugins/frontend-design",
-      "description": "Frontend design patterns and implementation skills for distinctive, non-generic UI experiences",
-      "version": "1.1.0",
-      "category": "development",
-      "keywords": ["frontend", "design", "ui", "ux", "animation", "interactive"]
-    },
-    {
-      "name": "life-ops",
-      "source": "./claude-plugins/life-ops",
-      "description": "Personal decision-making and life workflow support",
-      "version": "1.8.0",
-      "category": "productivity",
-      "keywords": ["decisions", "life", "personal", "advisor", "research"]
-    },
-    {
-      "name": "vibe-experimental",
-      "source": "./claude-plugins/vibe-experimental",
-      "description": "Experimental verification-first workflows. Every criterion has explicit verification; execution can't stop without verification passing or proper escalation.",
-      "version": "0.3.0",
-      "category": "development",
-      "keywords": ["experimental", "define", "verification", "acceptance-criteria", "autonomous", "do"]
-    }
+    { "name": "consultant", "source": "./claude-plugins/consultant" },
+    { "name": "prompt-engineering", "source": "./claude-plugins/prompt-engineering" },
+    { "name": "vibe-workflow", "source": "./claude-plugins/vibe-workflow" },
+    { "name": "solo-dev", "source": "./claude-plugins/solo-dev" },
+    { "name": "vibe-extras", "source": "./claude-plugins/vibe-extras" },
+    { "name": "frontend-design", "source": "./claude-plugins/frontend-design" },
+    { "name": "life-ops", "source": "./claude-plugins/life-ops" },
+    { "name": "vibe-experimental", "source": "./claude-plugins/vibe-experimental" }
   ]
 }
