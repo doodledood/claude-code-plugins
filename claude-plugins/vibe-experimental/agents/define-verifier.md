@@ -83,6 +83,13 @@ Started: [timestamp]
 
 Write findings to log BEFORE proceeding to next check.
 
+**Important**: The detailed checks below gather information, but only the THREE REQUIREMENTS determine PASS/FAIL:
+1. Core deliverable clear
+2. Rejection criteria captured (explicit + latent techniques used)
+3. Verification methods exist for rejection criteria
+
+Other checks (edge cases, examples, etc.) are informational - they only cause FAIL if they reveal a missing rejection criterion.
+
 **Comprehensiveness (PR acceptance dimensions)**
 
 Check if the definition addresses these dimensions (where applicable):
@@ -161,7 +168,9 @@ Result: PASS | FAIL
 ```markdown
 ### Rejection Criteria
 Found: [N] rejection criteria (R-1 through R-N)
-Result: PASS (≥3) | FAIL (<3)
+Explicit (from direct questions): [N]
+Latent (from discovery techniques): [N]
+Result: PASS (≥1 and latent techniques were used) | FAIL
 ```
 
 **Has examples**
@@ -298,8 +307,8 @@ Status: PASS | FAIL
 
 1. **Read log first** - understand user's deliberate choices before judging
 2. **Respect explicit decisions** - don't flag something user deliberately scoped out
-3. **Think like a reviewer** - would YOU accept a PR that only satisfies these criteria?
-4. **Flag unaddressed gaps** - missing dimensions/edge cases are failures IF not deliberately excluded
+3. **Focus on rejection criteria** - only flag gaps that would cause the user to reject the output
+4. **Latent techniques are required** - if no latent discovery techniques were used, FAIL (hidden rejection criteria likely missed)
 5. **Todo per check** - each check gets its own todo
 6. **Write to log before proceeding** - findings captured after each check
 7. **Refresh before synthesis** - read full log to restore context

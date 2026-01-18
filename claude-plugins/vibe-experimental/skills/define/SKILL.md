@@ -56,9 +56,10 @@ Ask about:
 - Integration: "What existing systems does this touch?"
 
 #### Negative Criteria (Rejection-First)
-Ask explicitly: "What would cause you to REJECT a PR for this work?"
-- Capture at least 3 rejection criteria
-- These are distinct from inverted positive criteria
+Ask explicitly: "What would cause you to REJECT this output?"
+- Capture ALL rejection criteria the user mentions
+- These are the most important criteria - everything else is optional
+- Keep probing until user can't think of more
 
 #### Edge Cases (Exhaustive)
 Walk through systematically:
@@ -430,13 +431,10 @@ Use the Task tool to verify the definition:
 Task("vibe-experimental", "define-verifier", read the interview log at /tmp/define-interview-{timestamp}.md and verify all acceptance criteria are met)
 ```
 
-The define-verifier checks:
-- All interview techniques used
-- All criteria have verification methods
-- No vague terms remain
-- Examples are concrete
-- Pre-mortem and disappointed documented
-- No conflicts between criteria
+The define-verifier checks the three requirements:
+1. Core deliverable is clear (ambiguity = guaranteed rejection)
+2. Rejection criteria captured (explicit + latent techniques used)
+3. Each rejection criterion has a verification method
 
 If gaps found → continue interview to fill them.
 
