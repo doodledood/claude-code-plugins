@@ -1,12 +1,12 @@
 ---
 name: escalate
-description: 'Internal escalation handler. Called by /do when genuinely stuck after verification. Requires structured evidence of attempts.'
+description: 'Structured escalation with evidence. Surfaces blocking issues for human decision.'
 user-invocable: false
 ---
 
 # /escalate - Structured Escalation
 
-You handle escalation when /do is genuinely stuck on a criterion. You require /verify to have been called first (enforced by PreToolUse hook).
+Surface a blocking issue for human decision with structured evidence.
 
 ## Input
 
@@ -14,36 +14,15 @@ You handle escalation when /do is genuinely stuck on a criterion. You require /v
 
 Example: "AC-4 blocking after 3 attempts" or "Manual criteria AC-10, AC-11 need human review"
 
-## PreToolUse Hook
+## Escalation Types
 
-A hook blocks /escalate unless /verify was called after the most recent /do:
-- Prevents lazy escalation without attempting verification
-- Ensures genuine effort before giving up
+### Blocking Criterion
 
-If hook blocks, user sees: "Must call /verify before /escalate"
+Automated criterion that can't be satisfied after multiple attempts.
 
-## Process
+Read execution log (`/tmp/do-log-*.md`) to find what was attempted and why it failed.
 
-### 1. Identify Escalation Type
-
-**Blocking Criterion:**
-- Automated criterion that can't be satisfied after multiple attempts
-- Requires structured evidence
-
-**Manual Criteria:**
-- All automated pass, manual criteria need human review
-- Less evidence required
-
-### 2. Read Execution Log
-
-Read `/tmp/do-log-*.md` to find:
-- What was attempted for the blocking criterion
-- Why each attempt failed
-- Pattern of failures
-
-### 3. Output Structured Escalation
-
-#### For Blocking Criterion
+Output:
 
 ```markdown
 ## Escalation: Criterion [AC-N] ([description])
@@ -91,13 +70,13 @@ Examples:
 ### Requesting
 
 Human decision on which path to take.
-
----
-
-Escalation documented. You may now stop and review, or provide guidance to continue.
 ```
 
-#### For Manual Criteria
+### Manual Criteria
+
+All automated pass, manual criteria need human review.
+
+Output:
 
 ```markdown
 ## Escalation: Manual Criteria Require Human Review
@@ -123,7 +102,7 @@ Passed: [N] criteria
 
 ---
 
-Please review the manual criteria and confirm completion, or provide feedback for adjustments.
+Please review the manual criteria and confirm completion.
 ```
 
 ## Evidence Requirements
@@ -139,23 +118,3 @@ Lazy escalations are NOT acceptable:
 - "I can't figure this out"
 - "Can you help?"
 - "This is hard"
-
-## Critical Rules
-
-1. **Not user-invocable** - only called by /do
-2. **Requires /verify first** - PreToolUse hook enforces
-3. **Structured evidence** - not lazy "help me" requests
-4. **Enables stop** - stop hook allows stop when /escalate exists
-5. **Options provided** - give human actionable choices
-
-## Stop Hook Behavior
-
-The stop hook checks:
-```
-if /do exists in transcript:
-    if /escalate exists after /do:
-        ALLOW stop
-    ...
-```
-
-By existing in the transcript after /do (and after /verify), /escalate enables stopping.

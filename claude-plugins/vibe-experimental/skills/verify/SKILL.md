@@ -1,18 +1,20 @@
 ---
 name: verify
-description: 'Internal verification runner. Executes all verification methods from definition against codebase. Called by /do, not directly by users.'
+description: 'Internal verification runner. Spawns parallel criteria-checker agents for each criterion. Called by /do, not directly by users.'
 user-invocable: false
 ---
 
 # /verify - Verification Runner
 
-You run all verification methods from a definition file against the current codebase state. You are called by /do, not directly by users.
+You run all verification methods from a definition file. You spawn criteria-checker agents in parallel—you don't run checks yourself.
 
 ## Input
 
-`$ARGUMENTS` = "<definition-file-path> <execution-log-path>"
+`$ARGUMENTS` = "<definition-file-path> <execution-log-path> [--parallel=N]"
 
-Example: `/tmp/define-123.md /tmp/do-log-123.md`
+- `--parallel=N`: Max concurrent criteria-checkers (default: 10)
+
+Example: `/tmp/define-123.md /tmp/do-log-123.md --parallel=5`
 
 ## Process
 
@@ -20,44 +22,33 @@ Example: `/tmp/define-123.md /tmp/do-log-123.md`
 
 Read both files:
 - Definition file: extract all criteria and their verification methods
-- Execution log: understand what was attempted (for context in subagent checks)
+- Execution log: context for criteria-checkers
+
+Parse `--parallel` argument (default 10).
 
 ### 2. Categorize Criteria
 
-Group by verification method:
+Group by verification type:
 - **bash**: Shell commands (npm test, tsc, lint, etc.)
-- **subagent**: Code pattern checks via Task tool
-- **manual**: Require human verification
+- **codebase**: Code pattern checks
+- **manual**: Require human verification (set aside for later)
 
-### 3. Run Bash Verifications
+### 3. Spawn Criteria-Checkers in Parallel
 
-For each bash criterion:
-```bash
-# Run with higher timeout (5 minutes default)
-# Retry once on transient failures (network, flaky tests)
+For each automatable criterion (bash OR codebase), spawn a criteria-checker agent using the Task tool.
+
+Example Task call:
+```
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Criterion: AC-1 (tests-pass)
+Description: All tests pass
+Verification method: bash
+Command: npm test")
 ```
 
-Capture:
-- Exit code
-- stdout/stderr
-- Specific failure location if detectable
+Launch up to N (from --parallel) concurrently. Wait for wave to complete before starting next wave.
 
-### 4. Run Subagent Verifications
-
-Launch in parallel waves (max 5 concurrent):
-
-```
-Use the Task tool to check criterion AC-N:
-Task("vibe-experimental", "criteria-checker", "Check AC-N: [description]. Context: [relevant files]. Checks: [from definition]")
-```
-
-For each subagent:
-- Provide criterion definition
-- Provide relevant code files
-- Provide execution log excerpt
-- Request pass/fail with specific file:line issues
-
-### 5. Collect Results
+### 4. Collect Results
 
 Build results structure:
 ```
@@ -67,23 +58,17 @@ Build results structure:
     {
       "id": "AC-3",
       "method": "bash",
-      "command": "npm test",
       "location": "src/foo.test.ts:45",
       "expected": "'queued'",
-      "actual": "'sent'"
-    },
-    {
-      "id": "AC-7",
-      "method": "subagent",
-      "location": "src/handlers/notify.ts:23",
-      "issue": "Raw Error() throw, expected AppError"
+      "actual": "'sent'",
+      "fix_hint": "..."
     }
   ],
   "manual": ["AC-10", "AC-11"]
 }
 ```
 
-### 6. Decision Logic
+### 5. Decision Logic
 
 ```
 if any automated failed:
@@ -98,7 +83,7 @@ elif all pass (no manual):
     → Call /done
 ```
 
-### 7. Output Format
+### 6. Output Format
 
 #### On Failure
 
@@ -112,18 +97,16 @@ elif all pass (no manual):
   Location: `src/notifications.test.ts:45`
   Expected: `'queued'`
   Actual: `'sent'`
+  Fix: Update status to 'queued' before notification
 
 - **AC-7**: error-pattern
-  Method: subagent (criteria-checker)
+  Method: codebase
   Location: `src/handlers/notify.ts:23`
   Issue: Raw Error() throw, expected AppError
+  Fix: Replace with `throw new AppError({...})`
 
 ### Passed (M)
-- AC-1: no-type-errors
-- AC-2: lint-clean
-- AC-4: file-structure
-- AC-5: naming-conventions
-- AC-6: no-console-logs
+- AC-1, AC-2, AC-4, AC-5, AC-6
 
 ---
 
@@ -135,23 +118,16 @@ Continue working on failed criteria, then call /verify again.
 ```markdown
 ## Verification Results
 
-### All Automated Criteria Pass
+### All Automated Criteria Pass (N)
 
-### Manual Verification Required (N)
-
-These criteria require human review:
+### Manual Verification Required (M)
 
 - **AC-10**: ux-feels-right
-  Verification: Manual review of UI flow
-
-- **AC-11**: performance-acceptable
-  Verification: Manual load testing
+  How to verify: [from definition]
 
 ---
 
-All automated criteria verified. To complete:
-- If manual criteria are acceptable: call /escalate to surface for human review
-- Human will verify manual criteria and approve completion
+Call /escalate to surface for human review.
 ```
 
 #### On Full Success
@@ -161,42 +137,10 @@ Call /done:
 Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria verified")
 ```
 
-## Verification Quality Requirements
-
-### Actionable Feedback
-
-Every failure MUST include:
-- Specific file:line location (where applicable)
-- Expected vs actual (what was wrong)
-- Actionable fix guidance (not vague "fix this")
-
-### Subagent Instructions
-
-When spawning criteria-checker:
-```
-Check [criterion description].
-
-Context files:
-- [file1]: [what it contains]
-- [file2]: [what it contains]
-
-Execution log excerpt:
-[relevant attempts for this criterion]
-
-Specific checks:
-1. [check from definition]
-2. [check from definition]
-
-Output format:
-- PASS or FAIL
-- If FAIL: file:line, expected, actual, fix suggestion
-```
-
 ## Critical Rules
 
-1. **Not user-invocable** - only called by /do
-2. **Check actual files** - state is codebase, not git history
-3. **Parallel subagents** - waves of 5 for efficiency
-4. **Hide manual on auto-fail** - focus on fixable issues first
-5. **Actionable feedback** - specific locations, expected vs actual
-6. **Call /done on success** - don't just return, trigger completion
+1. **Don't run checks yourself** - spawn criteria-checker agents
+2. **Parallel waves** - up to --parallel concurrent (default 10)
+3. **Hide manual on auto-fail** - focus on fixable issues first
+4. **Actionable feedback** - pass through file:line, expected vs actual from agents
+5. **Call /done on success** - trigger completion
