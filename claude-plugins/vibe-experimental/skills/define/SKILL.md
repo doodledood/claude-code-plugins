@@ -37,6 +37,7 @@ Create todos and log file:
 - [ ] Surface latent criteria (tradeoffs, boundaries, preferences)
 - [ ] Refine vague criteria to specific
 - [ ] Ask code quality gates question (if coding task)
+- [ ] Detect project quality gates from CLAUDE.md (if coding task)
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
 - [ ] Run meta-verification via define-verifier agent
@@ -462,6 +463,60 @@ For each selected category, add a criterion with appropriate threshold:
 
 Write selections to interview log under `## Code Quality Gates`.
 
+### 5b. Project Quality Gates (Auto-Detected)
+
+For coding tasks, detect project-specific quality gates from CLAUDE.md. These are bash-verifiable commands the project defines—whatever the project requires, not a fixed set.
+
+**Detection (no question needed):**
+
+Read CLAUDE.md and look for verifiable commands. Common categories (but not limited to):
+
+| Category | Common Patterns | Example Commands |
+|----------|-----------------|------------------|
+| Type checking | mypy, tsc, pyright | `mypy`, `tsc --noEmit` |
+| Tests | pytest, jest, npm test | `pytest tests/ -v`, `npm test` |
+| Linting | ruff, eslint, flake8 | `ruff check`, `npm run lint` |
+| Formatting | black, prettier | `black --check`, `prettier --check` |
+| Build | build, compile | `npm run build`, `cargo build` |
+
+Projects may have other gates (e.g., `cargo clippy`, `go vet`, security scans, migration checks). Include whatever the project's CLAUDE.md specifies.
+
+**If CLAUDE.md contains verifiable commands:**
+
+Extract and add as PQG-* criteria. Use descriptive IDs based on what's actually found:
+
+```yaml
+# Examples - actual gates depend on what CLAUDE.md specifies
+- id: PQG-TYPECHECK
+  description: "Type checking passes"
+  verify:
+    method: bash
+    command: "[extracted command]"
+
+- id: PQG-TEST
+  description: "Tests pass"
+  verify:
+    method: bash
+    command: "[extracted command]"
+
+- id: PQG-LINT
+  description: "Linting passes"
+  verify:
+    method: bash
+    command: "[extracted command]"
+```
+
+**If no CLAUDE.md or no verifiable commands found:**
+
+Don't invent gates. Only include what the project explicitly requires. Skip this section entirely if nothing is specified.
+
+**Command formatting:**
+
+- Use check-only variants for verification (e.g., `black --check` not `black`)
+- Keep commands as close to CLAUDE.md as possible
+
+Write detected gates to interview log under `## Project Quality Gates (Auto-Detected)`.
+
 ### 6. Write to Log (After Each Phase)
 
 After each interview phase, write findings to `/tmp/define-interview-{timestamp}.md`:
@@ -541,6 +596,15 @@ Selected:
 - [ ] Testability (QG-TESTABILITY)
 - [ ] Documentation (QG-DOCS)
 - [ ] CLAUDE.md adherence (QG-CLAUDE)
+
+## Project Quality Gates (Auto-Detected)
+(only if CLAUDE.md specifies verifiable commands)
+
+| ID | Category | Command | Source |
+|----|----------|---------|--------|
+| PQG-* | [category] | [command] | CLAUDE.md line X |
+
+(include only gates found in CLAUDE.md; omit section if none)
 
 ## Open Questions
 - (none if all resolved)
@@ -661,6 +725,25 @@ Fails because: [specific reason linked to criterion]
     pass_if: no_medium_or_higher
 
 [etc. for each selected gate - see mapping table above]
+
+## Project Quality Gates
+(only present if CLAUDE.md specifies verifiable commands)
+
+[Include only gates found in CLAUDE.md - examples:]
+
+- id: PQG-TYPECHECK
+  description: "Type checking passes"
+  verify:
+    method: bash
+    command: "[command from CLAUDE.md]"
+
+- id: PQG-TEST
+  description: "Tests pass"
+  verify:
+    method: bash
+    command: "[command from CLAUDE.md]"
+
+[etc. - actual gates and IDs depend on what the project specifies]
 
 ## Task-Specific Subagents
 [Only if generic verification isn't sufficient]
