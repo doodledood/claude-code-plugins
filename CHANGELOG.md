@@ -7,8 +7,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 ## [Unreleased]
 
 - [vibe-experimental] v0.3.1 - Trust LLM to work toward criteria:
-  - Simplified "Work Toward Criteria" section in `/do` skill
-  - Removed prescriptive steps—criteria define success, LLM decides the path
+  - Simplified "Work Toward Criteria" section—criteria define success, LLM decides the path
+  - Todos now follow CLAUDE.md pattern: goal + `→log` discipline + `; done when X`
+  - Removed prescriptive steps for logging and git commits
+  - Consolidated process sections (8 → 6)
 
 - [vibe-experimental] v0.3.0 - Rename skills for clarity and broader applicability:
   - `/spec` → `/define` - Verification-first requirements builder (works for any task, not just code)
