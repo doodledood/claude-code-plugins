@@ -465,70 +465,55 @@ Write selections to interview log under `## Code Quality Gates`.
 
 ### 5b. Project Quality Gates (Auto-Detected)
 
-For coding tasks, automatically detect project-specific quality gates from CLAUDE.md. These are bash-verifiable commands that the project already requires.
+For coding tasks, detect project-specific quality gates from CLAUDE.md. These are bash-verifiable commands the project defines—whatever the project requires, not a fixed set.
 
 **Detection (no question needed):**
 
-Read CLAUDE.md and extract commands for:
+Read CLAUDE.md and look for verifiable commands. Common categories (but not limited to):
 
 | Category | Common Patterns | Example Commands |
 |----------|-----------------|------------------|
-| Type checking | mypy, tsc, pyright, typecheck | `mypy`, `tsc --noEmit`, `npm run typecheck` |
-| Tests | pytest, jest, vitest, npm test | `pytest tests/ -v`, `npm test` |
-| Linting | ruff, eslint, flake8, lint | `ruff check --fix`, `npm run lint` |
-| Formatting | black, prettier, format | `black .`, `npm run format` |
+| Type checking | mypy, tsc, pyright | `mypy`, `tsc --noEmit` |
+| Tests | pytest, jest, npm test | `pytest tests/ -v`, `npm test` |
+| Linting | ruff, eslint, flake8 | `ruff check`, `npm run lint` |
+| Formatting | black, prettier | `black --check`, `prettier --check` |
 | Build | build, compile | `npm run build`, `cargo build` |
 
-**If CLAUDE.md exists and contains relevant commands:**
+Projects may have other gates (e.g., `cargo clippy`, `go vet`, security scans, migration checks). Include whatever the project's CLAUDE.md specifies.
 
-Extract and add as criteria automatically. No need to ask the user—these are project requirements.
+**If CLAUDE.md contains verifiable commands:**
+
+Extract and add as PQG-* criteria. Use descriptive IDs based on what's actually found:
 
 ```yaml
-# Type checking (if found)
+# Examples - actual gates depend on what CLAUDE.md specifies
 - id: PQG-TYPECHECK
   description: "Type checking passes"
   verify:
     method: bash
-    command: "[extracted command, e.g., mypy]"
+    command: "[extracted command]"
 
-# Tests (if found)
 - id: PQG-TEST
   description: "Tests pass"
   verify:
     method: bash
-    command: "[extracted command, e.g., pytest tests/ -v]"
+    command: "[extracted command]"
 
-# Linting (if found)
 - id: PQG-LINT
   description: "Linting passes"
   verify:
     method: bash
-    command: "[extracted command, e.g., ruff check claude-plugins/]"
-
-# Formatting (if found)
-- id: PQG-FORMAT
-  description: "Formatting passes"
-  verify:
-    method: bash
-    command: "[extracted command, e.g., black --check claude-plugins/]"
-
-# Build (if found)
-- id: PQG-BUILD
-  description: "Build succeeds"
-  verify:
-    method: bash
-    command: "[extracted command, e.g., npm run build]"
+    command: "[extracted command]"
 ```
 
-**If no CLAUDE.md or no relevant commands found:**
+**If no CLAUDE.md or no verifiable commands found:**
 
-Infer sensible defaults based on project type if obvious (e.g., `package.json` with test script → use `npm test`). Otherwise, omit project quality gates—don't invent commands that may not work.
+Don't invent gates. Only include what the project explicitly requires. Skip this section entirely if nothing is specified.
 
-**Formatting note for verify commands:**
+**Command formatting:**
 
-- For lint/format commands with `--fix` or auto-fix flags, use check-only variants for verification (e.g., `black --check` instead of `black`)
-- Chain related commands with `&&` if they're typically run together
-- Keep commands as close to CLAUDE.md as possible for consistency
+- Use check-only variants for verification (e.g., `black --check` not `black`)
+- Keep commands as close to CLAUDE.md as possible
 
 Write detected gates to interview log under `## Project Quality Gates (Auto-Detected)`.
 
@@ -613,17 +598,13 @@ Selected:
 - [ ] CLAUDE.md adherence (QG-CLAUDE)
 
 ## Project Quality Gates (Auto-Detected)
-(only for coding tasks, extracted from CLAUDE.md)
+(only if CLAUDE.md specifies verifiable commands)
 
 | ID | Category | Command | Source |
 |----|----------|---------|--------|
-| PQG-TYPECHECK | Type checking | [command] | CLAUDE.md line X |
-| PQG-TEST | Tests | [command] | CLAUDE.md line X |
-| PQG-LINT | Linting | [command] | CLAUDE.md line X |
-| PQG-FORMAT | Formatting | [command] | CLAUDE.md line X |
-| PQG-BUILD | Build | [command] | CLAUDE.md line X |
+| PQG-* | [category] | [command] | CLAUDE.md line X |
 
-(omit rows where no command detected)
+(include only gates found in CLAUDE.md; omit section if none)
 
 ## Open Questions
 - (none if all resolved)
@@ -746,27 +727,23 @@ Fails because: [specific reason linked to criterion]
 [etc. for each selected gate - see mapping table above]
 
 ## Project Quality Gates
-(only present if coding task and CLAUDE.md contains relevant commands)
+(only present if CLAUDE.md specifies verifiable commands)
+
+[Include only gates found in CLAUDE.md - examples:]
 
 - id: PQG-TYPECHECK
   description: "Type checking passes"
   verify:
     method: bash
-    command: "mypy"
+    command: "[command from CLAUDE.md]"
 
 - id: PQG-TEST
   description: "Tests pass"
   verify:
     method: bash
-    command: "pytest tests/ -v"
+    command: "[command from CLAUDE.md]"
 
-- id: PQG-LINT
-  description: "Linting passes"
-  verify:
-    method: bash
-    command: "ruff check claude-plugins/"
-
-[etc. for each detected gate - include only those found in CLAUDE.md]
+[etc. - actual gates and IDs depend on what the project specifies]
 
 ## Task-Specific Subagents
 [Only if generic verification isn't sufficient]
