@@ -36,6 +36,7 @@ Create todos and log file:
 - [ ] Ask persona simulation question
 - [ ] Surface latent criteria (tradeoffs, boundaries, preferences)
 - [ ] Refine vague criteria to specific
+- [ ] Ask code quality gates question (if coding task)
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
 - [ ] Run meta-verification via define-verifier agent
@@ -351,7 +352,66 @@ Use findings to:
 - Show examples in adversarial questions
 - Reference concrete code in options
 
-### 5. Write to Log (After Each Phase)
+### 5. Code Quality Gates (For Coding Tasks)
+
+If the task involves writing or modifying code, ask which code quality categories should gate the work.
+
+**Ask using AskUserQuestion:**
+
+```
+questions: [
+  {
+    question: "Which code quality categories should gate this work? Selected categories will be verified before completion.",
+    header: "Quality gates",
+    options: [
+      { label: "Bugs", description: "Logic errors, race conditions, edge cases, error handling" },
+      { label: "Type safety", description: "No any abuse, invalid states unrepresentable, proper narrowing" },
+      { label: "Maintainability", description: "DRY, coupling, cohesion, dead code, consistency" },
+      { label: "Simplicity", description: "No over-engineering, cognitive complexity, unnecessary abstraction" }
+    ],
+    multiSelect: true
+  },
+  {
+    question: "Additional quality gates?",
+    header: "More gates",
+    options: [
+      { label: "Test coverage", description: "New/changed code has adequate tests" },
+      { label: "Testability", description: "Code is designed to be testable (low mock count)" },
+      { label: "Documentation", description: "Docs and comments match code changes" },
+      { label: "CLAUDE.md adherence", description: "Follows project-specific standards" }
+    ],
+    multiSelect: true
+  }
+]
+```
+
+**Map selections to criteria:**
+
+| Category | Reviewer Agent | Criterion ID |
+|----------|---------------|--------------|
+| Bugs | code-bugs-reviewer | QG-BUGS |
+| Type safety | type-safety-reviewer | QG-TYPES |
+| Maintainability | code-maintainability-reviewer | QG-MAINT |
+| Simplicity | code-simplicity-reviewer | QG-SIMPLE |
+| Test coverage | code-coverage-reviewer | QG-COVERAGE |
+| Testability | code-testability-reviewer | QG-TESTABILITY |
+| Documentation | docs-reviewer | QG-DOCS |
+| CLAUDE.md adherence | claude-md-adherence-reviewer | QG-CLAUDE |
+
+For each selected category, add a criterion:
+```yaml
+- id: QG-BUGS
+  category: code-quality
+  description: "No HIGH or CRITICAL bugs introduced"
+  verify:
+    method: subagent
+    agent: code-bugs-reviewer
+    pass_if: no_high_or_critical
+```
+
+Write selections to interview log under `## Code Quality Gates`.
+
+### 6. Write to Log (After Each Phase)
 
 After each interview phase, write findings to `/tmp/define-interview-{timestamp}.md`:
 
@@ -418,11 +478,24 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 ## Disappointed Scenarios
 - Scenario: "..." | Prevention: criterion AC-X
 
+## Code Quality Gates
+(only for coding tasks)
+
+Selected:
+- [ ] Bugs (QG-BUGS)
+- [ ] Type safety (QG-TYPES)
+- [ ] Maintainability (QG-MAINT)
+- [ ] Simplicity (QG-SIMPLE)
+- [ ] Test coverage (QG-COVERAGE)
+- [ ] Testability (QG-TESTABILITY)
+- [ ] Documentation (QG-DOCS)
+- [ ] CLAUDE.md adherence (QG-CLAUDE)
+
 ## Open Questions
 - (none if all resolved)
 ```
 
-### 6. Meta-Verification
+### 7. Meta-Verification
 
 Before finalizing, verify the definition is complete:
 
@@ -518,6 +591,25 @@ Fails because: [specific reason linked to criterion]
 | Scenario | Preventive Criterion |
 |----------|---------------------|
 | ... | AC-X |
+
+## Code Quality Gates
+(only present if coding task and user selected gates)
+
+- id: QG-BUGS
+  description: "No HIGH or CRITICAL bugs introduced"
+  verify:
+    method: subagent
+    agent: code-bugs-reviewer
+    pass_if: no_high_or_critical
+
+- id: QG-TYPES
+  description: "No HIGH or CRITICAL type safety issues"
+  verify:
+    method: subagent
+    agent: type-safety-reviewer
+    pass_if: no_high_or_critical
+
+[etc. for each selected gate]
 
 ## Task-Specific Subagents
 [Only if generic verification isn't sufficient]
