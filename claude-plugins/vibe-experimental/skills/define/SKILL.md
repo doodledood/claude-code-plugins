@@ -424,14 +424,14 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 
 ### 6. Meta-Verification
 
-Before finalizing, spawn define-verifier agent:
+Before finalizing, verify the definition is complete:
 
 ```
-Use the Task tool to verify the definition:
-Task("vibe-experimental", "define-verifier", read the interview log at /tmp/define-interview-{timestamp}.md and verify all acceptance criteria are met)
+Use the Task tool to spawn a verification agent:
+Task(subagent_type="general-purpose", prompt="Read the define-verifier agent at claude-plugins/vibe-experimental/agents/define-verifier.md and follow its instructions to verify the definition at /tmp/define-interview-{timestamp}.md")
 ```
 
-The define-verifier checks the three requirements:
+The verifier checks three requirements:
 1. Core deliverable is clear (ambiguity = guaranteed rejection)
 2. Rejection criteria captured (explicit + latent techniques used)
 3. Each rejection criterion has a verification method
