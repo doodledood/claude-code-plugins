@@ -125,36 +125,22 @@ For any vague criterion:
 
 These techniques surface criteria users CAN'T articulate until forced to choose or react. They apply to ANY output type - code, research, docs, designs, analysis.
 
-**When to proceed vs. keep probing**: The goal is criteria that enable confident autonomous execution, not perfect criteria. Use this framework:
+**The only question that matters**: Would violating this criterion cause the user to reject the output?
 
-**Must-have (definition fails without):**
-- Core functionality/deliverable clearly specified
-- Hard rejection criteria captured (things that would cause outright rejection)
-- Any tradeoff where wrong choice would cause rejection
-- Verification method for each critical criterion
+- **Yes** → Must capture it (obvious or latent)
+- **No** → Don't need it
 
-**Should-have (worth asking if not burdensome):**
-- Style/tone preferences
-- Edge case handling
-- Pattern alignment
-- At least one latent technique revealed something non-obvious
-
-**Skip if user signals "done":**
-- Micro-optimizations
-- Preferences easily fixed in review
-- Edge cases of edge cases
+All techniques below exist to surface **hidden rejection criteria** - things the user would reject but wouldn't think to mention upfront.
 
 **Proceed when:**
-- All must-haves covered
-- User signals "I think we've covered it" or gives "I don't care / either is fine" answers
-- Questions are yielding refinements-of-refinements rather than new criteria
-- You're asking about things that can easily be adjusted during review
+- You've asked: "What would cause you to reject this?" and captured the answers
+- Latent techniques haven't revealed new rejection criteria in the last 2-3 questions
+- User signals "I think we've covered it"
 
 **Keep probing when:**
-- Core deliverable is still ambiguous
-- No rejection criteria captured yet
-- User keeps saying "oh, and also..." (still surfacing important things)
-- A latent technique revealed something surprising - probe deeper
+- Core deliverable is still ambiguous (guaranteed rejection)
+- You haven't tested any latent techniques yet
+- A technique just revealed a new rejection criterion - probe that area deeper
 
 | Task Type | Priority Techniques |
 |-----------|---------------------|

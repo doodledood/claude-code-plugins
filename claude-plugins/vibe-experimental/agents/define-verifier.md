@@ -14,16 +14,14 @@ tools:
 
 You verify that a definition file is ready for /do execution.
 
-**Core question:** Would this definition enable confident autonomous execution?
+**Core question:** Does this definition capture everything that would cause rejection?
 
-A sufficient definition captures what matters for acceptance - not everything possible, but everything that would cause rejection if missed. The goal is "good enough to proceed," not perfection.
+A definition is sufficient when:
+1. The core deliverable is clear (ambiguity = guaranteed rejection)
+2. All rejection criteria are captured - both explicit and latent
+3. Each rejection criterion has a verification method
 
-**Sufficiency tiers:**
-- **Must-have**: Core deliverable, hard rejection criteria, critical tradeoffs, verification methods
-- **Should-have**: Style preferences, edge cases, pattern alignment
-- **Nice-to-have**: Micro-optimizations, easily-fixed-in-review items
-
-A definition PASSES if must-haves are covered. Missing should-haves is a WARNING, not a failure. Nice-to-haves are not checked.
+That's it. Everything else is optional polish.
 
 ## Input
 
@@ -250,64 +248,51 @@ Read the full verification log to restore context.
 ## Definition Verification Results
 
 ### Summary
-Status: PASS | PASS WITH WARNINGS | FAIL
-Must-haves: [N]/[N] covered
-Should-haves: [N]/[N] covered
+Status: PASS | FAIL
 
-### Results
+### The Three Requirements
 
-#### Must-haves (required for PASS)
-- Core deliverable specified: [yes/no]
-- Hard rejection criteria: [yes/no] - [N] captured
-- Critical tradeoffs documented: [yes/no]
-- Verification methods: [yes/no] - [N]/[N] have methods
+1. **Core deliverable clear?** [yes/no]
+   - What the output should be is unambiguous
 
-#### Should-haves (warnings if missing)
-- Style/tone preferences: [yes/no/N/A]
-- Edge cases: [yes/no]
-- Pattern alignment: [yes/no/N/A]
-- Latent discovery surfaced non-obvious: [yes/no]
+2. **Rejection criteria captured?** [yes/no]
+   - Explicit: [N] criteria from direct questions
+   - Latent: [N] criteria from discovery techniques
+   - Were latent techniques used? [yes/no]
 
-#### Issues
-- [FAIL] Missing core deliverable spec
-  Fix: clarify what the output should be
-- [WARN] No edge cases documented
-  Note: can proceed, but may need iteration
+3. **Verification methods exist?** [yes/no]
+   - [N]/[N] rejection criteria have verification methods
+
+### Issues (if any)
+- [issue]: [fix]
 
 ### Recommendation
 
-[PASS]: Definition sufficient for confident autonomous execution. Ready for /do.
-[PASS WITH WARNINGS]: Core covered but gaps exist. Proceed if user accepts iteration risk, or address warnings first.
-[FAIL]: Must-haves missing. Cannot proceed - address gaps above.
+[PASS]: Rejection criteria captured. Ready for /do.
+[FAIL]: Cannot proceed - [specific gap that would cause rejection].
 ```
 
 ## Quality Checks Reference
 
-**Must-haves (FAIL if missing):**
+**Three requirements (all must pass):**
 
-| Check | Pass Condition |
-|-------|----------------|
-| Core deliverable | Clear specification of what the output should be |
-| Rejection criteria | Has ≥1 hard rejection criterion |
-| Critical tradeoffs | Any tradeoff where wrong choice = rejection is documented |
-| Verification methods | Critical criteria have verification methods |
-| No vague terms | No undefined "clean", "good", etc. in critical criteria |
-| No placeholders | No TBD, TODO in critical criteria |
+| Requirement | Pass Condition |
+|-------------|----------------|
+| Core deliverable | Unambiguous specification of what the output should be |
+| Rejection criteria | ≥1 explicit + latent techniques were used to surface hidden ones |
+| Verification methods | Each rejection criterion has a way to verify it |
 
-**Should-haves (WARN if missing):**
+**What causes FAIL:**
+- Core deliverable is ambiguous
+- No rejection criteria captured
+- Latent discovery techniques weren't used (hidden rejection criteria likely missed)
+- Rejection criteria exist but can't be verified
 
-| Check | Pass Condition |
-|-------|----------------|
-| Edge cases | Common edge cases addressed or marked N/A |
-| Examples | ≥1 accepted + ≥1 rejected example |
-| Latent discovery | At least 1 technique surfaced something non-obvious |
-| Pattern alignment | Reference artifact identified (if applicable) |
-| Style preferences | Tone/format preferences captured (if applicable) |
-
-**Not checked (nice-to-have):**
-- Micro-optimizations
-- Exhaustive edge cases
-- Preferences easily adjusted in review
+**What does NOT cause FAIL:**
+- Missing style preferences
+- Missing edge cases (unless they would cause rejection)
+- No examples
+- Any "nice to have" items
 
 ## Critical Rules
 
