@@ -44,18 +44,14 @@ Capture:
 
 ### 4. Run Subagent Verifications
 
-Launch in parallel waves (max 5 concurrent):
+For criteria requiring code inspection (not bash commands), check them directly:
 
-```
-Use the Task tool to check criterion AC-N:
-Task("vibe-experimental", "criteria-checker", "Check AC-N: [description]. Context: [relevant files]. Checks: [from definition]")
-```
+1. Read the relevant files specified in the criterion
+2. Search for required patterns / verify absence of forbidden patterns
+3. Check against accepted/rejected examples from definition
+4. Report pass/fail with specific file:line locations
 
-For each subagent:
-- Provide criterion definition
-- Provide relevant code files
-- Provide execution log excerpt
-- Request pass/fail with specific file:line issues
+Keep it simple - no need to spawn separate agents for each criterion.
 
 ### 5. Collect Results
 
@@ -114,7 +110,7 @@ elif all pass (no manual):
   Actual: `'sent'`
 
 - **AC-7**: error-pattern
-  Method: subagent (criteria-checker)
+  Method: code inspection
   Location: `src/handlers/notify.ts:23`
   Issue: Raw Error() throw, expected AppError
 
@@ -170,33 +166,10 @@ Every failure MUST include:
 - Expected vs actual (what was wrong)
 - Actionable fix guidance (not vague "fix this")
 
-### Subagent Instructions
-
-When spawning criteria-checker:
-```
-Check [criterion description].
-
-Context files:
-- [file1]: [what it contains]
-- [file2]: [what it contains]
-
-Execution log excerpt:
-[relevant attempts for this criterion]
-
-Specific checks:
-1. [check from definition]
-2. [check from definition]
-
-Output format:
-- PASS or FAIL
-- If FAIL: file:line, expected, actual, fix suggestion
-```
-
 ## Critical Rules
 
 1. **Not user-invocable** - only called by /do
 2. **Check actual files** - state is codebase, not git history
-3. **Parallel subagents** - waves of 5 for efficiency
-4. **Hide manual on auto-fail** - focus on fixable issues first
-5. **Actionable feedback** - specific locations, expected vs actual
-6. **Call /done on success** - don't just return, trigger completion
+3. **Hide manual on auto-fail** - focus on fixable issues first
+4. **Actionable feedback** - specific locations, expected vs actual
+5. **Call /done on success** - don't just return, trigger completion
