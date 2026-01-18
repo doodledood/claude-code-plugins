@@ -29,11 +29,12 @@ Create todos and log file:
 - [ ] Gather positive criteria (feature, quality, architecture)
 - [ ] Gather negative criteria (rejection conditions)
 - [ ] Explore edge cases exhaustively
-- [ ] Use adversarial examples (2+ synthetic implementations)
+- [ ] Use adversarial examples (3+ varying on different dimensions)
 - [ ] Use contrast pairs (alternative approaches)
 - [ ] Ask pre-mortem question
 - [ ] Ask disappointed question
 - [ ] Ask persona simulation question
+- [ ] Surface latent criteria (tradeoffs, boundaries, preferences)
 - [ ] Refine vague criteria to specific
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
@@ -68,7 +69,14 @@ Walk through systematically:
 - Continue until user says "I think we covered it"
 
 #### Adversarial Examples
-Generate 2+ synthetic implementations:
+Generate 3+ synthetic implementations that VARY ON DIFFERENT DIMENSIONS:
+
+| Example | Structure | Style | Abstraction |
+|---------|-----------|-------|-------------|
+| A | Flat | Verbose | High |
+| B | Nested | Terse | High |
+| C | Flat | Terse | Low |
+
 ```
 "Here's a possible implementation. Would you accept this?"
 
@@ -77,6 +85,8 @@ Generate 2+ synthetic implementations:
 If rejected: "What specifically makes this unacceptable?"
 → Capture as criterion
 ```
+
+Varying dimensions isolates preferences. If user accepts A and C but rejects B, the issue is nesting, not style.
 
 #### Contrast Pairs
 Present alternatives:
@@ -110,6 +120,153 @@ For any vague criterion:
 - "How would we verify 'good performance'?"
 - Refine until true/false verifiable
 - Use numeric thresholds where applicable
+
+### 2b. Latent Criteria Discovery
+
+These techniques surface criteria users CAN'T articulate until forced to choose or react. Use ALL of these - they catch what standard interviewing misses.
+
+#### Tradeoff Forcing
+Present competing values, force a choice:
+```
+questions: [
+  {
+    question: "When these conflict, which wins?",
+    header: "Tradeoff",
+    options: [
+      { label: "Smaller files", description: "Split concepts to stay under ~200 lines" },
+      { label: "Complete concepts", description: "Keep related code together, even if larger" },
+      { label: "Context-dependent", description: "I'll specify when each applies" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Common tradeoffs to probe:
+- File size vs conceptual completeness
+- DRY vs explicit/readable
+- Flexibility vs simplicity
+- Performance vs maintainability
+- Strict typing vs pragmatic any/unknown
+
+#### Extreme Aversion
+Find which direction they'd rather err:
+```
+questions: [
+  {
+    question: "Which extreme is WORSE?",
+    header: "Preference",
+    options: [
+      { label: "Over-abstracted", description: "Too many tiny functions, hard to follow flow" },
+      { label: "Under-abstracted", description: "Long functions, repeated patterns" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Reveals implicit preferences when both extremes technically meet criteria.
+
+#### Reaction Sampling
+Generate concrete artifacts, ask for gut reaction:
+```
+"Here's a possible error message style:"
+> Error E4012: Connection failed at localhost:5432. Verify database configuration.
+
+questions: [
+  {
+    question: "Your reaction to this style?",
+    header: "Style",
+    options: [
+      { label: "Accept as-is", description: "This matches what I want" },
+      { label: "Too formal/verbose", description: "Want friendlier or shorter" },
+      { label: "Too terse", description: "Need more detail or guidance" },
+      { label: "Wrong format entirely", description: "Will describe in Other" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Show 2-3 concrete examples varying in style/structure. Reactions reveal preferences that "good error messages" doesn't capture.
+
+#### Boundary Mapping
+Multi-select to map rejection boundaries explicitly:
+```
+questions: [
+  {
+    question: "Which would cause you to REJECT a PR? (Select all that apply)",
+    header: "Boundaries",
+    options: [
+      { label: "Functions > 50 lines", description: "Without exception" },
+      { label: "Files > 400 lines", description: "Without exception" },
+      { label: "More than 3 nesting levels", description: "Complexity limit" },
+      { label: "Missing error handling", description: "On any fallible operation" }
+    ],
+    multiSelect: true
+  }
+]
+```
+
+Creates explicit numeric/structural boundaries.
+
+#### Pattern Anchoring
+Use existing code as preference reference:
+```
+questions: [
+  {
+    question: "Which existing code is closest to what you want here?",
+    header: "Reference",
+    options: [
+      { label: "Like src/auth/", description: "Layered, explicit, heavily typed" },
+      { label: "Like src/utils/", description: "Flat, minimal, pragmatic" },
+      { label: "Like [external project]", description: "Name it in Other" },
+      { label: "Something new", description: "Describe in Other" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Explore codebase first to find pattern anchors. External references (React, Django, etc.) also work.
+
+#### Conceptual Grouping Probe
+For architecture/refactoring, test mental model boundaries:
+```
+questions: [
+  {
+    question: "Should auth and session management be in the SAME module?",
+    header: "Grouping",
+    options: [
+      { label: "Yes, same module", description: "They're conceptually unified" },
+      { label: "No, separate", description: "Distinct responsibilities" },
+      { label: "Depends on size", description: "Specify threshold in Other" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Ask 3-5 grouping questions to map the user's conceptual topology. Different people draw different boundaries.
+
+#### Spectrum Positioning
+For subjective dimensions, find where they sit:
+```
+questions: [
+  {
+    question: "Where on the verbosity spectrum?",
+    header: "Verbosity",
+    options: [
+      { label: "Minimal", description: "Terse names, few comments, implicit" },
+      { label: "Moderate", description: "Clear names, comments on non-obvious" },
+      { label: "Explicit", description: "Verbose names, thorough JSDoc, defensive" }
+    ],
+    multiSelect: false
+  }
+]
+```
+
+Use for: verbosity, abstraction level, error handling strictness, test coverage depth.
 
 ### 3. Question Format
 
@@ -169,6 +326,44 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 ## Edge Cases
 - [E-1] scenario: "..." | handling: "..." | verify: method
 - ...
+
+## Latent Criteria (from discovery techniques)
+
+### Tradeoffs Documented
+| Dimension | When conflicting, prefer | Rationale |
+|-----------|-------------------------|-----------|
+| File size vs concepts | Complete concepts | "I can scroll, but split concepts confuse me" |
+| DRY vs explicit | Explicit | "Hate hunting for abstractions" |
+
+### Boundaries (hard limits)
+- Functions: max 50 lines
+- Files: max 400 lines
+- Nesting: max 3 levels
+- (none if no hard limits specified)
+
+### Extreme Aversions
+- More averse to: over-abstraction (prefer slightly long over too fragmented)
+- More averse to: verbose errors (prefer terse)
+
+### Pattern References
+- Primary reference: src/auth/ (layered, explicit style)
+- Anti-reference: src/legacy/ (avoid this style)
+
+### Conceptual Groupings
+- auth + sessions → SAME module
+- validation + schemas → SEPARATE modules
+- (capture user's mental model boundaries)
+
+### Spectrum Positions
+- Verbosity: moderate
+- Error handling: strict
+- Test coverage: thorough
+
+### Reaction Samples
+| Artifact shown | Reaction | Criterion captured |
+|---------------|----------|-------------------|
+| Error msg style A | "Too robotic" | AC-12: errors use friendly tone |
+| Code structure B | "Accepted" | (validates existing criteria) |
 
 ## Adversarial Examples
 ### Accepted
@@ -240,6 +435,23 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 - id: R-1
   description: "PR will be rejected if..."
   verify: ...
+
+## Tradeoffs & Preferences
+When criteria conflict, these preferences apply:
+
+| Dimension | Preference | Context |
+|-----------|------------|---------|
+| File size vs concepts | Prefer complete concepts | Can exceed 200 lines if keeps concept unified |
+| DRY vs explicit | Prefer explicit | Repetition OK if improves readability |
+
+## Boundaries (Hard Limits)
+- id: B-1
+  limit: "Functions must be ≤50 lines"
+  verify: bash | `find . -name "*.ts" -exec awk '/^(export )?(async )?function/{start=NR} /^}$/{if(NR-start>50) print FILENAME":"start}' {} \;`
+
+## Pattern References
+- Follow: src/auth/ (layered, explicit, typed)
+- Avoid: src/legacy/ (implicit, untyped patterns)
 
 ## Edge Cases
 - id: E-1
@@ -322,3 +534,5 @@ This allows /do to request definition changes when codebase reality conflicts wi
 5. **Examples are concrete** - actual code, not descriptions
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
+8. **Surface latent criteria** - use ALL latent discovery techniques (tradeoffs, boundaries, reactions, etc.)
+9. **Vary adversarial examples on multiple dimensions** - don't just show 2 similar alternatives

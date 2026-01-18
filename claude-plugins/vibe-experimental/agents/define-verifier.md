@@ -66,6 +66,7 @@ Started: [timestamp]
 - [ ] Check: No vague terms→log; done when scanned
 - [ ] Check: Has rejection criteria→log; done when found/missing noted
 - [ ] Check: Has examples→log; done when counted
+- [ ] Check: Latent criteria discovered→log; done when all techniques verified
 - [ ] Check: No placeholders→log; done when scanned
 - [ ] Check: No conflicts→log; done when checked
 - [ ] Check: Bash commands valid→log; done when validated
@@ -164,7 +165,37 @@ Result: PASS (≥3) | FAIL (<3)
 Accepted examples: [N]
 Rejected examples: [N]
 Concrete (actual code, not descriptions)? [yes/no]
+Examples vary on multiple dimensions? [yes/no]
 Result: PASS | FAIL
+```
+
+**Latent criteria discovered**
+
+Check that techniques for surfacing implicit criteria were used:
+
+| Technique | Required | Look for in log |
+|-----------|----------|-----------------|
+| Tradeoff forcing | Yes | "Tradeoffs Documented" section with ≥2 tradeoffs |
+| Extreme aversion | Yes | "Extreme Aversions" section |
+| Reaction sampling | Yes | "Reaction Samples" table with ≥2 artifacts |
+| Boundary mapping | If applicable | "Boundaries" section with numeric limits |
+| Pattern anchoring | If applicable | "Pattern References" section |
+| Conceptual grouping | For refactors | "Conceptual Groupings" section |
+| Spectrum positioning | Yes | "Spectrum Positions" section with ≥2 dimensions |
+
+```markdown
+### Latent Criteria Discovery
+Techniques used:
+- Tradeoff forcing: [yes/no] - [evidence: N tradeoffs documented]
+- Extreme aversion: [yes/no] - [evidence]
+- Reaction sampling: [yes/no] - [evidence: N artifacts shown]
+- Boundary mapping: [yes/no/N/A] - [evidence: N hard limits]
+- Pattern anchoring: [yes/no/N/A] - [evidence]
+- Conceptual grouping: [yes/no/N/A] - [evidence]
+- Spectrum positioning: [yes/no] - [evidence: N dimensions]
+
+Missing techniques (not marked N/A): [list]
+Result: PASS (all required used) | FAIL
 ```
 
 **No placeholders**
@@ -200,7 +231,7 @@ Read the full verification log to restore context.
 
 ### Summary
 Status: PASS | FAIL
-Checks passed: N/10
+Checks passed: N/11
 Checks failed: N
 
 ### Results
@@ -213,6 +244,8 @@ Checks failed: N
   Fix: add criterion for test coverage with verification command
 - Edge cases: no handling for empty input
   Fix: add AC for empty input behavior
+- Latent criteria: missing tradeoff forcing and reaction sampling
+  Fix: ask user tradeoff questions (file size vs concepts, DRY vs explicit); show 2+ concrete artifacts for reaction
 
 ### Recommendation
 
@@ -229,7 +262,8 @@ Checks failed: N
 | Verification methods | Every AC-N has bash/subagent/manual |
 | No vague terms | No undefined "clean", "good", etc. |
 | Rejection criteria | Has ≥3 R-N criteria |
-| Examples | ≥2 accepted + ≥2 rejected, concrete |
+| Examples | ≥2 accepted + ≥2 rejected, concrete, varying dimensions |
+| Latent criteria | Required techniques used: tradeoffs, aversions, reactions, spectrums |
 | No placeholders | No TBD, TODO, "unclear" |
 | No conflicts | No contradicting criteria |
 | Valid bash | All bash commands parse correctly |
