@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.3.1 - Trust LLM to work toward criteria:
+  - Simplified "Work Toward Criteria" section in `/do` skill
+  - Removed prescriptive steps—criteria define success, LLM decides the path
+
 - [vibe-experimental] v0.3.0 - Rename skills for clarity and broader applicability:
   - `/spec` → `/define` - Verification-first requirements builder (works for any task, not just code)
   - `/implement` → `/do` - Autonomous execution from definition (task-agnostic naming)

@@ -63,19 +63,7 @@ Create TodoWrite with criteria to satisfy:
 
 ### 3. Work Toward Criteria
 
-**CRITICAL: Work toward criteria, NOT steps.**
-
-NO plan decomposition:
-- Do NOT create plan files
-- Do NOT chunk into "Chunk 1", "Chunk 2"
-- Reference criteria IDs in your work
-
-For each criterion:
-1. Read the criterion and its verification method
-2. Implement what's needed
-3. Log attempt: "Tried X for AC-N, result: Y"
-4. Make meaningful git commit referencing criterion
-5. Move to next criterion
+Work to satisfy the criteria. You decide how—the criteria define success, not the path to it.
 
 ### 4. Log Before Proceeding
 
