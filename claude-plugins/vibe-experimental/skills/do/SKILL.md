@@ -60,6 +60,7 @@ Create TodoWrite with criteria to satisfy:
 - [ ] (expand: sub-tasks as discovered)
 - [ ] Refresh: read full log
 - [ ] Call /verify; done when all criteria verified
+- [ ] (expand: fix failures from /verify—loop until pass)
 ```
 
 ### 3. Work Toward Criteria
