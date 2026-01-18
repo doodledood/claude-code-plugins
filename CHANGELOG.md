@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.5.0 - Auto-detect project quality gates from CLAUDE.md:
+  - /define now reads CLAUDE.md and extracts project-specific quality commands
+  - Detects: type checking (mypy, tsc), tests (pytest, jest), linting (ruff, eslint), formatting (black, prettier), build commands
+  - Creates PQG-* criteria with bash verification method (no question needed)
+  - Separate from code quality gates (QG-*) which use subagent verification
+  - Infers sensible defaults from project type if CLAUDE.md doesn't specify
+
 - [vibe-experimental] v0.3.2 - Parallel verification via criteria-checker agents:
   - /verify now spawns criteria-checker agents in parallel (up to --parallel=N, default 10)
   - criteria-checker handles BOTH bash and codebase checks (added Bash tool)
