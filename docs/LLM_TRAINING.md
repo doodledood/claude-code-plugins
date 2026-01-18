@@ -22,7 +22,7 @@ Training a world-class LLM in 2026 involves five distinct phases: **Pre-training
 │  • Data: 15-40T tokens (web, books, code)                                   │
 │  • Architecture: MoE with 16-128 experts                                    │
 │  • Objective: Next-token + Multi-token prediction                           │
-│  • Infrastructure: 2K-350K GPUs, 4D parallelism                             │
+│  • Infrastructure: 2K-350K GPUs, 4D/5D parallelism                          │
 │  • Duration: Weeks to months | Cost: $5M-$100M+                             │
 │                                                                             │
 │                              ↓                                              │
@@ -50,7 +50,7 @@ Training a world-class LLM in 2026 involves five distinct phases: **Pre-training
 │  • Constitutional AI / Deliberative Alignment                               │
 │  • Red teaming (200-attempt campaigns)                                      │
 │  • Jailbreak prevention (Constitutional Classifiers)                        │
-│  • Behavioral evaluation (Bloom, SHADE-Arena)                               │
+│  • Behavioral evaluation (SHADE-Arena, alignment faking tests)              │
 │                                                                             │
 │                              ↓                                              │
 │                                                                             │
@@ -63,6 +63,8 @@ Training a world-class LLM in 2026 involves five distinct phases: **Pre-training
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+> **Note on Ordering**: This pipeline is presented sequentially for clarity, but real-world training is more nuanced. Code data is typically included in pre-training (not a separate later phase). Safety objectives are often integrated into post-training alignment (RLHF/DPO), not applied afterward. Agency capabilities may be trained alongside other post-training objectives. Labs iterate through multiple rounds, and the boundaries between phases are fluid.
 
 ---
 
@@ -110,7 +112,7 @@ Pre-training is the foundation—teaching the model to understand and generate l
 
 | Model | Total Params | Active Params | Expert Config |
 |-------|--------------|---------------|---------------|
-| GPT-4 (estimated) | ~1.8T | ~220B | 16 experts (~111B each), 2 routed |
+| GPT-4 (estimated) | ~1.8T | ~220-280B | 16 experts (~111B each), 2 routed; unconfirmed |
 | Claude 4 | ~355B | - | Sparse attention, MoE layers |
 | Llama 4 Scout | 109B | 17B | 16 experts |
 | Llama 4 Maverick | 400B | 17B | 128 experts |
@@ -215,7 +217,7 @@ L = -log p_y  (averaged across all positions)
 | GPT-4 | $40-79M | Varies by methodology |
 | Gemini Ultra | $30-191M | Wide range in estimates |
 | DeepSeek-V3 | $5.6M | Remarkably efficient (MoE + FP8 + DualPipe) |
-| Llama 3.1 405B | ~$50M | ~10x DeepSeek cost |
+| Llama 3.1 405B | ~$500M+ | 16K+ H100 GPUs; ~100x DeepSeek cost |
 
 **Projection**: $1B training runs by early 2027.
 
@@ -250,7 +252,7 @@ Post-training transforms a raw language model into a helpful, harmless assistant
 
 ### 2.2 RLHF (Reinforcement Learning from Human Feedback)
 
-RLHF remains the dominant alignment paradigm:
+RLHF remains the dominant alignment paradigm for general helpfulness, though RLVR (Section 2.5) is increasingly used for reasoning/code:
 
 ```
 1. Supervised Fine-Tuning (SFT)
@@ -377,7 +379,7 @@ The model learns to predict the middle section given both what comes before AND 
 
 **FIM Rate**: The proportion of training examples using FIM format.
 - Bavarian et al. (2022): Claimed FIM rates up to 0.9 don't harm left-to-right performance
-- **Reality (2024-2025)**: FIM rates above 0.5 cause performance degradation
+- **Reality (2024-2025)**: Higher FIM rates (0.7+) can degrade L2R performance; 0.5 is the practical standard
 - DeepSeek-Coder, StarCoder: Use 0.5 FIM rate
 
 **Modes**:
@@ -450,7 +452,7 @@ Training on competitive programming (HumanEval, CodeContests) is useful but limi
 
 **Results**:
 - 42.2% Pass@1 on SWE-bench Verified (SOTA for open-weight)
-- 59% with test-time scaling (Pass@16)
+- 59% Pass@1 with test-time scaling
 - 71% Pass@16
 
 #### Self-play SWE-RL (SSR)
@@ -496,7 +498,7 @@ Training on competitive programming (HumanEval, CodeContests) is useful but limi
 - Claude Opus 4: 72.5% SWE-bench
 - Claude Opus 4.1: 74.5%
 - Claude Sonnet 4.5: 77.2% (82% with high compute)
-- Claude 4.5 Opus: >80% (first to break barrier)
+- Claude Opus 4.5: >80% (first to break barrier)
 
 **Data Sources**:
 - User code interactions (with consent)
@@ -520,7 +522,7 @@ Training on competitive programming (HumanEval, CodeContests) is useful but limi
 
 Safety training ensures models refuse harmful requests, resist manipulation, and operate within acceptable bounds.
 
-### 4.1 Constitutional AI
+### 4.1 Constitutional AI (CAI)
 
 **Anthropic's approach**: Give AI systems a set of principles against which they evaluate their own outputs.
 
@@ -674,7 +676,7 @@ Agency training enables models to use tools, interact with computers, maintain m
 
 ### 5.5 Memory Management
 
-**The Problem**: 65% of enterprise AI failures attributed to context drift or memory loss during multi-step reasoning.
+**The Problem**: Multi-turn tasks have high failure rates—Salesforce benchmarks show 65% failure on customer support tasks, with context loss being a primary contributor.
 
 **AgeMem (Agentic Memory)**:
 - Exposes memory operations as tool-based actions
@@ -758,6 +760,26 @@ Understanding how LLMs are trained informs how we should design workflows to max
    - Execution-feedback training means models can iteratively refine—allow multi-turn debugging
    - SWE-RL training means models understand real codebases—frame tasks as real issues, not toy problems
    - Models are trained on project-level context—provide dependency/architecture information
+
+---
+
+## Topics Not Covered
+
+This document focuses on the core training pipeline. The following significant topics are not covered in depth:
+
+| Topic | Why It Matters |
+|-------|----------------|
+| **Knowledge Distillation** | Transferring capabilities from large to small models; enables deployment |
+| **Model Merging** | Combining models without training (TIES, DARE, SLERP); thousands of merged models on HuggingFace |
+| **Continual Learning** | Updating models without catastrophic forgetting; critical for production |
+| **Mid-Training Stage** | Learning rate annealing with high-quality data; recognized as distinct phase |
+| **Quantization (QAT/PTQ)** | Training for efficient inference; critical for deployment |
+| **Multimodal Training** | Vision encoders, video MLLMs, audio integration; increasingly standard |
+| **Math-Specific Training** | MathCoder, ToRA, Llemma; parallel to code-specific approaches |
+| **Speculative Decoding** | Training draft models for faster inference; 2-3x throughput gains |
+| **Curriculum Learning** | Strategic data ordering during training; emerging best practice |
+
+See sources section for references to explore these topics further.
 
 ---
 
