@@ -29,11 +29,12 @@ Create todos and log file:
 - [ ] Gather positive criteria (feature, quality, architecture)
 - [ ] Gather negative criteria (rejection conditions)
 - [ ] Explore edge cases exhaustively
-- [ ] Use adversarial examples (2+ synthetic implementations)
+- [ ] Use adversarial examples (3+ varying on different dimensions)
 - [ ] Use contrast pairs (alternative approaches)
 - [ ] Ask pre-mortem question
 - [ ] Ask disappointed question
 - [ ] Ask persona simulation question
+- [ ] Surface latent criteria (tradeoffs, boundaries, preferences)
 - [ ] Refine vague criteria to specific
 - [ ] (expand: areas as discovered)
 - [ ] Refresh: read full interview log
@@ -55,9 +56,10 @@ Ask about:
 - Integration: "What existing systems does this touch?"
 
 #### Negative Criteria (Rejection-First)
-Ask explicitly: "What would cause you to REJECT a PR for this work?"
-- Capture at least 3 rejection criteria
-- These are distinct from inverted positive criteria
+Ask explicitly: "What would cause you to REJECT this output?"
+- Capture ALL rejection criteria the user mentions
+- These are the most important criteria - everything else is optional
+- Keep probing until user can't think of more
 
 #### Edge Cases (Exhaustive)
 Walk through systematically:
@@ -68,7 +70,14 @@ Walk through systematically:
 - Continue until user says "I think we covered it"
 
 #### Adversarial Examples
-Generate 2+ synthetic implementations:
+Generate 3+ synthetic implementations that VARY ON DIFFERENT DIMENSIONS:
+
+| Example | Structure | Style | Abstraction |
+|---------|-----------|-------|-------------|
+| A | Flat | Verbose | High |
+| B | Nested | Terse | High |
+| C | Flat | Terse | Low |
+
 ```
 "Here's a possible implementation. Would you accept this?"
 
@@ -77,6 +86,8 @@ Generate 2+ synthetic implementations:
 If rejected: "What specifically makes this unacceptable?"
 → Capture as criterion
 ```
+
+Varying dimensions isolates preferences. If user accepts A and C but rejects B, the issue is nesting, not style.
 
 #### Contrast Pairs
 Present alternatives:
@@ -110,6 +121,193 @@ For any vague criterion:
 - "How would we verify 'good performance'?"
 - Refine until true/false verifiable
 - Use numeric thresholds where applicable
+
+### 2b. Latent Criteria Discovery
+
+These techniques surface criteria users CAN'T articulate until forced to choose or react. They apply to ANY output type - code, research, docs, designs, analysis.
+
+**The only question that matters**: Would violating this criterion cause the user to reject the output?
+
+- **Yes** → Must capture it (obvious or latent)
+- **No** → Don't need it
+
+All techniques below exist to surface **hidden rejection criteria** - things the user would reject but wouldn't think to mention upfront.
+
+**Proceed when:**
+- You've asked: "What would cause you to reject this?" and captured the answers
+- Latent techniques haven't revealed new rejection criteria in the last 2-3 questions
+- User signals "I think we've covered it"
+
+**Keep probing when:**
+- Core deliverable is still ambiguous (guaranteed rejection)
+- You haven't tested any latent techniques yet
+- A technique just revealed a new rejection criterion - probe that area deeper
+
+| Task Type | Priority Techniques |
+|-----------|---------------------|
+| Code/refactor | Tradeoffs, boundaries, pattern anchoring, conceptual grouping |
+| Research/analysis | Tradeoffs, depth spectrum, reaction sampling |
+| Documentation | Audience spectrum, reaction sampling, tradeoffs |
+| Design/architecture | Conceptual grouping, tradeoffs, extreme aversion |
+
+#### Tradeoff Forcing
+Present competing values, force a choice. Works for ANY domain:
+
+**Coding example:**
+```
+question: "When file size and conceptual completeness conflict, which wins?"
+options:
+- { label: "Smaller files", description: "Split to stay under ~200 lines" }
+- { label: "Complete concepts", description: "Keep together even if larger" }
+```
+
+**Research example:**
+```
+question: "When depth and breadth conflict, which wins?"
+options:
+- { label: "Go deep", description: "Thoroughly explore fewer sources" }
+- { label: "Go broad", description: "Survey more sources, less depth each" }
+- { label: "Depends on topic", description: "Specify in Other" }
+```
+
+**Docs example:**
+```
+question: "When brevity and completeness conflict, which wins?"
+options:
+- { label: "Keep it short", description: "Readers can ask follow-ups" }
+- { label: "Be thorough", description: "Cover edge cases upfront" }
+```
+
+Common tradeoffs to probe (pick relevant ones):
+- Depth vs breadth (research, docs)
+- Brevity vs completeness (docs, analysis)
+- Speed vs rigor (any)
+- Flexibility vs simplicity (code, design)
+- Convention vs optimization (code)
+- Comprehensive vs focused (research)
+
+#### Extreme Aversion
+Find which direction they'd rather err. Universally applicable:
+
+**Coding:**
+```
+question: "Which extreme is WORSE?"
+options:
+- { label: "Over-abstracted", description: "Too many tiny pieces, hard to follow" }
+- { label: "Under-abstracted", description: "Long, repetitive, but traceable" }
+```
+
+**Research:**
+```
+question: "Which extreme is WORSE?"
+options:
+- { label: "Over-hedged", description: "Too many caveats, unclear conclusions" }
+- { label: "Over-confident", description: "Strong claims, may miss nuance" }
+```
+
+**Docs:**
+```
+question: "Which extreme is WORSE?"
+options:
+- { label: "Too technical", description: "Accurate but intimidating" }
+- { label: "Too simplified", description: "Accessible but imprecise" }
+```
+
+#### Reaction Sampling
+Generate concrete artifacts, ask for gut reaction. Show 2-3 examples varying in style:
+
+**Coding:** Show error message styles, function signatures, code structure
+**Research:** Show paragraph styles, citation density, conclusion strength
+**Docs:** Show explanation approaches, example density, tone
+
+```
+"Here's a possible style for [artifact type]:"
+> [concrete example]
+
+question: "Your reaction?"
+options:
+- { label: "Accept as-is", description: "Matches what I want" }
+- { label: "Too [X]", description: "Want less of this quality" }
+- { label: "Not enough [Y]", description: "Want more of this quality" }
+- { label: "Wrong approach", description: "Describe in Other" }
+```
+
+#### Boundary Mapping
+Multi-select to map hard limits. Adapt to domain:
+
+**Coding:**
+```
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "Functions > 50 lines", description: "No exceptions" }
+- { label: "Missing error handling", description: "On any fallible op" }
+- { label: "No tests for new code", description: "Coverage required" }
+```
+
+**Research:**
+```
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "No primary sources", description: "Must have direct evidence" }
+- { label: "Missing key papers", description: "Seminal works required" }
+- { label: "Unsupported claims", description: "Every claim needs citation" }
+```
+
+**Docs:**
+```
+question: "Which are HARD rejection criteria? (Select all)"
+options:
+- { label: "No working examples", description: "Must have runnable code" }
+- { label: "Assumes expert knowledge", description: "Must define terms" }
+- { label: "Missing troubleshooting", description: "Must cover common errors" }
+```
+
+#### Pattern Anchoring
+Use existing artifacts as preference reference:
+
+```
+question: "Which existing [artifact] is closest to what you want?"
+options:
+- { label: "[Internal reference A]", description: "[Its key characteristics]" }
+- { label: "[Internal reference B]", description: "[Its key characteristics]" }
+- { label: "External reference", description: "Name it in Other" }
+- { label: "Something new", description: "Describe in Other" }
+```
+
+Explore codebase/existing docs first to find anchors.
+
+#### Conceptual Grouping Probe
+For architecture, organization, or structure decisions:
+
+**Coding:**
+```
+question: "Should auth and session management be in the SAME module?"
+```
+
+**Research:**
+```
+question: "Should methodology and results be in the SAME section?"
+```
+
+**Docs:**
+```
+question: "Should setup and configuration be in the SAME guide?"
+```
+
+Ask 3-5 grouping questions to map mental model. Skip if task has no structural decisions.
+
+#### Spectrum Positioning
+Find position on subjective dimensions. Pick 2-3 relevant spectrums:
+
+**Universal spectrums:**
+- Verbosity: minimal → moderate → explicit
+- Formality: casual → professional → academic
+- Detail: high-level → balanced → granular
+
+**Domain-specific:**
+- Code: abstraction level, type strictness, error handling
+- Research: hedging, citation density, scope
+- Docs: technical depth, example density, assumed knowledge
 
 ### 3. Question Format
 
@@ -170,6 +368,43 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 - [E-1] scenario: "..." | handling: "..." | verify: method
 - ...
 
+## Latent Criteria (from discovery techniques)
+
+### Tradeoffs Documented
+| Dimension | When conflicting, prefer | Rationale |
+|-----------|-------------------------|-----------|
+| [e.g., depth vs breadth] | [preference] | [user's reasoning] |
+| [e.g., brevity vs completeness] | [preference] | [user's reasoning] |
+
+### Boundaries (hard limits)
+- [e.g., "No unsupported claims" for research]
+- [e.g., "Functions max 50 lines" for code]
+- [e.g., "Must have working examples" for docs]
+- (none if no hard limits specified)
+
+### Extreme Aversions
+- More averse to: [extreme A] (prefer erring toward [extreme B])
+- [e.g., "over-hedged" → prefer slightly bold over too cautious]
+
+### Pattern References
+- Primary reference: [existing artifact] ([key characteristics])
+- Anti-reference: [artifact to avoid] ([why])
+
+### Conceptual Groupings
+- [concept A] + [concept B] → SAME/SEPARATE
+- (capture user's mental model boundaries)
+- (skip if no structural decisions in task)
+
+### Spectrum Positions
+- [e.g., Formality]: [position]
+- [e.g., Detail level]: [position]
+- [e.g., Technical depth]: [position]
+
+### Reaction Samples
+| Artifact shown | Reaction | Criterion captured |
+|---------------|----------|-------------------|
+| [concrete example] | [reaction] | [resulting criterion] |
+
 ## Adversarial Examples
 ### Accepted
 - [code/behavior]
@@ -189,20 +424,17 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 
 ### 6. Meta-Verification
 
-Before finalizing, spawn define-verifier agent:
+Before finalizing, verify the definition is complete:
 
 ```
-Use the Task tool to verify the definition:
-Task("vibe-experimental", "define-verifier", read the interview log at /tmp/define-interview-{timestamp}.md and verify all acceptance criteria are met)
+Use the Task tool to spawn a verification agent:
+Task(subagent_type="general-purpose", prompt="Read the define-verifier agent at claude-plugins/vibe-experimental/agents/define-verifier.md and follow its instructions to verify the definition at /tmp/define-interview-{timestamp}.md")
 ```
 
-The define-verifier checks:
-- All interview techniques used
-- All criteria have verification methods
-- No vague terms remain
-- Examples are concrete
-- Pre-mortem and disappointed documented
-- No conflicts between criteria
+The verifier checks three requirements:
+1. Core deliverable is clear (ambiguity = guaranteed rejection)
+2. Rejection criteria captured (explicit + latent techniques used)
+3. Each rejection criterion has a verification method
 
 If gaps found → continue interview to fill them.
 
@@ -240,6 +472,22 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 - id: R-1
   description: "PR will be rejected if..."
   verify: ...
+
+## Tradeoffs & Preferences
+When criteria conflict, these preferences apply:
+
+| Dimension | Preference | Context |
+|-----------|------------|---------|
+| [from interview] | [preference] | [when it applies] |
+
+## Boundaries (Hard Limits)
+- id: B-1
+  limit: "[hard limit from interview]"
+  verify: [method]
+
+## Pattern References
+- Follow: [reference artifact] ([key characteristics])
+- Avoid: [anti-pattern] ([why])
 
 ## Edge Cases
 - id: E-1
@@ -319,6 +567,9 @@ This allows /do to request definition changes when codebase reality conflicts wi
 2. **Every criterion has verification** - no exceptions
 3. **No vague terms** - "clean", "good", "proper" must be defined
 4. **No placeholders** - no TBD, TODO, "figure out later"
-5. **Examples are concrete** - actual code, not descriptions
+5. **Examples are concrete** - actual code/artifacts, not descriptions
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
+8. **Surface latent criteria thoroughly** - use all techniques relevant to task type until diminishing returns
+9. **Vary adversarial examples on multiple dimensions** - don't just show 2 similar alternatives
+10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution

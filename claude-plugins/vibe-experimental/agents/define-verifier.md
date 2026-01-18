@@ -14,9 +14,14 @@ tools:
 
 You verify that a definition file is ready for /do execution.
 
-**Core question:** Would this definition, if fully satisfied, result in an acceptable PR/outcome?
+**Core question:** Does this definition capture everything that would cause rejection?
 
-A good definition captures everything that matters for acceptance: feature behavior, edge cases, code quality, testing, and anything else the reviewer/user would check.
+A definition is sufficient when:
+1. The core deliverable is clear (ambiguity = guaranteed rejection)
+2. All rejection criteria are captured - both explicit and latent
+3. Each rejection criterion has a verification method
+
+That's it. Everything else is optional polish.
 
 ## Input
 
@@ -66,6 +71,7 @@ Started: [timestamp]
 - [ ] Check: No vague terms→log; done when scanned
 - [ ] Check: Has rejection criteria→log; done when found/missing noted
 - [ ] Check: Has examples→log; done when counted
+- [ ] Check: Latent criteria discovered→log; done when all techniques verified
 - [ ] Check: No placeholders→log; done when scanned
 - [ ] Check: No conflicts→log; done when checked
 - [ ] Check: Bash commands valid→log; done when validated
@@ -76,6 +82,13 @@ Started: [timestamp]
 ### 3. Verify Each Check
 
 Write findings to log BEFORE proceeding to next check.
+
+**Important**: The detailed checks below gather information, but only the THREE REQUIREMENTS determine PASS/FAIL:
+1. Core deliverable clear
+2. Rejection criteria captured (explicit + latent techniques used)
+3. Verification methods exist for rejection criteria
+
+Other checks (edge cases, examples, etc.) are informational - they only cause FAIL if they reveal a missing rejection criterion.
 
 **Comprehensiveness (PR acceptance dimensions)**
 
@@ -155,7 +168,9 @@ Result: PASS | FAIL
 ```markdown
 ### Rejection Criteria
 Found: [N] rejection criteria (R-1 through R-N)
-Result: PASS (≥3) | FAIL (<3)
+Explicit (from direct questions): [N]
+Latent (from discovery techniques): [N]
+Result: PASS (≥1 and latent techniques were used) | FAIL
 ```
 
 **Has examples**
@@ -164,6 +179,49 @@ Result: PASS (≥3) | FAIL (<3)
 Accepted examples: [N]
 Rejected examples: [N]
 Concrete (actual code, not descriptions)? [yes/no]
+Examples vary on multiple dimensions? [yes/no]
+Result: PASS | FAIL
+```
+
+**Latent criteria discovered**
+
+Check that techniques for surfacing implicit criteria were used. Required techniques vary by task type:
+
+| Task Type | Required Techniques |
+|-----------|---------------------|
+| Code/refactor | Tradeoffs (≥1), boundaries OR pattern anchoring |
+| Research/analysis | Tradeoffs (≥1), spectrum positioning (≥1) |
+| Documentation | Tradeoffs (≥1), reaction sampling OR spectrum |
+| Design/architecture | Tradeoffs (≥1), conceptual grouping |
+| Any task | At least 2 latent criteria techniques total |
+
+**Quality check**: Techniques should be used substantively, not superficially. A tradeoff with one shallow question is worse than probing until the preference is clear.
+
+| Technique | Look for in log |
+|-----------|-----------------|
+| Tradeoff forcing | "Tradeoffs Documented" section with ≥1 tradeoff |
+| Extreme aversion | "Extreme Aversions" section |
+| Reaction sampling | "Reaction Samples" table with ≥1 artifact |
+| Boundary mapping | "Boundaries" section with limits |
+| Pattern anchoring | "Pattern References" section |
+| Conceptual grouping | "Conceptual Groupings" section |
+| Spectrum positioning | "Spectrum Positions" section with ≥1 dimension |
+
+```markdown
+### Latent Criteria Discovery
+Task type: [code/research/docs/design/other]
+
+Techniques used:
+- Tradeoff forcing: [yes/no] - [evidence]
+- Extreme aversion: [yes/no/N/A] - [evidence]
+- Reaction sampling: [yes/no/N/A] - [evidence]
+- Boundary mapping: [yes/no/N/A] - [evidence]
+- Pattern anchoring: [yes/no/N/A] - [evidence]
+- Conceptual grouping: [yes/no/N/A] - [evidence]
+- Spectrum positioning: [yes/no/N/A] - [evidence]
+
+Total techniques used: [N]
+Required for task type met: [yes/no]
 Result: PASS | FAIL
 ```
 
@@ -200,46 +258,57 @@ Read the full verification log to restore context.
 
 ### Summary
 Status: PASS | FAIL
-Checks passed: N/10
-Checks failed: N
 
-### Results
+### The Three Requirements
 
-#### Passed
-- [list passing checks with brief evidence]
+1. **Core deliverable clear?** [yes/no]
+   - What the output should be is unambiguous
 
-#### Failed
-- Comprehensiveness: missing testing criteria
-  Fix: add criterion for test coverage with verification command
-- Edge cases: no handling for empty input
-  Fix: add AC for empty input behavior
+2. **Rejection criteria captured?** [yes/no]
+   - Explicit: [N] criteria from direct questions
+   - Latent: [N] criteria from discovery techniques
+   - Were latent techniques used? [yes/no]
+
+3. **Verification methods exist?** [yes/no]
+   - [N]/[N] rejection criteria have verification methods
+
+### Issues (if any)
+- [issue]: [fix]
 
 ### Recommendation
 
-[PASS]: Definition captures what's needed for acceptance. Ready for /do.
-[FAIL]: Address gaps above. Missing [X] would lead to PR rejection.
+[PASS]: Rejection criteria captured. Ready for /do.
+[FAIL]: Cannot proceed - [specific gap that would cause rejection].
 ```
 
 ## Quality Checks Reference
 
-| Check | Pass Condition |
-|-------|----------------|
-| Comprehensiveness | Covers relevant PR acceptance dimensions |
-| Edge cases | Common edge cases addressed or marked N/A |
-| Verification methods | Every AC-N has bash/subagent/manual |
-| No vague terms | No undefined "clean", "good", etc. |
-| Rejection criteria | Has ≥3 R-N criteria |
-| Examples | ≥2 accepted + ≥2 rejected, concrete |
-| No placeholders | No TBD, TODO, "unclear" |
-| No conflicts | No contradicting criteria |
-| Valid bash | All bash commands parse correctly |
+**Three requirements (all must pass):**
+
+| Requirement | Pass Condition |
+|-------------|----------------|
+| Core deliverable | Unambiguous specification of what the output should be |
+| Rejection criteria | ≥1 explicit + latent techniques were used to surface hidden ones |
+| Verification methods | Each rejection criterion has a way to verify it |
+
+**What causes FAIL:**
+- Core deliverable is ambiguous
+- No rejection criteria captured
+- Latent discovery techniques weren't used (hidden rejection criteria likely missed)
+- Rejection criteria exist but can't be verified
+
+**What does NOT cause FAIL:**
+- Missing style preferences
+- Missing edge cases (unless they would cause rejection)
+- No examples
+- Any "nice to have" items
 
 ## Critical Rules
 
 1. **Read log first** - understand user's deliberate choices before judging
 2. **Respect explicit decisions** - don't flag something user deliberately scoped out
-3. **Think like a reviewer** - would YOU accept a PR that only satisfies these criteria?
-4. **Flag unaddressed gaps** - missing dimensions/edge cases are failures IF not deliberately excluded
+3. **Focus on rejection criteria** - only flag gaps that would cause the user to reject the output
+4. **Latent techniques are required** - if no latent discovery techniques were used, FAIL (hidden rejection criteria likely missed)
 5. **Todo per check** - each check gets its own todo
 6. **Write to log before proceeding** - findings captured after each check
 7. **Refresh before synthesis** - read full log to restore context
