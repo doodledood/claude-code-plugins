@@ -29,7 +29,7 @@ Create todos and log file:
 - [ ] Gather positive criteria (feature, quality, architecture)
 - [ ] Gather negative criteria (rejection conditions)
 - [ ] Explore edge cases exhaustively
-- [ ] Use adversarial examples (3+ varying on different dimensions)
+- [ ] Use adversarial examples (1-3 varying on relevant dimensions)
 - [ ] Use contrast pairs (alternative approaches)
 - [ ] Ask pre-mortem question
 - [ ] Ask disappointed question
@@ -72,13 +72,7 @@ Walk through systematically:
 - Continue until user says "I think we covered it"
 
 #### Adversarial Examples
-Generate 3+ synthetic implementations that VARY ON DIFFERENT DIMENSIONS:
-
-| Example | Structure | Style | Abstraction |
-|---------|-----------|-------|-------------|
-| A | Flat | Verbose | High |
-| B | Nested | Terse | High |
-| C | Flat | Terse | Low |
+Show 1-3 concrete implementations that vary on relevant dimensions. The goal is to isolate preferences—if the user accepts one but rejects another, the difference reveals a criterion.
 
 ```
 "Here's a possible implementation. Would you accept this?"
@@ -89,7 +83,15 @@ If rejected: "What specifically makes this unacceptable?"
 → Capture as criterion
 ```
 
-Varying dimensions isolates preferences. If user accepts A and C but rejects B, the issue is nesting, not style.
+Dimensions to consider varying (pick what's relevant):
+- Structure (flat vs nested, modular vs monolithic)
+- Style (verbose vs terse, explicit vs implicit)
+- Abstraction level (high vs low)
+- Error handling approach
+- Naming conventions
+- Any dimension relevant to the specific task
+
+Example: If user accepts A (flat, verbose) and C (flat, terse) but rejects B (nested, terse), the issue is nesting—not style.
 
 #### Contrast Pairs
 Present alternatives:
@@ -373,8 +375,8 @@ questions: [
     multiSelect: true
   },
   {
-    question: "Additional quality gates?",
-    header: "More gates",
+    question: "More quality categories to verify:",
+    header: "Quality gates (cont.)",
     options: [
       { label: "Test coverage", description: "New/changed code has adequate tests" },
       { label: "Testability", description: "Code is designed to be testable (low mock count)" },
@@ -797,5 +799,5 @@ This allows /do to request definition changes when codebase reality conflicts wi
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
 8. **Surface latent criteria thoroughly** - use all techniques relevant to task type until diminishing returns
-9. **Vary adversarial examples on multiple dimensions** - don't just show 2 similar alternatives
+9. **Vary adversarial examples on relevant dimensions** - differences should isolate preferences
 10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution

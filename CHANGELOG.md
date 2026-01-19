@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.5.3 - /define skill improvements:
+  - Adversarial examples now flexible (1-3 examples, pick relevant dimensions) instead of rigid 3+ with fixed table
+  - Quality gates questions rephrased so second question doesn't sound optional ("More quality categories to verify:" instead of "Additional quality gates?")
+  - criteria-checker agent now inherits all tools (removed explicit tool list restriction)
+
 - [vibe-workflow] v2.13.1 - claude-md-adherence-reviewer improvements:
   - Focuses on outcome rules (affect files) not process rules (workflow only)
   - Checks context before reading CLAUDE.md files (may be auto-loaded)

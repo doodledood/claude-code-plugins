@@ -2,11 +2,6 @@
 name: criteria-checker
 description: 'Read-only verification agent. Runs all automatable checks (bash commands, codebase patterns) for a single criterion. Returns structured PASS/FAIL results.'
 model: opus
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
 ---
 
 # Criteria Checker Agent
