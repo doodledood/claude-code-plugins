@@ -16,7 +16,7 @@ Run all verification methods from a Manifest. Spawn one verifier agent per crite
 
 ## Principles
 
-1. **Don't run checks yourself** - Spawn criteria-checker or reviewer agents. You orchestrate, they verify.
+1. **Don't run checks yourself** - Spawn agents to verify. You orchestrate, they verify.
 
 2. **Single parallel launch** - All criteria in one call, slow ones first (tests, builds, reviewers before lint/typecheck).
 
@@ -34,7 +34,7 @@ Run all verification methods from a Manifest. Spawn one verifier agent per crite
 - `codebase`: Code pattern checks
 - `manual`: Set aside for human verification
 
-**Launch verifiers** - One Task per criterion, all in parallel. Pass criterion ID, description, verification method, and relevant context.
+**Launch verifiers** - One Task per criterion, all in parallel. Use the agent type specified in the manifest's verification block. Pass criterion ID, description, verification method, and relevant context.
 
 **Collect and report results** - Group by Global Invariants first, then by Deliverable.
 
