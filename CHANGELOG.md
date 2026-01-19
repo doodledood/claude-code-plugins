@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v1.17.0 - Restructure /compress-prompt to goal-oriented:
+  - Removed rigid Phase 0-4 structure
+  - New structure: Goal → Principles → What to Keep/Drop → Constraints → Output
+  - ~90 lines (was ~375)
+  - Core insight preserved: trust capability, enforce discipline
+
 - [vibe-experimental] v0.13.0 - Restructure all skills from rigid phases to goal-oriented:
   - `/define`: Goal → Principles → Constraints → What to Discover → Output Schema
   - `/do`: Goal → Principles → Constraints (memento pattern) → What to Do

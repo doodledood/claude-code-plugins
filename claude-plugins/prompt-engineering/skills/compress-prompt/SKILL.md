@@ -5,371 +5,82 @@ description: 'Compresses prompts/skills into minimal goal-focused instructions. 
 
 # Compress Prompt
 
-Compress a full prompt or skill into a **minimal instruction** that preserves the goal while maximizing model freedom. Trust the model's training—it knows more than your constraints.
+## Goal
 
-## Overview
+Transform a prompt into the **minimal instruction** needed for the model to succeed. Not "preserve everything densely"—instead, "what's the least I need to say?"
 
-**Goal**: Transform any prompt into the minimal instruction needed. Not "preserve everything densely"—instead, "what's the least I need to say for the model to succeed?"
+Output: Display compressed result + stats. Optionally write to file with `--output <path>`.
 
-**Philosophy**:
-- 99% of the work is in the model itself
-- Models are trained on millions of examples—they know patterns you can't anticipate
-- Constraints often LIMIT the model rather than help it
-- Start with maximal capability, then restrict only what's necessary
+## Input
 
-**Critical Distinction: Trust Model's KNOWLEDGE, Not Its DISCIPLINE**
+`$ARGUMENTS` = prompt (file path or inline text) [--output path]
 
-| Trust (DROP) | Don't Trust (KEEP) |
-|--------------|-------------------|
-| HOW to do a task (capability) | To write findings before proceeding |
-| Professional defaults | To not declare "done" prematurely |
-| Edge case handling | To remember context after 50k tokens |
-| How to structure output | To self-verify without being told |
+If file path: read content. If inline: use directly. If ambiguous: try as file first.
 
-Models know HOW to do tasks. But they cut corners, forget context, skip verification, and declare victory too early. Execution discipline guardrails address model WEAKNESSES, not capability gaps—these must be preserved.
+## Principles
 
-This skill compresses prompts through:
-1. **Initial Compression** - Aggressively compress, trusting model's training
-2. **Verification** - `prompt-compression-verifier` checks goal clarity and flags over-specification
-3. **Refinement** - Fix critical issues, remove over-specification (max 5 iterations)
-4. **Output** - Display compressed paragraph + stats; optionally write to file
+1. **Trust capability, enforce discipline** - Models know HOW to do tasks. But they cut corners, forget context, skip verification, declare victory early. Drop capability instructions, keep discipline guardrails.
 
-**Loop**: Parse input → Compress → Verify → (Iterate if issues) → Output
+2. **Goal over process** - State WHAT to achieve, not HOW. Let the model choose its approach.
 
-**Key principles**:
-- **Trust the model**: Don't tell it what it already knows from training
-- **Goal over process**: State WHAT, not HOW—let model choose approach
-- **Novel constraints only**: Keep only constraints the model wouldn't naturally follow
-- **Maximize action space**: Fewer constraints = more model freedom = better results
-- **Inline-typable brevity**: Short enough a user could type it verbally
+3. **Training filter** - "Would a competent person need to be told this?" If no → drop it. Models are trained on millions of examples.
 
-**Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally.
+4. **Maximize action space** - Fewer constraints = more freedom = better results. Each constraint should earn its place.
 
-## Workflow
+5. **Inline-typable brevity** - Short enough you could type it verbally to a capable colleague.
 
-### Phase 0: Create Todo List (TodoWrite immediately)
+## What to Keep vs Drop
 
-Create todos tracking workflow phases:
+| KEEP | DROP |
+|------|------|
+| Core goal/purpose | Process/phases (capability) |
+| Acceptance criteria (success conditions) | Examples the model knows |
+| Novel constraints (counter-intuitive rules) | Obvious constraints (model defaults) |
+| Execution discipline (write before proceeding, verify before finalizing) | Edge case handling (model trained on these) |
+| Output format if non-standard | Explanations and rationale |
+
+**Execution discipline examples** (KEEP these):
+- "Write findings to file BEFORE proceeding" — prevents context rot
+- "Don't finalize until X confirmed" — prevents premature completion
+- "Read full log before synthesis" — restores lost context
+
+**Training-redundant examples** (DROP these):
+- "Be thorough", "Handle errors gracefully", "Ask clarifying questions"
+- "Consider edge cases", "Use professional tone"
+
+## Constraints
+
+**Create todo list** - Track: input validation, compression, verification iterations, output.
+
+**Verify with agent** - Launch `prompt-compression-verifier` to check goal clarity, novel constraints preserved, no over-specification. Iterate up to 5 times on issues.
+
+**Single paragraph output** - The compressed prompt must be one dense paragraph, not reformatted sections or bullets.
+
+**Non-destructive** - Original file untouched. Display output + optional file save.
+
+## Output Format
 
 ```
-- [ ] Input validation; done when prompt file read successfully
-- [ ] Initial compression→verify; done when verifier returns VERIFIED or issues fixed
-- [ ] (Expand: refinement iterations on ISSUES_FOUND)
-- [ ] Output compressed prompt; done when result displayed + optionally saved
-```
+Compressed: {source}
 
-### Phase 1: Input Validation
-
-**Mark "Input validation" todo `in_progress`.**
-
-**Step 1.1: Parse arguments**
-
-Extract from `$ARGUMENTS`:
-- Prompt (file path or inline text)
-- Optional `--output <path>` flag for file output
-
-**Step 1.2: Determine prompt source**
-
-| Input Type | Detection | Action |
-|------------|-----------|--------|
-| File path | Contains `/` or `\`, OR ends with `.md`, `.txt`, `.yaml`, `.yml` | Read file content |
-| Inline prompt | Does not match file path criteria | Use directly |
-
-**Priority**: If ambiguous, treat as file path first; if not found, treat as inline.
-
-**Step 1.3: Validate inputs**
-
-- If file path exists and has content: Use file content
-- If file empty: Error: "Cannot compress empty prompt: {path}"
-- If file not found: Re-classify as inline text
-- If no prompt: Error: "Usage: /compress-prompt <file-path-or-prompt> [--output path]"
-- If binary file detected: Error: "Cannot compress binary file: {path}"
-
-**Step 1.4: Estimate tokens and check length**
-
-- Estimate original tokens: `Math.ceil(content.length / 4)` (approximate)
-- If tokens < 100: Warning: "Prompt already concise ({tokens} tokens)" + compress anyway
-- Store `original_content`, `original_tokens`, `output_path` (if --output provided)
-
-**Step 1.5: Store metadata**
-
-- `source_path`: Source file path (or "inline" for inline input)
-- `original_content`: Full prompt text
-- `original_tokens`: Estimated token count
-- `original_path`: `/tmp/compress-original-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (copy for verifier)
-- `working_path`: `/tmp/compress-working-{YYYYMMDDHHMMSS}-{4-lowercase-alphanumeric}.md` (compressed version)
-- `output_path`: User-specified output path (if --output provided)
-
-**Mark "Input validation" todo `completed`.**
-
-### Phase 2: Initial Compression
-
-**Mark "Initial compression" todo `in_progress`.**
-
-**Step 2.1: Create working copies**
-
-Using Write tool:
-1. Copy original content to `original_path` (untouched reference for verifier)
-2. Compress and write to `working_path`
-
-**Step 2.2: Apply compression**
-
-**⚠️ CRITICAL**: Output must be ONE dense paragraph short enough to type inline. Not reformatted sections. Not bullet points. ONE paragraph you could reasonably type.
-
-Compress using:
-
-1. **Preservation Hierarchy** (what to KEEP vs DROP):
-
-   | Priority | Content | Action | Rationale |
-   |----------|---------|--------|-----------|
-   | 1 | Core goal/purpose | KEEP | Model needs to know WHAT to do |
-   | 1 | Acceptance criteria | KEEP | Model needs to know WHAT defines success—RL-trained to satisfy |
-   | 2 | Novel constraints | KEEP | Counter-intuitive rules model wouldn't guess |
-   | 2 | Execution discipline | KEEP | Guardrails against laziness, premature completion, context loss |
-   | 3 | Output artifacts | KEEP (brief) | File paths, format names if non-standard |
-   | 4 | Obvious constraints | DROP | Model does this naturally from training |
-   | 5 | Edge cases | DROP | Model handles edge cases from training |
-   | 6 | Process/phases (capability) | DROP | Model chooses its own approach |
-   | 7 | Examples | DROP | Model knows patterns |
-   | 8 | Explanations | DROP | Model can infer rationale |
-   | 9 | Formatting/style | DROP | Model knows professional defaults |
-
-   **Acceptance Criteria Defined**: Observable conditions that define when the goal is achieved:
-   - "Done when all tests pass" — verifiable completion condition
-   - "Success = output contains X, Y, Z fields" — concrete output requirements
-   - "Complete when user approves" — explicit handoff condition
-   - "Valid if schema validates" — measurable quality gate
-
-   **Execution Discipline Defined**: Guardrails that address model weaknesses, not capability gaps:
-   - "Write findings to file BEFORE proceeding" — prevents context rot
-   - "Don't finalize until X, Y, Z confirmed" — prevents premature completion
-   - "Read full log before synthesis" — restores lost context
-   - "Verify each step before moving on" — prevents skipped verification
-
-2. **The Training Filter** (ask for EACH constraint):
-
-   > "Would a competent person doing this task need to be told this, or would they figure it out?"
-
-   If model's training covers it → DROP. Examples of training-redundant content:
-   - "Handle errors gracefully" → model does this
-   - "Ask clarifying questions if unclear" → model does this
-   - "Be thorough" → model does this
-   - "Consider edge cases" → model does this
-   - "Structure output logically" → model does this
-   - "Use professional tone" → model does this
-   - "Weigh pros and cons" → model does this for decisions
-   - "Research before concluding" → model does this
-   - Common patterns for the task domain → model knows these
-
-3. **Novel vs Obvious Constraints**:
-
-   | Type | Example | Action |
-   |------|---------|--------|
-   | Novel | "Never suggest implementation during spec phase" | KEEP - counter-intuitive |
-   | Novel | "Use AskUserQuestion tool, not inline questions" | KEEP - tool-specific |
-   | Discipline | "Write findings to file BEFORE proceeding" | KEEP - prevents context rot |
-   | Discipline | "Don't finalize until all tests pass" | KEEP - prevents premature completion |
-   | Discipline | "Read full log before synthesis" | KEEP - restores lost context |
-   | Discipline | "Verify constraint X before moving on" | KEEP - prevents skipped verification |
-   | Obvious | "Be helpful and thorough" | DROP - model default |
-   | Obvious | "Handle empty input" | DROP - model default |
-   | Obvious | "Validate before proceeding" | DROP - model default |
-
-   **Why discipline guardrails are KEPT**: They address model weaknesses (cutting corners, forgetting context, declaring "done" too early), not capability gaps. The model KNOWS how to write to a file—it just won't do it reliably without being told.
-
-4. **Compression Techniques**:
-   - State goal in first sentence
-   - Add only novel constraints
-   - Specify output artifact if non-obvious
-   - Omit process—let model decide HOW
-   - Semicolons chain related statements
-   - Use arrows sparingly: only for truly sequential dependencies
-   - Drop all structure—flatten to prose
-
-5. **Action Space Check** (before finalizing):
-   - Does this leave model FREE to solve the problem its own way?
-   - Am I prescribing process, or just stating the goal?
-   - Could the model achieve this with LESS instruction?
-   - If I removed this constraint, would the model fail? If no → remove it.
-
-**Output format**: Single cohesive paragraph. Goal + acceptance criteria + novel constraints + output artifact. That's it.
-
-**Step 2.3: Verify compression**
-
-Launch prompt-compression-verifier agent via Task tool:
-- subagent_type: "prompt-engineering:prompt-compression-verifier"
-- prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: goal is clear, novel constraints preserved, action space is open, no over-specification. Flag any training-redundant content that should be removed. Report VERIFIED or ISSUES_FOUND."
-
-**Step 2.4: Handle verifier response**
-
-- If "VERIFIED": Mark todo completed, proceed to Phase 4
-- If "ISSUES_FOUND": Mark todo completed, save issues, add "Refinement iteration 1" todo, proceed to Phase 3
-- If verifier fails: Retry once. If retry fails, proceed to Phase 4 with warning: "Verification failed - manual review recommended."
-
-**Step 2.5: Display findings**
-
-If issues found:
-```
-Verifier found {count} issues. Proceeding with refinement...
-```
-
-**Mark "Initial compression" todo `completed`.**
-
-### Phase 3: Refinement Loop (Verifier-Driven)
-
-**Mark "Refinement iteration 1" todo `in_progress`.**
-
-**Key principle**: All refinements driven by verifier feedback. Only fix issues the verifier reported.
-
-For each iteration from 1 to 5:
-
-1. **Apply fixes from verifier feedback**: For each issue, apply the Suggested Fix. Update `working_path`.
-   - Only address issues the verifier identified
-   - Maintain single-paragraph format
-   - If Write tool fails: display error, proceed to Phase 4 with most recent version
-
-2. **Re-verify**: Launch prompt-compression-verifier agent via Task tool:
-   - subagent_type: "prompt-engineering:prompt-compression-verifier"
-   - prompt: "Verify compression. Original: {original_path}. Compressed: {working_path}. Check: goal is clear, novel constraints preserved, action space is open, no over-specification. Flag any training-redundant content that should be removed. Report VERIFIED or ISSUES_FOUND."
-
-3. **Handle response**:
-   - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
-   - If "ISSUES_FOUND" and iteration < 5: mark todo completed, save issues, add "Refinement iteration {next}" todo, continue
-   - If "ISSUES_FOUND" and iteration = 5: mark todo completed with note, proceed to Phase 4 with warning
-   - If verifier fails: display error, retry once. If retry fails, proceed to Phase 4 with warning: "Verification incomplete - manual review recommended."
-
-### Phase 4: Output
-
-**Mark "Output compressed prompt" todo `in_progress`.**
-
-**Step 4.1: Calculate metrics**
-
-- Original token count (from Phase 1)
-- Compressed token count: `Math.ceil(compressed_content.length / 4)`
-- Reduction percentage: `((original - compressed) / original * 100).toFixed(1)`
-
-**Step 4.2: Output to file (if requested)**
-
-If `--output <path>` was provided:
-- Write compressed content to specified path
-- Report: "Saved to: {path}"
-
-**Step 4.3: Display results**
-
-If verification passed:
-```
-Compressed: {source_path}
-
-Original: {original_tokens} tokens
-Compressed: {compressed_tokens} tokens ({percentage}% reduction)
+Original: {tokens} tokens
+Compressed: {tokens} tokens ({percentage}% reduction)
 
 ---
 {compressed paragraph}
 ---
 
-Verification: PASSED ({iteration_count} iteration(s))
+Verification: PASSED/INCOMPLETE ({iterations} iteration(s))
 ```
 
-If verification failed after 5 iterations:
+## Example
+
+**Before** (1,247 tokens): Full code reviewer prompt with phases, edge cases, examples...
+
+**After** (67 tokens):
 ```
-Compressed with warnings: {source_path}
-
-Original: {original_tokens} tokens
-Compressed: {compressed_tokens} tokens ({percentage}% reduction)
-
----
-{compressed paragraph}
----
-
-Verification: INCOMPLETE - manual review recommended
-
-Unresolved issues:
-- {list from last verification}
-```
-
-**Mark "Output compressed prompt" todo `completed`. Mark all todos complete.**
-
-## Key Principles
-
-| Principle | Rule |
-|-----------|------|
-| **Trust the model's knowledge** | Don't tell it what it already knows—it's trained on millions of examples |
-| **Don't trust model's discipline** | Keep guardrails against laziness, premature completion, context loss |
-| **Goal over process** | State WHAT to achieve, not HOW to do it |
-| **Acceptance criteria** | Keep observable success conditions—model is RL-trained to satisfy these |
-| **Novel constraints only** | Keep only counter-intuitive rules model wouldn't naturally follow |
-| **Execution discipline** | Keep "write before proceeding", "verify before finalizing", "read before synthesis" |
-| **Maximize action space** | Fewer capability constraints = more freedom = better results |
-| **Training filter** | "Would a competent person need to be told this?" If no → drop |
-| **Inline-typable** | Short enough to type verbally—like instructing a capable colleague |
-| **Non-destructive** | Original file untouched; display output (+ optional file save) |
-
-## Common Mistakes to Avoid
-
-| Mistake | Why It's Wrong | Fix |
-|---------|----------------|-----|
-| Preserving "obvious" constraints | Model does these naturally | Apply training filter—drop them |
-| Keeping capability process/phases | Constrains model's approach | State goal only, let model decide how |
-| Dropping discipline guardrails | Model cuts corners without them | Keep "write before proceeding", "verify before finalizing" |
-| Keeping edge case handling | Model handles edge cases from training | Trust the model |
-| Dense but still long | Preserved too much | Ask "would model fail without this?" |
-| Prescribing tools/methods | Limits action space | State goal, not implementation |
-| "Be thorough/professional" | Training-redundant | Drop entirely |
-
-**Key distinction**: "Phase 1: Research, Phase 2: Analyze" is droppable capability process. "Write findings BEFORE analysis" is essential discipline—model will skip it otherwise.
-
-## Edge Cases
-
-| Scenario | Handling |
-|----------|----------|
-| No prompt provided | Error: "Usage: /compress-prompt <file-path-or-prompt> [--output path]" |
-| Empty file | Error: "Cannot compress empty prompt: {path}" |
-| Short prompt (<100 tokens) | Warning: "Prompt already concise" + compress anyway |
-| File not found | Re-classify as inline text if plausible, else error |
-| Binary/non-text file | Error: "Cannot compress binary file: {path}" |
-| Prompt with code blocks | Preserve code blocks as-is; compress surrounding text |
-| Prompt with tables | Convert table semantics to dense prose |
-| Verification fails 5x | Output with warning: "Manual review recommended" |
-| Task tool unavailable | Error: "Task tool required for verification loop" |
-| --output path invalid | Error: "Cannot write to: {path}" |
-
-## Example Usage
-
-```bash
-# Compress a prompt file
-/compress-prompt prompts/code-reviewer.md
-
-# Compress and save to file
-/compress-prompt skills/bug-fixer/SKILL.md --output compressed/bug-fixer.txt
-
-# Compress inline text
-/compress-prompt "You are a helpful assistant that reviews code for bugs..."
-```
-
-## Example Output
-
-**Example**:
-```
-Compressed: prompts/code-reviewer.md
-
-Original: 1,247 tokens
-Compressed: 67 tokens (94.6% reduction)
-
----
 Review code for bugs, security issues, performance problems; success = all critical issues identified with actionable fixes. Output JSON {file, line, issue, severity, fix}. Never approve code with critical issues.
----
-
-Verification: PASSED (1 iteration)
 ```
 
-**What was kept**:
-- **Goal**: "Review code for bugs, security issues, performance problems"
-- **Acceptance criteria**: "success = all critical issues identified with actionable fixes" — defines what success looks like
-- **Output artifact**: "Output JSON {file, line, issue, severity, fix}"
-- **Novel constraint**: "Never approve code with critical issues" — counter-intuitive (model might default to always providing approval with caveats)
-
-**What was dropped and why**:
-- "suggest fixes with code snippets" → model does this naturally when finding issues
-- "handle empty input by requesting code" → model handles edge cases from training
-- "for large files process in chunks max 500 lines" → model manages context naturally
-- "flag severity" → implied by severity field in output format
+**Kept**: Goal, acceptance criteria, output format, novel constraint (never approve with critical issues).
+**Dropped**: Process phases, edge case handling, examples, obvious constraints.
