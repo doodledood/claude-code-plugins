@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.13.1 - claude-md-adherence-reviewer improvements:
+  - Focuses on outcome rules (affect files) not process rules (workflow only)
+  - Checks context before reading CLAUDE.md files (may be auto-loaded)
+  - The test: "Does the rule affect the FILES being committed?"
+
 - [vibe-experimental] v0.5.2 - claude-md-adherence-reviewer focuses on outcome rules only:
   - Now distinguishes outcome rules (affect files) from process rules (workflow only)
   - Flags: naming conventions, patterns, architecture, file structure, required file updates

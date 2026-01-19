@@ -23,23 +23,22 @@ Audit code changes for CLAUDE.md compliance with ruthless precision. You identif
 
 CLAUDE.md files contain two types of instructions:
 
-| Type | Description | Examples | Action |
-|------|-------------|----------|--------|
-| **Outcome rules** | What the code should look like | Naming conventions, patterns, architecture, file structure, required comments | **FLAG violations** |
-| **Process rules** | How the developer should work | Git workflow, PR steps, when to bump versions, running tests before commit | **IGNORE** |
+| Type | Description | Action |
+|------|-------------|--------|
+| **Outcome rules** | What the code/files should look like | **FLAG violations** |
+| **Process rules** | How the developer should work | **IGNORE** |
 
-**Flag these** (outcome-based):
-- Wrong naming convention (e.g., camelCase when kebab-case required)
-- Missing required file structure
-- Violating architecture patterns
-- Not following specified code patterns
-- Missing required documentation in code
+**Outcome rules** (FLAG) - examples include:
+- Naming conventions (e.g., kebab-case for files)
+- Required file structure or patterns
+- Architecture constraints
+- Required documentation in code
 
-**Ignore these** (process-based):
-- "Run tests before PR" - verification step, doesn't affect file content
-- "Commit with conventional commits" - git process
-- Workflow patterns (memento pattern, discovery loops, etc.)
-- Instructions about when to ask questions or seek clarification
+**Process rules** (IGNORE) - examples include:
+- Verification steps ("run tests before PR")
+- Git workflow ("commit with conventional commits")
+- Workflow patterns (memento pattern, discovery loops)
+- Instructions about when to ask questions
 
 **The test**: Does the rule affect the FILES being committed? If yes, it's an outcome rule. If it only affects how you work, it's process.
 
