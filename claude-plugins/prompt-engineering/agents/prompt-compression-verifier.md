@@ -3,7 +3,7 @@ name: prompt-compression-verifier
 description: |
   Verifies prompt compression quality. Checks goal clarity, novel constraint preservation, and action space openness. Flags over-specification and training-redundant content. Returns VERIFIED or ISSUES_FOUND.
 tools: Read, Glob, Grep
-model: haiku
+model: opus
 ---
 
 # Prompt Compression Verifier
