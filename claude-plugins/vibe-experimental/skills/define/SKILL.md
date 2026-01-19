@@ -32,11 +32,13 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 5. **Know when to stop** - Don't over-interview. When you have enough to build the manifest, build it.
 
-## Context Preservation
+## Constraints
 
-Write findings to `/tmp/define-interview-{timestamp}.md` as you discover them.
+**Create todo list immediately** - Track what needs to be discovered. Expand as you learn more.
 
-Before writing the final manifest, read the full interview log to restore context.
+**Write to log as you go** - Capture findings to `/tmp/define-interview-{timestamp}.md` after each discovery. Don't wait until the end.
+
+**Refresh before synthesis** - Before writing the final manifest, read the full interview log to restore context.
 
 ## What the Manifest Needs
 

@@ -82,31 +82,19 @@ user-invocable: true       # Optional: show in slash command menu (default: true
 
 ### Writing Skill and Agent Prompts
 
-A prompt is the agent's manifest. Define **what** and **why**, give freedom in **how**.
+A prompt should act as a manifest for the agent: clear goal, clear constraints, freedom in execution.
 
-**Structure prompts around:**
+**Principles:**
 
-| Section | Purpose | Example |
-|---------|---------|---------|
-| **Goal** | What to achieve, what output to produce | "Build a manifest file separating deliverables from invariants" |
-| **Principles** | Non-negotiable constraints on behavior | "Every criterion must have verification", "No vague terms" |
-| **What to Discover/Do** | Areas to address, not steps to follow | "Deliverables, Acceptance Criteria, Global Invariants" |
-| **Output Structure** | Schema/format of the final artifact | The manifest template |
-| **Context Preservation** | How to handle long workflows | "Write to log as you go, refresh before synthesis" |
+1. **Define WHAT and WHY, not HOW** - State goals and constraints. Don't prescribe steps the model knows how to do. No rigid phase ordering, no heuristics tables that become checklists.
 
-**Do:**
-- State goals and constraints clearly
-- Let the agent decide HOW to achieve the goal
-- Include the memento pattern for multi-step workflows
-- Define output structure when the artifact has a specific format
+2. **Operate under the memento pattern** - For non-trivial workflows, the agent should create a todo list immediately, write findings to a log file as it works, and refresh context before synthesis. This isn't optional structure—it's a constraint that makes the agent work better.
 
-**Don't:**
-- Prescribe rigid phase ordering ("Phase 1, then Phase 2, then Phase 3")
-- Include heuristics tables that become checklists
-- Over-specify steps the model knows how to do
-- Add capability instructions (model knows how to search, analyze, etc.)
+3. **Trust capability, enforce discipline** - The model knows how to search, analyze, generate. What it needs are guardrails: "write to log before proceeding", "refresh before synthesis", "don't skip verification".
 
-**The test**: Could this prompt be the agent's own "manifest"? Clear goal, clear constraints, clear output—but freedom in execution.
+4. **Output structure when needed** - If the artifact has a specific format (manifest schema, report template), define it. Otherwise let the agent decide.
+
+**The test**: Is this prompt a manifest? Clear goal, clear constraints, clear output—but the agent decides how to get there.
 
 ### Skill Description Best Practices
 
