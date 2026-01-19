@@ -1,6 +1,6 @@
 # vibe-experimental
 
-Experimental verification-first workflows. Invest in definition upfront, then execute autonomously with enforced verification.
+Experimental definition-driven workflows. Invest in definition upfront, then execute autonomously with enforced verification.
 
 ## Overview
 
@@ -12,7 +12,7 @@ Every criterion has explicit verification. Execution can't complete without veri
 
 | Skill | Description |
 |-------|-------------|
-| `/define` | Verification-first requirements builder with proactive interview |
+| `/define` | Work definition builder with proactive interview |
 | `/do` | Autonomous execution from definition file |
 
 ### Internal

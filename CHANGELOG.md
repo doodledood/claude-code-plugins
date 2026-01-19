@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.8.0 - Terminology and context handling:
+  - Reframed from "verification-first" to "definition-driven" (clearer positioning)
+  - /define now handles context/research provided via $ARGUMENTS
+  - When context is provided, asks what must be incorporated → becomes rejection criteria
+
 - [vibe-experimental] v0.7.0 - Unified criteria prefix to AC-*:
   - All criteria now use sequential `AC-N` numbering (no more R-, E-, B-, QG-*, PQG-*)
   - Category is now metadata via `category` field (feature, rejection, edge-case, boundary, quality-gate, project-gate)

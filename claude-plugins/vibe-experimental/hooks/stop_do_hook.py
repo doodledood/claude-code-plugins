@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stop hook that enforces verification-first workflow for /do.
+Stop hook that enforces definition completion workflow for /do.
 
 Blocks stop attempts unless /done or /escalate was called after /do.
 This prevents the LLM from declaring "done" without verification.

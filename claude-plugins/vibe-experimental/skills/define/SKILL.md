@@ -1,18 +1,39 @@
 ---
 name: define
-description: 'Verification-first requirements builder. Creates exhaustive definitions where every criterion has an explicit verification method. Use when starting new features, refactors, or any work requiring clear done criteria.'
+description: 'Work definition builder. Creates exhaustive definitions where every criterion has an explicit verification method. Use when starting new features, refactors, or any work requiring clear done criteria.'
 user-invocable: true
 ---
 
-# /define - Verification-First Requirements Builder
+# /define - Work Definition Builder
 
-You are building a requirements definition using a verification-first approach. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
+You are building a work definition. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
 
 ## Input
 
-`$ARGUMENTS` = task description (what the user wants to build/change)
+`$ARGUMENTS` = task description, optionally with context/research
+
+Examples:
+- Simple: `/define "Add user authentication"`
+- With context: `/define "Add OAuth integration" --context /tmp/oauth-research.md`
+- Inline context: `/define "Refactor payment module - must use Stripe v3 API, avoid webhooks per security team decision"`
 
 If no arguments provided, ask: "What would you like to build or change?"
+
+### Handling Provided Context
+
+If $ARGUMENTS contains context (file reference, inline notes, or research findings):
+
+1. **Read and summarize** the context
+2. **Ask**: "You provided [summary]. What from this MUST the implementation incorporate? (What would cause rejection if ignored?)"
+3. **Turn answers into criteria**:
+   ```yaml
+   - id: AC-N
+     category: rejection
+     description: "Must incorporate [specific aspect]"
+     verify: [user-specified or manual]
+   ```
+
+Don't ask redundant questions about whether context exists—if it's provided, handle it. The question is WHAT from the context is mandatory, not IF context should be used.
 
 ## Output
 
