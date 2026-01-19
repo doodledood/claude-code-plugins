@@ -54,11 +54,6 @@ Started: [timestamp]
 **Goal:** [from manifest]
 **Mental Model:** [from manifest]
 
-## Global Invariants Status
-- [ ] INV-G1: [description]
-- [ ] INV-G2: [description]
-...
-
 ## Deliverables Status
 
 ### Deliverable 1: [Name]
@@ -78,7 +73,6 @@ Started: [timestamp]
 Create TodoWrite:
 ```
 - [ ] Create log /tmp/do-log-{timestamp}.md
-- [ ] Pre-flight: verify global invariants
 - [ ] Deliverable 1: [name]
   - [ ] Check INV-L1.1 holds→log; done when verified
   - [ ] Satisfy AC-1.1→log; done when implemented + verified
@@ -92,41 +86,11 @@ Create TodoWrite:
 - [ ] Refresh log + output summary; done when user sees final status
 ```
 
-### 3. Pre-flight: Check Global Invariants
-
-Before starting any work, verify Global Invariants.
-
-**Why**: If a global invariant is already violated (e.g., tests already failing), the user should know before we begin.
-
-For each INV-G*:
-1. Run its verification method
-2. Record result in log
-
-**If any Global Invariant fails pre-flight:**
-```markdown
-## Pre-flight Warning
-
-The following Global Invariants are already failing:
-
-- **INV-G1**: Tests must pass
-  Status: FAILING
-  Evidence: [output from verification]
-
-This means the task starts in a violated state. Options:
-1. Fix these first, then continue
-2. Proceed anyway (task will fail final verification unless fixed)
-3. Amend the manifest to change these invariants
-```
-
-Ask the user how to proceed using AskUserQuestion.
-
-**If all pass**: Log success and continue.
-
-### 4. Execute Deliverables
+### 3. Execute Deliverables
 
 For each Deliverable in order:
 
-#### 4a. Pre-check Local Invariants
+#### 3a. Pre-check Local Invariants
 
 Before working on a deliverable, understand its constraints.
 
@@ -143,7 +107,7 @@ Log the Local Invariants you'll need to respect:
 - AC-1.2: [what success looks like]
 ```
 
-#### 4b. Work Toward Acceptance Criteria
+#### 3b. Work Toward Acceptance Criteria
 
 Work to satisfy the ACs. You decide HOW—the ACs define success, not the path.
 
@@ -160,7 +124,7 @@ Work to satisfy the ACs. You decide HOW—the ACs define success, not the path.
 - Result: [outcome]
 ```
 
-#### 4c. Verify Deliverable Complete
+#### 3c. Verify Deliverable Complete
 
 When you believe all ACs for this deliverable are satisfied:
 
@@ -235,21 +199,18 @@ Escalation requires /verify to have been called first.
 ```
 1. /do /tmp/manifest-123.md
 2. Read manifest, create log, create todos
-3. Pre-flight: check Global Invariants
-   - All pass → continue
-   - Failures → warn user, get decision
-4. Deliverable 1:
+3. Deliverable 1:
    - Note Local Invariants as guardrails
    - Work toward AC-1.1, AC-1.2
    - Verify deliverable complete
-5. Deliverable 2:
+4. Deliverable 2:
    - Note Local Invariants
    - Work toward AC-2.1
    - Verify deliverable complete
-6. Skill("vibe-experimental:verify", "...")
-7. If failures → fix specific criterion → retry verify
-8. All pass → /verify calls /done
-9. Refresh log → output summary → stop allowed
+5. Skill("vibe-experimental:verify", "...")
+6. If failures → fix specific criterion → retry verify
+7. All pass → /verify calls /done
+8. Refresh log → output summary → stop allowed
 ```
 
 ## Tradeoff Resolution
@@ -267,12 +228,11 @@ Log tradeoff resolutions:
 
 1. **Manifest file required** - fail clearly if not provided
 2. **Hierarchical respect** - Global Invariants > Local Invariants > ACs
-3. **Pre-flight check** - verify Global Invariants before starting
-4. **Local Invariants are guardrails** - actively consider while working
-5. **Log attempts** - each todo includes `→log` discipline
-6. **Must call /verify** - can't declare done without verification
-7. **Target failures** - on failure, fix specific criterion, don't restart
-8. **Proper escalation** - /escalate only after /verify, with evidence
+3. **Local Invariants are guardrails** - actively consider while working
+4. **Log attempts** - each todo includes `→log` discipline
+5. **Must call /verify** - can't declare done without verification
+6. **Target failures** - on failure, fix specific criterion, don't restart
+7. **Proper escalation** - /escalate only after /verify, with evidence
 
 ## Log Structure
 
@@ -287,10 +247,6 @@ Started: [timestamp]
 ## Intent
 **Goal:** [from manifest]
 **Mental Model:** [key concepts]
-
-## Pre-flight Check
-- [x] INV-G1: PASS
-- [x] INV-G2: PASS
 
 ## Deliverable 1: [Name]
 

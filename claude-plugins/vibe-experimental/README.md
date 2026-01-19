@@ -80,9 +80,7 @@ A hierarchical approach to task definition and execution:
                     ├─ Global Invariants
                     └─ Deliverables (with Local Invariants + ACs)
                                    ↓
-/do manifest.md → Pre-flight check Global Invariants
-                         ↓
-                  For each Deliverable:
+/do manifest.md → For each Deliverable:
                     - Respect Local Invariants
                     - Satisfy ACs
                          ↓
@@ -97,10 +95,9 @@ A hierarchical approach to task definition and execution:
 
 | Phase | Check | Failure Impact |
 |-------|-------|----------------|
-| Pre-flight | Global Invariants | Warn user before starting |
 | During deliverable | Local Invariants | Stop, find different approach |
 | After deliverable | Acceptance Criteria | Deliverable incomplete |
-| Final verification | All criteria | Must all pass for /done |
+| Final verification | All criteria (Global + Local + ACs) | Must all pass for /done |
 
 ## Status
 
