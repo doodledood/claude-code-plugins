@@ -97,6 +97,7 @@ A prompt should act as a manifest for the agent: clear goal, clear constraints, 
 **When updating prompts:**
 - **Don't overfit to feedback** - Make right-sized changes. Don't overcorrect or add complexity to address one edge case.
 - **Maximize information density** - Every word should earn its place. If you can say the same thing in fewer words, do it.
+- **Avoid arbitrary values** - "Max 4 rounds" or "2-3 examples" become rigid rules. State the principle ("stop when converged") not the number. Constrain productively while giving flexibility in execution.
 
 **The test**: Is this prompt a manifest? Clear goal, clear constraints, clear output—but the agent decides how to get there.
 

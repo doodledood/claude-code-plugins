@@ -44,18 +44,21 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Refresh before synthesis** - Before writing the final manifest, read the full interview log to restore context.
 
+**Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
+
+**Pre-mortem every task** - Generate concrete failure scenarios as choices. User selects real risks → become preventive criteria.
+
 ## What the Manifest Needs
 
-Discover these through probing—surface latent criteria the user hasn't articulated:
+Surface latent criteria through generation, not interrogation. Generate candidates; learn from user reactions.
 
-### Deliverables
-What specific things need to be built or changed? Decompose based on task complexity. Probe for implicit deliverables the user assumed but didn't state.
+Both can cover **output** or **process**:
 
-### Acceptance Criteria (per deliverable)
-How do we know each deliverable is done? Probe beyond the happy path: error handling, edge cases, constraints, security implications. ACs can be positive or negative. What would make the user reject a "working" implementation?
-
-### Global Invariants
-What rules apply to the ENTIRE task? This is NOT a closed list—invariants are task-specific. Probe for unstated assumptions: performance requirements, backwards compatibility, coding standards, security, data integrity, etc. What would make the user say "this breaks everything" even if individual deliverables work?
+- **Global Invariants** - "Don't do X" (negative constraints, ongoing). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
+- **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
+  - *Functional*: "Clicking Login redirects to Dashboard"
+  - *Non-Functional*: "Response time < 200ms"
+  - *Process*: "README.md contains section 'Authentication'"
 
 ### Code Quality Gates (for coding tasks)
 
@@ -170,7 +173,7 @@ When presenting options, mark the first as "(Recommended)" to reduce cognitive l
 | Dimension | Preference | Context |
 |-----------|------------|---------|
 
-## 5. Pre-mortem Risks (if any)
+## 5. Pre-mortem Risks
 | Risk | Preventive Measure |
 |------|-------------------|
 ```

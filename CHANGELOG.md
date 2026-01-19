@@ -6,11 +6,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-experimental] v0.14.0 - Restore code quality gate selection in /define:
-  - Added multi-select question for quality aspects (bugs, type safety, maintainability, simplicity)
-  - Added agent mapping table linking quality aspects to reviewer agents
-  - Made Global Invariants explicitly flexible (not a closed list)
-  - Added additional quality options (coverage, testability, docs, CLAUDE.md adherence)
+- [prompt-engineering] v1.18.0 - Add "avoid arbitrary values" principle to /compress-prompt:
+  - Added principle 6: state the principle, not the number
+  - Removed arbitrary "iterate up to 5 times" → "iterate until passes or stops improving"
+
+- [vibe-experimental] v0.15.0 - Optimize /define per prompting principles:
+  - Restored quality gate multi-select with agent mapping table
+  - Added process vs output distinction for invariants and ACs
+  - Added pre-mortem constraint, stopping convergence
+  - Updated CLAUDE.md with "avoid arbitrary values" guidance
 
 - [prompt-engineering] v1.17.0 - Restructure /compress-prompt and verifier to goal-oriented:
   - `/compress-prompt`: ~90 lines (was ~375)
