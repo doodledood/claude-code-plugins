@@ -26,7 +26,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **YOU generate, user validates** - Don't ask open-ended questions. Generate candidates from your knowledge, codebase exploration, or web research as needed. Present concrete options, learn from reactions.
+1. **YOU generate, user validates** - Don't ask open-ended questions. Generate concrete candidates; learn from reactions.
 
 2. **Only ask what you can't determine** - If you can infer from context, don't ask. Only ask when genuinely ambiguous.
 
@@ -66,10 +66,7 @@ What rules apply to the ENTIRE task? Probe for unstated assumptions: performance
 
 ## Question Format
 
-When you need to ask:
-- 2-4 concrete options (users reveal criteria by reacting)
-- First option = recommended (with "(Recommended)" suffix)
-- Batch related questions when possible
+When presenting options, mark the first as "(Recommended)" to reduce cognitive load.
 
 ## The Manifest Schema
 
