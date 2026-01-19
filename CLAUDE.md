@@ -80,6 +80,34 @@ user-invocable: true       # Optional: show in slash command menu (default: true
 ---
 ```
 
+### Writing Skill and Agent Prompts
+
+A prompt is the agent's manifest. Define **what** and **why**, give freedom in **how**.
+
+**Structure prompts around:**
+
+| Section | Purpose | Example |
+|---------|---------|---------|
+| **Goal** | What to achieve, what output to produce | "Build a manifest file separating deliverables from invariants" |
+| **Principles** | Non-negotiable constraints on behavior | "Every criterion must have verification", "No vague terms" |
+| **What to Discover/Do** | Areas to address, not steps to follow | "Deliverables, Acceptance Criteria, Global Invariants" |
+| **Output Structure** | Schema/format of the final artifact | The manifest template |
+| **Context Preservation** | How to handle long workflows | "Write to log as you go, refresh before synthesis" |
+
+**Do:**
+- State goals and constraints clearly
+- Let the agent decide HOW to achieve the goal
+- Include the memento pattern for multi-step workflows
+- Define output structure when the artifact has a specific format
+
+**Don't:**
+- Prescribe rigid phase ordering ("Phase 1, then Phase 2, then Phase 3")
+- Include heuristics tables that become checklists
+- Over-specify steps the model knows how to do
+- Add capability instructions (model knows how to search, analyze, etc.)
+
+**The test**: Could this prompt be the agent's own "manifest"? Clear goal, clear constraints, clear output—but freedom in execution.
+
 ### Skill Description Best Practices
 
 Skill descriptions drive auto-invocation. Claude uses semantic matching to decide when to invoke a skill based on its description.
