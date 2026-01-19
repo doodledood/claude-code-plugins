@@ -34,7 +34,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 4. **No vague terms** - "clean", "good", "proper" must become measurable.
 
-5. **Know when to stop** - Don't over-interview. When you have enough to build the manifest, build it.
+5. **Diminishing returns, not premature stop** - Be thorough in surfacing latent criteria, but recognize when additional probing isn't yielding new insights.
 
 ## Constraints
 
