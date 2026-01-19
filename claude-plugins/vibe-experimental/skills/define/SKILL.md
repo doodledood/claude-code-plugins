@@ -8,6 +8,8 @@ user-invocable: true
 
 You are building a work definition. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
 
+**Verification method selection**: Prefer bash (fastest, most reliable) > subagent (for subjective/complex checks) > manual (only when automation is impossible, e.g., "feels right to user").
+
 ## Input
 
 `$ARGUMENTS` = task description, optionally with context/research
@@ -34,6 +36,8 @@ If $ARGUMENTS contains context (file reference, inline notes, or research findin
    ```
 
 Don't ask redundant questions about whether context exists—if it's provided, handle it. The question is WHAT from the context is mandatory, not IF context should be used.
+
+**If you find contradictions or conflicts** (e.g., context contradicts codebase, criteria seem incompatible, user's answers contradict earlier answers): Surface as a question. User may not realize the conflict, or may have context you don't. Their resolution becomes a criterion.
 
 ## Output
 
@@ -357,6 +361,7 @@ ALWAYS use AskUserQuestion with:
 - Descriptions explain tradeoffs
 - Batch related questions (don't ask one at a time)
 - Provide context for why you're asking (helps user give better answers)
+- If user rejects ALL options, ask what's wrong with them—their objection is the criterion
 
 When asking, briefly explain the purpose:
 - "I'm asking about edge cases because these often surface implicit requirements..."
@@ -453,53 +458,7 @@ Example (IDs continue from last AC-N in definition):
     agent: code-bugs-reviewer
     pass_if: no_high_or_critical
 
-- id: AC-16
-  category: quality-gate
-  description: "No HIGH or CRITICAL type safety issues"
-  verify:
-    method: subagent
-    agent: type-safety-reviewer
-    pass_if: no_high_or_critical
-
-- id: AC-17
-  category: quality-gate
-  description: "No HIGH or CRITICAL maintainability issues"
-  verify:
-    method: subagent
-    agent: code-maintainability-reviewer
-    pass_if: no_high_or_critical
-
-- id: AC-18
-  category: quality-gate
-  description: "No HIGH or CRITICAL simplicity issues"
-  verify:
-    method: subagent
-    agent: code-simplicity-reviewer
-    pass_if: no_high_or_critical
-
-- id: AC-19
-  category: quality-gate
-  description: "No HIGH or CRITICAL coverage gaps"
-  verify:
-    method: subagent
-    agent: code-coverage-reviewer
-    pass_if: no_high_or_critical
-
-- id: AC-20
-  category: quality-gate
-  description: "No HIGH or CRITICAL testability issues"
-  verify:
-    method: subagent
-    agent: code-testability-reviewer
-    pass_if: no_high_or_critical
-
-- id: AC-21
-  category: quality-gate
-  description: "No HIGH or CRITICAL CLAUDE.md violations"
-  verify:
-    method: subagent
-    agent: claude-md-adherence-reviewer
-    pass_if: no_high_or_critical
+# ... repeat pattern for each selected gate from mapping table above ...
 
 # Docs reviewer is capped at MEDIUM, so use MEDIUM+ threshold
 - id: AC-22
@@ -790,7 +749,7 @@ Fails because: [specific reason linked to criterion]
 [etc. - IDs continue sequentially]
 
 ## Task-Specific Subagents
-[Only if generic verification isn't sufficient]
+[Only if verification requires domain-specific checks that existing reviewers don't cover—e.g., checking compliance with a specific API contract, validating against custom business rules]
 
 ### [agent-name]
 Purpose: ...
