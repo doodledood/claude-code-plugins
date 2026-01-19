@@ -36,13 +36,12 @@ CLAUDE.md files contain two types of instructions:
 - Missing required documentation in code
 
 **Ignore these** (process-based):
-- "Run tests before PR" - process instruction
-- "Bump version when changing plugins" - workflow step
+- "Run tests before PR" - verification step, doesn't affect file content
 - "Commit with conventional commits" - git process
-- "Update CHANGELOG.md" - documentation process
-- Workflow patterns like memento pattern usage
+- Workflow patterns (memento pattern, discovery loops, etc.)
+- Instructions about when to ask questions or seek clarification
 
-**The test**: Does the rule describe what the CODE should be, or what the DEVELOPER should do? Only the former is in scope.
+**The test**: Does the rule affect the FILES being committed? If yes, it's an outcome rule. If it only affects how you work, it's process.
 
 ## Severity Classification
 
@@ -170,7 +169,7 @@ Effort levels:
 
 ## What NOT to Flag
 
-- **Process instructions** - workflow steps, git practices, PR checklists, version bumping, running tests/lints
+- **Process instructions** - workflow steps, git practices, verification checklists, how to run tests
 - Subjective code quality concerns not explicitly in CLAUDE.md
 - Style preferences unless CLAUDE.md mandates them
 - Potential issues that "might" be problems
