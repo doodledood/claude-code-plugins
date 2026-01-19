@@ -39,40 +39,74 @@ Group by verification type:
 - **subagent**: Reviewer agents (code-bugs-reviewer, type-safety-reviewer, etc.)
 - **manual**: Require human verification (set aside for later)
 
-### 3. Spawn Verifiers in Parallel
+Then classify by expected duration—make an educated guess, err on the side of background:
 
-#### For bash/codebase criteria → criteria-checker
+- **Fast** (seconds): lint, typecheck, simple codebase patterns
+- **Slow** (30s+): test suites, builds, reviewer agents
+- When uncertain → treat as slow (background is safer)
 
-Spawn a criteria-checker agent using the Task tool.
+### 3. Spawn Verifiers (Three-Phase)
 
-Example Task call:
+#### Phase 1: Launch slow checks in background (non-blocking)
+
+Launch ALL slow criteria immediately with `run_in_background: true`. Don't wait—collect task IDs and continue.
+
 ```
-Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Task(subagent_type="vibe-experimental:criteria-checker",
+     run_in_background: true,
+     prompt="
 Criterion: AC-1 (tests-pass)
 Description: All tests pass
 Verification method: bash
 Command: npm test")
+→ Store task_id for later collection
 ```
 
-#### For subagent criteria → spawn reviewer directly
-
-For Code Quality Gate criteria (QG-*), spawn the reviewer agent directly.
-
-Example Task call:
+For subagent criteria, same pattern:
 ```
-Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
+Task(subagent_type="vibe-experimental:code-bugs-reviewer",
+     run_in_background: true,
+     prompt="
 Review the current branch changes for bugs. Focus on HIGH and CRITICAL severity issues only.
 Scope: git diff against origin/main")
+→ Store task_id for later collection
 ```
 
 **Scope override**: If /do provides explicit scope (e.g., specific files changed), pass it:
 ```
-Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
+Task(subagent_type="vibe-experimental:code-bugs-reviewer",
+     run_in_background: true,
+     prompt="
 Review these files for bugs: src/handlers/notify.ts, src/services/queue.ts
 Focus on HIGH and CRITICAL severity issues only.")
 ```
 
-Launch up to N (from --parallel) concurrently. Wait for wave to complete before starting next wave.
+#### Phase 2: Process fast checks in parallel waves (blocking)
+
+For fast criteria (lint, typecheck, codebase patterns), use wave-based parallelism:
+- Launch up to N (from --parallel) concurrently
+- Wait for wave to complete
+- Launch next wave
+- These complete quickly, so blocking is acceptable
+
+```
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Criterion: AC-7 (error-pattern)
+Description: All errors use AppError class
+Verification method: codebase
+Files: src/handlers/
+Check: No raw throw new Error() in modified files")
+```
+
+#### Phase 3: Collect background results
+
+After all fast checks complete, collect slow check results:
+
+```
+TaskOutput(task_id: "<stored-task-id>", block: true, timeout: 300000)
+```
+
+Process each result as it returns. If a slow check is still running when you need its result, `block: true` waits for completion.
 
 ### 4. Collect Results
 
@@ -214,9 +248,11 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 ## Critical Rules
 
 1. **Don't run checks yourself** - spawn criteria-checker or reviewer agents
-2. **Parallel waves** - up to --parallel concurrent (default 10)
-3. **Hide manual on auto-fail** - focus on fixable issues first
-4. **Actionable feedback** - pass through file:line, expected vs actual from agents
-5. **Call /done on success** - trigger completion
-6. **Respect pass_if threshold** - for QG-* criteria, read `pass_if` from definition to determine fail threshold
-7. **Return all issues** - for failed QG-* criteria, include all issues at/above threshold so /do can fix them
+2. **Three-phase execution** - (1) launch slow in background, (2) process fast in waves, (3) collect background results
+3. **Slow checks in background** - use `run_in_background: true` for tests, reviewers; store task IDs
+4. **Fast checks block** - lint, typecheck, codebase patterns complete quickly; wave-based is fine
+5. **Hide manual on auto-fail** - focus on fixable issues first
+6. **Actionable feedback** - pass through file:line, expected vs actual from agents
+7. **Call /done on success** - trigger completion
+8. **Respect pass_if threshold** - for QG-* criteria, read `pass_if` from definition to determine fail threshold
+9. **Return all issues** - for failed QG-* criteria, include all issues at/above threshold so /do can fix them

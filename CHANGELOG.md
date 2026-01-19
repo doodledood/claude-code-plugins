@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.6.0 - /verify three-phase execution for better parallelism:
+  - Slow checks (tests, reviewers) launch in background immediately with `run_in_background: true`
+  - Fast checks (lint, typecheck, codebase) process in parallel waves
+  - Background results collected after fast checks complete
+  - No longer blocked waiting for slow tests while fast checks could be running
+
 - [vibe-experimental] v0.5.3 - /define skill improvements:
   - Adversarial examples now flexible (1-3 examples, pick relevant dimensions) instead of rigid 3+ with fixed table
   - Quality gates questions rephrased so second question doesn't sound optional ("More quality categories to verify:" instead of "Additional quality gates?")
