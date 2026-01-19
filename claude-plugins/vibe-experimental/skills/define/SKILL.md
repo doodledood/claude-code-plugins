@@ -106,10 +106,10 @@ Create todos and log file:
 
 ```
 - [ ] Create log /tmp/define-interview-{timestamp}.md
-- [ ] Phase 1: Gather intent & context
-- [ ] Phase 2: Identify global invariants
-- [ ] Phase 3: Identify deliverables
-- [ ] Phase 4: For each deliverable, gather ACs
+- [ ] Phase 1: Understand intent (high info-gain questions)
+- [ ] Phase 2: Generate candidate global invariants→present for validation
+- [ ] Phase 3: Generate candidate deliverables→present for validation
+- [ ] Phase 4: For each deliverable, generate candidate ACs→present for validation
 - [ ] Phase 5: Quality gates (if coding task)
 - [ ] Phase 6: Project gates from CLAUDE.md (if coding task)
 - [ ] (expand: refine as needed)
@@ -117,136 +117,237 @@ Create todos and log file:
 - [ ] Write final manifest file
 ```
 
-### 2. Phase 1: Intent & Context
+### Interview Philosophy
 
-Establish the high-level purpose.
+**YOU generate, user validates.** Users have surface-level knowledge. Don't ask open-ended questions like "What are your constraints?" - they won't know. Instead:
 
-**Ask:**
+1. **Generate candidates** from domain knowledge and task context
+2. **Present concrete options** for user to react to
+3. **Learn from reactions** - acceptance/rejection reveals criteria
+4. **Maximize information gain** - ask questions that maximally split the possibility space
+5. **Order by importance** - high-stakes decisions first to avoid irrelevant rabbit holes
+
+**AskUserQuestion always has an "Other" option** - user can provide free text if your candidates miss something. But your candidates should be good enough that "Other" is rarely needed.
+
+### 2. Phase 1: Intent & Context (High Info-Gain)
+
+Start with questions that maximally constrain the solution space.
+
+**Question 1: Task type** (determines entire approach)
 ```
 questions: [
   {
-    question: "What is the high-level goal? (1-2 sentences)",
-    header: "Goal",
+    question: "What type of work is this?",
+    header: "Task type",
     options: [
-      { label: "Build new feature", description: "Adding new capability" },
-      { label: "Fix/improve existing", description: "Bug fix or enhancement" },
-      { label: "Refactor/restructure", description: "Improve code/structure without behavior change" },
-      { label: "Research/analysis", description: "Investigate and document findings" }
+      { label: "New feature", description: "Adding new capability to existing system" },
+      { label: "Bug fix", description: "Fixing incorrect behavior" },
+      { label: "Refactor", description: "Restructure without changing behavior" },
+      { label: "Greenfield", description: "Building something new from scratch" }
     ],
     multiSelect: false
   }
 ]
 ```
 
-Follow up for specifics based on their selection.
+**Question 2: Scope** (high info-gain - constrains everything else)
+```
+questions: [
+  {
+    question: "How would you describe the scope?",
+    header: "Scope",
+    options: [
+      { label: "Single file change", description: "Localized to one file" },
+      { label: "Single component", description: "Changes within one module/component" },
+      { label: "Cross-cutting", description: "Touches multiple parts of the system" },
+      { label: "System-wide", description: "Architectural or foundational change" }
+    ],
+    multiSelect: false
+  }
+]
+```
 
-**Then ask about mental model:**
-"What key concepts or architecture should I understand before starting? (e.g., existing patterns, domain knowledge, constraints from other systems)"
+**Question 3: Risk profile** (determines how many guardrails needed)
+```
+questions: [
+  {
+    question: "What's the risk profile?",
+    header: "Risk",
+    options: [
+      { label: "Low risk", description: "Easy to revert, low user impact" },
+      { label: "Medium risk", description: "Needs testing, moderate impact" },
+      { label: "High risk", description: "Hard to revert, significant impact" },
+      { label: "Critical path", description: "Affects core functionality, must not break" }
+    ],
+    multiSelect: false
+  }
+]
+```
 
-Write to log:
+Based on answers, you now know:
+- Task type → what patterns to expect
+- Scope → how many deliverables likely
+- Risk → how thorough verification needs to be
+
+Write to log with inferences:
 ```markdown
 ## Phase 1: Intent & Context
 
-**Goal:** [their answer]
-**Task Type:** [feature/fix/refactor/research]
-**Mental Model:** [key concepts they mentioned]
+**Task:** [from $ARGUMENTS]
+**Type:** [feature/fix/refactor/greenfield]
+**Scope:** [single-file/component/cross-cutting/system-wide]
+**Risk:** [low/medium/high/critical]
+
+**Inferences:**
+- [what this combination implies about deliverables]
+- [what this implies about invariants needed]
 ```
 
 ### 3. Phase 2: Global Invariants
 
-Surface rules that apply to EVERYTHING.
+**Generate candidates based on task type and risk, then validate.**
 
-**Ask explicitly:**
+From Phase 1, infer likely global invariants:
+
+| Task Type | Risk | Likely Invariants |
+|-----------|------|-------------------|
+| Feature | High/Critical | Tests pass, no regressions, security, linting |
+| Feature | Low/Medium | Tests pass, linting |
+| Bug fix | Any | Tests pass, specific regression test |
+| Refactor | Any | Tests pass, behavior unchanged, linting |
+| Greenfield | Any | Tests pass (if tests exist), linting |
+
+**Present generated candidates for validation:**
 ```
 questions: [
   {
-    question: "Are there rules that apply to EVERYTHING? Things that if violated at ANY point mean the task has failed?",
-    header: "Global rules",
+    question: "Which of these should be global invariants? (If violated anywhere, task fails)",
+    header: "Invariants",
     options: [
-      { label: "Tests must pass", description: "No breaking existing tests" },
+      { label: "Tests must pass (Recommended)", description: "No breaking existing tests" },
       { label: "No security vulnerabilities", description: "OWASP top 10, no secrets in code" },
-      { label: "Maintain backwards compatibility", description: "Existing APIs/behavior unchanged" },
-      { label: "Follow style guide", description: "Linting/formatting must pass" }
+      { label: "Backwards compatible", description: "Existing APIs/behavior unchanged" },
+      { label: "Linting/formatting passes", description: "Code style enforced" }
     ],
     multiSelect: true
   }
 ]
 ```
 
-Adapt options to task type:
-- **Coding**: tests, security, linting, typing
-- **Writing**: spelling, tone, formatting
-- **Research**: citations, methodology, scope
+**Adapt options to domain:**
+- **Coding**: tests, security, linting, typing, backwards compatibility
+- **Writing**: no spelling errors, consistent tone, word count limits
+- **Research**: all claims cited, methodology documented, scope boundaries
 
-For each global invariant identified:
-1. Capture the rule
-2. Ask for verification method (or propose one)
-3. Assign INV-G{N} ID
+**You propose verification methods** (don't ask):
+- Tests → `bash: npm test` or `bash: pytest`
+- Linting → `bash: npm run lint` or `bash: ruff check`
+- Security → `subagent: code-bugs-reviewer` with security focus
 
 Write to log:
 ```markdown
 ## Phase 2: Global Invariants
 
-- [INV-G1] Description: Tests must pass | Verify: bash `npm test`
-- [INV-G2] Description: No security vulnerabilities | Verify: subagent (code-bugs-reviewer) focusing on security
+Generated based on: [task type] + [risk level]
+
+- [INV-G1] Tests must pass | Verify: bash `npm test`
+- [INV-G2] Linting passes | Verify: bash `npm run lint`
 ```
 
 ### 4. Phase 3: Identify Deliverables
 
-Break the work into specific deliverables.
+**Generate candidate deliverables from task description, then validate.**
 
-**Ask:**
-"What are the specific things you need delivered? (Think of these as items you could check off a list)"
+Based on $ARGUMENTS and Phase 1 answers, decompose into deliverables:
 
-**Probing techniques:**
-- "Is this one deliverable or multiple?"
-- "Could these be done independently?"
-- "What's the natural grouping?"
+**Decomposition heuristics:**
+- Single-file scope → usually 1 deliverable
+- Component scope → 1-3 deliverables (interfaces, logic, tests)
+- Cross-cutting → 3-5 deliverables (by layer or by feature slice)
+- System-wide → 5+ deliverables (architectural pieces)
 
-For a task like "Add user authentication":
-- Deliverable 1: User registration flow
-- Deliverable 2: Login/logout mechanism
-- Deliverable 3: Session management
-- Deliverable 4: Password reset
+**Example decomposition for "Add user authentication":**
+```
+questions: [
+  {
+    question: "I've broken this into deliverables. Which should we include?",
+    header: "Deliverables",
+    options: [
+      { label: "User registration flow", description: "Sign-up form, validation, account creation" },
+      { label: "Login/logout", description: "Credential verification, session creation/destruction" },
+      { label: "Session management", description: "Token handling, expiry, refresh" },
+      { label: "Password reset", description: "Reset request, email, token verification" }
+    ],
+    multiSelect: true
+  }
+]
+```
+
+**Key: YOU propose the decomposition.** Don't ask "what are the deliverables?" - the user won't know the right granularity. You know from the task type and scope what makes sense.
+
+If user selects "Other", they can describe something you missed, which you then add.
 
 Write to log:
 ```markdown
-## Phase 3: Deliverables Identified
+## Phase 3: Deliverables
 
-1. [Deliverable name]
-2. [Deliverable name]
-3. [Deliverable name]
+Generated based on: [scope] + [task description]
+
+1. [Deliverable name] - [brief description]
+2. [Deliverable name] - [brief description]
 ```
 
 ### 5. Phase 4: Per-Deliverable Acceptance Criteria
 
-For EACH deliverable, gather acceptance criteria:
+**Generate candidate ACs from domain knowledge, then validate.**
 
-**Ask:**
-"How do we verify [Deliverable N] is done? What specific things must be true?"
+For EACH deliverable, generate ACs covering:
+1. **Happy path** - core functionality works
+2. **Error handling** - graceful failures
+3. **Edge cases** - boundary conditions
+4. **Constraints** - how it must (or must not) be built
 
-ACs can be positive or negative:
-- Positive: "User can log in with valid credentials"
-- Negative: "Passwords are hashed, not stored in plaintext"
+**Example for "Login/logout" deliverable:**
+```
+questions: [
+  {
+    question: "For Login/logout - which acceptance criteria should we include?",
+    header: "Login ACs",
+    options: [
+      { label: "Valid credentials → access granted", description: "Core happy path" },
+      { label: "Invalid credentials → clear error, no access", description: "Error handling" },
+      { label: "Passwords hashed, not plaintext", description: "Security constraint" },
+      { label: "Session created on login, destroyed on logout", description: "State management" }
+    ],
+    multiSelect: true
+  }
+]
+```
 
-Use probing techniques:
-- Rejection-first: "What would cause you to reject this deliverable?"
-- Edge cases: "What edge cases need handling?"
-- Constraints: "Are there rules about HOW this should be built?"
-- Adversarial: Show concrete examples, ask if acceptable
+**AC generation heuristics by deliverable type:**
 
-For each AC:
-1. Capture what success looks like (or what must not happen)
-2. Ask for verification method
-3. Assign AC-{D}.{N} ID
+| Deliverable Type | Typical ACs |
+|-----------------|-------------|
+| API endpoint | Request/response format, auth, error codes, rate limiting |
+| UI component | Renders correctly, handles input, accessibility, responsive |
+| Data operation | CRUD works, validation, constraints enforced, idempotent |
+| Integration | Connection handling, retry logic, timeout behavior |
+| Algorithm | Correctness, performance bounds, edge cases |
+
+**You propose verification methods:**
+- Functional → `bash: npm run test:feature`
+- Constraint → `codebase: check pattern exists/doesn't exist`
+- Subjective → `manual: human review`
+
+**Don't ask open-ended "what else?"** - if you've covered happy path, errors, edges, and constraints, you've covered it. User can add via "Other" if truly missing something.
 
 Write to log after each deliverable:
 ```markdown
 ### Deliverable 1: [Name]
 
-**Acceptance Criteria:**
-- [AC-1.1] Description: ... | Verify: ...
-- [AC-1.2] Description: ... | Verify: ...
+**Acceptance Criteria (generated):**
+- [AC-1.1] [description] | Verify: [method]
+- [AC-1.2] [description] | Verify: [method]
 ```
 
 ### 6. Phase 5: Quality Gates (Coding Tasks)
@@ -300,24 +401,45 @@ Add as Global Invariants:
 - [INV-G{N}] Description: Tests pass | Verify: bash `[command from CLAUDE.md]`
 ```
 
-### 8. Latent Discovery (Use as Needed)
+### 8. Latent Discovery (Only If Needed)
 
-Apply latent discovery techniques when direct questions don't surface criteria:
+These techniques are for **edge cases where your generated candidates weren't sufficient**. Most tasks won't need them.
 
-**Tradeoff Forcing:**
-When working on a deliverable, ask: "When [value A] and [value B] conflict, which wins?"
-- Capture as Global Invariant if applies everywhere
-- Capture as AC if specific to deliverable
+**Tradeoff question** (when you detect competing concerns):
+```
+questions: [
+  {
+    question: "When speed and thoroughness conflict, which wins?",
+    header: "Tradeoff",
+    options: [
+      { label: "Speed - ship fast, iterate later", description: "Accept some rough edges" },
+      { label: "Thoroughness - get it right first", description: "Take time to be complete" },
+      { label: "Depends on the specific case", description: "Judge case by case" }
+    ],
+    multiSelect: false
+  }
+]
+```
 
-**Extreme Aversion:**
-"Which extreme is WORSE?" → Reveals constraints (become ACs)
+**Pre-mortem** (for high-risk tasks only):
+```
+questions: [
+  {
+    question: "If this fails badly, what's the most likely cause?",
+    header: "Risk",
+    options: [
+      { label: "Performance issues at scale", description: "Works in dev, fails in prod" },
+      { label: "Integration breaks", description: "Downstream systems affected" },
+      { label: "Data corruption", description: "Invalid state persisted" },
+      { label: "Security vulnerability", description: "Exploitable flaw" }
+    ],
+    multiSelect: true
+  }
+]
+```
+→ Selected risks become either Global Invariants or specific ACs.
 
-**Pre-mortem:**
-"Imagine this shipped and was a disaster. What went wrong?"
-- Each risk becomes either a Global Invariant or AC
-
-**Reaction Sampling:**
-Show concrete examples, capture reactions as criteria.
+**Don't overuse these.** If your Phase 1-4 candidates were good, the manifest is complete.
 
 ### 9. Write to Log (After Each Phase)
 
@@ -471,11 +593,11 @@ Manifests support amendments during execution if genuine gaps are discovered:
 
 ## Critical Rules
 
-1. **YOU drive the interview** - don't wait for user to think of everything
-2. **Two-level structure** - Global Invariants (task-level) → Deliverables with ACs
-3. **Every criterion has verification** - no exceptions
-4. **No vague terms** - "clean", "good", "proper" must be defined
-5. **Domain-agnostic** - adapt questions to task type (coding/writing/research)
-6. **Write to log before proceeding** - after each phase
-7. **Concrete choices > open-ended** - users reveal criteria by reacting
-8. **Know when to stop** - if criteria are clear, move on
+1. **YOU generate, user validates** - never ask open-ended "what do you want?"
+2. **Maximize information gain** - high-stakes questions first, space-splitting
+3. **Concrete options always** - users reveal criteria by reacting, not by inventing
+4. **Every criterion has verification** - you propose the method, don't ask
+5. **No vague terms** - "clean", "good", "proper" → must be measurable
+6. **Domain knowledge drives** - use your knowledge to generate relevant candidates
+7. **Write to log before proceeding** - after each phase
+8. **Know when to stop** - happy path + errors + edges + constraints = sufficient
