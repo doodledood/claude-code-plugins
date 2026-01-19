@@ -107,11 +107,9 @@ Create todos and log file:
 ```
 - [ ] Create log /tmp/define-interview-{timestamp}.md
 - [ ] Phase 1: Understand intent (high info-gain questions)
-- [ ] Phase 2: Generate candidate global invariants→present for validation
-- [ ] Phase 3: Generate candidate deliverables→present for validation
-- [ ] Phase 4: For each deliverable, generate candidate ACs→present for validation
-- [ ] Phase 5: Quality gates (if coding task)
-- [ ] Phase 6: Project gates from CLAUDE.md (if coding task)
+- [ ] Phase 2: Generate candidate deliverables→present for validation
+- [ ] Phase 3: For each deliverable, generate candidate ACs→present for validation
+- [ ] Phase 4: Global invariants (auto-detect + generate candidates)
 - [ ] (expand: refine as needed)
 - [ ] Refresh: read full interview log
 - [ ] Write final manifest file
@@ -203,58 +201,7 @@ Write to log with inferences:
 - [what this implies about invariants needed]
 ```
 
-### 3. Phase 2: Global Invariants
-
-**Generate candidates based on task type and risk, then validate.**
-
-From Phase 1, infer likely global invariants:
-
-| Task Type | Risk | Likely Invariants |
-|-----------|------|-------------------|
-| Feature | High/Critical | Tests pass, no regressions, security, linting |
-| Feature | Low/Medium | Tests pass, linting |
-| Bug fix | Any | Tests pass, specific regression test |
-| Refactor | Any | Tests pass, behavior unchanged, linting |
-| Greenfield | Any | Tests pass (if tests exist), linting |
-
-**Present generated candidates for validation:**
-```
-questions: [
-  {
-    question: "Which of these should be global invariants? (If violated anywhere, task fails)",
-    header: "Invariants",
-    options: [
-      { label: "Tests must pass (Recommended)", description: "No breaking existing tests" },
-      { label: "No security vulnerabilities", description: "OWASP top 10, no secrets in code" },
-      { label: "Backwards compatible", description: "Existing APIs/behavior unchanged" },
-      { label: "Linting/formatting passes", description: "Code style enforced" }
-    ],
-    multiSelect: true
-  }
-]
-```
-
-**Adapt options to domain:**
-- **Coding**: tests, security, linting, typing, backwards compatibility
-- **Writing**: no spelling errors, consistent tone, word count limits
-- **Research**: all claims cited, methodology documented, scope boundaries
-
-**You propose verification methods** (don't ask):
-- Tests → `bash: npm test` or `bash: pytest`
-- Linting → `bash: npm run lint` or `bash: ruff check`
-- Security → `subagent: code-bugs-reviewer` with security focus
-
-Write to log:
-```markdown
-## Phase 2: Global Invariants
-
-Generated based on: [task type] + [risk level]
-
-- [INV-G1] Tests must pass | Verify: bash `npm test`
-- [INV-G2] Linting passes | Verify: bash `npm run lint`
-```
-
-### 4. Phase 3: Identify Deliverables
+### 3. Phase 2: Identify Deliverables
 
 **Generate candidate deliverables from task description, then validate.**
 
@@ -297,7 +244,7 @@ Generated based on: [scope] + [task description]
 2. [Deliverable name] - [brief description]
 ```
 
-### 5. Phase 4: Per-Deliverable Acceptance Criteria
+### 4. Phase 3: Per-Deliverable Acceptance Criteria
 
 **Generate candidate ACs from domain knowledge, then validate.**
 
@@ -350,58 +297,71 @@ Write to log after each deliverable:
 - [AC-1.2] [description] | Verify: [method]
 ```
 
-### 6. Phase 5: Quality Gates (Coding Tasks)
+### 5. Phase 4: Global Invariants (Last)
 
-If the task involves code, ask about quality gates.
+Global invariants are cross-cutting rules verified at the end. Consolidate from three sources:
 
-**These are typically Global Invariants:**
-
-```
-questions: [
-  {
-    question: "Which code quality checks should be global invariants? (Apply to ALL deliverables)",
-    header: "Quality gates",
-    options: [
-      { label: "No HIGH/CRITICAL bugs", description: "Logic errors, race conditions, error handling" },
-      { label: "Type safety", description: "No any abuse, proper narrowing" },
-      { label: "Maintainability", description: "DRY, low coupling, consistency" },
-      { label: "Simplicity", description: "No over-engineering" }
-    ],
-    multiSelect: true
-  }
-]
-```
-
-Map selections to Global Invariants with subagent verification:
-
-| Selection | INV-G ID | Agent |
-|-----------|----------|-------|
-| No bugs | INV-G{N} | code-bugs-reviewer |
-| Type safety | INV-G{N} | type-safety-reviewer |
-| Maintainability | INV-G{N} | code-maintainability-reviewer |
-| Simplicity | INV-G{N} | code-simplicity-reviewer |
-| Coverage | INV-G{N} | code-coverage-reviewer |
-| Testability | INV-G{N} | code-testability-reviewer |
-| Documentation | INV-G{N} | docs-reviewer |
-| CLAUDE.md | INV-G{N} | claude-md-adherence-reviewer |
-
-### 7. Phase 6: Project Gates (Auto-Detected)
-
-For coding tasks, detect project-specific gates from CLAUDE.md.
-
+**1. Auto-detect from CLAUDE.md** (for coding tasks):
 Read CLAUDE.md and extract verifiable commands:
 - Type checking: mypy, tsc
 - Tests: pytest, jest
 - Linting: ruff, eslint
 - Formatting: black, prettier
 
-Add as Global Invariants:
-```markdown
-- [INV-G{N}] Description: Type checking passes | Verify: bash `[command from CLAUDE.md]`
-- [INV-G{N}] Description: Tests pass | Verify: bash `[command from CLAUDE.md]`
+**2. Generate candidates based on task type + risk:**
+
+| Task Type | Risk | Likely Invariants |
+|-----------|------|-------------------|
+| Feature | High/Critical | Tests pass, no regressions, security, linting |
+| Feature | Low/Medium | Tests pass, linting |
+| Bug fix | Any | Tests pass, specific regression test |
+| Refactor | Any | Tests pass, behavior unchanged, linting |
+| Greenfield | Any | Tests pass (if tests exist), linting |
+
+**3. Quality reviewers** (if coding task and user wants deeper checks):
+
+| Quality Gate | Verification |
+|--------------|--------------|
+| No HIGH/CRITICAL bugs | subagent: code-bugs-reviewer |
+| Type safety | subagent: type-safety-reviewer |
+| Maintainability | subagent: code-maintainability-reviewer |
+| Simplicity | subagent: code-simplicity-reviewer |
+
+**Present consolidated candidates for validation:**
+```
+questions: [
+  {
+    question: "Which should be global invariants? (If violated anywhere, task fails)",
+    header: "Invariants",
+    options: [
+      { label: "Tests pass (Recommended)", description: "[command from CLAUDE.md or standard]" },
+      { label: "Linting/type checks pass", description: "[command from CLAUDE.md or standard]" },
+      { label: "No security vulnerabilities", description: "OWASP top 10, no secrets in code" },
+      { label: "Code quality review", description: "Subagent checks for bugs, maintainability" }
+    ],
+    multiSelect: true
+  }
+]
 ```
 
-### 8. Latent Discovery (Only If Needed)
+**Adapt to domain:**
+- **Coding**: tests, linting, security, quality reviewers
+- **Writing**: no spelling errors, consistent tone, word count limits
+- **Research**: all claims cited, methodology documented
+
+Write to log:
+```markdown
+## Phase 4: Global Invariants
+
+Auto-detected from CLAUDE.md:
+- [INV-G1] Tests pass | Verify: bash `pytest`
+- [INV-G2] Linting passes | Verify: bash `ruff check`
+
+User-selected:
+- [INV-G3] No security vulnerabilities | Verify: subagent code-bugs-reviewer (security focus)
+```
+
+### 6. Latent Discovery (Only If Needed)
 
 These techniques are for **edge cases where your generated candidates weren't sufficient**. Most tasks won't need them.
 
@@ -439,9 +399,9 @@ questions: [
 ```
 → Selected risks become either Global Invariants or specific ACs.
 
-**Don't overuse these.** If your Phase 1-4 candidates were good, the manifest is complete.
+**Don't overuse these.** If your Phase 1-3 candidates were good, the manifest is complete.
 
-### 9. Write to Log (After Each Phase)
+### 7. Write to Log (After Each Phase)
 
 Write findings to `/tmp/define-interview-{timestamp}.md` after each phase.
 
@@ -455,15 +415,11 @@ Started: [timestamp]
 ## Phase 1: Intent & Context
 ...
 
-## Phase 2: Global Invariants
-- [INV-G1] ...
-- [INV-G2] ...
-
-## Phase 3: Deliverables Identified
+## Phase 2: Deliverables Identified
 1. ...
 2. ...
 
-## Phase 4: Deliverable Details
+## Phase 3: Deliverable Details
 
 ### Deliverable 1: [Name]
 **Acceptance Criteria:**
@@ -473,20 +429,18 @@ Started: [timestamp]
 ### Deliverable 2: [Name]
 ...
 
-## Phase 5: Quality Gates
-(selections and resulting INV-G IDs)
+## Phase 4: Global Invariants
+Auto-detected: ...
+User-selected: ...
 
-## Phase 6: Project Gates
-(auto-detected from CLAUDE.md)
-
-## Latent Discoveries
-(tradeoffs, aversions, pre-mortem risks)
+## Latent Discoveries (if any)
+(tradeoffs, pre-mortem risks)
 
 ## Open Questions
 (none if all resolved)
 ```
 
-### 10. Write Final Manifest
+### 8. Write Final Manifest
 
 After refreshing context from the interview log, write `/tmp/manifest-{timestamp}.md`:
 
@@ -553,7 +507,7 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 | [risk] | [INV-G/AC that prevents it] |
 ```
 
-### 11. Complete
+### 9. Complete
 
 Output the manifest file path:
 
