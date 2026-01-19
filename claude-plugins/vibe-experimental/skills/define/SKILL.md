@@ -441,7 +441,12 @@ User-selected: ...
 
 ### 8. Write Final Manifest
 
-After refreshing context from the interview log, write `/tmp/manifest-{timestamp}.md`:
+After refreshing context from the interview log, write `/tmp/manifest-{timestamp}.md`.
+
+**Order deliverables by dependency then importance.** /do iterates in order, so:
+1. Dependencies first (if D2 needs D1, D1 comes first)
+2. Among independent deliverables, higher importance first
+3. This lets /do execute top-to-bottom without backtracking
 
 ```markdown
 # Definition: [Task Description]
@@ -469,7 +474,7 @@ Interview Log: /tmp/define-interview-{timestamp}.md
   ...
 
 ## 3. Deliverables (The Work)
-*Specific items to complete.*
+*Ordered by dependency, then importance. Execute top-to-bottom.*
 
 ### Deliverable 1: [Name]
 
