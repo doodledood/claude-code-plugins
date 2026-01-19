@@ -6,15 +6,25 @@ user-invocable: false
 
 # /done - Completion Marker
 
-Output a summary of what was accomplished, organized by the Manifest hierarchy.
+## Goal
+
+Output a completion summary showing what was accomplished, organized by the Manifest hierarchy.
 
 ## Input
 
 `$ARGUMENTS` = completion context (optional)
 
-## Output Summary
+## What to Do
 
-Read execution log (`/tmp/do-log-*.md`) and manifest to populate:
+Read the execution log and manifest. Output a summary that shows:
+
+1. **Intent** - What was the goal
+2. **Global Invariants** - All respected
+3. **Deliverables** - Each with its ACs, all passing
+4. **Key changes** - Files modified, commits made
+5. **Tradeoffs applied** - How preferences were used
+
+## Output Format
 
 ```markdown
 ## Execution Complete
@@ -25,100 +35,36 @@ All global invariants pass. All acceptance criteria verified.
 **Goal:** [from manifest]
 
 ### Global Invariants
-
 | ID | Description | Status |
 |----|-------------|--------|
-| INV-G1 | Tests must pass | PASS |
-| INV-G2 | No HIGH/CRITICAL bugs | PASS |
-| INV-G3 | Linting passes | PASS |
+| INV-G1 | ... | PASS |
 
 ### Deliverables
 
 #### Deliverable 1: [Name]
-
-**Acceptance Criteria:**
 | ID | Description | Status |
 |----|-------------|--------|
-| AC-1.1 | User can log in | PASS |
-| AC-1.2 | Passwords hashed | PASS |
+| AC-1.1 | ... | PASS |
 
 **Key Changes:**
-- [file:line] - [what changed]
-
----
-
-#### Deliverable 2: [Name]
-
-**Acceptance Criteria:**
-| ID | Description | Status |
-|----|-------------|--------|
-| AC-2.1 | User receives reset email | PASS |
-| AC-2.2 | Reset link works | PASS |
-
-**Key Changes:**
-- [file:line] - [what changed]
+- [file] - [what changed]
 
 ---
 
 ### Tradeoffs Applied
-
-| Decision | Manifest Preference | Outcome |
-|----------|---------------------|---------|
-| [decision context] | [preference from manifest] | [what was chosen] |
-
-### Key Decisions Made
-
-- **[Decision 1]**: [rationale]
-- **[Decision 2]**: [rationale]
-
-### Git Commits
-
-- `[hash]`: [message]
-- `[hash]`: [message]
+| Decision | Preference | Outcome |
+|----------|------------|---------|
 
 ### Files Modified
-
 | File | Changes |
 |------|---------|
-| src/auth.ts | Added login logic |
-| src/session.ts | Added session persistence |
 
 ---
-
 Manifest execution verified complete.
 ```
 
-## Process
+## Principles
 
-1. Read the execution log (`/tmp/do-log-*.md`)
-2. Read the original manifest for structure
-3. Extract:
-   - Intent from manifest
-   - Global Invariant statuses from verification
-   - Per-deliverable results
-   - Tradeoff resolutions from log
-   - Key decisions from log
-   - Git commits made during execution
-   - Files modified
-
-4. Output the structured summary
-
-## Summary Levels
-
-Adjust detail based on task complexity:
-
-**Simple task (1 deliverable, few criteria):**
-- Condensed single-section output
-- Skip empty sections
-
-**Complex task (multiple deliverables):**
-- Full hierarchical output
-- Include all sections
-
-## Key Points
-
-1. **Hierarchical structure** - Mirror the Manifest organization
-2. **Status visibility** - Every criterion shows PASS/Respected
-3. **Changes linked** - Show what changed for each deliverable
-4. **Tradeoffs documented** - Show how preferences were applied
-5. **Git integration** - Link to commits made
+1. **Mirror manifest structure** - Hierarchy should match: Intent → Global Invariants → Deliverables
+2. **Show evidence** - Link changes to deliverables
+3. **Adapt detail to complexity** - Simple task = condensed output. Complex task = full hierarchy.

@@ -6,12 +6,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-experimental] v0.13.0 - Restructure /define from rigid phases to goal-oriented:
-  - Removed prescriptive phase ordering and heuristics tables
-  - New structure: Goal → Principles → What to Discover → Output Schema
-  - Agent has freedom in HOW to build manifest, constrained by principles
-  - Kept memento pattern: write to log as you go, refresh before synthesis
-  - ~130 lines (was ~560)
+- [vibe-experimental] v0.13.0 - Restructure all skills from rigid phases to goal-oriented:
+  - `/define`: Goal → Principles → Constraints → What to Discover → Output Schema
+  - `/do`: Goal → Principles → Constraints (memento pattern) → What to Do
+  - `/verify`: Goal → Principles → What to Do → Decision Logic → Output Format
+  - `/done`: Goal → What to Do → Output Format → Principles
+  - `/escalate`: Goal → Principles → Evidence Requirements → Escalation Types
+  - All skills now: clear goal, clear constraints, freedom in execution
+  - Memento pattern as constraint (todo list, log file, refresh before synthesis)
+  - Significantly shorter across all skills
 
 - [vibe-experimental] v0.12.1 - Fix outdated/inaccurate content in /define skill:
   - Removed "Local Invariants" from intro (merged into Acceptance Criteria in v0.11.0)
