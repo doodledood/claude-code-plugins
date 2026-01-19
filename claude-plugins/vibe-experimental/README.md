@@ -38,14 +38,24 @@ A two-level approach to task definition and execution:
 | Global Invariant | INV-G{N} | Entire task | Task fails |
 | Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |
 
+## Interview Philosophy
+
+**YOU generate, user validates.** Users have surface-level knowledge. Don't ask open-ended questions - generate candidates from domain knowledge, present concrete options, learn from reactions.
+
+**Phase order** (high info-gain first):
+1. Intent & Context (task type, scope, risk)
+2. Deliverables (what are we building?)
+3. Acceptance Criteria (how do we know each is done?)
+4. Global Invariants (auto-detect + generate candidates)
+
 ## Skills
 
 ### User-Invocable
 
 | Skill | Description |
 |-------|-------------|
-| `/define` | Manifest builder - creates hierarchical definition through proactive interview |
-| `/do` | Manifest executor - respects hierarchy, checks invariants, satisfies ACs |
+| `/define` | Manifest builder - YOU generate candidates, user validates (no open-ended questions) |
+| `/do` | Manifest executor - iterates deliverables, satisfies ACs, calls /verify |
 
 ### Internal
 

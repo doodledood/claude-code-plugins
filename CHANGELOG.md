@@ -6,16 +6,25 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.12.0 - Proactive interview + consolidated Global Invariants:
+  - `/define` now uses proactive candidate generation ("YOU generate, user validates")
+  - Phase order changed: Intent → Deliverables → ACs → Global Invariants (rules come last)
+  - Global Invariants consolidated into single phase (merged Quality Gates + Project Gates)
+  - Auto-detects project gates from CLAUDE.md + generates candidates from task type/risk
+  - Questions ordered by information gain (task type, scope, risk split the space early)
+  - Removed open-ended questions - users reveal criteria by reacting to concrete options
+
 - [vibe-experimental] v0.11.0 - Major refactor: Manifest-based two-level architecture:
   - New schema: **Global Invariants** (task-level rules) + **Deliverables** with **Acceptance Criteria**
   - **Global Invariants** (INV-G*): Rules that apply to entire task; task fails if violated
   - **Acceptance Criteria** (AC-{D}.*): Per-deliverable verification (can be positive or negative)
   - Removed Local Invariants (merged into ACs - both verified the same way)
-  - `/define`: Builds "Manifests" through phased interview (Intent → Global Invariants → Deliverables → ACs)
-  - `/do`: Iterates deliverables satisfying ACs, then calls /verify
+  - `/define`: Builds "Manifests" through phased interview (Intent → Deliverables → ACs → Global Invariants)
+  - `/do`: Iterates deliverables satisfying ACs (flat todos with D{N}: prefix), then calls /verify
   - `/verify`: Launches one verifier per criterion in parallel, reports by type
   - `/done`: Outputs completion summary
   - `/escalate`: Type-aware escalation (task-level vs deliverable-level)
+  - Removed pre-flight checks (Global Invariants only verified at final /verify)
   - **Breaking**: Old flat AC-N definitions incompatible; use new Manifest schema
 
 - [vibe-experimental] v0.10.2 - Simplified /verify: single parallel launch, slow first in array
