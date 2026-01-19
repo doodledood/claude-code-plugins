@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.10.3 - Reordered acceptance criteria by importance/dependency:
+  - Rejection conditions first (deal-breakers, no dependencies)
+  - Feature behavior second (core functionality)
+  - Boundaries and edge cases after
+  - Project quality gates before code quality gates (bash-verifiable first)
+  - Task-specific verification last (custom subagent definitions)
+
 - [vibe-experimental] v0.10.2 - Simplified /verify: single parallel launch, slow first in array
 
 - [vibe-experimental] v0.10.1 - Subagent verification uses natural language prompts:

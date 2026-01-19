@@ -535,14 +535,15 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 All criteria use sequential `AC-N` numbering with a `category` field to track origin.
 
 ```markdown
-## All Criteria (logged sequentially)
-- [AC-1] category: feature | description: "..." | verify: method
-- [AC-2] category: feature | description: "..." | verify: method
-- [AC-3] category: rejection | description: "Will reject if..." | verify: method
-- [AC-4] category: edge-case | scenario: "..." | handling: "..." | verify: method
+## All Criteria (logged sequentially, ordered by importance)
+- [AC-1] category: rejection | description: "Will reject if..." | verify: method
+- [AC-2] category: rejection | description: "Will reject if..." | verify: method
+- [AC-3] category: feature | description: "..." | verify: method
+- [AC-4] category: feature | description: "..." | verify: method
 - [AC-5] category: boundary | limit: "..." | verify: method
-- [AC-6] category: quality-gate | agent: code-bugs-reviewer | prompt: "Pass if no HIGH+ bugs"
+- [AC-6] category: edge-case | scenario: "..." | handling: "..." | verify: method
 - [AC-7] category: project-gate | command: "npm test" | verify: bash
+- [AC-8] category: quality-gate | agent: code-bugs-reviewer | prompt: "Pass if no HIGH+ bugs"
 - ...
 
 ## Latent Criteria (from discovery techniques)
@@ -595,6 +596,15 @@ All criteria use sequential `AC-N` numbering with a `category` field to track or
 ## Disappointed Scenarios
 - Scenario: "..." | Prevention: criterion AC-X
 
+## Project Quality Gates (Auto-Detected)
+(only if CLAUDE.md specifies verifiable commands; IDs continue from last AC-N)
+
+| AC-N | Category | Command | Source |
+|------|----------|---------|--------|
+| AC-N | project-gate | [command] | CLAUDE.md line X |
+
+(include only gates found in CLAUDE.md; omit section if none)
+
 ## Code Quality Gates
 (only for coding tasks; IDs continue from last AC-N)
 
@@ -607,15 +617,6 @@ Selected (with sequential AC-N IDs):
 - [ ] Testability (category: quality-gate, agent: code-testability-reviewer)
 - [ ] Documentation (category: quality-gate, agent: docs-reviewer)
 - [ ] CLAUDE.md adherence (category: quality-gate, agent: claude-md-adherence-reviewer)
-
-## Project Quality Gates (Auto-Detected)
-(only if CLAUDE.md specifies verifiable commands; IDs continue from last AC-N)
-
-| AC-N | Category | Command | Source |
-|------|----------|---------|--------|
-| AC-N | project-gate | [command] | CLAUDE.md line X |
-
-(include only gates found in CLAUDE.md; omit section if none)
 
 ## Open Questions
 - (none if all resolved)
@@ -639,33 +640,38 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 ## Acceptance Criteria
 
 All criteria use sequential AC-N numbering. The `category` field indicates the criterion type.
+Ordered by importance and dependency: rejection conditions first (deal-breakers), then core functionality, then constraints and edge cases.
+
+### Rejection Conditions
+- id: AC-1
+  category: rejection
+  description: "PR will be rejected if..."
+  verify: ...
+
+- id: AC-2
+  category: rejection
+  ...
 
 ### Feature Behavior
-- id: AC-1
+- id: AC-3
   category: feature
   description: "..."
   verify:
     method: bash | subagent | manual
     [details]
 
-- id: AC-2
+- id: AC-4
   category: feature
   ...
 
-### Rejection Conditions
-- id: AC-3
-  category: rejection
-  description: "PR will be rejected if..."
-  verify: ...
-
 ### Boundaries (Hard Limits)
-- id: AC-4
+- id: AC-5
   category: boundary
   limit: "[hard limit from interview]"
   verify: [method]
 
 ### Edge Cases
-- id: AC-5
+- id: AC-6
   category: edge-case
   scenario: "..."
   handling: "..."
@@ -688,7 +694,7 @@ When criteria conflict, these preferences apply:
 ```[language]
 [concrete code that would pass]
 ```
-Passes criteria: AC-1, AC-3
+Passes criteria: AC-1, AC-3 (rejection conditions + feature behavior)
 
 ### Rejected
 ```[language]
@@ -706,10 +712,29 @@ Fails because: [specific reason linked to criterion]
 |----------|---------------------|
 | ... | AC-X |
 
+## Project Quality Gates
+(only present if CLAUDE.md specifies verifiable commands; IDs continue sequentially)
+
+- id: AC-10
+  category: project-gate
+  description: "Type checking passes"
+  verify:
+    method: bash
+    command: "[command from CLAUDE.md]"
+
+- id: AC-11
+  category: project-gate
+  description: "Tests pass"
+  verify:
+    method: bash
+    command: "[command from CLAUDE.md]"
+
+[etc. - IDs continue sequentially]
+
 ## Code Quality Gates
 (only present if coding task and user selected gates; IDs continue sequentially)
 
-- id: AC-10
+- id: AC-12
   category: quality-gate
   description: "No HIGH or CRITICAL bugs introduced"
   verify:
@@ -717,7 +742,7 @@ Fails because: [specific reason linked to criterion]
     agent: code-bugs-reviewer
     prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."
 
-- id: AC-11
+- id: AC-13
   category: quality-gate
   description: "Documentation matches code changes"
   verify:
@@ -726,25 +751,6 @@ Fails because: [specific reason linked to criterion]
     prompt: "Check docs accuracy. Pass if no MEDIUM+ issues."
 
 [etc. for each selected gate]
-
-## Project Quality Gates
-(only present if CLAUDE.md specifies verifiable commands; IDs continue sequentially)
-
-- id: AC-12
-  category: project-gate
-  description: "Type checking passes"
-  verify:
-    method: bash
-    command: "[command from CLAUDE.md]"
-
-- id: AC-13
-  category: project-gate
-  description: "Tests pass"
-  verify:
-    method: bash
-    command: "[command from CLAUDE.md]"
-
-[etc. - IDs continue sequentially]
 
 ## Task-Specific Verification
 

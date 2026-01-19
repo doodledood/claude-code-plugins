@@ -1,6 +1,6 @@
 {
   "name": "vibe-experimental",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Experimental definition-driven workflows. Every criterion has explicit verification; execution can't stop without verification passing or proper escalation.",
   "keywords": [
     "experimental",
