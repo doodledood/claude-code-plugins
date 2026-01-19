@@ -33,8 +33,7 @@ If $ARGUMENTS contains context (file reference, inline notes, or research):
 2. **Ask**: "You provided [summary]. What from this MUST the implementation incorporate?"
 3. **Classify answers** as either:
    - Global Invariants (applies to everything)
-   - Local Invariants (applies to specific deliverable)
-   - Acceptance Criteria (verification of success)
+   - Acceptance Criteria (per-deliverable verification)
 
 ## Output
 

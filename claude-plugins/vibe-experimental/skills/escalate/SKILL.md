@@ -99,7 +99,6 @@ Unable to satisfy this acceptance criterion after [N] attempts.
 ### Context
 
 **Deliverable:** [name]
-**Local Invariants respected:** [list]
 **Other ACs in this deliverable:**
 - AC-{D}.1: [status]
 - AC-{D}.2: [status]

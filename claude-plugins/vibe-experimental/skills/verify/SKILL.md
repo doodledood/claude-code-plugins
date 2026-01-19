@@ -131,7 +131,7 @@ Focus on HIGH and CRITICAL severity issues only.")
 Standard structure:
 ```json
 {
-  "passed": ["INV-G1", "INV-L1.1", "AC-1.1"],
+  "passed": ["INV-G1", "AC-1.1"],
   "failed": [
     {
       "id": "AC-1.2",

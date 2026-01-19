@@ -66,8 +66,8 @@ Always return this structure:
 ```markdown
 ## Criterion: [ID]
 
-**Type**: global-invariant | local-invariant | acceptance-criteria
-**Deliverable**: [N] (if local-invariant or acceptance-criteria)
+**Type**: global-invariant | acceptance-criteria
+**Deliverable**: [N] (if acceptance-criteria)
 
 **Status**: PASS | FAIL
 
