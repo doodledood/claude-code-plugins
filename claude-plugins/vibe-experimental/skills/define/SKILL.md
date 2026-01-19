@@ -1,14 +1,18 @@
 ---
 name: define
-description: 'Work definition builder. Creates exhaustive definitions where every criterion has an explicit verification method. Use when starting new features, refactors, or any work requiring clear done criteria.'
+description: 'Manifest builder. Creates hierarchical definitions separating Deliverables (what to build) from Invariants (rules to follow). Use when starting new features, refactors, or any work requiring clear done criteria.'
 user-invocable: true
 ---
 
-# /define - Work Definition Builder
+# /define - Manifest Builder
 
-You are building a work definition. Every criterion you capture MUST have an explicit verification method (bash command, subagent check, or manual flag).
+You are building a **Manifest**—a hierarchical definition that separates:
+- **What we build** (Deliverables with Acceptance Criteria)
+- **Rules we must follow** (Invariants—Global and Local)
 
-**Verification method selection**: Prefer bash (fastest, most reliable) > subagent (for subjective/complex checks) > manual (only when automation is impossible, e.g., "feels right to user").
+Every criterion MUST have an explicit verification method (bash command, subagent check, or manual flag).
+
+**Verification method selection**: Prefer bash (fastest, most reliable) > subagent (for subjective/complex checks) > manual (only when automation is impossible).
 
 ## Input
 
@@ -17,615 +21,372 @@ You are building a work definition. Every criterion you capture MUST have an exp
 Examples:
 - Simple: `/define "Add user authentication"`
 - With context: `/define "Add OAuth integration" --context /tmp/oauth-research.md`
-- Inline context: `/define "Refactor payment module - must use Stripe v3 API, avoid webhooks per security team decision"`
+- Inline context: `/define "Refactor payment module - must use Stripe v3 API"`
 
 If no arguments provided, ask: "What would you like to build or change?"
 
 ### Handling Provided Context
 
-If $ARGUMENTS contains context (file reference, inline notes, or research findings):
+If $ARGUMENTS contains context (file reference, inline notes, or research):
 
 1. **Read and summarize** the context
-2. **Ask**: "You provided [summary]. What from this MUST the implementation incorporate? (What would cause rejection if ignored?)"
-3. **Turn answers into criteria**:
-   ```yaml
-   - id: AC-N
-     category: rejection
-     description: "Must incorporate [specific aspect]"
-     verify: [user-specified or manual]
-   ```
-
-Don't ask redundant questions about whether context exists—if it's provided, handle it. The question is WHAT from the context is mandatory, not IF context should be used.
-
-**If you find contradictions or conflicts** (e.g., context contradicts codebase, criteria seem incompatible, user's answers contradict earlier answers): Surface as a question. User may not realize the conflict, or may have context you don't. Their resolution becomes a criterion.
+2. **Ask**: "You provided [summary]. What from this MUST the implementation incorporate?"
+3. **Classify answers** as either:
+   - Global Invariants (applies to everything)
+   - Local Invariants (applies to specific deliverable)
+   - Acceptance Criteria (verification of success)
 
 ## Output
 
-Definition file: `/tmp/define-{timestamp}.md`
+Manifest file: `/tmp/manifest-{timestamp}.md`
+
+## The Manifest Schema
+
+```markdown
+# Definition: [Title]
+
+## 1. Intent & Context
+- **Goal:** [High-level purpose]
+- **Mental Model:** [Key concepts/architecture to understand]
+
+## 2. Global Invariants (The Constitution)
+*Rules that apply to the ENTIRE execution. If these fail, the task is failed.*
+
+- [INV-G1] Description: ... | Verify: [Method]
+- [INV-G2] Description: ... | Verify: [Method]
+
+## 3. Deliverables (The Work)
+*Specific items to complete.*
+
+### Deliverable 1: [Name]
+- **Local Invariants** (Constraints specific to this item):
+  - [INV-L1.1] Description: ... | Verify: ...
+- **Acceptance Criteria** (Positive verification of success):
+  - [AC-1.1] Description: ... | Verify: ...
+  - [AC-1.2] Description: ... | Verify: ...
+
+### Deliverable 2: [Name]
+...
+```
+
+## Conceptual Framework
+
+### Invariants vs Acceptance Criteria
+
+| Type | Question | Scope | Failure Semantics |
+|------|----------|-------|-------------------|
+| **Global Invariant** | "What rules must NEVER be violated?" | Entire task | Task FAILS if violated |
+| **Local Invariant** | "What constraints apply while building THIS?" | Single deliverable | Deliverable invalid if violated |
+| **Acceptance Criteria** | "How do we know THIS is done?" | Single deliverable | Deliverable incomplete if not met |
+
+### Examples Across Domains
+
+**Coding:**
+- Global Invariant: "Tests must pass" (INV-G1)
+- Deliverable: "Add user authentication"
+  - Local Invariant: "No plaintext passwords" (INV-L1.1)
+  - AC: "User can log in with valid credentials" (AC-1.1)
+
+**Writing:**
+- Global Invariant: "No spelling errors" (INV-G1)
+- Deliverable: "Executive summary"
+  - Local Invariant: "Max 500 words" (INV-L1.1)
+  - AC: "Key findings are summarized" (AC-1.1)
+
+**Research:**
+- Global Invariant: "All claims have citations" (INV-G1)
+- Deliverable: "Literature review"
+  - Local Invariant: "Only peer-reviewed sources" (INV-L1.1)
+  - AC: "Covers major approaches" (AC-1.1)
 
 ## Process
 
 ### 1. Initialize
 
-Create todos and log file. The todos below are starting points—add task-specific areas as you discover them:
+Create todos and log file:
 
 ```
 - [ ] Create log /tmp/define-interview-{timestamp}.md
-- [ ] Gather positive criteria (feature, quality, architecture)
-- [ ] Gather negative criteria (rejection conditions)
-- [ ] Explore edge cases relevant to this task
-- [ ] Surface latent criteria (use techniques relevant to task type)
-- [ ] Ask task-specific questions (security, performance, UX, etc. as relevant)
-- [ ] Refine vague criteria to specific
-- [ ] Ask code quality gates question (if coding task)
-- [ ] Detect project quality gates from CLAUDE.md (if coding task)
-- [ ] (expand: add areas as discovered during interview)
+- [ ] Phase 1: Gather intent & context
+- [ ] Phase 2: Identify global invariants
+- [ ] Phase 3: Identify deliverables
+- [ ] Phase 4: For each deliverable, gather local invariants + ACs
+- [ ] Phase 5: Quality gates (if coding task)
+- [ ] Phase 6: Project gates from CLAUDE.md (if coding task)
+- [ ] (expand: refine as needed)
 - [ ] Refresh: read full interview log
-- [ ] Write final definition file
+- [ ] Write final manifest file
 ```
 
-**Note**: The interview techniques in Section 2 are tools, not a checklist. Start with rejection criteria, then use concrete choice questions to probe deeper. Use latent discovery techniques when direct questions don't surface what you need.
+### 2. Phase 1: Intent & Context
 
-### 2. Proactive LLM-Driven Interview
+Establish the high-level purpose.
 
-YOU drive the interview. Don't wait for the user to volunteer everything. Surface questions they wouldn't think to ask.
-
-**Goal**: A definition so complete that an LLM can execute autonomously without ambiguity.
-
-**Interview Philosophy**:
-
-**Be proactive with concrete choices.** Users often can't articulate criteria until they see options to react to. Present concrete alternatives—code examples, approaches, tradeoffs—and let them accept or reject. Their reactions reveal criteria they couldn't have stated upfront. Use AskUserQuestion with 2-4 options; reserve open-ended questions for initial exploration only.
-
-Start with "What would cause you to reject this?" to prime rejection thinking, then drive the interview with concrete choices based on their answer.
-
-**Know when to stop**: If the user clearly knows what they want and rejection criteria are captured, move on. Don't over-interview simple tasks. Probe deeper when complexity or risk warrants it.
-
-**Interview Techniques (use as needed, not as checklist):**
-
-#### Positive Criteria
-Ask about:
-- Feature behavior: "What should happen when X?"
-- Quality standards: "What code quality expectations apply?"
-- Architecture: "Where should this live in the codebase?"
-- Integration: "What existing systems does this touch?"
-
-#### Negative Criteria (Rejection-First)
-Ask explicitly: "What would cause you to REJECT this output?"
-- Capture ALL rejection criteria the user mentions
-- These are the most important criteria - everything else is optional
-- If user struggles, offer common rejection reasons as options based on task type
-
-#### Edge Cases
-Present relevant edge cases as options for the user to confirm handling:
-- Empty input / null values
-- Large input / scale limits
-- Concurrent access / race conditions
-- Failure modes / error handling
-- Task-specific edge cases (e.g., timezone handling, unicode, permissions)
-
-Use multi-select AskUserQuestion: "Which edge cases need explicit handling?" with task-relevant options.
-
-#### Adversarial Examples
-Show 1-3 concrete implementations that vary on relevant dimensions. The goal is to isolate preferences—if the user accepts one but rejects another, the difference reveals a criterion.
-
-```
-"Here's a possible implementation. Would you accept this?"
-
-[Show concrete code/behavior]
-
-If rejected: "What specifically makes this unacceptable?"
-→ Capture as criterion
-```
-
-Dimensions to consider varying (pick what's relevant):
-- Structure (flat vs nested, modular vs monolithic)
-- Style (verbose vs terse, explicit vs implicit)
-- Abstraction level (high vs low)
-- Error handling approach
-- Naming conventions
-- Any dimension relevant to the specific task
-
-Example: If user accepts A (flat, verbose) and C (flat, terse) but rejects B (nested, terse), the issue is nesting—not style.
-
-#### Contrast Pairs
-Present alternatives with follow-up options:
-```
-"Which approach do you prefer?"
-
-Option A: [approach]
-Option B: [approach]
-
-If they choose, follow up with concrete options:
-"What makes that better for this case?"
-- { label: "Simpler", description: "..." }
-- { label: "More flexible", description: "..." }
-- { label: "Matches existing patterns", description: "..." }
-→ Capture reasoning as criterion
-```
-
-#### Pre-mortem Question
-Ask: "Imagine this shipped and it was a disaster. What went wrong?"
-- Capture risks mentioned
-- Each risk becomes a preventive criterion
-- If user struggles, offer common failure modes as options
-
-#### Disappointed Question
-Ask: "All criteria pass but you're disappointed. What would cause that?"
-- Capture scenarios mentioned
-- Each scenario becomes a criterion
-- If user struggles, offer possible disappointments as options (e.g., "too slow?", "hard to extend?", "doesn't match team style?")
-
-#### Persona Simulation
-Ask: "If [respected developer/architect] reviewed this, what would they critique?"
-- User identifies a persona
-- If they struggle to generate critiques, offer common concerns that persona might have
-- Capture critiques as criteria
-
-#### Progressive Concreteness
-For any vague criterion, offer concrete interpretations:
-- Instead of "What does 'clean' mean?", offer: "Which matters most: readability, short functions, minimal dependencies, or consistent style?"
-- Instead of "How would we verify 'good performance'?", offer: "What's acceptable: <100ms, <500ms, <1s, or just 'not noticeably slow'?"
-- Refine until true/false verifiable
-- Use numeric thresholds where applicable
-
-### 2b. Latent Criteria Discovery
-
-These techniques surface criteria users CAN'T articulate until forced to choose or react. They apply to ANY output type - code, research, docs, designs, analysis.
-
-**The only question that matters**: Would violating this criterion cause the user to reject the output?
-
-- **Yes** → Must capture it (obvious or latent)
-- **No** → Don't need it
-
-All techniques below exist to surface **hidden rejection criteria** - things the user would reject but wouldn't think to mention upfront.
-
-**Proceed when:**
-- You've asked: "What would cause you to reject this?" and captured the answers
-- Latent techniques haven't revealed new rejection criteria in the last 2-3 questions
-- User signals "I think we've covered it"
-
-**Keep probing when:**
-- Core deliverable is still ambiguous (guaranteed rejection)
-- You haven't tested any latent techniques yet
-- A technique just revealed a new rejection criterion - probe that area deeper
-- You sense there's something important the user hasn't articulated
-
-**Goal**: Surface hidden rejection criteria through substantive probing. The techniques below are examples—use whatever approaches reveal what the user would reject but wouldn't think to mention.
-
-#### Tradeoff Forcing
-Present competing values, force a choice. Works for ANY domain:
-
-**Coding example:**
-```
-question: "When file size and conceptual completeness conflict, which wins?"
-options:
-- { label: "Smaller files", description: "Split to stay under ~200 lines" }
-- { label: "Complete concepts", description: "Keep together even if larger" }
-```
-
-**Research example:**
-```
-question: "When depth and breadth conflict, which wins?"
-options:
-- { label: "Go deep", description: "Thoroughly explore fewer sources" }
-- { label: "Go broad", description: "Survey more sources, less depth each" }
-- { label: "Depends on topic", description: "Specify in Other" }
-```
-
-**Docs example:**
-```
-question: "When brevity and completeness conflict, which wins?"
-options:
-- { label: "Keep it short", description: "Readers can ask follow-ups" }
-- { label: "Be thorough", description: "Cover edge cases upfront" }
-```
-
-Common tradeoffs to probe (examples—identify task-specific tradeoffs):
-- Depth vs breadth (research, docs)
-- Brevity vs completeness (docs, analysis)
-- Speed vs rigor (any)
-- Flexibility vs simplicity (code, design)
-- Convention vs optimization (code)
-- Comprehensive vs focused (research)
-- (Task-specific: e.g., "backwards compat vs clean API", "user convenience vs security")
-
-#### Extreme Aversion
-Find which direction they'd rather err. Universally applicable:
-
-**Coding:**
-```
-question: "Which extreme is WORSE?"
-options:
-- { label: "Over-abstracted", description: "Too many tiny pieces, hard to follow" }
-- { label: "Under-abstracted", description: "Long, repetitive, but traceable" }
-```
-
-**Research:**
-```
-question: "Which extreme is WORSE?"
-options:
-- { label: "Over-hedged", description: "Too many caveats, unclear conclusions" }
-- { label: "Over-confident", description: "Strong claims, may miss nuance" }
-```
-
-**Docs:**
-```
-question: "Which extreme is WORSE?"
-options:
-- { label: "Too technical", description: "Accurate but intimidating" }
-- { label: "Too simplified", description: "Accessible but imprecise" }
-```
-
-#### Reaction Sampling
-Generate concrete artifacts, ask for gut reaction. Show 2-3 examples varying in style:
-
-**Coding:** Show error message styles, function signatures, code structure
-**Research:** Show paragraph styles, citation density, conclusion strength
-**Docs:** Show explanation approaches, example density, tone
-
-```
-"Here's a possible style for [artifact type]:"
-> [concrete example]
-
-question: "Your reaction?"
-options:
-- { label: "Accept as-is", description: "Matches what I want" }
-- { label: "Too [X]", description: "Want less of this quality" }
-- { label: "Not enough [Y]", description: "Want more of this quality" }
-- { label: "Wrong approach", description: "Describe in Other" }
-```
-
-#### Boundary Mapping
-Multi-select to map hard limits. Adapt to domain:
-
-**Coding:**
-```
-question: "Which are HARD rejection criteria? (Select all)"
-options:
-- { label: "Functions > 50 lines", description: "No exceptions" }
-- { label: "Missing error handling", description: "On any fallible op" }
-- { label: "No tests for new code", description: "Coverage required" }
-```
-
-**Research:**
-```
-question: "Which are HARD rejection criteria? (Select all)"
-options:
-- { label: "No primary sources", description: "Must have direct evidence" }
-- { label: "Missing key papers", description: "Seminal works required" }
-- { label: "Unsupported claims", description: "Every claim needs citation" }
-```
-
-**Docs:**
-```
-question: "Which are HARD rejection criteria? (Select all)"
-options:
-- { label: "No working examples", description: "Must have runnable code" }
-- { label: "Assumes expert knowledge", description: "Must define terms" }
-- { label: "Missing troubleshooting", description: "Must cover common errors" }
-```
-
-#### Pattern Anchoring
-Use existing artifacts as preference reference:
-
-```
-question: "Which existing [artifact] is closest to what you want?"
-options:
-- { label: "[Internal reference A]", description: "[Its key characteristics]" }
-- { label: "[Internal reference B]", description: "[Its key characteristics]" }
-- { label: "External reference", description: "Name it in Other" }
-- { label: "Something new", description: "Describe in Other" }
-```
-
-Explore codebase/existing docs first to find anchors.
-
-#### Conceptual Grouping Probe
-For architecture, organization, or structure decisions:
-
-**Coding:**
-```
-question: "Should auth and session management be in the SAME module?"
-```
-
-**Research:**
-```
-question: "Should methodology and results be in the SAME section?"
-```
-
-**Docs:**
-```
-question: "Should setup and configuration be in the SAME guide?"
-```
-
-Ask 3-5 grouping questions to map mental model. Skip if task has no structural decisions.
-
-#### Spectrum Positioning
-Find position on subjective dimensions. Pick 2-3 relevant spectrums (examples below—identify task-specific spectrums):
-
-**Common spectrums:**
-- Verbosity: minimal → moderate → explicit
-- Formality: casual → professional → academic
-- Detail: high-level → balanced → granular
-
-**Domain-specific examples:**
-- Code: abstraction level, type strictness, error handling
-- Research: hedging, citation density, scope
-- Docs: technical depth, example density, assumed knowledge
-- (Task-specific: identify spectrums relevant to THIS task)
-
-### 3. Question Format
-
-ALWAYS use AskUserQuestion with:
-- 2-4 options (never open-ended unless truly necessary)
-- First option = recommended (with "(Recommended)" suffix)
-- Descriptions explain tradeoffs
-- Batch related questions (don't ask one at a time)
-- Provide context for why you're asking (helps user give better answers)
-- If user rejects ALL options, ask what's wrong with them—their objection is the criterion
-
-When asking, briefly explain the purpose:
-- "I'm asking about edge cases because these often surface implicit requirements..."
-- "Rejection criteria help catch issues the LLM might otherwise miss..."
-- "This pre-mortem question surfaces risks you might not think of directly..."
-
-Example:
+**Ask:**
 ```
 questions: [
   {
-    question: "How should failures be handled?",
-    header: "Failures",
+    question: "What is the high-level goal? (1-2 sentences)",
+    header: "Goal",
     options: [
-      { label: "Retry with backoff (Recommended)", description: "3 retries at 1s/2s/4s. Matches existing queue patterns." },
-      { label: "Dead letter queue", description: "Store failed items for manual review. More complex." },
-      { label: "Silent drop with logging", description: "Log and continue. Simple but items may be lost." }
+      { label: "Build new feature", description: "Adding new capability" },
+      { label: "Fix/improve existing", description: "Bug fix or enhancement" },
+      { label: "Refactor/restructure", description: "Improve code/structure without behavior change" },
+      { label: "Research/analysis", description: "Investigate and document findings" }
     ],
     multiSelect: false
   }
 ]
 ```
 
-### 4. Codebase Exploration
+Follow up for specifics based on their selection.
 
-Explore AS NEEDED during interview, not upfront:
-- When user mentions existing patterns → explore to find examples
-- When discussing architecture → check current structure
-- When gathering quality criteria → read CLAUDE.md, existing tests
+**Then ask about mental model:**
+"What key concepts or architecture should I understand before starting? (e.g., existing patterns, domain knowledge, constraints from other systems)"
 
-Use findings to:
-- Propose criteria based on existing patterns
-- Show examples in adversarial questions
-- Reference concrete code in options
+Write to log:
+```markdown
+## Phase 1: Intent & Context
 
-### 5. Code Quality Gates (For Coding Tasks)
+**Goal:** [their answer]
+**Task Type:** [feature/fix/refactor/research]
+**Mental Model:** [key concepts they mentioned]
+```
 
-If the task involves writing or modifying code, ask which code quality categories should gate the work.
+### 3. Phase 2: Global Invariants
 
-The categories below are common quality concerns with automated reviewers available. However, some tasks may have additional quality concerns not covered here (e.g., accessibility, security-specific checks, performance benchmarks). If you identify task-specific quality concerns during the interview, capture them as criteria with appropriate verification methods.
+Surface rules that apply to EVERYTHING.
 
-**Ask using AskUserQuestion:**
-
+**Ask explicitly:**
 ```
 questions: [
   {
-    question: "Which code quality categories should gate this work? Selected categories will be verified before completion.",
-    header: "Quality gates",
+    question: "Are there rules that apply to EVERYTHING? Things that if violated at ANY point mean the task has failed?",
+    header: "Global rules",
     options: [
-      { label: "Bugs", description: "Logic errors, race conditions, edge cases, error handling" },
-      { label: "Type safety", description: "No any abuse, invalid states unrepresentable, proper narrowing" },
-      { label: "Maintainability", description: "DRY, coupling, cohesion, dead code, consistency" },
-      { label: "Simplicity", description: "No over-engineering, cognitive complexity, unnecessary abstraction" }
-    ],
-    multiSelect: true
-  },
-  {
-    question: "More quality categories to verify:",
-    header: "Quality gates (cont.)",
-    options: [
-      { label: "Test coverage", description: "New/changed code has adequate tests" },
-      { label: "Testability", description: "Code is designed to be testable (low mock count)" },
-      { label: "Documentation", description: "Docs and comments match code changes" },
-      { label: "CLAUDE.md adherence", description: "Follows project-specific standards" }
+      { label: "Tests must pass", description: "No breaking existing tests" },
+      { label: "No security vulnerabilities", description: "OWASP top 10, no secrets in code" },
+      { label: "Maintain backwards compatibility", description: "Existing APIs/behavior unchanged" },
+      { label: "Follow style guide", description: "Linting/formatting must pass" }
     ],
     multiSelect: true
   }
 ]
 ```
 
-**Map selections to criteria:**
+Adapt options to task type:
+- **Coding**: tests, security, linting, typing
+- **Writing**: spelling, tone, formatting
+- **Research**: citations, methodology, scope
 
-For each selected category, add a criterion with sequential `AC-N` ID and `category: quality-gate`:
+For each global invariant identified:
+1. Capture the rule
+2. Ask for verification method (or propose one)
+3. Assign INV-G{N} ID
 
-| Category | Reviewer Agent | Category Value |
-|----------|---------------|----------------|
-| Bugs | code-bugs-reviewer | quality-gate |
-| Type safety | type-safety-reviewer | quality-gate |
-| Maintainability | code-maintainability-reviewer | quality-gate |
-| Simplicity | code-simplicity-reviewer | quality-gate |
-| Test coverage | code-coverage-reviewer | quality-gate |
-| Testability | code-testability-reviewer | quality-gate |
-| Documentation | docs-reviewer | quality-gate |
-| CLAUDE.md adherence | claude-md-adherence-reviewer | quality-gate |
-
-Example (IDs continue from last AC-N in definition):
-
-```yaml
-- id: AC-15
-  category: quality-gate
-  description: "No HIGH or CRITICAL bugs introduced"
-  verify:
-    method: subagent
-    agent: code-bugs-reviewer
-    prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."
-
-- id: AC-16
-  category: quality-gate
-  description: "Documentation matches code changes"
-  verify:
-    method: subagent
-    agent: docs-reviewer
-    prompt: "Check docs accuracy. Pass if no MEDIUM+ issues (docs caps at MEDIUM)."
-```
-
-Note: `agent` is the `subagent_type` for the Task tool. Use named agents (like `code-bugs-reviewer`) when available, or `general-purpose` for custom checks.
-
-Write selections to interview log under `## Code Quality Gates`.
-
-### 5b. Project Quality Gates (Auto-Detected)
-
-For coding tasks, detect project-specific quality gates from CLAUDE.md. These are bash-verifiable commands the project defines—whatever the project requires, not a fixed set.
-
-**Detection (no question needed):**
-
-Read CLAUDE.md and look for verifiable commands. Common categories (but not limited to):
-
-| Category | Common Patterns | Example Commands |
-|----------|-----------------|------------------|
-| Type checking | mypy, tsc, pyright | `mypy`, `tsc --noEmit` |
-| Tests | pytest, jest, npm test | `pytest tests/ -v`, `npm test` |
-| Linting | ruff, eslint, flake8 | `ruff check`, `npm run lint` |
-| Formatting | black, prettier | `black --check`, `prettier --check` |
-| Build | build, compile | `npm run build`, `cargo build` |
-
-Projects may have other gates (e.g., `cargo clippy`, `go vet`, security scans, migration checks). Include whatever the project's CLAUDE.md specifies.
-
-**If CLAUDE.md contains verifiable commands:**
-
-Extract and add as criteria with sequential `AC-N` IDs and `category: project-gate`:
-
-```yaml
-# Examples - actual gates depend on what CLAUDE.md specifies
-# IDs continue from last AC-N in definition
-- id: AC-23
-  category: project-gate
-  description: "Type checking passes"
-  verify:
-    method: bash
-    command: "[extracted command]"
-
-- id: AC-24
-  category: project-gate
-  description: "Tests pass"
-  verify:
-    method: bash
-    command: "[extracted command]"
-
-- id: AC-25
-  category: project-gate
-  description: "Linting passes"
-  verify:
-    method: bash
-    command: "[extracted command]"
-```
-
-**If no CLAUDE.md or no verifiable commands found:**
-
-Don't invent gates. Only include what the project explicitly requires. Skip this section entirely if nothing is specified.
-
-**Command formatting:**
-
-- Use check-only variants for verification (e.g., `black --check` not `black`)
-- Keep commands as close to CLAUDE.md as possible
-
-Write detected gates to interview log under `## Project Quality Gates (Auto-Detected)`.
-
-### 6. Write to Log (After Each Phase)
-
-After each interview phase, write findings to `/tmp/define-interview-{timestamp}.md`:
-
-All criteria use sequential `AC-N` numbering with a `category` field to track origin.
-
+Write to log:
 ```markdown
-## All Criteria (logged sequentially)
-- [AC-1] category: feature | description: "..." | verify: method
-- [AC-2] category: feature | description: "..." | verify: method
-- [AC-3] category: rejection | description: "Will reject if..." | verify: method
-- [AC-4] category: edge-case | scenario: "..." | handling: "..." | verify: method
-- [AC-5] category: boundary | limit: "..." | verify: method
-- [AC-6] category: quality-gate | agent: code-bugs-reviewer | prompt: "Pass if no HIGH+ bugs"
-- [AC-7] category: project-gate | command: "npm test" | verify: bash
-- ...
+## Phase 2: Global Invariants
 
-## Latent Criteria (from discovery techniques)
+- [INV-G1] Description: Tests must pass | Verify: bash `npm test`
+- [INV-G2] Description: No security vulnerabilities | Verify: subagent (code-bugs-reviewer) focusing on security
+```
 
-### Tradeoffs Documented
-| Dimension | When conflicting, prefer | Rationale |
-|-----------|-------------------------|-----------|
-| [e.g., depth vs breadth] | [preference] | [user's reasoning] |
-| [e.g., brevity vs completeness] | [preference] | [user's reasoning] |
+### 4. Phase 3: Identify Deliverables
 
-### Boundaries (hard limits)
-- [e.g., "No unsupported claims" for research]
-- [e.g., "Functions max 50 lines" for code]
-- [e.g., "Must have working examples" for docs]
-- (none if no hard limits specified)
+Break the work into specific deliverables.
 
-### Extreme Aversions
-- More averse to: [extreme A] (prefer erring toward [extreme B])
-- [e.g., "over-hedged" → prefer slightly bold over too cautious]
+**Ask:**
+"What are the specific things you need delivered? (Think of these as items you could check off a list)"
 
-### Pattern References
-- Primary reference: [existing artifact] ([key characteristics])
-- Anti-reference: [artifact to avoid] ([why])
+**Probing techniques:**
+- "Is this one deliverable or multiple?"
+- "Could these be done independently?"
+- "What's the natural grouping?"
 
-### Conceptual Groupings
-- [concept A] + [concept B] → SAME/SEPARATE
-- (capture user's mental model boundaries)
-- (skip if no structural decisions in task)
+For a task like "Add user authentication":
+- Deliverable 1: User registration flow
+- Deliverable 2: Login/logout mechanism
+- Deliverable 3: Session management
+- Deliverable 4: Password reset
 
-### Spectrum Positions
-- [e.g., Formality]: [position]
-- [e.g., Detail level]: [position]
-- [e.g., Technical depth]: [position]
+Write to log:
+```markdown
+## Phase 3: Deliverables Identified
 
-### Reaction Samples
-| Artifact shown | Reaction | Criterion captured |
-|---------------|----------|-------------------|
-| [concrete example] | [reaction] | [resulting criterion] |
+1. [Deliverable name]
+2. [Deliverable name]
+3. [Deliverable name]
+```
 
-## Adversarial Examples
-### Accepted
-- [code/behavior]
+### 5. Phase 4: Per-Deliverable Details
 
-### Rejected
-- [code/behavior] | reason: "..."
+For EACH deliverable, gather:
 
-## Pre-mortem Risks
-- Risk: "..." | Prevention: criterion AC-X
+#### 4a. Local Invariants
 
-## Disappointed Scenarios
-- Scenario: "..." | Prevention: criterion AC-X
+**Ask:**
+"For [Deliverable N], are there constraints on HOW you want it built? (Not what it does, but rules for building it)"
 
-## Code Quality Gates
-(only for coding tasks; IDs continue from last AC-N)
+Examples:
+- "No storing passwords in plaintext" (for auth deliverable)
+- "Must use existing ORM, no raw SQL" (for data deliverable)
+- "Max 500 words" (for writing deliverable)
+- "Only peer-reviewed sources" (for research deliverable)
 
-Selected (with sequential AC-N IDs):
-- [ ] Bugs (category: quality-gate, agent: code-bugs-reviewer)
-- [ ] Type safety (category: quality-gate, agent: type-safety-reviewer)
-- [ ] Maintainability (category: quality-gate, agent: code-maintainability-reviewer)
-- [ ] Simplicity (category: quality-gate, agent: code-simplicity-reviewer)
-- [ ] Test coverage (category: quality-gate, agent: code-coverage-reviewer)
-- [ ] Testability (category: quality-gate, agent: code-testability-reviewer)
-- [ ] Documentation (category: quality-gate, agent: docs-reviewer)
-- [ ] CLAUDE.md adherence (category: quality-gate, agent: claude-md-adherence-reviewer)
+For each local invariant:
+1. Capture the constraint
+2. Ask for verification method
+3. Assign INV-L{D}.{N} ID
 
-## Project Quality Gates (Auto-Detected)
-(only if CLAUDE.md specifies verifiable commands; IDs continue from last AC-N)
+#### 4b. Acceptance Criteria
 
-| AC-N | Category | Command | Source |
-|------|----------|---------|--------|
-| AC-N | project-gate | [command] | CLAUDE.md line X |
+**Ask:**
+"How do we verify [Deliverable N] is done? What specific things must be true?"
 
-(include only gates found in CLAUDE.md; omit section if none)
+Use probing techniques from the original /define:
+- Rejection-first: "What would cause you to reject this deliverable?"
+- Edge cases: "What edge cases need handling?"
+- Adversarial: Show concrete examples, ask if acceptable
+
+For each AC:
+1. Capture what success looks like
+2. Ask for verification method
+3. Assign AC-{D}.{N} ID
+
+Write to log after each deliverable:
+```markdown
+### Deliverable 1: [Name]
+
+**Local Invariants:**
+- [INV-L1.1] Description: ... | Verify: ...
+- [INV-L1.2] Description: ... | Verify: ...
+
+**Acceptance Criteria:**
+- [AC-1.1] Description: ... | Verify: ...
+- [AC-1.2] Description: ... | Verify: ...
+```
+
+### 6. Phase 5: Quality Gates (Coding Tasks)
+
+If the task involves code, ask about quality gates.
+
+**These are typically Global Invariants:**
+
+```
+questions: [
+  {
+    question: "Which code quality checks should be global invariants? (Apply to ALL deliverables)",
+    header: "Quality gates",
+    options: [
+      { label: "No HIGH/CRITICAL bugs", description: "Logic errors, race conditions, error handling" },
+      { label: "Type safety", description: "No any abuse, proper narrowing" },
+      { label: "Maintainability", description: "DRY, low coupling, consistency" },
+      { label: "Simplicity", description: "No over-engineering" }
+    ],
+    multiSelect: true
+  }
+]
+```
+
+Map selections to Global Invariants with subagent verification:
+
+| Selection | INV-G ID | Agent |
+|-----------|----------|-------|
+| No bugs | INV-G{N} | code-bugs-reviewer |
+| Type safety | INV-G{N} | type-safety-reviewer |
+| Maintainability | INV-G{N} | code-maintainability-reviewer |
+| Simplicity | INV-G{N} | code-simplicity-reviewer |
+| Coverage | INV-G{N} | code-coverage-reviewer |
+| Testability | INV-G{N} | code-testability-reviewer |
+| Documentation | INV-G{N} | docs-reviewer |
+| CLAUDE.md | INV-G{N} | claude-md-adherence-reviewer |
+
+### 7. Phase 6: Project Gates (Auto-Detected)
+
+For coding tasks, detect project-specific gates from CLAUDE.md.
+
+Read CLAUDE.md and extract verifiable commands:
+- Type checking: mypy, tsc
+- Tests: pytest, jest
+- Linting: ruff, eslint
+- Formatting: black, prettier
+
+Add as Global Invariants:
+```markdown
+- [INV-G{N}] Description: Type checking passes | Verify: bash `[command from CLAUDE.md]`
+- [INV-G{N}] Description: Tests pass | Verify: bash `[command from CLAUDE.md]`
+```
+
+### 8. Latent Discovery (Use as Needed)
+
+Apply latent discovery techniques when direct questions don't surface criteria:
+
+**Tradeoff Forcing:**
+When working on a deliverable, ask: "When [value A] and [value B] conflict, which wins?"
+- Capture as Local Invariant if specific to deliverable
+- Capture as Global Invariant if applies everywhere
+
+**Extreme Aversion:**
+"Which extreme is WORSE?" → Reveals constraints
+
+**Pre-mortem:**
+"Imagine this shipped and was a disaster. What went wrong?"
+- Each risk becomes either a Global Invariant or AC
+
+**Reaction Sampling:**
+Show concrete examples, capture reactions as criteria.
+
+### 9. Write to Log (After Each Phase)
+
+Write findings to `/tmp/define-interview-{timestamp}.md` after each phase.
+
+Log format:
+```markdown
+# Interview Log
+
+Task: [title]
+Started: [timestamp]
+
+## Phase 1: Intent & Context
+...
+
+## Phase 2: Global Invariants
+- [INV-G1] ...
+- [INV-G2] ...
+
+## Phase 3: Deliverables Identified
+1. ...
+2. ...
+
+## Phase 4: Deliverable Details
+
+### Deliverable 1: [Name]
+**Local Invariants:**
+- [INV-L1.1] ...
+
+**Acceptance Criteria:**
+- [AC-1.1] ...
+
+### Deliverable 2: [Name]
+...
+
+## Phase 5: Quality Gates
+(selections and resulting INV-G IDs)
+
+## Phase 6: Project Gates
+(auto-detected from CLAUDE.md)
+
+## Latent Discoveries
+(tradeoffs, aversions, pre-mortem risks)
 
 ## Open Questions
-- (none if all resolved)
+(none if all resolved)
 ```
 
-### 7. Write Final Definition
+### 10. Write Final Manifest
 
-After refreshing context from the interview log, write `/tmp/define-{timestamp}.md`:
-
-All criteria use sequential `AC-N` numbering. Categories are metadata via the `category` field.
+After refreshing context from the interview log, write `/tmp/manifest-{timestamp}.md`:
 
 ```markdown
 # Definition: [Task Description]
@@ -633,185 +394,120 @@ All criteria use sequential `AC-N` numbering. Categories are metadata via the `c
 Generated: [date]
 Interview Log: /tmp/define-interview-{timestamp}.md
 
-## Overview
-[1-2 sentences describing what this definition covers]
+## 1. Intent & Context
+- **Goal:** [High-level purpose from Phase 1]
+- **Mental Model:** [Key concepts/architecture from Phase 1]
 
-## Acceptance Criteria
+## 2. Global Invariants (The Constitution)
+*Rules that apply to the ENTIRE execution. If these fail, the task is failed.*
 
-All criteria use sequential AC-N numbering. The `category` field indicates the criterion type.
-
-### Feature Behavior
-- id: AC-1
-  category: feature
-  description: "..."
+- [INV-G1] Description: [rule] | Verify: [method]
+  ```yaml
   verify:
     method: bash | subagent | manual
-    [details]
+    command: "[if bash]"
+    agent: "[if subagent]"
+    prompt: "[if subagent]"
+  ```
 
-- id: AC-2
-  category: feature
+- [INV-G2] Description: [rule] | Verify: [method]
   ...
 
-### Rejection Conditions
-- id: AC-3
-  category: rejection
-  description: "PR will be rejected if..."
-  verify: ...
+## 3. Deliverables (The Work)
+*Specific items to complete.*
 
-### Boundaries (Hard Limits)
-- id: AC-4
-  category: boundary
-  limit: "[hard limit from interview]"
-  verify: [method]
+### Deliverable 1: [Name]
 
-### Edge Cases
-- id: AC-5
-  category: edge-case
-  scenario: "..."
-  handling: "..."
-  verify: ...
+**Local Invariants** (Constraints specific to this item):
+- [INV-L1.1] Description: [constraint] | Verify: [method]
+  ```yaml
+  verify:
+    method: bash | subagent | codebase | manual
+    [details]
+  ```
 
-## Tradeoffs & Preferences
-When criteria conflict, these preferences apply:
+**Acceptance Criteria** (Positive verification of success):
+- [AC-1.1] Description: [success condition] | Verify: [method]
+  ```yaml
+  verify:
+    method: bash | subagent | codebase | manual
+    [details]
+  ```
+- [AC-1.2] Description: [success condition] | Verify: [method]
+  ...
+
+### Deliverable 2: [Name]
+
+**Local Invariants**:
+- [INV-L2.1] ...
+
+**Acceptance Criteria**:
+- [AC-2.1] ...
+- [AC-2.2] ...
+
+## 4. Tradeoffs & Preferences
+*When criteria conflict, these preferences apply:*
 
 | Dimension | Preference | Context |
 |-----------|------------|---------|
 | [from interview] | [preference] | [when it applies] |
 
-## Pattern References
+## 5. Pattern References
 - Follow: [reference artifact] ([key characteristics])
 - Avoid: [anti-pattern] ([why])
 
-## Examples
-
-### Accepted
-```[language]
-[concrete code that would pass]
-```
-Passes criteria: AC-1, AC-3
-
-### Rejected
-```[language]
-[concrete code that would fail]
-```
-Fails because: [specific reason linked to criterion]
-
-## Pre-mortem Risks
-| Risk | Preventive Criterion |
-|------|---------------------|
-| ... | AC-X |
-
-## Disappointed Scenarios
-| Scenario | Preventive Criterion |
-|----------|---------------------|
-| ... | AC-X |
-
-## Code Quality Gates
-(only present if coding task and user selected gates; IDs continue sequentially)
-
-- id: AC-10
-  category: quality-gate
-  description: "No HIGH or CRITICAL bugs introduced"
-  verify:
-    method: subagent
-    agent: code-bugs-reviewer
-    prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."
-
-- id: AC-11
-  category: quality-gate
-  description: "Documentation matches code changes"
-  verify:
-    method: subagent
-    agent: docs-reviewer
-    prompt: "Check docs accuracy. Pass if no MEDIUM+ issues."
-
-[etc. for each selected gate]
-
-## Project Quality Gates
-(only present if CLAUDE.md specifies verifiable commands; IDs continue sequentially)
-
-- id: AC-12
-  category: project-gate
-  description: "Type checking passes"
-  verify:
-    method: bash
-    command: "[command from CLAUDE.md]"
-
-- id: AC-13
-  category: project-gate
-  description: "Tests pass"
-  verify:
-    method: bash
-    command: "[command from CLAUDE.md]"
-
-[etc. - IDs continue sequentially]
-
-## Task-Specific Verification
-
-[Only if verification requires domain-specific checks that existing reviewers don't cover]
-
-Use `general-purpose` agent with a custom prompt for ad-hoc verification:
-
-```yaml
-- id: AC-20
-  category: custom
-  description: "API response matches contract"
-  verify:
-    method: subagent
-    agent: general-purpose
-    prompt: "Read api-contract.yaml and check the implementation matches. Pass if all endpoints conform."
+## 6. Pre-mortem Risks
+| Risk | Preventive Measure |
+|------|-------------------|
+| [risk] | [INV-G/INV-L/AC that prevents it] |
 ```
 
-Or define a reusable subagent if the check is complex:
+### 11. Complete
 
-```yaml
-### [agent-name]
-Purpose: ...
-Context Files: ...
-Checks: [natural language description of what passes]
-```
-
-### 8. Complete
-
-Output the definition file path:
+Output the manifest file path:
 
 ```text
-Definition complete: /tmp/define-{timestamp}.md
+Manifest complete: /tmp/manifest-{timestamp}.md
 
-To do: /do /tmp/define-{timestamp}.md
+To execute: /do /tmp/manifest-{timestamp}.md
 ```
 
-## Resuming Interrupted Interview
+## ID Scheme Reference
 
-If interview is interrupted, it can be resumed:
+| Type | Format | Example | Scope |
+|------|--------|---------|-------|
+| Global Invariant | INV-G{N} | INV-G1, INV-G2 | Entire task |
+| Local Invariant | INV-L{D}.{N} | INV-L1.1, INV-L2.1 | Deliverable D |
+| Acceptance Criteria | AC-{D}.{N} | AC-1.1, AC-2.3 | Deliverable D |
 
-1. Check for existing log: `ls /tmp/define-interview-*.md`
-2. Read the log to understand what's been covered
-3. Update todos to mark completed phases
-4. Continue from next incomplete phase
+Where D = deliverable number, N = sequential within type.
 
-The log file preserves all gathered criteria, examples, and risks.
+## Question Format
+
+ALWAYS use AskUserQuestion with:
+- 2-4 options (concrete choices reveal criteria better than open-ended questions)
+- First option = recommended (with "(Recommended)" suffix)
+- Descriptions explain tradeoffs
+- Batch related questions when possible
+
+Provide context for why you're asking:
+- "Global invariants are rules that if violated anywhere mean the task fails..."
+- "Local invariants are constraints on how to build this specific deliverable..."
 
 ## Amendment Protocol
 
-Definitions support amendments during execution if genuine gaps are discovered:
+Manifests support amendments during execution if genuine gaps are discovered:
 
-- Criteria have unique sequential IDs (AC-1, AC-2, AC-3, etc.)
-- Amendments reference original: "AC-3.1 amends AC-3"
-- Track amendments in definition with date and reason
-- Format: `## Amendments\n- AC-3.1 (2026-01-17): [reason] - [new criterion]`
-
-This allows /do to request definition changes when codebase reality conflicts with criteria.
+- Reference original ID: "INV-G1.1 amends INV-G1"
+- Track in manifest: `## Amendments\n- INV-G1.1 (2026-01-19): [reason]`
 
 ## Critical Rules
 
 1. **YOU drive the interview** - don't wait for user to think of everything
-2. **Every criterion has verification** - no exceptions
-3. **No vague terms** - "clean", "good", "proper" must be defined
-4. **No placeholders** - no TBD, TODO, "figure out later"
-5. **Examples are concrete** - actual code/artifacts, not descriptions
-6. **Write to log before proceeding** - memento pattern mandatory
-7. **Techniques are starting points** - ask whatever questions surface hidden criteria for THIS task
-8. **Concrete choices > open-ended questions** - users reveal criteria by reacting to options
-9. **Know when to stop** - if rejection criteria are clear, move on
-10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution
+2. **Hierarchical structure** - Global Invariants → Deliverables → Local Invariants + ACs
+3. **Every criterion has verification** - no exceptions
+4. **No vague terms** - "clean", "good", "proper" must be defined
+5. **Domain-agnostic** - adapt questions to task type (coding/writing/research)
+6. **Write to log before proceeding** - after each phase
+7. **Concrete choices > open-ended** - users reveal criteria by reacting
+8. **Know when to stop** - if criteria are clear, move on

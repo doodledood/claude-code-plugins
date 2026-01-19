@@ -1,11 +1,14 @@
 {
   "name": "vibe-experimental",
-  "version": "0.10.2",
-  "description": "Experimental definition-driven workflows. Every criterion has explicit verification; execution can't stop without verification passing or proper escalation.",
+  "version": "0.11.0",
+  "description": "Manifest-driven workflows separating Deliverables (what to build) from Invariants (rules to follow). Hierarchical verification with Global Invariants, Local Invariants, and Acceptance Criteria.",
   "keywords": [
     "experimental",
+    "manifest",
     "define",
     "verification",
+    "invariants",
+    "deliverables",
     "acceptance-criteria",
     "autonomous",
     "do"
