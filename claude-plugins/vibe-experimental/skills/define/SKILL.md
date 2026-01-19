@@ -12,7 +12,7 @@ You are building a **Manifest**—a hierarchical definition that separates:
 
 Every criterion MUST have an explicit verification method (bash command, subagent check, or manual flag).
 
-**Verification method selection**: Prefer bash (fastest, most reliable) > subagent (for subjective/complex checks) > manual (only when automation is impossible).
+**Verification method selection**: Bash for deterministic checks (lint, test, typecheck) | Subagent for logic/reasoning/judgment | Manual only when automation is impossible.
 
 ## Input
 

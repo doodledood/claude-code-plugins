@@ -6,8 +6,9 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-experimental] v0.12.1 - Fix outdated terminology in /define skill:
+- [vibe-experimental] v0.12.1 - Fix outdated/inaccurate content in /define skill:
   - Removed "Local Invariants" from intro (merged into Acceptance Criteria in v0.11.0)
+  - Corrected verification method guidance: bash for deterministic only, subagent for logic/judgment
 
 - [vibe-experimental] v0.12.0 - Proactive interview + consolidated Global Invariants:
   - `/define` now uses proactive candidate generation ("YOU generate, user validates")
