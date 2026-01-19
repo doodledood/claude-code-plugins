@@ -80,6 +80,26 @@ user-invocable: true       # Optional: show in slash command menu (default: true
 ---
 ```
 
+### Writing Skill and Agent Prompts
+
+A prompt should act as a manifest for the agent: clear goal, clear constraints, freedom in execution.
+
+**Principles:**
+
+1. **Define WHAT and WHY, not HOW** - State goals and constraints. Don't prescribe steps the model knows how to do. No rigid phase ordering, no heuristics tables that become checklists.
+
+2. **Operate under the memento pattern** - For non-trivial workflows, the agent should create a todo list immediately, write findings to a log file as it works, and refresh context before synthesis. This isn't optional structure—it's a constraint that makes the agent work better.
+
+3. **Trust capability, enforce discipline** - The model knows how to search, analyze, generate. What it needs are guardrails: "write to log before proceeding", "refresh before synthesis", "don't skip verification".
+
+4. **Output structure when needed** - If the artifact has a specific format (manifest schema, report template), define it. Otherwise let the agent decide.
+
+**When updating prompts:**
+- **Don't overfit to feedback** - Make right-sized changes. Don't overcorrect or add complexity to address one edge case.
+- **Maximize information density** - Every word should earn its place. If you can say the same thing in fewer words, do it.
+
+**The test**: Is this prompt a manifest? Clear goal, clear constraints, clear output—but the agent decides how to get there.
+
 ### Skill Description Best Practices
 
 Skill descriptions drive auto-invocation. Claude uses semantic matching to decide when to invoke a skill based on its description.

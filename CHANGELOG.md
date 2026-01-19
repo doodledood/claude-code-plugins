@@ -6,6 +6,26 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v1.17.0 - Restructure /compress-prompt and verifier to goal-oriented:
+  - `/compress-prompt`: ~90 lines (was ~375)
+  - `prompt-compression-verifier`: ~120 lines (was ~495)
+  - Removed rigid phase/step structures
+  - Core insight preserved: trust capability, enforce discipline
+
+- [vibe-experimental] v0.13.0 - Restructure all skills from rigid phases to goal-oriented:
+  - `/define`: Goal → Principles → Constraints → What to Discover → Output Schema
+  - `/do`: Goal → Principles → Constraints (memento pattern) → What to Do
+  - `/verify`: Goal → Principles → What to Do → Decision Logic → Output Format
+  - `/done`: Goal → What to Do → Output Format → Principles
+  - `/escalate`: Goal → Principles → Evidence Requirements → Escalation Types
+  - All skills now: clear goal, clear constraints, freedom in execution
+  - Memento pattern as constraint (todo list, log file, refresh before synthesis)
+  - Significantly shorter across all skills
+
+- [vibe-experimental] v0.12.1 - Fix outdated/inaccurate content in /define skill:
+  - Removed "Local Invariants" from intro (merged into Acceptance Criteria in v0.11.0)
+  - Corrected verification method guidance: bash for deterministic only, subagent for logic/judgment
+
 - [vibe-experimental] v0.12.0 - Proactive interview + consolidated Global Invariants:
   - `/define` now uses proactive candidate generation ("YOU generate, user validates")
   - Phase order changed: Intent → Deliverables → ACs → Global Invariants (rules come last)
