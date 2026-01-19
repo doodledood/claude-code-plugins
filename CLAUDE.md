@@ -94,6 +94,10 @@ A prompt should act as a manifest for the agent: clear goal, clear constraints, 
 
 4. **Output structure when needed** - If the artifact has a specific format (manifest schema, report template), define it. Otherwise let the agent decide.
 
+**When updating prompts:**
+- **Don't overfit to feedback** - Make right-sized changes. Don't overcorrect or add complexity to address one edge case.
+- **Maximize information density** - Every word should earn its place. If you can say the same thing in fewer words, do it.
+
 **The test**: Is this prompt a manifest? Clear goal, clear constraints, clear output—but the agent decides how to get there.
 
 ### Skill Description Best Practices
