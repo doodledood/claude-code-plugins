@@ -7,12 +7,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 ## [Unreleased]
 
 - [vibe-experimental] v0.13.0 - Restructure /define from rigid phases to goal-oriented:
-  - Removed prescriptive phase ordering (Phase 1, 2, 3, 4)
-  - New structure: Goal → Principles → What to Discover → Reference Material
+  - Removed prescriptive phase ordering and heuristics tables
+  - New structure: Goal → Principles → What to Discover → Output Schema
   - Agent has freedom in HOW to build manifest, constrained by principles
-  - Principle 2: "Only ask what you can't determine" - infer when possible
-  - Heuristics and examples moved to "Reference" sections (use when helpful, not checklists)
-  - Significantly shorter (~230 lines vs ~560 lines)
+  - Kept memento pattern: write to log as you go, refresh before synthesis
+  - ~130 lines (was ~560)
 
 - [vibe-experimental] v0.12.1 - Fix outdated/inaccurate content in /define skill:
   - Removed "Local Invariants" from intro (merged into Acceptance Criteria in v0.11.0)
