@@ -43,33 +43,33 @@ Definition file: `/tmp/define-{timestamp}.md`
 
 ### 1. Initialize
 
-Create todos and log file:
+Create todos and log file. The todos below are starting points—add task-specific areas as you discover them:
 
 ```
 - [ ] Create log /tmp/define-interview-{timestamp}.md
 - [ ] Gather positive criteria (feature, quality, architecture)
 - [ ] Gather negative criteria (rejection conditions)
-- [ ] Explore edge cases exhaustively
-- [ ] Use adversarial examples (1-3 varying on relevant dimensions)
-- [ ] Use contrast pairs (alternative approaches)
-- [ ] Ask pre-mortem question
-- [ ] Ask disappointed question
-- [ ] Ask persona simulation question
-- [ ] Surface latent criteria (tradeoffs, boundaries, preferences)
+- [ ] Explore edge cases relevant to this task
+- [ ] Surface latent criteria (use techniques relevant to task type)
+- [ ] Ask task-specific questions (security, performance, UX, etc. as relevant)
 - [ ] Refine vague criteria to specific
 - [ ] Ask code quality gates question (if coding task)
 - [ ] Detect project quality gates from CLAUDE.md (if coding task)
-- [ ] (expand: areas as discovered)
+- [ ] (expand: add areas as discovered during interview)
 - [ ] Refresh: read full interview log
 - [ ] Run meta-verification via define-verifier agent
 - [ ] Write final definition file
 ```
 
+**Note**: The interview techniques listed in Section 2 (adversarial examples, contrast pairs, pre-mortem, disappointed question, persona simulation, etc.) are tools to use as relevant—not a checklist to complete. Use whichever techniques surface hidden criteria for THIS task, and invent new ones if needed.
+
 ### 2. Proactive LLM-Driven Interview
 
 YOU drive the interview. Don't wait for the user to volunteer everything. Surface questions they wouldn't think to ask.
 
-**Interview Techniques (use ALL):**
+**Goal**: A definition so complete that an LLM can execute autonomously without ambiguity. The techniques below are starting points—invent new questions as the task demands. Every task has unique aspects; ask whatever surfaces hidden criteria.
+
+**Interview Techniques (starting points, not exhaustive):**
 
 #### Positive Criteria
 Ask about:
@@ -84,12 +84,13 @@ Ask explicitly: "What would cause you to REJECT this output?"
 - These are the most important criteria - everything else is optional
 - Keep probing until user can't think of more
 
-#### Edge Cases (Exhaustive)
-Walk through systematically:
+#### Edge Cases
+Walk through systematically. Common areas (adapt to task):
 - Empty input / null values
 - Large input / scale limits
 - Concurrent access / race conditions
 - Failure modes / error handling
+- Task-specific edge cases (e.g., timezone handling, unicode, permissions)
 - Continue until user says "I think we covered it"
 
 #### Adversarial Examples
@@ -167,13 +168,9 @@ All techniques below exist to surface **hidden rejection criteria** - things the
 - Core deliverable is still ambiguous (guaranteed rejection)
 - You haven't tested any latent techniques yet
 - A technique just revealed a new rejection criterion - probe that area deeper
+- You sense there's something important the user hasn't articulated
 
-| Task Type | Priority Techniques |
-|-----------|---------------------|
-| Code/refactor | Tradeoffs, boundaries, pattern anchoring, conceptual grouping |
-| Research/analysis | Tradeoffs, depth spectrum, reaction sampling |
-| Documentation | Audience spectrum, reaction sampling, tradeoffs |
-| Design/architecture | Conceptual grouping, tradeoffs, extreme aversion |
+**Goal**: Surface hidden rejection criteria through substantive probing. The techniques below are examples—use whatever approaches reveal what the user would reject but wouldn't think to mention.
 
 #### Tradeoff Forcing
 Present competing values, force a choice. Works for ANY domain:
@@ -203,13 +200,14 @@ options:
 - { label: "Be thorough", description: "Cover edge cases upfront" }
 ```
 
-Common tradeoffs to probe (pick relevant ones):
+Common tradeoffs to probe (examples—identify task-specific tradeoffs):
 - Depth vs breadth (research, docs)
 - Brevity vs completeness (docs, analysis)
 - Speed vs rigor (any)
 - Flexibility vs simplicity (code, design)
 - Convention vs optimization (code)
 - Comprehensive vs focused (research)
+- (Task-specific: e.g., "backwards compat vs clean API", "user convenience vs security")
 
 #### Extreme Aversion
 Find which direction they'd rather err. Universally applicable:
@@ -322,17 +320,18 @@ question: "Should setup and configuration be in the SAME guide?"
 Ask 3-5 grouping questions to map mental model. Skip if task has no structural decisions.
 
 #### Spectrum Positioning
-Find position on subjective dimensions. Pick 2-3 relevant spectrums:
+Find position on subjective dimensions. Pick 2-3 relevant spectrums (examples below—identify task-specific spectrums):
 
-**Universal spectrums:**
+**Common spectrums:**
 - Verbosity: minimal → moderate → explicit
 - Formality: casual → professional → academic
 - Detail: high-level → balanced → granular
 
-**Domain-specific:**
+**Domain-specific examples:**
 - Code: abstraction level, type strictness, error handling
 - Research: hedging, citation density, scope
 - Docs: technical depth, example density, assumed knowledge
+- (Task-specific: identify spectrums relevant to THIS task)
 
 ### 3. Question Format
 
@@ -379,6 +378,8 @@ Use findings to:
 ### 5. Code Quality Gates (For Coding Tasks)
 
 If the task involves writing or modifying code, ask which code quality categories should gate the work.
+
+The categories below are common quality concerns with automated reviewers available. However, some tasks may have additional quality concerns not covered here (e.g., accessibility, security-specific checks, performance benchmarks). If you identify task-specific quality concerns during the interview, capture them as criteria with appropriate verification methods.
 
 **Ask using AskUserQuestion:**
 
@@ -656,9 +657,9 @@ Use the Task tool to spawn the define-verifier agent:
 Task(subagent_type="vibe-experimental:define-verifier", prompt="Verify the definition at /tmp/define-interview-{timestamp}.md")
 ```
 
-The verifier checks three requirements:
+The verifier checks:
 1. Core deliverable is clear (ambiguity = guaranteed rejection)
-2. Rejection criteria captured (explicit + latent techniques used)
+2. Rejection criteria captured (explicit + latent discovery attempted)
 3. Each rejection criterion has a verification method
 
 If gaps found → continue interview to fill them.
@@ -839,6 +840,6 @@ This allows /do to request definition changes when codebase reality conflicts wi
 5. **Examples are concrete** - actual code/artifacts, not descriptions
 6. **Meta-verification before finalize** - definition not done until it passes
 7. **Write to log before proceeding** - memento pattern mandatory
-8. **Surface latent criteria thoroughly** - use all techniques relevant to task type until diminishing returns
+8. **Techniques are starting points** - ask whatever questions surface hidden criteria for THIS task
 9. **Vary adversarial examples on relevant dimensions** - differences should isolate preferences
 10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution

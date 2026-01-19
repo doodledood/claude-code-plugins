@@ -65,13 +65,13 @@ Started: [timestamp]
 ```
 - [ ] Read interview log for context→log; done when deliberate choices captured
 - [ ] Create verification log
-- [ ] Check: Comprehensiveness→log; done when all dimensions reviewed
-- [ ] Check: Edge cases addressed→log; done when common cases checked
+- [ ] Check: Comprehensiveness→log; done when relevant dimensions reviewed
+- [ ] Check: Edge cases addressed→log; done when relevant cases checked
 - [ ] Check: Each criterion has verification method→log; done when all checked
 - [ ] Check: No vague terms→log; done when scanned
 - [ ] Check: Has rejection criteria→log; done when found/missing noted
 - [ ] Check: Has examples→log; done when counted
-- [ ] Check: Latent criteria discovered→log; done when all techniques verified
+- [ ] Check: Latent criteria discovered→log; done when techniques verified
 - [ ] Check: No placeholders→log; done when scanned
 - [ ] Check: No conflicts→log; done when checked
 - [ ] Check: Bash commands valid→log; done when validated
@@ -185,44 +185,27 @@ Result: PASS | FAIL
 
 **Latent criteria discovered**
 
-Check that techniques for surfacing implicit criteria were used. Required techniques vary by task type:
+Check that the interview probed for hidden criteria users wouldn't think to mention. The specific techniques matter less than whether latent discovery was attempted substantively.
 
-| Task Type | Required Techniques |
-|-----------|---------------------|
-| Code/refactor | Tradeoffs (≥1), boundaries OR pattern anchoring |
-| Research/analysis | Tradeoffs (≥1), spectrum positioning (≥1) |
-| Documentation | Tradeoffs (≥1), reaction sampling OR spectrum |
-| Design/architecture | Tradeoffs (≥1), conceptual grouping |
-| Any task | At least 2 latent criteria techniques total |
+Example techniques (not exhaustive):
+- Tradeoff forcing - surface preferences when values conflict
+- Extreme aversion - find which direction they'd rather err
+- Reaction sampling - show concrete examples, capture gut reactions
+- Boundary mapping - identify hard limits
+- Pattern anchoring - reference existing artifacts as preference guide
+- Conceptual grouping - map mental model boundaries
+- Spectrum positioning - find position on subjective dimensions
 
-**Quality check**: Techniques should be used substantively, not superficially. A tradeoff with one shallow question is worse than probing until the preference is clear.
-
-| Technique | Look for in log |
-|-----------|-----------------|
-| Tradeoff forcing | "Tradeoffs Documented" section with ≥1 tradeoff |
-| Extreme aversion | "Extreme Aversions" section |
-| Reaction sampling | "Reaction Samples" table with ≥1 artifact |
-| Boundary mapping | "Boundaries" section with limits |
-| Pattern anchoring | "Pattern References" section |
-| Conceptual grouping | "Conceptual Groupings" section |
-| Spectrum positioning | "Spectrum Positions" section with ≥1 dimension |
+**Quality check**: Look for evidence of substantive probing, not checkbox completion. One deep tradeoff conversation is better than shallow coverage of many techniques.
 
 ```markdown
 ### Latent Criteria Discovery
-Task type: [code/research/docs/design/other]
+Evidence of probing for hidden criteria:
+- [describe what techniques/approaches were used]
+- [note depth of exploration - shallow checkbox vs substantive probing]
 
-Techniques used:
-- Tradeoff forcing: [yes/no] - [evidence]
-- Extreme aversion: [yes/no/N/A] - [evidence]
-- Reaction sampling: [yes/no/N/A] - [evidence]
-- Boundary mapping: [yes/no/N/A] - [evidence]
-- Pattern anchoring: [yes/no/N/A] - [evidence]
-- Conceptual grouping: [yes/no/N/A] - [evidence]
-- Spectrum positioning: [yes/no/N/A] - [evidence]
-
-Total techniques used: [N]
-Required for task type met: [yes/no]
-Result: PASS | FAIL
+Hidden criteria surfaced: [list any latent criteria discovered]
+Result: PASS (substantive probing attempted) | FAIL (no evidence of latent discovery)
 ```
 
 **No placeholders**
