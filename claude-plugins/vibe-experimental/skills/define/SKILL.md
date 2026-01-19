@@ -22,7 +22,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **YOU generate, user validates** - Don't ask open-ended questions. Generate candidates from domain knowledge, present concrete options, learn from reactions.
+1. **YOU generate, user validates** - Don't ask open-ended questions. Generate candidates from your knowledge, codebase exploration, or web research as needed. Present concrete options, learn from reactions.
 
 2. **Only ask what you can't determine** - If you can infer from context, don't ask. Only ask when genuinely ambiguous.
 
