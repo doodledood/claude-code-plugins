@@ -8,9 +8,13 @@ user-invocable: true
 
 ## Goal
 
-Build a **Manifest** that separates:
+Build a **comprehensive Manifest** that captures:
 - **What we build** (Deliverables with Acceptance Criteria)
 - **Rules we must follow** (Global Invariants)
+
+Comprehensive means surfacing **latent criteria**—requirements the user doesn't know they have until probed. Users know their surface-level needs; your job is to discover the constraints and edge cases they haven't thought about.
+
+You can't get to 100% upfront—some criteria only emerge during implementation. But strive for good coverage without diminishing returns. The manifest supports amendments for what's discovered later.
 
 Output: `/tmp/manifest-{timestamp}.md`
 
@@ -42,16 +46,16 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## What the Manifest Needs
 
-Discover these through interview - use your judgment on how:
+Discover these through probing—surface latent criteria the user hasn't articulated:
 
 ### Deliverables
-What specific things need to be built or changed? Decompose based on task complexity.
+What specific things need to be built or changed? Decompose based on task complexity. Probe for implicit deliverables the user assumed but didn't state.
 
 ### Acceptance Criteria (per deliverable)
-How do we know each deliverable is done? Cover what matters: functionality, error handling, edge cases, constraints. ACs can be positive or negative.
+How do we know each deliverable is done? Probe beyond the happy path: error handling, edge cases, constraints, security implications. ACs can be positive or negative. What would make the user reject a "working" implementation?
 
 ### Global Invariants
-What rules apply to the ENTIRE task? If violated anywhere, task fails. For coding tasks, auto-detect from CLAUDE.md (tests, linting, type checks). Adapt to domain.
+What rules apply to the ENTIRE task? Probe for unstated assumptions: performance requirements, backwards compatibility, coding standards. For coding tasks, auto-detect from CLAUDE.md. What would make the user say "this breaks everything" even if individual deliverables work?
 
 ## Conceptual Framework
 
