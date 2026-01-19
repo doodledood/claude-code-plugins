@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.5.1 - claude-md-adherence-reviewer checks context before reading files:
+  - CLAUDE.md content may be auto-loaded into subagent context
+  - Agent now checks if rules are already in context before using Read tool
+  - Avoids redundant file reads when content is already available
+
 - [vibe-experimental] v0.5.0 - Auto-detect project quality gates from CLAUDE.md:
   - /define now reads CLAUDE.md and extracts project-specific verifiable commands
   - Creates PQG-* criteria with bash verification (no question needed)

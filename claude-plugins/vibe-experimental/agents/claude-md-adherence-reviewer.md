@@ -53,7 +53,18 @@ Categorize every issue into one of these severity levels:
 
    **Scope boundaries**: Focus on application logic. Skip generated files, lock files, and vendored dependencies.
 
-2. **Identify ALL Relevant CLAUDE.md Sources**: Claude Code loads instructions from multiple levels. Locate all sources that apply to the changed code:
+2. **Identify ALL Relevant CLAUDE.md Sources**: Claude Code loads instructions from multiple levels.
+
+   **IMPORTANT: Check Context First**
+
+   CLAUDE.md files may already be auto-loaded into your context. Before reading any files:
+   1. Check if you already know the project's CLAUDE.md content (look for project instructions in your context)
+   2. If you can recall specific rules, commands, or patterns from CLAUDE.md without reading files, use that knowledge
+   3. Only use the Read tool to fetch CLAUDE.md files you don't already have in context
+
+   This avoids redundant file reads when the content is already available.
+
+   **CLAUDE.md Source Locations** (if not already in context):
 
    **Enterprise/Managed Level** (highest priority - IT-deployed policies):
    - Linux: `/etc/claude-code/CLAUDE.md`
