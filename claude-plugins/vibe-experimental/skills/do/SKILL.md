@@ -1,17 +1,14 @@
 ---
 name: do
-description: 'Manifest executor. Respects hierarchical structure: checks Global Invariants as guardrails, iterates through Deliverables checking Local Invariants, satisfies Acceptance Criteria. Use when you have a manifest from /define.'
+description: 'Manifest executor. Iterates through Deliverables satisfying Acceptance Criteria, then verifies all ACs and Global Invariants pass. Use when you have a manifest from /define.'
 user-invocable: true
 ---
 
 # /do - Manifest Executor
 
-You execute a **Manifest** respecting its hierarchical structure:
-1. **Global Invariants** - check before starting (guardrails)
-2. **Deliverables** - iterate through each
-   - **Local Invariants** - constraints to respect while building
-   - **Acceptance Criteria** - positive verification of completion
-3. **Final Verification** - all ACs pass AND all Global Invariants still pass
+You execute a **Manifest** respecting its structure:
+1. **Deliverables** - iterate through each, satisfying their ACs
+2. **Final Verification** - all ACs pass AND all Global Invariants pass
 
 ## Input
 
@@ -34,7 +31,6 @@ Extract:
 - **Global Invariants**: INV-G* with verification methods
 - **Deliverables**: Each with:
   - Name
-  - Local Invariants (INV-L*.*)
   - Acceptance Criteria (AC-*.*)
 - **Tradeoffs & Preferences**: For conflict resolution
 - **Pattern References**: What to follow/avoid
@@ -57,8 +53,6 @@ Started: [timestamp]
 ## Deliverables Status
 
 ### Deliverable 1: [Name]
-**Local Invariants:**
-- [ ] INV-L1.1: [description]
 **Acceptance Criteria:**
 - [ ] AC-1.1: [description]
 - [ ] AC-1.2: [description]
@@ -73,10 +67,8 @@ Started: [timestamp]
 Create TodoWrite:
 ```
 - [ ] Create log /tmp/do-log-{timestamp}.md
-- [ ] D1: Check local invariants hold→log
 - [ ] D1: Satisfy AC-1.1→log; done when implemented + verified
 - [ ] D1: Satisfy AC-1.2→log; done when implemented + verified
-- [ ] D2: Check local invariants hold→log
 - [ ] D2: Satisfy AC-2.1→log; done when implemented + verified
 - [ ] (expand: sub-tasks as discovered)
 - [ ] Final: call /verify for comprehensive check
@@ -90,17 +82,11 @@ Use `D{N}:` prefix to indicate which deliverable a todo belongs to.
 
 For each Deliverable in order:
 
-#### 3a. Pre-check Local Invariants
+#### 3a. Understand the Deliverable
 
-Before working on a deliverable, understand its constraints.
-
-Log the Local Invariants you'll need to respect:
+Log what you're working on:
 ```markdown
 ### Starting Deliverable 1: [Name]
-
-**Local Invariants to respect:**
-- INV-L1.1: [constraint]
-- INV-L1.2: [constraint]
 
 **Acceptance Criteria to satisfy:**
 - AC-1.1: [what success looks like]
@@ -111,16 +97,10 @@ Log the Local Invariants you'll need to respect:
 
 Work to satisfy the ACs. You decide HOW—the ACs define success, not the path.
 
-**While working:**
-- Actively consider Local Invariants as guardrails
-- If you're about to violate an INV-L*, stop and find another approach
-- Log significant decisions, especially when Local Invariants constrain your choices
-
 **Log format during work:**
 ```markdown
 ### AC-1.1: [description]
 - Approach: [what you're trying]
-- Local Invariant consideration: INV-L1.1 requires [constraint], so [how you're respecting it]
 - Result: [outcome]
 ```
 
@@ -128,15 +108,11 @@ Work to satisfy the ACs. You decide HOW—the ACs define success, not the path.
 
 When you believe all ACs for this deliverable are satisfied:
 
-1. Quick-check Local Invariants still hold
-2. Quick-check ACs are met
-3. Log completion
+1. Quick-check ACs are met
+2. Log completion
 
 ```markdown
 ### Deliverable 1: [Name] - COMPLETE
-
-**Local Invariants:**
-- [x] INV-L1.1: Verified [evidence]
 
 **Acceptance Criteria:**
 - [x] AC-1.1: Satisfied [evidence]
@@ -145,7 +121,7 @@ When you believe all ACs for this deliverable are satisfied:
 
 Move to next deliverable.
 
-### 5. Call /verify When All Deliverables Complete
+### 4. Call /verify When All Deliverables Complete
 
 When all deliverables are addressed:
 
@@ -153,13 +129,12 @@ When all deliverables are addressed:
 Use the Skill tool to verify: Skill("vibe-experimental:verify", "/tmp/manifest-{ts}.md /tmp/do-log-{ts}.md")
 ```
 
-### 6. Handle Verification Results
+### 5. Handle Verification Results
 
 **/verify returns failures:**
 
 Failures are categorized:
 - **Global Invariant failure**: Task-level failure, must fix
-- **Local Invariant failure**: Specific deliverable invalid
 - **AC failure**: Specific deliverable incomplete
 
 For each failure:
@@ -179,7 +154,7 @@ For each failure:
 - Manual criteria need human verification
 - Call /escalate to surface them
 
-### 7. Escalation (When Genuinely Stuck)
+### 6. Escalation (When Genuinely Stuck)
 
 If you've tried 3+ approaches and can't satisfy a criterion:
 
@@ -191,8 +166,8 @@ Escalation requires /verify to have been called first.
 
 **Escalation scenarios:**
 - Global Invariant seems impossible to satisfy
-- Local Invariant conflicts with AC (can't satisfy both)
 - AC requires something the codebase can't support
+- Two ACs conflict (can't satisfy both)
 
 ## Example Flow
 
@@ -200,13 +175,11 @@ Escalation requires /verify to have been called first.
 1. /do /tmp/manifest-123.md
 2. Read manifest, create log, create todos
 3. Deliverable 1:
-   - Note Local Invariants as guardrails
    - Work toward AC-1.1, AC-1.2
-   - Verify deliverable complete
+   - Mark deliverable complete
 4. Deliverable 2:
-   - Note Local Invariants
    - Work toward AC-2.1
-   - Verify deliverable complete
+   - Mark deliverable complete
 5. Skill("vibe-experimental:verify", "...")
 6. If failures → fix specific criterion → retry verify
 7. All pass → /verify calls /done
@@ -227,12 +200,10 @@ Log tradeoff resolutions:
 ## Critical Rules
 
 1. **Manifest file required** - fail clearly if not provided
-2. **Hierarchical respect** - Global Invariants > Local Invariants > ACs
-3. **Local Invariants are guardrails** - actively consider while working
-4. **Log attempts** - each todo includes `→log` discipline
-5. **Must call /verify** - can't declare done without verification
-6. **Target failures** - on failure, fix specific criterion, don't restart
-7. **Proper escalation** - /escalate only after /verify, with evidence
+2. **Log attempts** - each todo includes `→log` discipline
+3. **Must call /verify** - can't declare done without verification
+4. **Target failures** - on failure, fix specific criterion, don't restart
+5. **Proper escalation** - /escalate only after /verify, with evidence
 
 ## Log Structure
 
@@ -250,14 +221,10 @@ Started: [timestamp]
 
 ## Deliverable 1: [Name]
 
-### Local Invariants
-- [x] INV-L1.1: Respected throughout
-
 ### Work Log
 
 #### AC-1.1: [description]
 - Attempt 1: [approach]
-  - Local Invariant consideration: [how INV-L1.1 affected approach]
   - Result: [outcome]
 
 #### AC-1.2: [description]
@@ -265,7 +232,6 @@ Started: [timestamp]
   - Result: [outcome]
 
 ### Status: COMPLETE
-- All Local Invariants held
 - All ACs satisfied
 
 ## Deliverable 2: [Name]

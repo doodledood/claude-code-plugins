@@ -14,7 +14,7 @@ Surface a blocking issue for human decision with structured evidence, referencin
 
 Examples:
 - "INV-G1 blocking after 3 attempts"
-- "INV-L1.2 conflicts with AC-1.1"
+- "AC-1.2 blocking after 3 attempts"
 - "Manual criteria AC-2.3 needs human review"
 
 ## Escalation Types
@@ -81,61 +81,7 @@ Examples:
 Human decision on which path to take.
 ```
 
-### 2. Local Invariant Blocking
-
-A Local Invariant specific to one deliverable.
-
-```markdown
-## Escalation: Local Invariant [INV-L{D}.{N}] Blocking
-
-**Criterion:** [description]
-**Type:** Local Invariant for Deliverable {D}: [deliverable name]
-**Impact:** Deliverable {D} cannot be completed while constraint violated
-
-### Summary
-
-Unable to respect this constraint while building Deliverable {D}.
-
-### Context
-
-**Deliverable:** [name]
-**Goal:** [what this deliverable is trying to achieve]
-**Constraint:** [the local invariant that can't be satisfied]
-
-### Attempts
-
-1. **[Approach 1]**
-   What: [what was tried]
-   How it violated constraint: [specific reason]
-
-2. **[Approach 2]**
-   ...
-
-### Conflict Analysis
-
-[If this conflicts with an AC or another invariant, explain]
-
-- INV-L{D}.{N} requires: [constraint]
-- But AC-{D}.{M} requires: [conflicting requirement]
-- These conflict because: [explanation]
-
-### Possible Resolutions
-
-1. **Prioritize the invariant**: Change approach to AC-{D}.{M}
-   Tradeoff: [what changes]
-
-2. **Prioritize the AC**: Amend INV-L{D}.{N} to allow [exception]
-   Tradeoff: [what constraint is relaxed]
-
-3. **Redesign the deliverable**: [alternative approach]
-   Tradeoff: [scope change]
-
-### Requesting
-
-Human decision on which constraint to prioritize.
-```
-
-### 3. Acceptance Criteria Blocking
+### 2. Acceptance Criteria Blocking
 
 An AC that can't be satisfied.
 
@@ -190,7 +136,7 @@ Unable to satisfy this acceptance criterion after [N] attempts.
 Human decision on path forward.
 ```
 
-### 4. Manual Criteria Review
+### 3. Manual Criteria Review
 
 All automated criteria pass, manual criteria need human verification.
 
@@ -204,10 +150,10 @@ All [N] global invariants pass.
 
 ### Deliverables Summary
 
-| Deliverable | Local Invariants | Automated ACs | Manual ACs |
-|-------------|-----------------|---------------|------------|
-| 1: [name] | All respected | [n]/[m] pass | [k] pending |
-| 2: [name] | All respected | [n]/[m] pass | [k] pending |
+| Deliverable | Automated ACs | Manual ACs |
+|-------------|---------------|------------|
+| 1: [name] | [n]/[m] pass | [k] pending |
+| 2: [name] | [n]/[m] pass | [k] pending |
 
 ### Manual Criteria Pending
 
@@ -240,8 +186,8 @@ Please review the manual criteria and confirm completion.
 
 For blocking criterion escalation, MUST include:
 
-1. **Which criterion** - specific ID (INV-G*, INV-L*.*, AC-*.*)
-2. **Criterion type** - global-invariant, local-invariant, or acceptance-criteria
+1. **Which criterion** - specific ID (INV-G*, AC-*.*)
+2. **Criterion type** - global-invariant or acceptance-criteria
 3. **Scope** - task-level or which deliverable
 4. **At least 3 attempts** - what was tried
 5. **Why each failed** - not just "didn't work"
@@ -261,5 +207,4 @@ These are rejected:
 | Type | Pattern | Example | Scope |
 |------|---------|---------|-------|
 | Global Invariant | INV-G{N} | INV-G1 | Entire task |
-| Local Invariant | INV-L{D}.{N} | INV-L1.2 | Deliverable D |
 | Acceptance Criteria | AC-{D}.{N} | AC-2.3 | Deliverable D |

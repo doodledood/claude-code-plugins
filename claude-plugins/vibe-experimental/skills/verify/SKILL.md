@@ -1,12 +1,12 @@
 ---
 name: verify
-description: 'Manifest verification runner. Spawns parallel verifiers for Global Invariants, Local Invariants, and Acceptance Criteria. Called by /do, not directly by users.'
+description: 'Manifest verification runner. Spawns parallel verifiers for Global Invariants and Acceptance Criteria. Called by /do, not directly by users.'
 user-invocable: false
 ---
 
 # /verify - Manifest Verification Runner
 
-You run all verification methods from a Manifest file. You spawn verifier agents in parallel—you don't run checks yourself.
+You run all verification methods from a Manifest file. You spawn one verifier agent per criterion in parallel—you don't run checks yourself.
 
 ## Input
 
@@ -42,18 +42,7 @@ From the Manifest, extract:
     command: "npm test"
 ```
 
-**Local Invariants (INV-L*.*):**
-```yaml
-- id: INV-L1.1
-  type: local-invariant
-  deliverable: 1
-  description: "No plaintext passwords"
-  verify:
-    method: codebase
-    check: "No password storage without hashing"
-```
-
-**Acceptance Criteria (AC-*.*):**
+**Acceptance Criteria (AC-{D}.{N}):**
 ```yaml
 - id: AC-1.1
   type: acceptance-criteria
@@ -63,6 +52,14 @@ From the Manifest, extract:
     method: subagent
     agent: general-purpose
     prompt: "Verify login flow works as specified"
+
+- id: AC-1.2
+  type: acceptance-criteria
+  deliverable: 1
+  description: "Passwords are hashed, not plaintext"
+  verify:
+    method: codebase
+    check: "No password storage without hashing"
 ```
 
 ### 3. Categorize by Verification Method
@@ -79,7 +76,7 @@ Then sort by expected duration (slow first):
 
 ### 4. Launch All Verifiers in Parallel
 
-Launch ALL criteria in a single parallel call, **slow ones first**. Claude Code caps at ~10 concurrent and queues the rest.
+Launch ONE verifier per criterion in a single parallel call, **slow ones first**. Claude Code caps at ~10 concurrent and queues the rest.
 
 ```
 // Single message with multiple Task calls - slow first
@@ -97,20 +94,19 @@ Criterion: INV-G2 (global-invariant)
 Description: No HIGH or CRITICAL bugs
 Scope: git diff against origin/main")
 
-// Local Invariants
-Task(subagent_type="vibe-experimental:criteria-checker", prompt="
-Criterion: INV-L1.1 (local-invariant, Deliverable 1)
-Description: No plaintext passwords
-Verification method: codebase
-Files: src/auth/
-Check: Password storage must use bcrypt or similar hashing")
-
 // Acceptance Criteria
 Task(subagent_type="vibe-experimental:criteria-checker", prompt="
 Criterion: AC-1.1 (acceptance-criteria, Deliverable 1)
 Description: User can log in with valid credentials
 Verification method: bash
 Command: npm run test:auth")
+
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Criterion: AC-1.2 (acceptance-criteria, Deliverable 1)
+Description: Passwords are hashed, not plaintext
+Verification method: codebase
+Files: src/auth/
+Check: Password storage must use bcrypt or similar hashing")
 
 // Fast checks last
 Task(subagent_type="vibe-experimental:criteria-checker", prompt="
@@ -187,7 +183,7 @@ if any Global Invariant failed:
     → Highlight global failures prominently
     → /do must fix global issues first
 
-elif any Local Invariant or AC failed:
+elif any AC failed:
     → Return failures grouped by deliverable
     → /do continues working on specific deliverables
 
@@ -233,29 +229,20 @@ elif all pass (no manual):
 
 ### Deliverable 1: User Authentication
 
-#### Local Invariants
-- **INV-L1.1**: No plaintext passwords - PASS
-
-#### Acceptance Criteria
-
-##### Failed (1)
+#### Failed (1)
 - **AC-1.2**: Session persists across page reload
   Method: bash (`npm run test:session`)
   Location: `src/session.test.ts:23`
   Issue: Session cookie not set with correct flags
   Fix: Add `httpOnly` and `secure` flags
 
-##### Passed (1)
+#### Passed (1)
 - AC-1.1
 
 ---
 
 ### Deliverable 2: Password Reset
 
-#### Local Invariants
-- **INV-L2.1**: Reset tokens expire in 1 hour - PASS
-
-#### Acceptance Criteria
 - **AC-2.1**: User receives reset email - PASS
 - **AC-2.2**: Reset link works - PASS
 
@@ -277,8 +264,8 @@ Continue working on failed criteria, then call /verify again.
 ### All Automated Criteria Pass
 
 **Global Invariants:** 4/4 pass
-**Deliverable 1:** 2/2 ACs pass, 1/1 Local Invariants pass
-**Deliverable 2:** 2/2 ACs pass, 1/1 Local Invariants pass
+**Deliverable 1:** 2/2 ACs pass
+**Deliverable 2:** 2/2 ACs pass
 
 ### Manual Verification Required
 
@@ -316,5 +303,4 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 | Type | ID Pattern | Scope | Failure Impact |
 |------|------------|-------|----------------|
 | Global Invariant | INV-G{N} | Entire task | Task fails |
-| Local Invariant | INV-L{D}.{N} | Deliverable D | Deliverable invalid |
 | Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |

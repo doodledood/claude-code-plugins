@@ -1,15 +1,14 @@
 # vibe-experimental
 
-Manifest-driven workflows separating **what to build** (Deliverables) from **rules to follow** (Invariants).
+Manifest-driven workflows separating **what to build** (Deliverables) from **rules to follow** (Global Invariants).
 
 ## Overview
 
-A hierarchical approach to task definition and execution:
+A two-level approach to task definition and execution:
 
 1. **Global Invariants** - Rules that apply to the ENTIRE task (e.g., "tests must pass")
-2. **Deliverables** - Specific items to complete
-   - **Local Invariants** - Constraints on how to build this deliverable
-   - **Acceptance Criteria** - Positive verification of completion
+2. **Deliverables** - Specific items to complete, each with **Acceptance Criteria**
+   - ACs can be positive ("user can log in") or negative ("passwords are hashed")
 
 ## The Manifest Schema
 
@@ -27,10 +26,9 @@ A hierarchical approach to task definition and execution:
 ## 3. Deliverables (The Work)
 
 ### Deliverable 1: [Name]
-- **Local Invariants**:
-  - [INV-L1.1] Description | Verify: [method]
 - **Acceptance Criteria**:
   - [AC-1.1] Description | Verify: [method]
+  - [AC-1.2] Description | Verify: [method]
 ```
 
 ## ID Scheme
@@ -38,7 +36,6 @@ A hierarchical approach to task definition and execution:
 | Type | Pattern | Scope | Failure Impact |
 |------|---------|-------|----------------|
 | Global Invariant | INV-G{N} | Entire task | Task fails |
-| Local Invariant | INV-L{D}.{N} | Deliverable D | Deliverable invalid |
 | Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |
 
 ## Skills
@@ -78,26 +75,24 @@ A hierarchical approach to task definition and execution:
                     │
                     ├─ Intent & Context
                     ├─ Global Invariants
-                    └─ Deliverables (with Local Invariants + ACs)
+                    └─ Deliverables (with ACs)
                                    ↓
 /do manifest.md → For each Deliverable:
-                    - Respect Local Invariants
                     - Satisfy ACs
                          ↓
                   /verify → (failures) → Fix specific criterion → /verify again
                          ↓
                   All pass → /done
                          ↓
-                  (stuck) → /escalate with type-aware context
+                  (stuck) → /escalate
 ```
 
 ## Execution Semantics
 
 | Phase | Check | Failure Impact |
 |-------|-------|----------------|
-| During deliverable | Local Invariants | Stop, find different approach |
-| After deliverable | Acceptance Criteria | Deliverable incomplete |
-| Final verification | All criteria (Global + Local + ACs) | Must all pass for /done |
+| After each deliverable | Acceptance Criteria | Deliverable incomplete |
+| Final verification | Global Invariants + all ACs | Must all pass for /done |
 
 ## Status
 

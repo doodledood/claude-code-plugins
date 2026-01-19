@@ -19,14 +19,12 @@ Read execution log (`/tmp/do-log-*.md`) and manifest to populate:
 ```markdown
 ## Execution Complete
 
-All invariants respected. All acceptance criteria verified.
+All global invariants pass. All acceptance criteria verified.
 
 ### Intent
 **Goal:** [from manifest]
 
-### Global Invariants (The Constitution)
-
-All global rules were respected throughout execution:
+### Global Invariants
 
 | ID | Description | Status |
 |----|-------------|--------|
@@ -38,29 +36,18 @@ All global rules were respected throughout execution:
 
 #### Deliverable 1: [Name]
 
-**Local Invariants:**
-| ID | Constraint | Status |
-|----|------------|--------|
-| INV-L1.1 | No plaintext passwords | Respected |
-
 **Acceptance Criteria:**
 | ID | Description | Status |
 |----|-------------|--------|
 | AC-1.1 | User can log in | PASS |
-| AC-1.2 | Session persists | PASS |
+| AC-1.2 | Passwords hashed | PASS |
 
 **Key Changes:**
-- [file:line] - [what changed]
 - [file:line] - [what changed]
 
 ---
 
 #### Deliverable 2: [Name]
-
-**Local Invariants:**
-| ID | Constraint | Status |
-|----|------------|--------|
-| INV-L2.1 | Reset tokens expire in 1 hour | Respected |
 
 **Acceptance Criteria:**
 | ID | Description | Status |

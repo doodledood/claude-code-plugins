@@ -59,9 +59,7 @@ Manifest file: `/tmp/manifest-{timestamp}.md`
 *Specific items to complete.*
 
 ### Deliverable 1: [Name]
-- **Local Invariants** (Constraints specific to this item):
-  - [INV-L1.1] Description: ... | Verify: ...
-- **Acceptance Criteria** (Positive verification of success):
+- **Acceptance Criteria:**
   - [AC-1.1] Description: ... | Verify: ...
   - [AC-1.2] Description: ... | Verify: ...
 
@@ -71,33 +69,34 @@ Manifest file: `/tmp/manifest-{timestamp}.md`
 
 ## Conceptual Framework
 
-### Invariants vs Acceptance Criteria
+### Global Invariants vs Acceptance Criteria
 
 | Type | Question | Scope | Failure Semantics |
 |------|----------|-------|-------------------|
 | **Global Invariant** | "What rules must NEVER be violated?" | Entire task | Task FAILS if violated |
-| **Local Invariant** | "What constraints apply while building THIS?" | Single deliverable | Deliverable invalid if violated |
-| **Acceptance Criteria** | "How do we know THIS is done?" | Single deliverable | Deliverable incomplete if not met |
+| **Acceptance Criteria** | "How do we know THIS deliverable is done?" | Single deliverable | Deliverable incomplete if not met |
+
+ACs can be **positive** ("user can log in") or **negative** ("passwords are hashed, not plaintext").
 
 ### Examples Across Domains
 
 **Coding:**
 - Global Invariant: "Tests must pass" (INV-G1)
 - Deliverable: "Add user authentication"
-  - Local Invariant: "No plaintext passwords" (INV-L1.1)
   - AC: "User can log in with valid credentials" (AC-1.1)
+  - AC: "Passwords are hashed, not stored in plaintext" (AC-1.2)
 
 **Writing:**
 - Global Invariant: "No spelling errors" (INV-G1)
 - Deliverable: "Executive summary"
-  - Local Invariant: "Max 500 words" (INV-L1.1)
   - AC: "Key findings are summarized" (AC-1.1)
+  - AC: "Under 500 words" (AC-1.2)
 
 **Research:**
 - Global Invariant: "All claims have citations" (INV-G1)
 - Deliverable: "Literature review"
-  - Local Invariant: "Only peer-reviewed sources" (INV-L1.1)
   - AC: "Covers major approaches" (AC-1.1)
+  - AC: "Only uses peer-reviewed sources" (AC-1.2)
 
 ## Process
 
@@ -110,7 +109,7 @@ Create todos and log file:
 - [ ] Phase 1: Gather intent & context
 - [ ] Phase 2: Identify global invariants
 - [ ] Phase 3: Identify deliverables
-- [ ] Phase 4: For each deliverable, gather local invariants + ACs
+- [ ] Phase 4: For each deliverable, gather ACs
 - [ ] Phase 5: Quality gates (if coding task)
 - [ ] Phase 6: Project gates from CLAUDE.md (if coding task)
 - [ ] (expand: refine as needed)
@@ -219,48 +218,31 @@ Write to log:
 3. [Deliverable name]
 ```
 
-### 5. Phase 4: Per-Deliverable Details
+### 5. Phase 4: Per-Deliverable Acceptance Criteria
 
-For EACH deliverable, gather:
-
-#### 4a. Local Invariants
-
-**Ask:**
-"For [Deliverable N], are there constraints on HOW you want it built? (Not what it does, but rules for building it)"
-
-Examples:
-- "No storing passwords in plaintext" (for auth deliverable)
-- "Must use existing ORM, no raw SQL" (for data deliverable)
-- "Max 500 words" (for writing deliverable)
-- "Only peer-reviewed sources" (for research deliverable)
-
-For each local invariant:
-1. Capture the constraint
-2. Ask for verification method
-3. Assign INV-L{D}.{N} ID
-
-#### 4b. Acceptance Criteria
+For EACH deliverable, gather acceptance criteria:
 
 **Ask:**
 "How do we verify [Deliverable N] is done? What specific things must be true?"
 
-Use probing techniques from the original /define:
+ACs can be positive or negative:
+- Positive: "User can log in with valid credentials"
+- Negative: "Passwords are hashed, not stored in plaintext"
+
+Use probing techniques:
 - Rejection-first: "What would cause you to reject this deliverable?"
 - Edge cases: "What edge cases need handling?"
+- Constraints: "Are there rules about HOW this should be built?"
 - Adversarial: Show concrete examples, ask if acceptable
 
 For each AC:
-1. Capture what success looks like
+1. Capture what success looks like (or what must not happen)
 2. Ask for verification method
 3. Assign AC-{D}.{N} ID
 
 Write to log after each deliverable:
 ```markdown
 ### Deliverable 1: [Name]
-
-**Local Invariants:**
-- [INV-L1.1] Description: ... | Verify: ...
-- [INV-L1.2] Description: ... | Verify: ...
 
 **Acceptance Criteria:**
 - [AC-1.1] Description: ... | Verify: ...
@@ -324,11 +306,11 @@ Apply latent discovery techniques when direct questions don't surface criteria:
 
 **Tradeoff Forcing:**
 When working on a deliverable, ask: "When [value A] and [value B] conflict, which wins?"
-- Capture as Local Invariant if specific to deliverable
 - Capture as Global Invariant if applies everywhere
+- Capture as AC if specific to deliverable
 
 **Extreme Aversion:**
-"Which extreme is WORSE?" → Reveals constraints
+"Which extreme is WORSE?" → Reveals constraints (become ACs)
 
 **Pre-mortem:**
 "Imagine this shipped and was a disaster. What went wrong?"
@@ -362,11 +344,9 @@ Started: [timestamp]
 ## Phase 4: Deliverable Details
 
 ### Deliverable 1: [Name]
-**Local Invariants:**
-- [INV-L1.1] ...
-
 **Acceptance Criteria:**
 - [AC-1.1] ...
+- [AC-1.2] ...
 
 ### Deliverable 2: [Name]
 ...
@@ -418,30 +398,19 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 
 ### Deliverable 1: [Name]
 
-**Local Invariants** (Constraints specific to this item):
-- [INV-L1.1] Description: [constraint] | Verify: [method]
+**Acceptance Criteria:**
+- [AC-1.1] Description: [criterion] | Verify: [method]
   ```yaml
   verify:
     method: bash | subagent | codebase | manual
     [details]
   ```
-
-**Acceptance Criteria** (Positive verification of success):
-- [AC-1.1] Description: [success condition] | Verify: [method]
-  ```yaml
-  verify:
-    method: bash | subagent | codebase | manual
-    [details]
-  ```
-- [AC-1.2] Description: [success condition] | Verify: [method]
+- [AC-1.2] Description: [criterion] | Verify: [method]
   ...
 
 ### Deliverable 2: [Name]
 
-**Local Invariants**:
-- [INV-L2.1] ...
-
-**Acceptance Criteria**:
+**Acceptance Criteria:**
 - [AC-2.1] ...
 - [AC-2.2] ...
 
@@ -459,7 +428,7 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 ## 6. Pre-mortem Risks
 | Risk | Preventive Measure |
 |------|-------------------|
-| [risk] | [INV-G/INV-L/AC that prevents it] |
+| [risk] | [INV-G/AC that prevents it] |
 ```
 
 ### 11. Complete
@@ -477,10 +446,9 @@ To execute: /do /tmp/manifest-{timestamp}.md
 | Type | Format | Example | Scope |
 |------|--------|---------|-------|
 | Global Invariant | INV-G{N} | INV-G1, INV-G2 | Entire task |
-| Local Invariant | INV-L{D}.{N} | INV-L1.1, INV-L2.1 | Deliverable D |
 | Acceptance Criteria | AC-{D}.{N} | AC-1.1, AC-2.3 | Deliverable D |
 
-Where D = deliverable number, N = sequential within type.
+Where D = deliverable number, N = sequential within deliverable.
 
 ## Question Format
 
@@ -492,7 +460,7 @@ ALWAYS use AskUserQuestion with:
 
 Provide context for why you're asking:
 - "Global invariants are rules that if violated anywhere mean the task fails..."
-- "Local invariants are constraints on how to build this specific deliverable..."
+- "Acceptance criteria can be positive (what must work) or negative (what must not happen)..."
 
 ## Amendment Protocol
 
@@ -504,7 +472,7 @@ Manifests support amendments during execution if genuine gaps are discovered:
 ## Critical Rules
 
 1. **YOU drive the interview** - don't wait for user to think of everything
-2. **Hierarchical structure** - Global Invariants → Deliverables → Local Invariants + ACs
+2. **Two-level structure** - Global Invariants (task-level) → Deliverables with ACs
 3. **Every criterion has verification** - no exceptions
 4. **No vague terms** - "clean", "good", "proper" must be defined
 5. **Domain-agnostic** - adapt questions to task type (coding/writing/research)

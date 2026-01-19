@@ -6,17 +6,16 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-experimental] v0.11.0 - Major refactor: Manifest-based hierarchical architecture:
-  - New schema separates **Deliverables** (what to build) from **Invariants** (rules to follow)
+- [vibe-experimental] v0.11.0 - Major refactor: Manifest-based two-level architecture:
+  - New schema: **Global Invariants** (task-level rules) + **Deliverables** with **Acceptance Criteria**
   - **Global Invariants** (INV-G*): Rules that apply to entire task; task fails if violated
-  - **Local Invariants** (INV-L{D}.*): Constraints on how to build a specific deliverable
-  - **Acceptance Criteria** (AC-{D}.*): Positive verification of deliverable completion
-  - `/define`: Now builds "Manifests" through phased interview (Intent → Global Invariants → Deliverables → Local Invariants + ACs)
-  - `/do`: Pre-flight checks Global Invariants, respects Local Invariants as guardrails while working, satisfies ACs
-  - `/verify`: Reports results grouped by type (Global Invariants > Deliverable > Local Invariants + ACs)
-  - `/done`: Outputs hierarchical completion summary
-  - `/escalate`: Type-aware escalation with impact context (task-level vs deliverable-level)
-  - `criteria-checker`: Now type-aware (global-invariant, local-invariant, acceptance-criteria)
+  - **Acceptance Criteria** (AC-{D}.*): Per-deliverable verification (can be positive or negative)
+  - Removed Local Invariants (merged into ACs - both verified the same way)
+  - `/define`: Builds "Manifests" through phased interview (Intent → Global Invariants → Deliverables → ACs)
+  - `/do`: Iterates deliverables satisfying ACs, then calls /verify
+  - `/verify`: Launches one verifier per criterion in parallel, reports by type
+  - `/done`: Outputs completion summary
+  - `/escalate`: Type-aware escalation (task-level vs deliverable-level)
   - **Breaking**: Old flat AC-N definitions incompatible; use new Manifest schema
 
 - [vibe-experimental] v0.10.2 - Simplified /verify: single parallel launch, slow first in array
