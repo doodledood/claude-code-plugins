@@ -10,13 +10,12 @@ You run all verification methods from a definition file. You spawn criteria-chec
 
 ## Input
 
-`$ARGUMENTS` = "<definition-file-path> <execution-log-path> [--parallel=N] [--scope=files]"
+`$ARGUMENTS` = "<definition-file-path> <execution-log-path> [--scope=files]"
 
-- `--parallel=N`: Max concurrent criteria-checkers (default: 10)
 - `--scope=files`: Comma-separated file paths for reviewer scope override (optional)
 
 Examples:
-- `/tmp/define-123.md /tmp/do-log-123.md --parallel=5`
+- `/tmp/define-123.md /tmp/do-log-123.md`
 - `/tmp/define-123.md /tmp/do-log-123.md --scope=src/queue.ts,src/batch.ts`
 
 ## Process
@@ -27,9 +26,7 @@ Read both files:
 - Definition file: extract all criteria and their verification methods
 - Execution log: context for criteria-checkers
 
-Parse arguments:
-- `--parallel=N` (default 10)
-- `--scope=files` (optional, for reviewer scope override)
+Parse `--scope=files` if provided (optional, for reviewer scope override).
 
 ### 2. Categorize Criteria
 
@@ -41,74 +38,46 @@ All criteria use sequential `AC-N` numbering. Group by verification type (from `
 
 Note: The `category` field (feature, rejection, edge-case, boundary, quality-gate, project-gate) is metadata; grouping is by verification METHOD.
 
-Then classify by expected duration—make an educated guess, err on the side of background:
+Then sort by expected duration (slow first):
 
-- **Fast** (seconds): lint, typecheck, simple codebase patterns
 - **Slow** (30s+): test suites, builds, reviewer agents
-- When uncertain → treat as slow (background is safer)
+- **Fast** (seconds): lint, typecheck, simple codebase patterns
 
-### 3. Spawn Verifiers (Three-Phase)
+### 3. Launch All Verifiers in Parallel
 
-#### Phase 1: Launch slow checks in background (non-blocking)
-
-Launch ALL slow criteria immediately with `run_in_background: true`. Don't wait—collect task IDs and continue.
+Launch ALL criteria in a single parallel call, **slow ones first** in the array. Claude Code caps at ~10 concurrent and queues the rest—by putting slow ones first, they start immediately and fast ones fill in as slots free up.
 
 ```
-Task(subagent_type="vibe-experimental:criteria-checker",
-     run_in_background: true,
-     prompt="
+// Single message with multiple Task calls - slow first
+Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
+Review the current branch changes for bugs. Focus on HIGH and CRITICAL severity issues only.
+Scope: git diff against origin/main")
+
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
 Criterion: AC-1 (tests-pass)
 Description: All tests pass
 Verification method: bash
 Command: npm test")
-→ Store task_id for later collection
-```
 
-For subagent criteria, same pattern:
-```
-Task(subagent_type="vibe-experimental:code-bugs-reviewer",
-     run_in_background: true,
-     prompt="
-Review the current branch changes for bugs. Focus on HIGH and CRITICAL severity issues only.
-Scope: git diff against origin/main")
-→ Store task_id for later collection
-```
+// ... other slow checks ...
 
-**Scope override**: If /do provides explicit scope (e.g., specific files changed), pass it:
-```
-Task(subagent_type="vibe-experimental:code-bugs-reviewer",
-     run_in_background: true,
-     prompt="
-Review these files for bugs: src/handlers/notify.ts, src/services/queue.ts
-Focus on HIGH and CRITICAL severity issues only.")
-```
-
-#### Phase 2: Process fast checks in parallel waves (blocking)
-
-For fast criteria (lint, typecheck, codebase patterns), use wave-based parallelism:
-- Launch up to N (from --parallel) concurrently
-- Wait for wave to complete
-- Launch next wave
-- These complete quickly, so blocking is acceptable
-
-```
+// Then fast checks
 Task(subagent_type="vibe-experimental:criteria-checker", prompt="
 Criterion: AC-7 (error-pattern)
 Description: All errors use AppError class
 Verification method: codebase
 Files: src/handlers/
 Check: No raw throw new Error() in modified files")
+
+// ... other fast checks ...
 ```
 
-#### Phase 3: Collect background results
-
-After all fast checks complete, collect slow check results:
-
+**Scope override**: If /do provides explicit scope (e.g., specific files changed), pass it to reviewers:
 ```
-TaskOutput(task_id: "<stored-task-id>", block: true, timeout: 300000)
+Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
+Review these files for bugs: src/handlers/notify.ts, src/services/queue.ts
+Focus on HIGH and CRITICAL severity issues only.")
 ```
-
-Process each result as it returns. If a slow check is still running when you need its result, `block: true` waits for completion.
 
 ### 4. Collect Results
 
@@ -134,17 +103,16 @@ Standard structure:
 
 #### For subagent results (from reviewer agents)
 
-Parse the reviewer's report based on the criterion's `pass_if` threshold from the definition file:
+Parse the reviewer's report based on the criterion's `prompt` field which specifies pass conditions in natural language:
 
-| pass_if value | Parse for | FAIL if |
-|---------------|-----------|---------|
-| `no_high_or_critical` | `#### [CRITICAL]` and `#### [HIGH]` | Any CRITICAL or HIGH found |
-| `no_medium_or_higher` | `#### [CRITICAL]`, `#### [HIGH]`, `#### [MEDIUM]` | Any MEDIUM+ found |
+Examples:
+- `prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."` → FAIL if any HIGH/CRITICAL found
+- `prompt: "Check docs accuracy. Pass if no MEDIUM+ issues."` → FAIL if any MEDIUM/HIGH/CRITICAL found
 
-1. Read the `pass_if` field from the criterion definition
-2. Look for severity headers matching the threshold
-3. Extract each issue's location, description, and suggested fix
-4. Apply threshold: issues at or above threshold → criterion FAILS
+1. Read the `prompt` field from the criterion definition
+2. Parse the pass condition (e.g., "Pass if no HIGH or CRITICAL")
+3. Look for severity headers in the agent's report
+4. Apply the condition: issues violating it → criterion FAILS
 
 Convert to same structure:
 ```
@@ -251,11 +219,10 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 ## Critical Rules
 
 1. **Don't run checks yourself** - spawn criteria-checker or reviewer agents
-2. **Three-phase execution** - (1) launch slow in background, (2) process fast in waves, (3) collect background results
-3. **Slow checks in background** - use `run_in_background: true` for tests, reviewers; store task IDs
-4. **Fast checks block** - lint, typecheck, codebase patterns complete quickly; wave-based is fine
-5. **Hide manual on auto-fail** - focus on fixable issues first
-6. **Actionable feedback** - pass through file:line, expected vs actual from agents
-7. **Call /done on success** - trigger completion
-8. **Respect pass_if threshold** - for criteria with `category: quality-gate`, read `pass_if` from definition to determine fail threshold
-9. **Return all issues** - for failed quality-gate criteria, include all issues at/above threshold so /do can fix them
+2. **Single parallel launch** - all criteria in one call, slow ones first in array
+3. **Slow first** - Claude Code queues in order; slow ones get first slots, fast ones fill in
+4. **Hide manual on auto-fail** - focus on fixable issues first
+5. **Actionable feedback** - pass through file:line, expected vs actual from agents
+6. **Call /done on success** - trigger completion
+7. **Parse prompt for pass condition** - quality-gate criteria specify pass conditions in natural language
+8. **Return all issues** - for failed criteria, include all issues so /do can fix them

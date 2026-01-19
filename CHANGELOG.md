@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.10.2 - Simplified /verify: single parallel launch, slow first in array
+
 - [vibe-experimental] v0.10.1 - Subagent verification uses natural language prompts:
   - Changed `pass_if` to `prompt` field for subagent verification (maps to Task tool)
   - Added `general-purpose` agent option for custom checks
