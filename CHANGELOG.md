@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.10.1 - Subagent verification uses natural language prompts:
+  - Changed `pass_if` to `prompt` field for subagent verification (maps to Task tool)
+  - Added `general-purpose` agent option for custom checks
+  - Clarified `agent` field is `subagent_type` for Task tool
+
 - [vibe-experimental] v0.10.0 - Removed define-verifier, improved interview flow:
   - Removed define-verifier agent (user approval is the quality gate, not meta-verification)
   - Added Interview Philosophy: concrete choices > open-ended questions (users reveal criteria by reacting)

@@ -449,26 +449,24 @@ For each selected category, add a criterion with sequential `AC-N` ID and `categ
 Example (IDs continue from last AC-N in definition):
 
 ```yaml
-# Most reviewers use HIGH+ threshold
 - id: AC-15
   category: quality-gate
   description: "No HIGH or CRITICAL bugs introduced"
   verify:
     method: subagent
     agent: code-bugs-reviewer
-    pass_if: no_high_or_critical
+    prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."
 
-# ... repeat pattern for each selected gate from mapping table above ...
-
-# Docs reviewer is capped at MEDIUM, so use MEDIUM+ threshold
-- id: AC-22
+- id: AC-16
   category: quality-gate
-  description: "No MEDIUM or higher documentation issues"
+  description: "Documentation matches code changes"
   verify:
     method: subagent
     agent: docs-reviewer
-    pass_if: no_medium_or_higher
+    prompt: "Check docs accuracy. Pass if no MEDIUM+ issues (docs caps at MEDIUM)."
 ```
+
+Note: `agent` is the `subagent_type` for the Task tool. Use named agents (like `code-bugs-reviewer`) when available, or `general-purpose` for custom checks.
 
 Write selections to interview log under `## Code Quality Gates`.
 
@@ -543,7 +541,7 @@ All criteria use sequential `AC-N` numbering with a `category` field to track or
 - [AC-3] category: rejection | description: "Will reject if..." | verify: method
 - [AC-4] category: edge-case | scenario: "..." | handling: "..." | verify: method
 - [AC-5] category: boundary | limit: "..." | verify: method
-- [AC-6] category: quality-gate | agent: code-bugs-reviewer | verify: subagent
+- [AC-6] category: quality-gate | agent: code-bugs-reviewer | prompt: "Pass if no HIGH+ bugs"
 - [AC-7] category: project-gate | command: "npm test" | verify: bash
 - ...
 
@@ -717,17 +715,17 @@ Fails because: [specific reason linked to criterion]
   verify:
     method: subagent
     agent: code-bugs-reviewer
-    pass_if: no_high_or_critical
+    prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."
 
 - id: AC-11
   category: quality-gate
-  description: "No MEDIUM or higher documentation issues"
+  description: "Documentation matches code changes"
   verify:
     method: subagent
     agent: docs-reviewer
-    pass_if: no_medium_or_higher
+    prompt: "Check docs accuracy. Pass if no MEDIUM+ issues."
 
-[etc. for each selected gate - see mapping table above]
+[etc. for each selected gate]
 
 ## Project Quality Gates
 (only present if CLAUDE.md specifies verifiable commands; IDs continue sequentially)
@@ -748,21 +746,36 @@ Fails because: [specific reason linked to criterion]
 
 [etc. - IDs continue sequentially]
 
-## Task-Specific Subagents
-[Only if verification requires domain-specific checks that existing reviewers don't cover—e.g., checking compliance with a specific API contract, validating against custom business rules]
+## Task-Specific Verification
 
+[Only if verification requires domain-specific checks that existing reviewers don't cover]
+
+Use `general-purpose` agent with a custom prompt for ad-hoc verification:
+
+```yaml
+- id: AC-20
+  category: custom
+  description: "API response matches contract"
+  verify:
+    method: subagent
+    agent: general-purpose
+    prompt: "Read api-contract.yaml and check the implementation matches. Pass if all endpoints conform."
+```
+
+Or define a reusable subagent if the check is complex:
+
+```yaml
 ### [agent-name]
 Purpose: ...
 Context Files: ...
-Checks:
-- "..."
-- "..."
+Checks: [natural language description of what passes]
 ```
 
 ### 8. Complete
 
 Output the definition file path:
-```
+
+```text
 Definition complete: /tmp/define-{timestamp}.md
 
 To do: /do /tmp/define-{timestamp}.md
