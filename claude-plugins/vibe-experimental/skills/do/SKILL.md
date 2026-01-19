@@ -73,18 +73,18 @@ Started: [timestamp]
 Create TodoWrite:
 ```
 - [ ] Create log /tmp/do-log-{timestamp}.md
-- [ ] Deliverable 1: [name]
-  - [ ] Check INV-L1.1 holds→log; done when verified
-  - [ ] Satisfy AC-1.1→log; done when implemented + verified
-  - [ ] Satisfy AC-1.2→log; done when implemented + verified
-- [ ] Deliverable 2: [name]
-  - [ ] Check INV-L2.1 holds→log; done when verified
-  - [ ] Satisfy AC-2.1→log; done when implemented + verified
+- [ ] D1: Check local invariants hold→log
+- [ ] D1: Satisfy AC-1.1→log; done when implemented + verified
+- [ ] D1: Satisfy AC-1.2→log; done when implemented + verified
+- [ ] D2: Check local invariants hold→log
+- [ ] D2: Satisfy AC-2.1→log; done when implemented + verified
 - [ ] (expand: sub-tasks as discovered)
 - [ ] Final: call /verify for comprehensive check
 - [ ] (expand: fix failures from /verify—loop until pass)
 - [ ] Refresh log + output summary; done when user sees final status
 ```
+
+Use `D{N}:` prefix to indicate which deliverable a todo belongs to.
 
 ### 3. Execute Deliverables
 
