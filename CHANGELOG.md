@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.14.0 - Restore code quality gate selection in /define:
+  - Added multi-select question for quality aspects (bugs, type safety, maintainability, simplicity)
+  - Added agent mapping table linking quality aspects to reviewer agents
+  - Made Global Invariants explicitly flexible (not a closed list)
+  - Added additional quality options (coverage, testability, docs, CLAUDE.md adherence)
+
 - [prompt-engineering] v1.17.0 - Restructure /compress-prompt and verifier to goal-oriented:
   - `/compress-prompt`: ~90 lines (was ~375)
   - `prompt-compression-verifier`: ~120 lines (was ~495)
