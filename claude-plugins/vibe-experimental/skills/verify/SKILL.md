@@ -1,144 +1,191 @@
 ---
 name: verify
-description: 'Internal verification runner. Spawns parallel criteria-checker agents for each criterion. Called by /do, not directly by users.'
+description: 'Manifest verification runner. Spawns parallel verifiers for Global Invariants and Acceptance Criteria. Called by /do, not directly by users.'
 user-invocable: false
 ---
 
-# /verify - Verification Runner
+# /verify - Manifest Verification Runner
 
-You run all verification methods from a definition file. You spawn criteria-checker agents in parallel—you don't run checks yourself.
+You run all verification methods from a Manifest file. You spawn one verifier agent per criterion in parallel—you don't run checks yourself.
 
 ## Input
 
-`$ARGUMENTS` = "<definition-file-path> <execution-log-path> [--scope=files]"
+`$ARGUMENTS` = "<manifest-file-path> <execution-log-path> [--scope=files]"
 
 - `--scope=files`: Comma-separated file paths for reviewer scope override (optional)
 
 Examples:
-- `/tmp/define-123.md /tmp/do-log-123.md`
-- `/tmp/define-123.md /tmp/do-log-123.md --scope=src/queue.ts,src/batch.ts`
+- `/tmp/manifest-123.md /tmp/do-log-123.md`
+- `/tmp/manifest-123.md /tmp/do-log-123.md --scope=src/auth.ts,src/session.ts`
 
 ## Process
 
 ### 1. Parse Inputs
 
 Read both files:
-- Definition file: extract all criteria and their verification methods
-- Execution log: context for criteria-checkers
+- Manifest file: extract all criteria with verification methods
+- Execution log: context for verifiers
 
 Parse `--scope=files` if provided (optional, for reviewer scope override).
 
-### 2. Categorize Criteria
+### 2. Extract All Criteria
 
-All criteria use sequential `AC-N` numbering. Group by verification type (from `verify.method`):
-- **bash**: Shell commands (npm test, tsc, lint, etc.)
+From the Manifest, extract:
+
+**Global Invariants (INV-G*):**
+```yaml
+- id: INV-G1
+  type: global-invariant
+  description: "Tests must pass"
+  verify:
+    method: bash
+    command: "npm test"
+```
+
+**Acceptance Criteria (AC-{D}.{N}):**
+```yaml
+- id: AC-1.1
+  type: acceptance-criteria
+  deliverable: 1
+  description: "User can log in"
+  verify:
+    method: subagent
+    agent: general-purpose
+    prompt: "Verify login flow works as specified"
+
+- id: AC-1.2
+  type: acceptance-criteria
+  deliverable: 1
+  description: "Passwords are hashed, not plaintext"
+  verify:
+    method: codebase
+    check: "No password storage without hashing"
+```
+
+### 3. Categorize by Verification Method
+
+Group criteria by verification type (from `verify.method`):
+- **bash**: Shell commands
 - **codebase**: Code pattern checks
-- **subagent**: Reviewer agents (code-bugs-reviewer, type-safety-reviewer, etc.)
-- **manual**: Require human verification (set aside for later)
-
-Note: The `category` field (feature, rejection, edge-case, boundary, quality-gate, project-gate) is metadata; grouping is by verification METHOD.
+- **subagent**: Reviewer agents
+- **manual**: Require human verification (set aside)
 
 Then sort by expected duration (slow first):
-
 - **Slow** (30s+): test suites, builds, reviewer agents
 - **Fast** (seconds): lint, typecheck, simple codebase patterns
 
-### 3. Launch All Verifiers in Parallel
+### 4. Launch All Verifiers in Parallel
 
-Launch ALL criteria in a single parallel call, **slow ones first** in the array. Claude Code caps at ~10 concurrent and queues the rest—by putting slow ones first, they start immediately and fast ones fill in as slots free up.
+Launch ONE verifier per criterion in a single parallel call, **slow ones first**. Claude Code caps at ~10 concurrent and queues the rest.
 
 ```
 // Single message with multiple Task calls - slow first
-Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
-Review the current branch changes for bugs. Focus on HIGH and CRITICAL severity issues only.
-Scope: git diff against origin/main")
 
+// Global Invariants (often slow - tests, builds)
 Task(subagent_type="vibe-experimental:criteria-checker", prompt="
-Criterion: AC-1 (tests-pass)
-Description: All tests pass
+Criterion: INV-G1 (global-invariant)
+Description: Tests must pass
 Verification method: bash
 Command: npm test")
 
-// ... other slow checks ...
+// Subagent checks (slow)
+Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
+Criterion: INV-G2 (global-invariant)
+Description: No HIGH or CRITICAL bugs
+Scope: git diff against origin/main")
 
-// Then fast checks
+// Acceptance Criteria
 Task(subagent_type="vibe-experimental:criteria-checker", prompt="
-Criterion: AC-7 (error-pattern)
-Description: All errors use AppError class
-Verification method: codebase
-Files: src/handlers/
-Check: No raw throw new Error() in modified files")
+Criterion: AC-1.1 (acceptance-criteria, Deliverable 1)
+Description: User can log in with valid credentials
+Verification method: bash
+Command: npm run test:auth")
 
-// ... other fast checks ...
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Criterion: AC-1.2 (acceptance-criteria, Deliverable 1)
+Description: Passwords are hashed, not plaintext
+Verification method: codebase
+Files: src/auth/
+Check: Password storage must use bcrypt or similar hashing")
+
+// Fast checks last
+Task(subagent_type="vibe-experimental:criteria-checker", prompt="
+Criterion: INV-G3 (global-invariant)
+Description: Linting passes
+Verification method: bash
+Command: npm run lint")
 ```
 
-**Scope override**: If /do provides explicit scope (e.g., specific files changed), pass it to reviewers:
+**Scope override**: If /do provides explicit scope, pass to reviewers:
 ```
 Task(subagent_type="vibe-experimental:code-bugs-reviewer", prompt="
-Review these files for bugs: src/handlers/notify.ts, src/services/queue.ts
+Criterion: INV-G2 (global-invariant)
+Review these files for bugs: src/auth.ts, src/session.ts
 Focus on HIGH and CRITICAL severity issues only.")
 ```
 
-### 4. Collect Results
+### 5. Collect Results
 
 #### For bash/codebase results (from criteria-checker)
 
 Standard structure:
-```
+```json
 {
-  "passed": ["AC-1", "AC-2", ...],
+  "passed": ["INV-G1", "AC-1.1"],
   "failed": [
     {
-      "id": "AC-3",
+      "id": "AC-1.2",
+      "type": "acceptance-criteria",
+      "deliverable": 1,
       "method": "bash",
-      "location": "src/foo.test.ts:45",
-      "expected": "'queued'",
-      "actual": "'sent'",
-      "fix_hint": "..."
+      "location": "src/auth.test.ts:45",
+      "expected": "'authenticated'",
+      "actual": "'pending'",
+      "fix_hint": "Check token validation logic"
     }
   ],
-  "manual": ["AC-10", "AC-11"]
+  "manual": ["AC-2.3"]
 }
 ```
 
 #### For subagent results (from reviewer agents)
 
-Parse the reviewer's report based on the criterion's `prompt` field which specifies pass conditions in natural language:
+Parse based on criterion's `prompt` field which specifies pass conditions:
 
 Examples:
-- `prompt: "Review for bugs. Pass if no HIGH or CRITICAL severity issues."` → FAIL if any HIGH/CRITICAL found
-- `prompt: "Check docs accuracy. Pass if no MEDIUM+ issues."` → FAIL if any MEDIUM/HIGH/CRITICAL found
-
-1. Read the `prompt` field from the criterion definition
-2. Parse the pass condition (e.g., "Pass if no HIGH or CRITICAL")
-3. Look for severity headers in the agent's report
-4. Apply the condition: issues violating it → criterion FAILS
+- `prompt: "Pass if no HIGH or CRITICAL severity issues"` → FAIL if any HIGH/CRITICAL found
+- `prompt: "Pass if no MEDIUM+ issues"` → FAIL if any MEDIUM/HIGH/CRITICAL found
 
 Convert to same structure:
-```
+```json
 {
-  "id": "AC-15",
-  "category": "quality-gate",
+  "id": "INV-G2",
+  "type": "global-invariant",
   "method": "subagent",
   "agent": "code-bugs-reviewer",
   "issues": [
     {
       "severity": "HIGH",
-      "title": "Race condition in queue processing",
-      "location": "src/queue.ts:45-52",
-      "description": "Async state change without synchronization",
-      "fix_hint": "Add mutex or use atomic operations"
+      "title": "Race condition in auth flow",
+      "location": "src/auth.ts:45-52",
+      "description": "Token validation not atomic",
+      "fix_hint": "Add mutex or use atomic compare-and-set"
     }
   ]
 }
 ```
 
-### 5. Decision Logic
+### 6. Decision Logic
 
 ```
-if any automated failed:
-    → Return failures only (hide manual)
-    → /do continues working
+if any Global Invariant failed:
+    → Return ALL failures (global failures are critical)
+    → Highlight global failures prominently
+    → /do must fix global issues first
+
+elif any AC failed:
+    → Return failures grouped by deliverable
+    → /do continues working on specific deliverables
 
 elif all automated pass AND manual exists:
     → Return manual criteria
@@ -148,46 +195,63 @@ elif all pass (no manual):
     → Call /done
 ```
 
-### 6. Output Format
+### 7. Output Format
 
 #### On Failure
 
 ```markdown
 ## Verification Results
 
-### Failed (N)
+### Global Invariants
 
-- **AC-3**: tests-pass
+#### Failed (N)
+
+- **INV-G1**: Tests must pass
   Method: bash (`npm test`)
-  Location: `src/notifications.test.ts:45`
-  Expected: `'queued'`
-  Actual: `'sent'`
-  Fix: Update status to 'queued' before notification
+  Location: `src/auth.test.ts:45`
+  Expected: `'authenticated'`
+  Actual: `'pending'`
+  Fix: Check token validation in AuthService
 
-- **AC-7**: error-pattern
-  Method: codebase
-  Location: `src/handlers/notify.ts:23`
-  Issue: Raw Error() throw, expected AppError
-  Fix: Replace with `throw new AppError({...})`
-
-- **AC-15** (category: quality-gate): No HIGH or CRITICAL bugs
+- **INV-G2**: No HIGH or CRITICAL bugs
   Method: subagent (code-bugs-reviewer)
-  Issues found: 2
+  Issues: 1
 
-  1. [HIGH] Race condition in queue processing
-     Location: `src/queue.ts:45-52`
-     Description: Async state change without synchronization
-     Fix: Add mutex or use atomic operations
+  1. [HIGH] Race condition in auth flow
+     Location: `src/auth.ts:45-52`
+     Description: Token validation not atomic
+     Fix: Add mutex or use atomic compare-and-set
 
-  2. [CRITICAL] Data loss in batch update
-     Location: `src/batch.ts:112`
-     Description: Missing error handling causes silent failures
-     Fix: Add try-catch and rollback on failure
-
-### Passed (M)
-- AC-1, AC-2, AC-4, AC-5, AC-6
+#### Passed (M)
+- INV-G3, INV-G4
 
 ---
+
+### Deliverable 1: User Authentication
+
+#### Failed (1)
+- **AC-1.2**: Session persists across page reload
+  Method: bash (`npm run test:session`)
+  Location: `src/session.test.ts:23`
+  Issue: Session cookie not set with correct flags
+  Fix: Add `httpOnly` and `secure` flags
+
+#### Passed (1)
+- AC-1.1
+
+---
+
+### Deliverable 2: Password Reset
+
+- **AC-2.1**: User receives reset email - PASS
+- **AC-2.2**: Reset link works - PASS
+
+---
+
+**Summary:**
+- Global Invariants: 2/4 failed (CRITICAL - fix first)
+- Deliverable 1: 1/2 ACs failed
+- Deliverable 2: All pass
 
 Continue working on failed criteria, then call /verify again.
 ```
@@ -197,12 +261,19 @@ Continue working on failed criteria, then call /verify again.
 ```markdown
 ## Verification Results
 
-### All Automated Criteria Pass (N)
+### All Automated Criteria Pass
 
-### Manual Verification Required (M)
+**Global Invariants:** 4/4 pass
+**Deliverable 1:** 2/2 ACs pass
+**Deliverable 2:** 2/2 ACs pass
 
-- **AC-10**: ux-feels-right
-  How to verify: [from definition]
+### Manual Verification Required
+
+- **AC-1.3**: UX feels intuitive (Deliverable 1)
+  How to verify: [from manifest]
+
+- **AC-2.3**: Email tone is appropriate (Deliverable 2)
+  How to verify: [from manifest]
 
 ---
 
@@ -219,10 +290,17 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 ## Critical Rules
 
 1. **Don't run checks yourself** - spawn criteria-checker or reviewer agents
-2. **Single parallel launch** - all criteria in one call, slow ones first in array
-3. **Slow first** - Claude Code queues in order; slow ones get first slots, fast ones fill in
-4. **Hide manual on auto-fail** - focus on fixable issues first
-5. **Actionable feedback** - pass through file:line, expected vs actual from agents
+2. **Single parallel launch** - all criteria in one call, slow ones first
+3. **Preserve hierarchy** - report results grouped by type and deliverable
+4. **Global failures are critical** - highlight them prominently
+5. **Actionable feedback** - pass through file:line, expected vs actual
 6. **Call /done on success** - trigger completion
-7. **Parse prompt for pass condition** - quality-gate criteria specify pass conditions in natural language
+7. **Parse prompt for pass condition** - subagent criteria specify conditions in natural language
 8. **Return all issues** - for failed criteria, include all issues so /do can fix them
+
+## Criterion Types Reference
+
+| Type | ID Pattern | Scope | Failure Impact |
+|------|------------|-------|----------------|
+| Global Invariant | INV-G{N} | Entire task | Task fails |
+| Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |

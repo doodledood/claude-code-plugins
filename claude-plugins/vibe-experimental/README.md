@@ -1,10 +1,52 @@
 # vibe-experimental
 
-Experimental definition-driven workflows. Invest in definition upfront, then execute autonomously with enforced verification.
+Manifest-driven workflows separating **what to build** (Deliverables) from **rules to follow** (Global Invariants).
 
 ## Overview
 
-Every criterion has explicit verification. Execution can't complete without verification passing or proper escalation.
+A two-level approach to task definition and execution:
+
+1. **Global Invariants** - Rules that apply to the ENTIRE task (e.g., "tests must pass")
+2. **Deliverables** - Specific items to complete, each with **Acceptance Criteria**
+   - ACs can be positive ("user can log in") or negative ("passwords are hashed")
+
+## The Manifest Schema
+
+```markdown
+# Definition: [Title]
+
+## 1. Intent & Context
+- **Goal:** [High-level purpose]
+- **Mental Model:** [Key concepts/architecture]
+
+## 2. Global Invariants (The Constitution)
+- [INV-G1] Description | Verify: [method]
+- [INV-G2] Description | Verify: [method]
+
+## 3. Deliverables (The Work)
+
+### Deliverable 1: [Name]
+- **Acceptance Criteria**:
+  - [AC-1.1] Description | Verify: [method]
+  - [AC-1.2] Description | Verify: [method]
+```
+
+## ID Scheme
+
+| Type | Pattern | Scope | Failure Impact |
+|------|---------|-------|----------------|
+| Global Invariant | INV-G{N} | Entire task | Task fails |
+| Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |
+
+## Interview Philosophy
+
+**YOU generate, user validates.** Users have surface-level knowledge. Don't ask open-ended questions - generate candidates from domain knowledge, present concrete options, learn from reactions.
+
+**Phase order** (high info-gain first):
+1. Intent & Context (task type, scope, risk)
+2. Deliverables (what are we building?)
+3. Acceptance Criteria (how do we know each is done?)
+4. Global Invariants (auto-detect + generate candidates)
 
 ## Skills
 
@@ -12,22 +54,22 @@ Every criterion has explicit verification. Execution can't complete without veri
 
 | Skill | Description |
 |-------|-------------|
-| `/define` | Work definition builder with proactive interview |
-| `/do` | Autonomous execution from definition file |
+| `/define` | Manifest builder - YOU generate candidates, user validates (no open-ended questions) |
+| `/do` | Manifest executor - iterates deliverables, satisfies ACs, calls /verify |
 
 ### Internal
 
 | Skill | Purpose |
 |-------|---------|
-| `/verify` | Runs verification for all criteria |
-| `/done` | Completion marker with summary |
-| `/escalate` | Structured escalation with evidence |
+| `/verify` | Runs all verifications, reports by type and deliverable |
+| `/done` | Outputs hierarchical completion summary |
+| `/escalate` | Structured escalation with type-aware context |
 
 ## Agents
 
 | Agent | Purpose |
 |-------|---------|
-| `criteria-checker` | Verifies a single criterion (bash or codebase check) |
+| `criteria-checker` | Verifies a single criterion with type awareness |
 
 ## Hooks
 
@@ -39,15 +81,29 @@ Every criterion has explicit verification. Execution can't complete without veri
 ## Workflow
 
 ```
-/define "task" → Interview → Definition file
+/define "task" → Interview → Manifest file
+                    │
+                    ├─ Intent & Context
+                    ├─ Global Invariants
+                    └─ Deliverables (with ACs)
                                    ↓
-/do definition.md → Work → /verify → /done
-                              ↓
-                    (failures) → Fix → /verify again
-                              ↓
-                    (stuck) → /escalate
+/do manifest.md → For each Deliverable:
+                    - Satisfy ACs
+                         ↓
+                  /verify → (failures) → Fix specific criterion → /verify again
+                         ↓
+                  All pass → /done
+                         ↓
+                  (stuck) → /escalate
 ```
+
+## Execution Semantics
+
+| Phase | Check | Failure Impact |
+|-------|-------|----------------|
+| After each deliverable | Acceptance Criteria | Deliverable incomplete |
+| Final verification | Global Invariants + all ACs | Must all pass for /done |
 
 ## Status
 
-**Experimental** - More rigorous than standard workflows. Use when you want quality-focused autonomous execution.
+**Experimental** - More rigorous than standard workflows. Use when you want quality-focused autonomous execution with clear separation of constraints and deliverables.
