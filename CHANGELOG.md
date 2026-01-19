@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.5.2 - claude-md-adherence-reviewer focuses on outcome rules only:
+  - Now distinguishes outcome rules (code quality) from process rules (workflow steps)
+  - Flags: naming conventions, patterns, architecture, file structure
+  - Ignores: git workflow, PR steps, version bumping, running tests before commit
+  - The test: "Does the rule describe what the CODE should be, or what the DEVELOPER should do?"
+
 - [vibe-experimental] v0.5.1 - claude-md-adherence-reviewer checks context before reading files:
   - CLAUDE.md content may be auto-loaded into subagent context
   - Agent now checks if rules are already in context before using Read tool
