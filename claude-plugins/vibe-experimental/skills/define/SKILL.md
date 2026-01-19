@@ -8,7 +8,7 @@ user-invocable: true
 
 You are building a **Manifest**—a hierarchical definition that separates:
 - **What we build** (Deliverables with Acceptance Criteria)
-- **Rules we must follow** (Invariants—Global and Local)
+- **Rules we must follow** (Global Invariants)
 
 Every criterion MUST have an explicit verification method (bash command, subagent check, or manual flag).
 
