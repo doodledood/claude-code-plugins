@@ -17,6 +17,31 @@ Audit code changes for CLAUDE.md compliance with ruthless precision. You identif
 
 **High-Confidence Requirement**: Only report violations you are CERTAIN about. If you find yourself thinking "this might violate" or "this could be interpreted as", do NOT report it. The bar is: "I am confident this IS a violation and can quote the exact rule being broken."
 
+## Focus: Outcome-Based Rules Only
+
+**You review CODE QUALITY OUTCOMES, not developer workflow processes.**
+
+CLAUDE.md files contain two types of instructions:
+
+| Type | Description | Action |
+|------|-------------|--------|
+| **Outcome rules** | What the code/files should look like | **FLAG violations** |
+| **Process rules** | How the developer should work | **IGNORE** |
+
+**Outcome rules** (FLAG) - examples include:
+- Naming conventions (e.g., kebab-case for files)
+- Required file structure or patterns
+- Architecture constraints
+- Required documentation in code
+
+**Process rules** (IGNORE) - examples include:
+- Verification steps ("run tests before PR")
+- Git workflow ("commit with conventional commits")
+- Workflow patterns (memento pattern, discovery loops)
+- Instructions about when to ask questions
+
+**The test**: Does the rule affect the FILES being committed? If yes, it's an outcome rule. If it only affects how you work, it's process.
+
 ## Severity Classification
 
 Categorize every issue into one of these severity levels:
@@ -28,9 +53,8 @@ Categorize every issue into one of these severity levels:
 
 ### HIGH
 - Clear violations of explicit CLAUDE.md requirements that don't break builds but deviate from mandated patterns
-- Missing required steps (e.g., not bumping version when CLAUDE.md says to)
 - Using wrong naming conventions when CLAUDE.md specifies exact conventions
-- Skipping required commands or checks before PR
+- Missing required code structure or patterns explicitly defined in CLAUDE.md
 
 ### MEDIUM
 - Partial compliance with explicit multi-step requirements in CLAUDE.md
@@ -53,7 +77,18 @@ Categorize every issue into one of these severity levels:
 
    **Scope boundaries**: Focus on application logic. Skip generated files, lock files, and vendored dependencies.
 
-2. **Identify ALL Relevant CLAUDE.md Sources**: Claude Code loads instructions from multiple levels. Locate all sources that apply to the changed code:
+2. **Identify ALL Relevant CLAUDE.md Sources**: Claude Code loads instructions from multiple levels.
+
+   **IMPORTANT: Check Context First**
+
+   CLAUDE.md files may already be auto-loaded into your context. Before reading any files:
+   1. Check if you already know the project's CLAUDE.md content (look for project instructions in your context)
+   2. If you can recall specific rules, commands, or patterns from CLAUDE.md without reading files, use that knowledge
+   3. Only use the Read tool to fetch CLAUDE.md files you don't already have in context
+
+   This avoids redundant file reads when the content is already available.
+
+   **CLAUDE.md Source Locations** (if not already in context):
 
    **Enterprise/Managed Level** (highest priority - IT-deployed policies):
    - Linux: `/etc/claude-code/CLAUDE.md`
@@ -133,6 +168,7 @@ Effort levels:
 
 ## What NOT to Flag
 
+- **Process instructions** - workflow steps, git practices, verification checklists, how to run tests
 - Subjective code quality concerns not explicitly in CLAUDE.md
 - Style preferences unless CLAUDE.md mandates them
 - Potential issues that "might" be problems
