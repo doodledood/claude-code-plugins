@@ -27,7 +27,6 @@ Every criterion has explicit verification. Execution can't complete without veri
 
 | Agent | Purpose |
 |-------|---------|
-| `define-verifier` | Verifies definition completeness before /do |
 | `criteria-checker` | Verifies a single criterion (bash or codebase check) |
 
 ## Hooks

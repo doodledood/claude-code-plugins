@@ -57,19 +57,26 @@ Create todos and log file. The todos below are starting points—add task-specif
 - [ ] Detect project quality gates from CLAUDE.md (if coding task)
 - [ ] (expand: add areas as discovered during interview)
 - [ ] Refresh: read full interview log
-- [ ] Run meta-verification via define-verifier agent
 - [ ] Write final definition file
 ```
 
-**Note**: The interview techniques listed in Section 2 (adversarial examples, contrast pairs, pre-mortem, disappointed question, persona simulation, etc.) are tools to use as relevant—not a checklist to complete. Use whichever techniques surface hidden criteria for THIS task, and invent new ones if needed.
+**Note**: The interview techniques in Section 2 are tools, not a checklist. Start with rejection criteria, then use concrete choice questions to probe deeper. Use latent discovery techniques when direct questions don't surface what you need.
 
 ### 2. Proactive LLM-Driven Interview
 
 YOU drive the interview. Don't wait for the user to volunteer everything. Surface questions they wouldn't think to ask.
 
-**Goal**: A definition so complete that an LLM can execute autonomously without ambiguity. The techniques below are starting points—invent new questions as the task demands. Every task has unique aspects; ask whatever surfaces hidden criteria.
+**Goal**: A definition so complete that an LLM can execute autonomously without ambiguity.
 
-**Interview Techniques (starting points, not exhaustive):**
+**Interview Philosophy**:
+
+**Be proactive with concrete choices.** Users often can't articulate criteria until they see options to react to. Present concrete alternatives—code examples, approaches, tradeoffs—and let them accept or reject. Their reactions reveal criteria they couldn't have stated upfront. Use AskUserQuestion with 2-4 options; reserve open-ended questions for initial exploration only.
+
+Start with "What would cause you to reject this?" to prime rejection thinking, then drive the interview with concrete choices based on their answer.
+
+**Know when to stop**: If the user clearly knows what they want and rejection criteria are captured, move on. Don't over-interview simple tasks. Probe deeper when complexity or risk warrants it.
+
+**Interview Techniques (use as needed, not as checklist):**
 
 #### Positive Criteria
 Ask about:
@@ -82,16 +89,17 @@ Ask about:
 Ask explicitly: "What would cause you to REJECT this output?"
 - Capture ALL rejection criteria the user mentions
 - These are the most important criteria - everything else is optional
-- Keep probing until user can't think of more
+- If user struggles, offer common rejection reasons as options based on task type
 
 #### Edge Cases
-Walk through systematically. Common areas (adapt to task):
+Present relevant edge cases as options for the user to confirm handling:
 - Empty input / null values
 - Large input / scale limits
 - Concurrent access / race conditions
 - Failure modes / error handling
 - Task-specific edge cases (e.g., timezone handling, unicode, permissions)
-- Continue until user says "I think we covered it"
+
+Use multi-select AskUserQuestion: "Which edge cases need explicit handling?" with task-relevant options.
 
 #### Adversarial Examples
 Show 1-3 concrete implementations that vary on relevant dimensions. The goal is to isolate preferences—if the user accepts one but rejects another, the difference reveals a criterion.
@@ -116,35 +124,43 @@ Dimensions to consider varying (pick what's relevant):
 Example: If user accepts A (flat, verbose) and C (flat, terse) but rejects B (nested, terse), the issue is nesting—not style.
 
 #### Contrast Pairs
-Present alternatives:
+Present alternatives with follow-up options:
 ```
 "Which approach do you prefer?"
 
 Option A: [approach]
 Option B: [approach]
 
-"Why?" → Capture reasoning as criterion
+If they choose, follow up with concrete options:
+"What makes that better for this case?"
+- { label: "Simpler", description: "..." }
+- { label: "More flexible", description: "..." }
+- { label: "Matches existing patterns", description: "..." }
+→ Capture reasoning as criterion
 ```
 
 #### Pre-mortem Question
 Ask: "Imagine this shipped and it was a disaster. What went wrong?"
-- Capture at least 2 risks
+- Capture risks mentioned
 - Each risk becomes a preventive criterion
+- If user struggles, offer common failure modes as options
 
 #### Disappointed Question
 Ask: "All criteria pass but you're disappointed. What would cause that?"
-- Repeat until user can't think of more
+- Capture scenarios mentioned
 - Each scenario becomes a criterion
+- If user struggles, offer possible disappointments as options (e.g., "too slow?", "hard to extend?", "doesn't match team style?")
 
 #### Persona Simulation
 Ask: "If [respected developer/architect] reviewed this, what would they critique?"
 - User identifies a persona
+- If they struggle to generate critiques, offer common concerns that persona might have
 - Capture critiques as criteria
 
 #### Progressive Concreteness
-For any vague criterion:
-- "What does 'clean' mean specifically?"
-- "How would we verify 'good performance'?"
+For any vague criterion, offer concrete interpretations:
+- Instead of "What does 'clean' mean?", offer: "Which matters most: readability, short functions, minimal dependencies, or consistent style?"
+- Instead of "How would we verify 'good performance'?", offer: "What's acceptable: <100ms, <500ms, <1s, or just 'not noticeably slow'?"
 - Refine until true/false verifiable
 - Use numeric thresholds where applicable
 
@@ -648,25 +664,9 @@ Selected (with sequential AC-N IDs):
 - (none if all resolved)
 ```
 
-### 7. Meta-Verification
-
-Before finalizing, verify the definition is complete:
-
-```
-Use the Task tool to spawn the define-verifier agent:
-Task(subagent_type="vibe-experimental:define-verifier", prompt="Verify the definition at /tmp/define-interview-{timestamp}.md")
-```
-
-The verifier checks:
-1. Core deliverable is clear (ambiguity = guaranteed rejection)
-2. Rejection criteria captured (explicit + latent discovery attempted)
-3. Each rejection criterion has a verification method
-
-If gaps found → continue interview to fill them.
-
 ### 7. Write Final Definition
 
-Only after meta-verification passes, write `/tmp/define-{timestamp}.md`:
+After refreshing context from the interview log, write `/tmp/define-{timestamp}.md`:
 
 All criteria use sequential `AC-N` numbering. Categories are metadata via the `category` field.
 
@@ -838,8 +838,8 @@ This allows /do to request definition changes when codebase reality conflicts wi
 3. **No vague terms** - "clean", "good", "proper" must be defined
 4. **No placeholders** - no TBD, TODO, "figure out later"
 5. **Examples are concrete** - actual code/artifacts, not descriptions
-6. **Meta-verification before finalize** - definition not done until it passes
-7. **Write to log before proceeding** - memento pattern mandatory
-8. **Techniques are starting points** - ask whatever questions surface hidden criteria for THIS task
-9. **Vary adversarial examples on relevant dimensions** - differences should isolate preferences
+6. **Write to log before proceeding** - memento pattern mandatory
+7. **Techniques are starting points** - ask whatever questions surface hidden criteria for THIS task
+8. **Concrete choices > open-ended questions** - users reveal criteria by reacting to options
+9. **Know when to stop** - if rejection criteria are clear, move on
 10. **Invest in definition quality** - thorough upfront criteria discovery enables autonomous execution

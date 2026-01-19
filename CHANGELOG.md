@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.10.0 - Removed define-verifier, improved interview flow:
+  - Removed define-verifier agent (user approval is the quality gate, not meta-verification)
+  - Added Interview Philosophy: concrete choices > open-ended questions (users reveal criteria by reacting)
+  - Added "Know when to stop" guidance (don't over-interview simple tasks)
+  - Critical rules updated: "Concrete choices > open-ended" and "Know when to stop"
+
 - [vibe-experimental] v0.9.0 - Techniques are starting points, not checklists:
   - Changed "Interview Techniques (use ALL)" to "starting points, not exhaustive"
   - Simplified todo template to be more adaptive
