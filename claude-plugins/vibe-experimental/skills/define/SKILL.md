@@ -390,64 +390,73 @@ questions: [
 
 **Map selections to criteria:**
 
-| Category | Reviewer Agent | Criterion ID |
-|----------|---------------|--------------|
-| Bugs | code-bugs-reviewer | QG-BUGS |
-| Type safety | type-safety-reviewer | QG-TYPES |
-| Maintainability | code-maintainability-reviewer | QG-MAINT |
-| Simplicity | code-simplicity-reviewer | QG-SIMPLE |
-| Test coverage | code-coverage-reviewer | QG-COVERAGE |
-| Testability | code-testability-reviewer | QG-TESTABILITY |
-| Documentation | docs-reviewer | QG-DOCS |
-| CLAUDE.md adherence | claude-md-adherence-reviewer | QG-CLAUDE |
+For each selected category, add a criterion with sequential `AC-N` ID and `category: quality-gate`:
 
-For each selected category, add a criterion with appropriate threshold:
+| Category | Reviewer Agent | Category Value |
+|----------|---------------|----------------|
+| Bugs | code-bugs-reviewer | quality-gate |
+| Type safety | type-safety-reviewer | quality-gate |
+| Maintainability | code-maintainability-reviewer | quality-gate |
+| Simplicity | code-simplicity-reviewer | quality-gate |
+| Test coverage | code-coverage-reviewer | quality-gate |
+| Testability | code-testability-reviewer | quality-gate |
+| Documentation | docs-reviewer | quality-gate |
+| CLAUDE.md adherence | claude-md-adherence-reviewer | quality-gate |
+
+Example (IDs continue from last AC-N in definition):
 
 ```yaml
 # Most reviewers use HIGH+ threshold
-- id: QG-BUGS
+- id: AC-15
+  category: quality-gate
   description: "No HIGH or CRITICAL bugs introduced"
   verify:
     method: subagent
     agent: code-bugs-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-TYPES
+- id: AC-16
+  category: quality-gate
   description: "No HIGH or CRITICAL type safety issues"
   verify:
     method: subagent
     agent: type-safety-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-MAINT
+- id: AC-17
+  category: quality-gate
   description: "No HIGH or CRITICAL maintainability issues"
   verify:
     method: subagent
     agent: code-maintainability-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-SIMPLE
+- id: AC-18
+  category: quality-gate
   description: "No HIGH or CRITICAL simplicity issues"
   verify:
     method: subagent
     agent: code-simplicity-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-COVERAGE
+- id: AC-19
+  category: quality-gate
   description: "No HIGH or CRITICAL coverage gaps"
   verify:
     method: subagent
     agent: code-coverage-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-TESTABILITY
+- id: AC-20
+  category: quality-gate
   description: "No HIGH or CRITICAL testability issues"
   verify:
     method: subagent
     agent: code-testability-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-CLAUDE
+- id: AC-21
+  category: quality-gate
   description: "No HIGH or CRITICAL CLAUDE.md violations"
   verify:
     method: subagent
@@ -455,7 +464,8 @@ For each selected category, add a criterion with appropriate threshold:
     pass_if: no_high_or_critical
 
 # Docs reviewer is capped at MEDIUM, so use MEDIUM+ threshold
-- id: QG-DOCS
+- id: AC-22
+  category: quality-gate
   description: "No MEDIUM or higher documentation issues"
   verify:
     method: subagent
@@ -485,23 +495,27 @@ Projects may have other gates (e.g., `cargo clippy`, `go vet`, security scans, m
 
 **If CLAUDE.md contains verifiable commands:**
 
-Extract and add as PQG-* criteria. Use descriptive IDs based on what's actually found:
+Extract and add as criteria with sequential `AC-N` IDs and `category: project-gate`:
 
 ```yaml
 # Examples - actual gates depend on what CLAUDE.md specifies
-- id: PQG-TYPECHECK
+# IDs continue from last AC-N in definition
+- id: AC-23
+  category: project-gate
   description: "Type checking passes"
   verify:
     method: bash
     command: "[extracted command]"
 
-- id: PQG-TEST
+- id: AC-24
+  category: project-gate
   description: "Tests pass"
   verify:
     method: bash
     command: "[extracted command]"
 
-- id: PQG-LINT
+- id: AC-25
+  category: project-gate
   description: "Linting passes"
   verify:
     method: bash
@@ -523,17 +537,17 @@ Write detected gates to interview log under `## Project Quality Gates (Auto-Dete
 
 After each interview phase, write findings to `/tmp/define-interview-{timestamp}.md`:
 
+All criteria use sequential `AC-N` numbering with a `category` field to track origin.
+
 ```markdown
-## Positive Criteria
-- [AC-1] description: "..." | verify: method
-- [AC-2] ...
-
-## Negative Criteria (Rejection)
-- [R-1] "Will reject if..."
-- [R-2] ...
-
-## Edge Cases
-- [E-1] scenario: "..." | handling: "..." | verify: method
+## All Criteria (logged sequentially)
+- [AC-1] category: feature | description: "..." | verify: method
+- [AC-2] category: feature | description: "..." | verify: method
+- [AC-3] category: rejection | description: "Will reject if..." | verify: method
+- [AC-4] category: edge-case | scenario: "..." | handling: "..." | verify: method
+- [AC-5] category: boundary | limit: "..." | verify: method
+- [AC-6] category: quality-gate | agent: code-bugs-reviewer | verify: subagent
+- [AC-7] category: project-gate | command: "npm test" | verify: bash
 - ...
 
 ## Latent Criteria (from discovery techniques)
@@ -587,24 +601,24 @@ After each interview phase, write findings to `/tmp/define-interview-{timestamp}
 - Scenario: "..." | Prevention: criterion AC-X
 
 ## Code Quality Gates
-(only for coding tasks)
+(only for coding tasks; IDs continue from last AC-N)
 
-Selected:
-- [ ] Bugs (QG-BUGS)
-- [ ] Type safety (QG-TYPES)
-- [ ] Maintainability (QG-MAINT)
-- [ ] Simplicity (QG-SIMPLE)
-- [ ] Test coverage (QG-COVERAGE)
-- [ ] Testability (QG-TESTABILITY)
-- [ ] Documentation (QG-DOCS)
-- [ ] CLAUDE.md adherence (QG-CLAUDE)
+Selected (with sequential AC-N IDs):
+- [ ] Bugs (category: quality-gate, agent: code-bugs-reviewer)
+- [ ] Type safety (category: quality-gate, agent: type-safety-reviewer)
+- [ ] Maintainability (category: quality-gate, agent: code-maintainability-reviewer)
+- [ ] Simplicity (category: quality-gate, agent: code-simplicity-reviewer)
+- [ ] Test coverage (category: quality-gate, agent: code-coverage-reviewer)
+- [ ] Testability (category: quality-gate, agent: code-testability-reviewer)
+- [ ] Documentation (category: quality-gate, agent: docs-reviewer)
+- [ ] CLAUDE.md adherence (category: quality-gate, agent: claude-md-adherence-reviewer)
 
 ## Project Quality Gates (Auto-Detected)
-(only if CLAUDE.md specifies verifiable commands)
+(only if CLAUDE.md specifies verifiable commands; IDs continue from last AC-N)
 
-| ID | Category | Command | Source |
-|----|----------|---------|--------|
-| PQG-* | [category] | [command] | CLAUDE.md line X |
+| AC-N | Category | Command | Source |
+|------|----------|---------|--------|
+| AC-N | project-gate | [command] | CLAUDE.md line X |
 
 (include only gates found in CLAUDE.md; omit section if none)
 
@@ -632,6 +646,8 @@ If gaps found → continue interview to fill them.
 
 Only after meta-verification passes, write `/tmp/define-{timestamp}.md`:
 
+All criteria use sequential `AC-N` numbering. Categories are metadata via the `category` field.
+
 ```markdown
 # Definition: [Task Description]
 
@@ -643,24 +659,37 @@ Interview Log: /tmp/define-interview-{timestamp}.md
 
 ## Acceptance Criteria
 
+All criteria use sequential AC-N numbering. The `category` field indicates the criterion type.
+
 ### Feature Behavior
 - id: AC-1
+  category: feature
   description: "..."
   verify:
     method: bash | subagent | manual
     [details]
 
-### Code Quality
 - id: AC-2
+  category: feature
   ...
 
-### Architecture
+### Rejection Conditions
 - id: AC-3
-  ...
-
-## Rejection Criteria
-- id: R-1
+  category: rejection
   description: "PR will be rejected if..."
+  verify: ...
+
+### Boundaries (Hard Limits)
+- id: AC-4
+  category: boundary
+  limit: "[hard limit from interview]"
+  verify: [method]
+
+### Edge Cases
+- id: AC-5
+  category: edge-case
+  scenario: "..."
+  handling: "..."
   verify: ...
 
 ## Tradeoffs & Preferences
@@ -670,20 +699,9 @@ When criteria conflict, these preferences apply:
 |-----------|------------|---------|
 | [from interview] | [preference] | [when it applies] |
 
-## Boundaries (Hard Limits)
-- id: B-1
-  limit: "[hard limit from interview]"
-  verify: [method]
-
 ## Pattern References
 - Follow: [reference artifact] ([key characteristics])
 - Avoid: [anti-pattern] ([why])
-
-## Edge Cases
-- id: E-1
-  scenario: "..."
-  handling: "..."
-  verify: ...
 
 ## Examples
 
@@ -710,16 +728,18 @@ Fails because: [specific reason linked to criterion]
 | ... | AC-X |
 
 ## Code Quality Gates
-(only present if coding task and user selected gates)
+(only present if coding task and user selected gates; IDs continue sequentially)
 
-- id: QG-BUGS
+- id: AC-10
+  category: quality-gate
   description: "No HIGH or CRITICAL bugs introduced"
   verify:
     method: subagent
     agent: code-bugs-reviewer
     pass_if: no_high_or_critical
 
-- id: QG-DOCS
+- id: AC-11
+  category: quality-gate
   description: "No MEDIUM or higher documentation issues"
   verify:
     method: subagent
@@ -729,23 +749,23 @@ Fails because: [specific reason linked to criterion]
 [etc. for each selected gate - see mapping table above]
 
 ## Project Quality Gates
-(only present if CLAUDE.md specifies verifiable commands)
+(only present if CLAUDE.md specifies verifiable commands; IDs continue sequentially)
 
-[Include only gates found in CLAUDE.md - examples:]
-
-- id: PQG-TYPECHECK
+- id: AC-12
+  category: project-gate
   description: "Type checking passes"
   verify:
     method: bash
     command: "[command from CLAUDE.md]"
 
-- id: PQG-TEST
+- id: AC-13
+  category: project-gate
   description: "Tests pass"
   verify:
     method: bash
     command: "[command from CLAUDE.md]"
 
-[etc. - actual gates and IDs depend on what the project specifies]
+[etc. - IDs continue sequentially]
 
 ## Task-Specific Subagents
 [Only if generic verification isn't sufficient]
@@ -782,7 +802,7 @@ The log file preserves all gathered criteria, examples, and risks.
 
 Definitions support amendments during execution if genuine gaps are discovered:
 
-- Criteria have unique IDs (AC-1, R-1, E-1) for reference
+- Criteria have unique sequential IDs (AC-1, AC-2, AC-3, etc.)
 - Amendments reference original: "AC-3.1 amends AC-3"
 - Track amendments in definition with date and reason
 - Format: `## Amendments\n- AC-3.1 (2026-01-17): [reason] - [new criterion]`

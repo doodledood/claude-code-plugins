@@ -25,7 +25,7 @@ Read the definition file from `$ARGUMENTS`:
 - If file invalid (missing criteria section) → output clear error and stop
 
 Extract:
-- All criteria (AC-N, R-N, E-N)
+- All criteria (all use sequential AC-N numbering; category field indicates type)
 - Verification methods for each
 - Examples (accepted/rejected)
 - Task-specific subagent definitions
@@ -42,9 +42,11 @@ Definition: [definition file path]
 Started: [timestamp]
 
 ## Criteria Status
-- [ ] AC-1: [description]
-- [ ] AC-2: [description]
-- [ ] R-1: [description]
+(all criteria use AC-N numbering; category noted for context)
+- [ ] AC-1 (feature): [description]
+- [ ] AC-2 (feature): [description]
+- [ ] AC-3 (rejection): [description]
+- [ ] AC-4 (edge-case): [description]
 ...
 
 ## Attempts
@@ -56,7 +58,7 @@ Create TodoWrite with criteria to satisfy:
 - [ ] Create log /tmp/do-log-{timestamp}.md
 - [ ] Satisfy AC-1: [brief]→log; done when implemented + attempt logged
 - [ ] Satisfy AC-2: [brief]→log; done when implemented + attempt logged
-- [ ] Satisfy R-1: [brief]→log; done when not violated + attempt logged
+- [ ] Satisfy AC-3: [brief]→log; done when not violated + attempt logged
 - [ ] (expand: sub-tasks as discovered)
 - [ ] Call /verify; done when all criteria verified
 - [ ] (expand: fix failures from /verify—loop until pass)

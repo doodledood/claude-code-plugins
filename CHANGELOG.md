@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.7.0 - Unified criteria prefix to AC-*:
+  - All criteria now use sequential `AC-N` numbering (no more R-, E-, B-, QG-*, PQG-*)
+  - Category is now metadata via `category` field (feature, rejection, edge-case, boundary, quality-gate, project-gate)
+  - Sections organize criteria by type, but IDs are sequential across the entire definition
+  - Verification methods unchanged - grouping by verification METHOD (bash, codebase, subagent, manual) still works
+
 - [vibe-experimental] v0.6.0 - /verify three-phase execution for better parallelism:
   - Slow checks (tests, reviewers) launch in background immediately with `run_in_background: true`
   - Fast checks (lint, typecheck, codebase) process in parallel waves

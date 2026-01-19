@@ -33,11 +33,13 @@ Parse arguments:
 
 ### 2. Categorize Criteria
 
-Group by verification type:
+All criteria use sequential `AC-N` numbering. Group by verification type (from `verify.method`):
 - **bash**: Shell commands (npm test, tsc, lint, etc.)
 - **codebase**: Code pattern checks
 - **subagent**: Reviewer agents (code-bugs-reviewer, type-safety-reviewer, etc.)
 - **manual**: Require human verification (set aside for later)
+
+Note: The `category` field (feature, rejection, edge-case, boundary, quality-gate, project-gate) is metadata; grouping is by verification METHOD.
 
 Then classify by expected duration—make an educated guess, err on the side of background:
 
@@ -147,7 +149,8 @@ Parse the reviewer's report based on the criterion's `pass_if` threshold from th
 Convert to same structure:
 ```
 {
-  "id": "QG-BUGS",
+  "id": "AC-15",
+  "category": "quality-gate",
   "method": "subagent",
   "agent": "code-bugs-reviewer",
   "issues": [
@@ -199,7 +202,7 @@ elif all pass (no manual):
   Issue: Raw Error() throw, expected AppError
   Fix: Replace with `throw new AppError({...})`
 
-- **QG-BUGS**: No HIGH or CRITICAL bugs
+- **AC-15** (category: quality-gate): No HIGH or CRITICAL bugs
   Method: subagent (code-bugs-reviewer)
   Issues found: 2
 
@@ -254,5 +257,5 @@ Use the Skill tool to complete: Skill("vibe-experimental:done", "all criteria ve
 5. **Hide manual on auto-fail** - focus on fixable issues first
 6. **Actionable feedback** - pass through file:line, expected vs actual from agents
 7. **Call /done on success** - trigger completion
-8. **Respect pass_if threshold** - for QG-* criteria, read `pass_if` from definition to determine fail threshold
-9. **Return all issues** - for failed QG-* criteria, include all issues at/above threshold so /do can fix them
+8. **Respect pass_if threshold** - for criteria with `category: quality-gate`, read `pass_if` from definition to determine fail threshold
+9. **Return all issues** - for failed quality-gate criteria, include all issues at/above threshold so /do can fix them

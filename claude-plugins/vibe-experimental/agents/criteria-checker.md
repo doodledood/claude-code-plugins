@@ -11,7 +11,7 @@ You verify a SINGLE criterion from a definition. You are READ-ONLY—you check, 
 ## Input
 
 You receive:
-- Criterion ID, description, and type (AC/R/E)
+- Criterion ID (AC-N), description, and category (feature, rejection, edge-case, boundary, quality-gate, project-gate)
 - Verification method (bash command OR codebase check instructions)
 - Context files (optional)
 

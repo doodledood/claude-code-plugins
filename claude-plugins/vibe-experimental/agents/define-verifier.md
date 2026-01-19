@@ -167,7 +167,7 @@ Result: PASS | FAIL
 **Has rejection criteria**
 ```markdown
 ### Rejection Criteria
-Found: [N] rejection criteria (R-1 through R-N)
+Found: [N] criteria with category: rejection (AC-N IDs)
 Explicit (from direct questions): [N]
 Latent (from discovery techniques): [N]
 Result: PASS (≥1 and latent techniques were used) | FAIL
