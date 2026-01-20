@@ -10,6 +10,8 @@ user-invocable: true
 
 Execute a Manifest: satisfy all Deliverables' Acceptance Criteria, then verify everything passes (including Global Invariants).
 
+**Why quality execution matters**: The manifest front-loaded the thinking—criteria are already defined. Your job is implementation that passes verification on first attempt. Every verification failure is rework.
+
 ## Input
 
 `$ARGUMENTS` = manifest file path (REQUIRED)
@@ -26,18 +28,31 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 
 ## Constraints
 
-**Create todo list immediately** - Track deliverables and their ACs. Use `D{N}:` prefix to indicate which deliverable. Expand as work reveals sub-tasks.
-
-**Create execution log** - Write to `/tmp/do-log-{timestamp}.md`. Log what you're working on, approaches tried, results. This is your working memory.
-
-**Write to log as you go** - After each significant action, update the log. Don't wait until the end.
-
 **Must call /verify** - Can't declare done without verification. When all deliverables addressed:
 ```
 Skill("vibe-experimental:verify", "/tmp/manifest-{ts}.md /tmp/do-log-{ts}.md")
 ```
 
-**Refresh before completion** - Read the full log before outputting final summary.
+## Todo Discipline
+
+**Create todo list immediately** based on manifest structure—deliverables and their ACs. Use `D{N}:` prefix. Adapt to THIS manifest's complexity.
+
+**Required elements:**
+- Log file creation (`/tmp/do-log-{timestamp}.md`)
+- `→log` after implementation steps (externalizes progress)
+- `(expand: ...)` when sub-tasks will emerge during implementation
+- `Refresh: read full log` before calling /verify
+- Acceptance criteria on each todo ("; done when X")
+
+**Update todos after every substantive action**—no batching completions.
+
+## Log Discipline
+
+**Create execution log** - Write to `/tmp/do-log-{timestamp}.md`. This is your working memory.
+
+**Write as you go** - After each significant action, update the log. Don't wait until the end.
+
+**Refresh before /verify** - Read the full log to restore context before verification.
 
 ## What to Do
 

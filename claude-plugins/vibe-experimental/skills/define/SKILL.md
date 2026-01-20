@@ -12,9 +12,11 @@ Build a **comprehensive Manifest** that captures:
 - **What we build** (Deliverables with Acceptance Criteria)
 - **Rules we must follow** (Global Invariants)
 
+**Why thoroughness matters**: Every criterion discovered NOW is one fewer rejection during implementation/review. The goal is a PR that passes on first submission—no "oh, I also needed X" after the work is done.
+
 Comprehensive means surfacing **latent criteria**—requirements the user doesn't know they have until probed. Users know their surface-level needs; your job is to discover the constraints and edge cases they haven't thought about.
 
-You can't get to 100% upfront—some criteria only emerge during implementation. But strive for good coverage without diminishing returns. The manifest supports amendments for what's discovered later.
+You can't get to 100% upfront—some criteria only emerge during implementation. But strive for high coverage. The manifest supports amendments for what's discovered later.
 
 Output: `/tmp/manifest-{timestamp}.md`
 
@@ -51,6 +53,19 @@ If no arguments provided, ask: "What would you like to build or change?"
 **Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
 
 **Pre-mortem every task** - Generate concrete failure scenarios as choices. User selects real risks → become preventive criteria.
+
+## Todo Discipline
+
+**Create todo list immediately** based on what THIS task needs—not a fixed template. Adapt structure to the specific requirements being defined.
+
+**Required elements:**
+- Log file creation (`/tmp/define-interview-{timestamp}.md`)
+- `→log` after discovery steps (externalizes findings)
+- `(expand: ...)` placeholder when areas will emerge
+- `Refresh: read full log` before synthesis (restores context)
+- Acceptance criteria on each todo ("; done when X")
+
+**Update todos after every substantive action**—no batching completions.
 
 ## What the Manifest Needs
 

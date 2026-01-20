@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.17.0 - Strengthen todo discipline and goal motivation across skills:
+  - /define: Added "Todo Discipline" section with required elements (flexible, not rigid template)
+  - /define: Added "Why thoroughness matters" - explicit motivation for first-pass PR approval
+  - /do: Added "Why quality execution matters" - verification pass on first attempt
+  - /do: Added "Todo Discipline" and "Log Discipline" sections with required elements
+
 - [vibe-experimental] v0.16.0 - /define improvements from session analysis:
   - Added principle 6: "ACs are observable behaviors" with non-engineer verification test
   - Added principle 7: "Explicitly surface edge cases" after core behavior
