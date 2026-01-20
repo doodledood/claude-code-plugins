@@ -28,7 +28,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **YOU generate, user validates** - Don't ask open-ended questions. Generate concrete candidates; learn from reactions.
+1. **YOU generate, user validates** - Surface latent criteria by generating concrete candidates; learn from reactions. Don't ask open-ended questions.
 
 2. **Only ask what you can't determine** - If you can infer from context, don't ask. Only ask when genuinely ambiguous.
 
@@ -36,40 +36,27 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 4. **No vague terms** - "clean", "good", "proper" must become measurable.
 
-5. **Diminishing returns, not premature stop** - Be thorough in surfacing latent criteria, but recognize when additional probing isn't yielding new insights.
+5. **Diminishing returns, not premature stop** - Be thorough in surfacing latent criteria, but recognize when additional probing isn't yielding new insights. Low-reversibility decisions need more specific ACs.
 
 6. **ACs are observable behaviors** - "User sees X" not "Code does Y". Test: could a non-engineer verify this by looking at the result?
 
 7. **Explicitly surface edge cases** - After core behavior, ask about edge cases. Generate concrete scenarios (empty states, null inputs, boundaries, concurrent access) as options.
 
+8. **Outside view first** - Before diving into task specifics, consider: "What typically goes wrong in similar projects? What do successful implementations look like?" Base rates surface criteria the user won't think of. Convert patterns into concrete ACs/invariants—the insight has no value until it's embedded in a deliverable.
+
 ## Constraints
 
-**Create todo list immediately** - Track what needs to be discovered. Expand as you learn more.
+**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-interview-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, acceptance criteria ("; done when X"). Update after every action.
 
-**Write to log as you go** - Capture findings to `/tmp/define-interview-{timestamp}.md` after each discovery. Don't wait until the end.
+**Write to log as you go** - Don't wait until the end.
 
-**Refresh before synthesis** - Before writing the final manifest, read the full interview log to restore context.
+**Refresh before synthesis** - Read full interview log to restore context.
 
 **Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
 
-**Pre-mortem every task** - Generate concrete failure scenarios as choices. User selects real risks → become preventive criteria.
-
-## Todo Discipline
-
-**Create todo list immediately** based on what THIS task needs—not a fixed template. Adapt structure to the specific requirements being defined.
-
-**Required elements:**
-- Log file creation (`/tmp/define-interview-{timestamp}.md`)
-- `→log` after discovery steps (externalizes findings)
-- `(expand: ...)` placeholder when areas will emerge
-- `Refresh: read full log` before synthesis (restores context)
-- Acceptance criteria on each todo ("; done when X")
-
-**Update todos after every substantive action**—no batching completions.
+**Pre-mortem + Backcast** - Generate failure/success scenarios. Task-wide risks → INV-G*. Deliverable-scoped → AC-*. Must become criteria—no standalone value.
 
 ## What the Manifest Needs
-
-Surface latent criteria through generation, not interrogation. Generate candidates; learn from user reactions.
 
 Both can cover **output** or **process**:
 
@@ -142,20 +129,13 @@ verify:
   command: "[command from CLAUDE.md]"
 ```
 
-## Conceptual Framework
-
-| Type | Question | Scope | Failure |
-|------|----------|-------|---------|
-| **Global Invariant** | "What must NEVER be violated?" | Entire task | Task FAILS |
-| **Acceptance Criteria** | "How do we know THIS is done?" | Single deliverable | Incomplete |
-
 ## Question Format
 
 When presenting options, mark the first as "(Recommended)" to reduce cognitive load.
 
 ## The Manifest Schema
 
-```markdown
+````markdown
 # Definition: [Title]
 
 ## 1. Intent & Context
@@ -189,15 +169,7 @@ When presenting options, mark the first as "(Recommended)" to reduce cognitive l
 
 ### Deliverable 2: [Name]
 ...
-
-## 4. Tradeoffs & Preferences (if any)
-| Dimension | Preference | Context |
-|-----------|------------|---------|
-
-## 5. Pre-mortem Risks
-| Risk | Preventive Measure |
-|------|-------------------|
-```
+````
 
 ## ID Scheme
 

@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.18.0 - Decision-making improvements to /define (inspired by Annie Duke):
+  - Add backcasting alongside pre-mortem as discovery tools
+  - Add "outside view first" principle: base rates → concrete criteria
+  - Key insight: discovery tools must become INV-G*/AC-*—no standalone value
+  - Simplified manifest schema to 3 sections: Intent, Invariants, Deliverables
+
 - [solo-dev] v1.20.0 - Add /define-x-strategy skill for personalized X/Twitter growth:
   - Algorithm-derived optimal growth strategy based on X recommendation system analysis
   - Three-phase model: Build R (retrieval alignment) → Build D (engagement density) → Maximize S (content score)
