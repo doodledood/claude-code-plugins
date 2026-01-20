@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [solo-dev] v1.20.0 - Add /define-x-strategy skill for personalized X/Twitter growth:
+  - Algorithm-derived optimal growth strategy based on X recommendation system analysis
+  - Three-phase model: Build R (retrieval alignment) → Build D (engagement density) → Maximize S (content score)
+  - Guided interview to create personalized X_STRATEGY.md
+  - Includes reference doc with full optimization model
+
 - [vibe-experimental] v0.17.0 - Strengthen todo discipline and goal motivation across skills:
   - /define: Added "Todo Discipline" section with required elements (flexible, not rigid template)
   - /define: Added "Why thoroughness matters" - explicit motivation for first-pass PR approval
