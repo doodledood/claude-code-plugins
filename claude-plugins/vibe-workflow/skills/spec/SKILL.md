@@ -1,6 +1,6 @@
 ---
 name: spec
-description: 'Builds requirements specification through structured discovery interview. Use when defining scope, gathering requirements, or specifying WHAT any work should accomplish - features, bugs, refactors, infrastructure, migrations, performance, documentation, or any other work type.'
+description: 'Requirements discovery through structured interview. Use when WHAT is unclear—scope needs definition, requirements need gathering, or starting from scratch. Outputs spec document, not executable manifest.'
 ---
 
 **User request**: $ARGUMENTS

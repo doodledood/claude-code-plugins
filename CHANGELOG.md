@@ -6,6 +6,15 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.16.0 - /define improvements from session analysis:
+  - Added principle 6: "ACs are observable behaviors" with non-engineer verification test
+  - Added principle 7: "Explicitly surface edge cases" after core behavior
+  - Improved description: "known requirements", "not for requirements discovery"
+
+- [vibe-workflow] v2.13.2 - /spec description update:
+  - Clarified /spec is for when WHAT is unclear (discovery phase)
+  - Added "not executable manifest" to differentiate from manifest builders
+
 - [vibe-experimental] v0.15.1 - /define now filters quality gates through project preferences:
   - Check CLAUDE.md for quality gate preferences before presenting options
   - Exclude gates users have disabled (e.g., "skip documentation checks")

@@ -1,6 +1,6 @@
 ---
 name: define
-description: 'Manifest builder. Creates hierarchical definitions separating Deliverables (what to build) from Invariants (rules to follow). Use when starting new features, refactors, or any work requiring clear done criteria.'
+description: 'Manifest builder with verification criteria. Converts known requirements into Deliverables + Invariants. Use when you need done criteria, acceptance tests, quality gates—not for requirements discovery. Outputs executable manifest.'
 user-invocable: true
 ---
 
@@ -35,6 +35,10 @@ If no arguments provided, ask: "What would you like to build or change?"
 4. **No vague terms** - "clean", "good", "proper" must become measurable.
 
 5. **Diminishing returns, not premature stop** - Be thorough in surfacing latent criteria, but recognize when additional probing isn't yielding new insights.
+
+6. **ACs are observable behaviors** - "User sees X" not "Code does Y". Test: could a non-engineer verify this by looking at the result?
+
+7. **Explicitly surface edge cases** - After core behavior, ask about edge cases. Generate concrete scenarios (empty states, null inputs, boundaries, concurrent access) as options.
 
 ## Constraints
 
