@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.15.1 - /define now filters quality gates through project preferences:
+  - Check CLAUDE.md for quality gate preferences before presenting options
+  - Exclude gates users have disabled (e.g., "skip documentation checks")
+  - Include custom gates users have defined (e.g., "always run security scan")
+
 - [prompt-engineering] v1.18.0 - Add "avoid arbitrary values" principle to /compress-prompt:
   - Added principle 6: state the principle, not the number
   - Removed arbitrary "iterate up to 5 times" → "iterate until passes or stops improving"

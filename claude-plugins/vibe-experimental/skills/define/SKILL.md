@@ -62,7 +62,9 @@ Both can cover **output** or **process**:
 
 ### Code Quality Gates (for coding tasks)
 
-For tasks involving code, ask users to **multi-select** which quality aspects they care about. Present both questions together:
+For tasks involving code, ask users to **multi-select** which quality aspects they care about. Present both questions together.
+
+**Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
 
 ```
 questions: [
