@@ -54,6 +54,3 @@ node_modules/
 
 # .claude stuff
 settings.local.json
-
-# Cloned repos for research
-x-algorithm/
