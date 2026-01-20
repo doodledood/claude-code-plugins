@@ -7,7 +7,9 @@ description: 'Creates personalized X/Twitter growth strategy through guided inte
 
 Create personalized X_STRATEGY.md through discovery interview. Strategy is grounded in algorithm-derived optimal growth principles.
 
-**Before starting**: Read `skills/define-x-strategy/X_GROWTH_REFERENCE.md` to internalize the growth model.
+**Before starting**: Read the reference documents in `skills/define-x-strategy/references/`:
+- `OPTIMAL_STRATEGY.md` — The growth model and optimization principles
+- `ALGORITHM_ANALYSIS.md` — Deep dive into X's recommendation algorithm
 
 **Discovery log**: `/tmp/x-strategy-{YYYYMMDD-HHMMSS}.md`
 
@@ -34,7 +36,7 @@ E = S × (N × D + R × U_oon)
 ### Create todo list (immediately)
 
 ```
-- [ ] Read X_GROWTH_REFERENCE.md; done when model internalized
+- [ ] Read references/; done when model internalized
 - [ ] Create discovery log
 - [ ] Discover current state→log; done when N, D, R assessed
 - [ ] Discover niche positioning→log; done when angle clear
@@ -206,7 +208,7 @@ Update based on feedback. Write refinements to log.
 
 | Principle | Rule |
 |-----------|------|
-| Reference first | Internalize X_GROWTH_REFERENCE.md before interviewing |
+| Reference first | Read references/ before interviewing |
 | Write before proceed | Log findings after each discovery step |
 | Phase-appropriate | Strategy must match current state |
 | Realistic constraints | Actions must fit their actual time/capacity |
