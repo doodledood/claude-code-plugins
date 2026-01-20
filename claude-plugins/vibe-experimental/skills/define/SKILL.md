@@ -44,18 +44,82 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Refresh before synthesis** - Before writing the final manifest, read the full interview log to restore context.
 
+**Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
+
+**Pre-mortem every task** - Generate concrete failure scenarios as choices. User selects real risks → become preventive criteria.
+
 ## What the Manifest Needs
 
-Discover these through probing—surface latent criteria the user hasn't articulated:
+Surface latent criteria through generation, not interrogation. Generate candidates; learn from user reactions.
 
-### Deliverables
-What specific things need to be built or changed? Decompose based on task complexity. Probe for implicit deliverables the user assumed but didn't state.
+Both can cover **output** or **process**:
 
-### Acceptance Criteria (per deliverable)
-How do we know each deliverable is done? Probe beyond the happy path: error handling, edge cases, constraints, security implications. ACs can be positive or negative. What would make the user reject a "working" implementation?
+- **Global Invariants** - "Don't do X" (negative constraints, ongoing). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
+- **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
+  - *Functional*: "Clicking Login redirects to Dashboard"
+  - *Non-Functional*: "Response time < 200ms"
+  - *Process*: "README.md contains section 'Authentication'"
 
-### Global Invariants
-What rules apply to the ENTIRE task? Probe for unstated assumptions: performance requirements, backwards compatibility, coding standards. For coding tasks, auto-detect from CLAUDE.md. What would make the user say "this breaks everything" even if individual deliverables work?
+### Code Quality Gates (for coding tasks)
+
+For tasks involving code, ask users to **multi-select** which quality aspects they care about. Present both questions together:
+
+```
+questions: [
+  {
+    question: "Which code quality checks should apply as global invariants?",
+    header: "Quality",
+    options: [
+      { label: "No HIGH/CRITICAL bugs (Recommended)", description: "Logic errors, race conditions, error handling" },
+      { label: "Type safety", description: "No any abuse, proper narrowing, invalid states unrepresentable" },
+      { label: "Maintainability", description: "DRY, low coupling, consistency, no dead code" },
+      { label: "Simplicity", description: "No over-engineering, appropriate complexity" }
+    ],
+    multiSelect: true
+  },
+  {
+    question: "Additional quality checks:",
+    header: "More quality",
+    options: [
+      { label: "Test coverage", description: "New/changed code has adequate tests" },
+      { label: "Testability", description: "Code structure allows easy testing (low mock count)" },
+      { label: "Documentation", description: "Docs and comments match code" },
+      { label: "CLAUDE.md adherence", description: "Follows project-specific standards" }
+    ],
+    multiSelect: true
+  }
+]
+```
+
+**Map selections to reviewer agents:**
+
+| Quality Aspect | Agent | Threshold |
+|---------------|-------|-----------|
+| No bugs | code-bugs-reviewer | no HIGH/CRITICAL |
+| Type safety | type-safety-reviewer | no HIGH/CRITICAL |
+| Maintainability | code-maintainability-reviewer | no HIGH/CRITICAL |
+| Simplicity | code-simplicity-reviewer | no HIGH/CRITICAL |
+| Test coverage | code-coverage-reviewer | no HIGH/CRITICAL |
+| Testability | code-testability-reviewer | no HIGH/CRITICAL |
+| Documentation | docs-reviewer | no MEDIUM+ (max severity is MEDIUM) |
+| CLAUDE.md adherence | claude-md-adherence-reviewer | no HIGH/CRITICAL |
+
+Add selected quality gates as Global Invariants with subagent verification:
+```yaml
+verify:
+  method: subagent
+  agent: [agent-name-from-table]
+  prompt: "Review for [quality aspect] issues in the changed files"
+```
+
+### Project Gates (auto-detect from CLAUDE.md)
+
+For coding tasks, read CLAUDE.md and extract verifiable commands (typecheck, lint, test, format). Add as Global Invariants with bash verification:
+```yaml
+verify:
+  method: bash
+  command: "[command from CLAUDE.md]"
+```
 
 ## Conceptual Framework
 
@@ -109,7 +173,7 @@ When presenting options, mark the first as "(Recommended)" to reduce cognitive l
 | Dimension | Preference | Context |
 |-----------|------------|---------|
 
-## 5. Pre-mortem Risks (if any)
+## 5. Pre-mortem Risks
 | Risk | Preventive Measure |
 |------|-------------------|
 ```

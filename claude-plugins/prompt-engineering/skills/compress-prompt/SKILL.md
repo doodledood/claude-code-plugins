@@ -29,6 +29,8 @@ If file path: read content. If inline: use directly. If ambiguous: try as file f
 
 5. **Inline-typable brevity** - Short enough you could type it verbally to a capable colleague.
 
+6. **Avoid arbitrary values** - "Max 4 rounds" or "2-3 examples" become rigid rules. State the principle, not the number. Constrain productively while giving flexibility.
+
 ## What to Keep vs Drop
 
 | KEEP | DROP |
@@ -52,7 +54,7 @@ If file path: read content. If inline: use directly. If ambiguous: try as file f
 
 **Create todo list** - Track: input validation, compression, verification iterations, output.
 
-**Verify with agent** - Launch `prompt-compression-verifier` to check goal clarity, novel constraints preserved, no over-specification. Iterate up to 5 times on issues.
+**Verify with agent** - Launch `prompt-compression-verifier` to check goal clarity, novel constraints preserved, no over-specification. Iterate until verification passes.
 
 **Single paragraph output** - The compressed prompt must be one dense paragraph, not reformatted sections or bullets.
 
