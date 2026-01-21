@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.14.0 - Add "Extensibility Risk" category to code-maintainability-reviewer:
+  - Catches responsibilities placed at wrong abstraction level that create "forgettability risk"
+  - Key test: "If someone adds another similar component, will they naturally do the right thing?"
+  - Common cases: analytics/logging/auth embedded in leaf classes instead of orchestrators
+  - High severity when 2+ siblings already manually replicate cross-cutting behavior
+  - Medium severity for new code where pattern is likely to extend
+
 - [vibe-experimental] v0.19.0 - /define: Restructure around 3 core principles
   - **Verifiable**: Every criterion has verification method (subsumes "no vague terms")
   - **Validated**: Generate concrete candidates, learn from reactions
