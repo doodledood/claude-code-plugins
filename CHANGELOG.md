@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.20.0 - Sync reviewers from vibe-workflow v2.17.0:
+  - code-bugs-reviewer: dangerous defaults category, hidden contracts cross-reference
+  - code-maintainability-reviewer: hidden contracts, function/type cohesion expansion, extensibility risk
+  - code-coverage-reviewer: sync updates
+
 - [vibe-workflow] v2.17.0 - Add "Hidden Contracts" to maintainability-reviewer (moved from bugs-reviewer):
   - Expanded "Temporal coupling" to "Temporal coupling & hidden contracts"
   - Catches cross-boundary implicit dependencies: code relies on side effects of another process rather than explicit data flow
