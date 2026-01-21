@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.17.0 - Expand Category 6 in bugs-reviewer to cover unverified assumptions:
+  - Renamed to "State Inconsistencies & Unverified Assumptions"
+  - Catches code that assumes external state exists without checking
+  - Examples: DB row "created by another process", file "created by setup", config "loaded by main()"
+  - Test: "If the assumed precondition isn't met, does this code check or crash?"
+  - High severity for main API paths, Medium for background/error recovery paths
+
 - [vibe-workflow] v2.16.0 - Add "Dangerous Defaults" category to code-bugs-reviewer:
   - Catches defaults that cause silent failures, security holes, or unbounded resource consumption
   - Test: "If a tired developer calls this with minimal args, will something bad happen?"
