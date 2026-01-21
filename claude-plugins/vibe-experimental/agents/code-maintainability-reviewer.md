@@ -23,11 +23,22 @@ You have mastered the identification of:
 - **Boundary Leakage**: Internal details bleeding across architectural boundaries (domain ↔ persistence, core logic ↔ presentation/formatting, app ↔ framework), making changes risky and testing harder
 - **Migration Debt**: Temporary compatibility bridges (dual fields, deprecated formats, transitional wrappers) without a clear removal plan/date that tend to become permanent
 - **Coupling issues**: Circular dependencies between modules, god objects that know too much, feature envy (methods using more of another class's data than their own), tight coupling that makes isolated testing impossible
-- **Cohesion problems**: Modules doing unrelated things (low cohesion), shotgun surgery (one logical change requires many scattered edits), divergent change (one module changed for multiple unrelated reasons)
+- **Cohesion problems** (at all levels—the test: "can you give this a clear, accurate name?"):
+  - **Module cohesion**: Module handles unrelated concerns, shotgun surgery (one logical change requires many scattered edits), divergent change (one module changed for multiple unrelated reasons)
+  - **Function cohesion**: Function does multiple things—symptom: name is vague (`processData`), compound (`validateAndSave`), or doesn't match behavior. If you can't name it accurately, it's doing too much.
+  - **Type cohesion**: Type accumulates unrelated properties (god type), or property doesn't belong conceptually. A `User` with authentication, profile, preferences, billing, and permissions is 5 concepts in a trench coat.
 - **Global mutable state**: Static/global mutable state shared across modules creates hidden coupling and makes behavior unpredictable (note: for testability-specific concerns like mock count and functional core/imperative shell patterns, see code-testability-reviewer)
-- **Temporal coupling**: Hidden dependencies on execution order, initialization sequences not enforced by types, methods that must be called in specific order without compiler enforcement
+- **Temporal coupling & hidden contracts**: Hidden dependencies on execution order that aren't enforced by types or visible in function signatures:
+  - Methods that must be called in specific order without compiler enforcement
+  - Initialization sequences assumed but not enforced
+  - **Cross-boundary implicit dependencies**: Code relies on side effects of another process rather than explicit data flow (e.g., fetching from DB instead of receiving as parameter, relying on "auth runs before this" without explicit handoff). The dependency exists but callers can't see it.
 - **Common anti-patterns**: Data clumps (parameter groups that always appear together), long parameter lists (5+ params)
 - **Linter/Type suppression abuse**: `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `// nolint`, `#pragma warning disable` comments that may be hiding real issues instead of fixing them. These should be rare, justified, and documented—not a crutch to silence warnings
+- **Extensibility risk**: Responsibilities placed at the wrong abstraction level that work fine now but create "forgettability risk" when the pattern extends. The test: if someone adds another similar component, will they naturally do the right thing, or must they remember to manually replicate behavior? Common cases:
+  - Cross-cutting concerns (analytics, logging, auth, auditing) embedded in specific implementations rather than centralized/intercepted at a higher level
+  - Behavior in a leaf class that should live in a base class, factory, or orchestrator
+  - Event firing, metrics, or side effects buried inside components instead of at composition points
+  - Validation or setup logic in concrete implementations that won't automatically apply to new siblings
 
 ## Out of Scope
 
@@ -79,6 +90,18 @@ Do NOT report on (handled by other agents):
      - For each suppression, ask: Is this genuinely necessary, or is it hiding a fixable issue?
      - **Valid uses**: Intentional unsafe operations with clear documentation, working around third-party type bugs, legacy code migration with TODO
      - **Red flags**: No explanation comment, suppressing errors in new code, broad rule disables (`eslint-disable` without specific rule), multiple suppressions in same function
+   - **Extensibility risk**
+     - For any cross-cutting behavior (analytics, logging, auth checks, event firing, metrics) embedded in a specific class or function, ask: "If someone adds a sibling class/component, will this behavior automatically apply, or must they remember to add it?"
+     - Look for patterns where 2+ similar components exist—do they all manually implement the same cross-cutting behavior? That's evidence the concern belongs at a higher level.
+     - Check factories, base classes, decorators, middleware—places where cross-cutting concerns SHOULD live. If they're empty or absent while leaf implementations handle those concerns, flag it.
+   - **Cohesion (the naming test)**
+     - For each function: does the name accurately describe what it does? If the name is vague (`handleData`), compound (`fetchAndTransform`), or misleading (name says X, code does Y), the function likely lacks cohesion.
+     - For each type/interface: does adding this property make sense, or is the type becoming a grab-bag? Types with 15+ properties or properties spanning unrelated domains (auth + billing + preferences) are candidates for decomposition.
+     - For modules: is this file changed for multiple unrelated reasons? Does it import from wildly different domains?
+   - **Hidden contracts / implicit dependencies**
+     - For each function that fetches external state (DB, cache, file, config): could this data have been passed as a parameter instead? If yes, the function has an invisible dependency.
+     - Look for comments like "assumes X already ran", "must be called after Y", "requires Z to be initialized"—these are hidden contracts that should be explicit.
+     - The test: "Could a caller know this dependency exists by looking at the function signature?"
 
 4. **Cross-File Analysis**: Look for:
    - Duplicate logic across files
@@ -145,10 +168,14 @@ Classify every issue with one of these severity levels:
 - Inconsistent API patterns within the same module
 - Inconsistent naming/shapes for the same concept across modules causing repeated mapping/translation code
 - Migration debt (dual paths, deprecated wrappers) without a concrete removal plan
-- Low cohesion: single file handling 3+ concerns from different architectural layers. Core layers: HTTP/transport handling, business/domain logic, data access/persistence, external service integration. Supporting concerns (logging, configuration, error handling) don't count as separate layers when mixed with one core layer.
+- Low module cohesion: single file handling 3+ concerns from different architectural layers. Core layers: HTTP/transport handling, business/domain logic, data access/persistence, external service integration. Supporting concerns (logging, configuration, error handling) don't count as separate layers when mixed with one core layer.
+- Low function cohesion: function name doesn't match behavior (misleading), or function does 3+ distinct operations that could be separate functions
+- Low type cohesion: type with 15+ properties spanning unrelated domains, or property that clearly belongs to a different concept (e.g., `billingAddress` on `AuthToken`)
 - Long parameter lists (5+) without parameter object
 - Hard-coded external service URLs/endpoints that should be configurable
 - Unexplained `@ts-ignore`/`eslint-disable` in new code—likely hiding a real bug
+- Extensibility risk where 2+ sibling components already exist and each manually implements the same cross-cutting behavior (analytics, auth, logging)—evidence the concern belongs at a higher level
+- Hidden contract in main API paths: function fetches external state (DB, cache, config) instead of receiving it as a parameter, hiding the dependency from callers
 
 **Medium**: Issues that degrade code quality but don't cause immediate problems
 
@@ -157,6 +184,10 @@ Classify every issue with one of these severity levels:
 - Suppression comments without explanation (add comment explaining why)
 - Broad `eslint-disable` without specific rule (should target specific rule)
 - Minor boundary violations (one layer leaking into another)
+- Extensibility risk in new code: cross-cutting concern placed in a specific implementation where the pattern is likely to be extended (e.g., analytics in first handler when more handlers will follow)
+- Function with compound name (`validateAndSave`, `fetchAndTransform`) that could be split
+- Hidden contract in internal/helper code: function relies on external state or execution order that isn't visible in signature
+- Type growing beyond its original purpose (new property doesn't quite fit but isn't egregious)
 
 **Low**: Minor improvements that would polish the codebase
 
@@ -167,7 +198,7 @@ Classify every issue with one of these severity levels:
 
 **Calibration check**: Maintainability reviews should rarely have Critical issues. If you're marking more than two issues as Critical in a single review, double-check each against the explicit Critical patterns listed above—if it doesn't match one of those patterns, it's High at most. Most maintainability issues are High or Medium.
 
-## Example Issue Report
+## Example Issue Reports
 
 ```
 #### [HIGH] Duplicate validation logic
@@ -191,6 +222,92 @@ if (!userId || typeof userId !== 'string' || userId.length < 5) {
 **Suggested Fix**: Extract to a shared validation module as `validateUserId(id: string): void`
 ```
 
+```
+#### [HIGH] Analytics calls embedded in individual processors
+**Category**: Extensibility Risk
+**Location**: `src/processors/OrderProcessor.ts:89`, `src/processors/RefundProcessor.ts:67`, `src/processors/ReturnProcessor.ts:73`
+**Description**: Each processor manually fires analytics events. Adding a new processor requires remembering to add the analytics call—nothing enforces it.
+**Evidence**:
+```typescript
+// OrderProcessor.ts:89
+class OrderProcessor {
+  process(order: Order) {
+    // ... business logic ...
+    analytics.track('order_processed', { orderId: order.id });
+  }
+}
+
+// RefundProcessor.ts:67 - same pattern
+// ReturnProcessor.ts:73 - same pattern
+```
+**Impact**: New processors will silently lack analytics unless developers remember to add them. Already have 3 processors with manual calls—pattern will continue.
+**Effort**: Moderate refactor
+**Suggested Fix**: Move analytics to the orchestration layer (e.g., `ProcessorRunner`) or use a decorator/wrapper:
+```typescript
+class ProcessorRunner {
+  run(processor: Processor, input: Input) {
+    const result = processor.process(input);
+    analytics.track(`${processor.name}_processed`, { id: input.id });
+    return result;
+  }
+}
+```
+```
+
+```
+#### [HIGH] Function name doesn't match behavior
+**Category**: Cohesion
+**Location**: `src/services/user.ts:145`
+**Description**: `getUser()` creates a user if not found, but the name implies read-only retrieval. Callers expecting idempotent read behavior will cause unintended user creation.
+**Evidence**:
+```typescript
+async function getUser(email: string): Promise<User> {
+  const existing = await db.users.findByEmail(email);
+  if (existing) return existing;
+  // Surprise! This "get" function creates users
+  return await db.users.create({ email, createdAt: new Date() });
+}
+```
+**Impact**: Callers will misuse this function. Someone checking "does user exist?" by calling getUser will accidentally create users. The name lies about the contract.
+**Effort**: Quick win
+**Suggested Fix**: Either rename to `getOrCreateUser()` or split into `getUser()` (returns null if not found) and `ensureUser()` (creates if needed).
+```
+
+```
+#### [HIGH] Type accumulates unrelated concerns
+**Category**: Cohesion
+**Location**: `src/types/User.ts:1-45`
+**Description**: `User` type has grown to include authentication, profile, preferences, billing, and audit fields—5 distinct concerns in one type.
+**Evidence**:
+```typescript
+interface User {
+  // Identity (ok)
+  id: string;
+  email: string;
+  // Auth (separate concern)
+  passwordHash: string;
+  mfaSecret: string;
+  sessions: Session[];
+  // Profile (separate concern)
+  displayName: string;
+  avatarUrl: string;
+  bio: string;
+  // Preferences (separate concern)
+  theme: 'light' | 'dark';
+  notifications: NotificationSettings;
+  // Billing (separate concern)
+  stripeCustomerId: string;
+  subscriptionTier: string;
+  // Audit (separate concern)
+  createdAt: Date;
+  lastLoginAt: Date;
+}
+```
+**Impact**: Every feature touching any user aspect must load/pass the entire User. Changes to billing affect auth code. Type is hard to understand and evolve.
+**Effort**: Moderate refactor
+**Suggested Fix**: Decompose into focused types: `UserIdentity`, `UserAuth`, `UserProfile`, `UserPreferences`, `UserBilling`. Core `User` composes or references these.
+```
+
 ## Output Format
 
 Your review must include:
@@ -205,7 +322,7 @@ Organize all found issues by severity level. For each issue, provide:
 
 ```
 #### [SEVERITY] Issue Title
-**Category**: DRY | Structural Complexity | Dead Code | Consistency | Coupling | Cohesion | Testability | Anti-pattern | Suppression | Boundary | Contract Drift
+**Category**: DRY | Structural Complexity | Dead Code | Consistency | Coupling | Cohesion | Testability | Anti-pattern | Suppression | Boundary | Contract Drift | Extensibility Risk
 **Location**: file(s) and line numbers
 **Description**: Clear explanation of the issue
 **Evidence**: Specific code references or patterns observed
