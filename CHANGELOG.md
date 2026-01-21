@@ -6,13 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-experimental] v0.19.0 - /define: Streamline principles, trust model more
-  - Add "Non-obvious questions" constraint (surface what user hasn't considered)
-  - Remove "Only ask what you can't determine" (conflicted with non-obvious)
-  - Remove "Diminishing returns" (redundant with "Stop when converged" constraint)
-  - Remove "Explicitly surface edge cases" with examples (prescriptive HOW)
-  - Remove "ACs are observable behaviors" (redundant with verification + no vague terms)
-  - 8 principles → 4 principles
+- [vibe-experimental] v0.19.0 - /define: Restructure around 3 core principles
+  - **Verifiable**: Every criterion has verification method (subsumes "no vague terms")
+  - **Validated**: Generate concrete candidates, learn from reactions
+  - **Complete**: Surface hidden requirements (outside view, pre-mortem, non-obvious)
+  - Consolidate constraints: "Insights become criteria" (no standalone value)
+  - 8 principles → 3 principles
 
 - [vibe-experimental] v0.18.0 - Decision-making improvements to /define (inspired by Annie Duke):
   - Add backcasting alongside pre-mortem as discovery tools

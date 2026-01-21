@@ -28,13 +28,11 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **YOU generate, user validates** - Surface latent criteria by generating concrete candidates; learn from reactions. Don't ask open-ended questions.
+1. **Verifiable** - Every criterion has a verification method (bash, subagent, manual). If you can't verify it, it's not a criterion.
 
-2. **Every criterion has verification** - Bash for deterministic checks (e.g., lint, test, typecheck). Subagent for logic/reasoning/judgment. Manual only when automation impossible.
+2. **Validated** - Generate concrete candidates; learn from user reactions. Don't ask open-ended questions.
 
-3. **No vague terms** - "clean", "good", "proper" must become measurable.
-
-4. **Outside view first** - Before diving into task specifics, consider: "What typically goes wrong in similar projects? What do successful implementations look like?" Base rates surface criteria the user won't think of. Convert patterns into concrete ACs/invariants—the insight has no value until it's embedded in a deliverable.
+3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
 ## Constraints
 
@@ -46,9 +44,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
 
-**Non-obvious questions** - Surface what the user hasn't considered, not what they already know they need.
-
-**Pre-mortem + Backcast** - Generate failure/success scenarios. Task-wide risks → INV-G*. Deliverable-scoped → AC-*. Must become criteria—no standalone value.
+**Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
 ## What the Manifest Needs
 
