@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.19.0 - /define: Restructure around 3 core principles
+  - **Verifiable**: Every criterion has verification method (subsumes "no vague terms")
+  - **Validated**: Generate concrete candidates, learn from reactions
+  - **Complete**: Surface hidden requirements (outside view, pre-mortem, non-obvious)
+  - Consolidate constraints: "Insights become criteria" (no standalone value)
+  - 8 principles → 3 principles
+
 - [vibe-experimental] v0.18.0 - Decision-making improvements to /define (inspired by Annie Duke):
   - Add backcasting alongside pre-mortem as discovery tools
   - Add "outside view first" principle: base rates → concrete criteria

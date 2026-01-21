@@ -28,21 +28,11 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **YOU generate, user validates** - Surface latent criteria by generating concrete candidates; learn from reactions. Don't ask open-ended questions.
+1. **Verifiable** - Every criterion has a verification method (bash, subagent, manual). If you can't verify it, it's not a criterion.
 
-2. **Only ask what you can't determine** - If you can infer from context, don't ask. Only ask when genuinely ambiguous.
+2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
-3. **Every criterion has verification** - Bash for deterministic checks (e.g., lint, test, typecheck). Subagent for logic/reasoning/judgment. Manual only when automation impossible.
-
-4. **No vague terms** - "clean", "good", "proper" must become measurable.
-
-5. **Diminishing returns, not premature stop** - Be thorough in surfacing latent criteria, but recognize when additional probing isn't yielding new insights. Low-reversibility decisions need more specific ACs.
-
-6. **ACs are observable behaviors** - "User sees X" not "Code does Y". Test: could a non-engineer verify this by looking at the result?
-
-7. **Explicitly surface edge cases** - After core behavior, ask about edge cases. Generate concrete scenarios (empty states, null inputs, boundaries, concurrent access) as options.
-
-8. **Outside view first** - Before diving into task specifics, consider: "What typically goes wrong in similar projects? What do successful implementations look like?" Base rates surface criteria the user won't think of. Convert patterns into concrete ACs/invariants—the insight has no value until it's embedded in a deliverable.
+3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
 ## Constraints
 
@@ -54,7 +44,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
 
-**Pre-mortem + Backcast** - Generate failure/success scenarios. Task-wide risks → INV-G*. Deliverable-scoped → AC-*. Must become criteria—no standalone value.
+**Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
 ## What the Manifest Needs
 
