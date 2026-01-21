@@ -6,6 +6,40 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.20.0 - Sync reviewers from vibe-workflow v2.17.0:
+  - code-bugs-reviewer: dangerous defaults category, hidden contracts cross-reference
+  - code-maintainability-reviewer: hidden contracts, function/type cohesion expansion, extensibility risk
+  - code-coverage-reviewer: sync updates
+
+- [vibe-workflow] v2.17.0 - Add "Hidden Contracts" to maintainability-reviewer (moved from bugs-reviewer):
+  - Expanded "Temporal coupling" to "Temporal coupling & hidden contracts"
+  - Catches cross-boundary implicit dependencies: code relies on side effects of another process rather than explicit data flow
+  - Examples: fetching from DB instead of receiving as parameter, relying on order-of-operations
+  - Test: "Could a caller know this dependency exists by looking at the function signature?"
+  - Root issue is fragility (maintainability), not incorrectness (bugs)—if assumption holds, code works
+  - High severity for main API paths, Medium for internal/helper code
+  - Added cross-reference note in bugs-reviewer Category 6 pointing to maintainability
+
+- [vibe-workflow] v2.16.0 - Add "Dangerous Defaults" category to code-bugs-reviewer:
+  - Catches defaults that cause silent failures, security holes, or unbounded resource consumption
+  - Test: "If a tired developer calls this with minimal args, will something bad happen?"
+  - Examples: `timeout = 0`, `retries = Infinity`, `secure = false`, `validate = false`, `overwrite = true`
+  - Severity based on impact: Critical for security/data loss, High for hangs/unbounded ops, Medium for internal utils
+
+- [vibe-workflow] v2.15.0 - Expand cohesion to cover function and type levels in maintainability reviewer:
+  - Module cohesion (existing): module handles unrelated concerns
+  - Function cohesion (new): function does multiple things, name doesn't match behavior
+  - Type cohesion (new): type accumulates unrelated properties (god type)
+  - Unifying test: "Can you give this a clear, accurate name? If not, it's doing too much."
+  - Added severity entries and example issue reports for each level
+
+- [vibe-workflow] v2.14.0 - Add "Extensibility Risk" category to code-maintainability-reviewer:
+  - Catches responsibilities placed at wrong abstraction level that create "forgettability risk"
+  - Key test: "If someone adds another similar component, will they naturally do the right thing?"
+  - Common cases: analytics/logging/auth embedded in leaf classes instead of orchestrators
+  - High severity when 2+ siblings already manually replicate cross-cutting behavior
+  - Medium severity for new code where pattern is likely to extend
+
 - [vibe-experimental] v0.19.0 - /define: Restructure around 3 core principles
   - **Verifiable**: Every criterion has verification method (subsumes "no vague terms")
   - **Validated**: Generate concrete candidates, learn from reactions
