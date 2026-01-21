@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.15.0 - Expand cohesion to cover function and type levels in maintainability reviewer:
+  - Module cohesion (existing): module handles unrelated concerns
+  - Function cohesion (new): function does multiple things, name doesn't match behavior
+  - Type cohesion (new): type accumulates unrelated properties (god type)
+  - Unifying test: "Can you give this a clear, accurate name? If not, it's doing too much."
+  - Added severity entries and example issue reports for each level
+
 - [vibe-workflow] v2.14.0 - Add "Extensibility Risk" category to code-maintainability-reviewer:
   - Catches responsibilities placed at wrong abstraction level that create "forgettability risk"
   - Key test: "If someone adds another similar component, will they naturally do the right thing?"
