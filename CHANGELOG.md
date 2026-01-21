@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.18.1 - /define: Add "Non-obvious questions" as explicit constraint (probe implications, unstated edge cases, tradeoffs, feasibility)
+
 - [vibe-experimental] v0.18.0 - Decision-making improvements to /define (inspired by Annie Duke):
   - Add backcasting alongside pre-mortem as discovery tools
   - Add "outside view first" principle: base rates → concrete criteria

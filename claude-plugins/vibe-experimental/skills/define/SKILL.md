@@ -54,6 +54,8 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
 
+**Non-obvious questions** - Don't ask what the user already knows they need. Probe implications they haven't considered, edge cases implied but unstated, tradeoffs between stated criteria, feasibility concerns.
+
 **Pre-mortem + Backcast** - Generate failure/success scenarios. Task-wide risks → INV-G*. Deliverable-scoped → AC-*. Must become criteria—no standalone value.
 
 ## What the Manifest Needs
