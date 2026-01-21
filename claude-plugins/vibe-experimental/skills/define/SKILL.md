@@ -30,7 +30,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 1. **Verifiable** - Every criterion has a verification method (bash, subagent, manual). If you can't verify it, it's not a criterion.
 
-2. **Validated** - Generate concrete candidates; learn from user reactions. Don't ask open-ended questions.
+2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
 3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
