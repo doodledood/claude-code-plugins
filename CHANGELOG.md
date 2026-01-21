@@ -6,13 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-workflow] v2.17.0 - Expand Category 6 in bugs-reviewer to cover implicit coupling:
-  - Renamed to "State Inconsistencies & Implicit Coupling"
-  - Catches code that relies on side effects of another process rather than explicit data flow
+- [vibe-workflow] v2.17.0 - Add "Hidden Contracts" to maintainability-reviewer (moved from bugs-reviewer):
+  - Expanded "Temporal coupling" to "Temporal coupling & hidden contracts"
+  - Catches cross-boundary implicit dependencies: code relies on side effects of another process rather than explicit data flow
   - Examples: fetching from DB instead of receiving as parameter, relying on order-of-operations
-  - Test: "Is this code depending on something it didn't receive explicitly?"
-  - Root issue is invisible coupling—dependency exists but isn't visible in function signature
-  - High severity for main API paths, Medium for background/error recovery paths
+  - Test: "Could a caller know this dependency exists by looking at the function signature?"
+  - Root issue is fragility (maintainability), not incorrectness (bugs)—if assumption holds, code works
+  - High severity for main API paths, Medium for internal/helper code
+  - Added cross-reference note in bugs-reviewer Category 6 pointing to maintainability
 
 - [vibe-workflow] v2.16.0 - Add "Dangerous Defaults" category to code-bugs-reviewer:
   - Catches defaults that cause silent failures, security holes, or unbounded resource consumption

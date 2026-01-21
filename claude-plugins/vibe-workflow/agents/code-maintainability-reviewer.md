@@ -28,7 +28,10 @@ You have mastered the identification of:
   - **Function cohesion**: Function does multiple things—symptom: name is vague (`processData`), compound (`validateAndSave`), or doesn't match behavior. If you can't name it accurately, it's doing too much.
   - **Type cohesion**: Type accumulates unrelated properties (god type), or property doesn't belong conceptually. A `User` with authentication, profile, preferences, billing, and permissions is 5 concepts in a trench coat.
 - **Global mutable state**: Static/global mutable state shared across modules creates hidden coupling and makes behavior unpredictable (note: for testability-specific concerns like mock count and functional core/imperative shell patterns, see code-testability-reviewer)
-- **Temporal coupling**: Hidden dependencies on execution order, initialization sequences not enforced by types, methods that must be called in specific order without compiler enforcement
+- **Temporal coupling & hidden contracts**: Hidden dependencies on execution order that aren't enforced by types or visible in function signatures:
+  - Methods that must be called in specific order without compiler enforcement
+  - Initialization sequences assumed but not enforced
+  - **Cross-boundary implicit dependencies**: Code relies on side effects of another process rather than explicit data flow (e.g., fetching from DB instead of receiving as parameter, relying on "auth runs before this" without explicit handoff). The dependency exists but callers can't see it.
 - **Common anti-patterns**: Data clumps (parameter groups that always appear together), long parameter lists (5+ params)
 - **Linter/Type suppression abuse**: `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `// nolint`, `#pragma warning disable` comments that may be hiding real issues instead of fixing them. These should be rare, justified, and documented—not a crutch to silence warnings
 - **Extensibility risk**: Responsibilities placed at the wrong abstraction level that work fine now but create "forgettability risk" when the pattern extends. The test: if someone adds another similar component, will they naturally do the right thing, or must they remember to manually replicate behavior? Common cases:
@@ -95,6 +98,10 @@ Do NOT report on (handled by other agents):
      - For each function: does the name accurately describe what it does? If the name is vague (`handleData`), compound (`fetchAndTransform`), or misleading (name says X, code does Y), the function likely lacks cohesion.
      - For each type/interface: does adding this property make sense, or is the type becoming a grab-bag? Types with 15+ properties or properties spanning unrelated domains (auth + billing + preferences) are candidates for decomposition.
      - For modules: is this file changed for multiple unrelated reasons? Does it import from wildly different domains?
+   - **Hidden contracts / implicit dependencies**
+     - For each function that fetches external state (DB, cache, file, config): could this data have been passed as a parameter instead? If yes, the function has an invisible dependency.
+     - Look for comments like "assumes X already ran", "must be called after Y", "requires Z to be initialized"—these are hidden contracts that should be explicit.
+     - The test: "Could a caller know this dependency exists by looking at the function signature?"
 
 4. **Cross-File Analysis**: Look for:
    - Duplicate logic across files
@@ -168,6 +175,7 @@ Classify every issue with one of these severity levels:
 - Hard-coded external service URLs/endpoints that should be configurable
 - Unexplained `@ts-ignore`/`eslint-disable` in new code—likely hiding a real bug
 - Extensibility risk where 2+ sibling components already exist and each manually implements the same cross-cutting behavior (analytics, auth, logging)—evidence the concern belongs at a higher level
+- Hidden contract in main API paths: function fetches external state (DB, cache, config) instead of receiving it as a parameter, hiding the dependency from callers
 
 **Medium**: Issues that degrade code quality but don't cause immediate problems
 
@@ -178,6 +186,7 @@ Classify every issue with one of these severity levels:
 - Minor boundary violations (one layer leaking into another)
 - Extensibility risk in new code: cross-cutting concern placed in a specific implementation where the pattern is likely to be extended (e.g., analytics in first handler when more handlers will follow)
 - Function with compound name (`validateAndSave`, `fetchAndTransform`) that could be split
+- Hidden contract in internal/helper code: function relies on external state or execution order that isn't visible in signature
 - Type growing beyond its original purpose (new property doesn't quite fit but isn't egregious)
 
 **Low**: Minor improvements that would polish the codebase
