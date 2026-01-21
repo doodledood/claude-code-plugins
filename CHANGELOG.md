@@ -11,7 +11,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
   - Remove "Only ask what you can't determine" (conflicted with non-obvious)
   - Remove "Diminishing returns" (redundant with "Stop when converged" constraint)
   - Remove "Explicitly surface edge cases" with examples (prescriptive HOW)
-  - 8 principles → 5 principles
+  - Remove "ACs are observable behaviors" (redundant with verification + no vague terms)
+  - 8 principles → 4 principles
 
 - [vibe-experimental] v0.18.0 - Decision-making improvements to /define (inspired by Annie Duke):
   - Add backcasting alongside pre-mortem as discovery tools

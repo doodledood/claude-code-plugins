@@ -34,9 +34,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 3. **No vague terms** - "clean", "good", "proper" must become measurable.
 
-4. **ACs are observable behaviors** - "User sees X" not "Code does Y". Test: could a non-engineer verify this by looking at the result?
-
-5. **Outside view first** - Before diving into task specifics, consider: "What typically goes wrong in similar projects? What do successful implementations look like?" Base rates surface criteria the user won't think of. Convert patterns into concrete ACs/invariants—the insight has no value until it's embedded in a deliverable.
+4. **Outside view first** - Before diving into task specifics, consider: "What typically goes wrong in similar projects? What do successful implementations look like?" Base rates surface criteria the user won't think of. Convert patterns into concrete ACs/invariants—the insight has no value until it's embedded in a deliverable.
 
 ## Constraints
 
