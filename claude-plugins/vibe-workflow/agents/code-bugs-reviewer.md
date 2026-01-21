@@ -101,18 +101,20 @@ For each changed file in scope:
 Note: Inconsistent error handling PATTERNS (some modules throw, others return error codes)
 are handled by code-maintainability-reviewer.
 
-**Category 6 - State Inconsistencies & Unverified Assumptions**
+**Category 6 - State Inconsistencies & Implicit Coupling**
 - Context vs storage synchronization gaps
 - Stale cache serving outdated data
 - Orphaned references after deletions
 - Partial updates leaving inconsistent state
-- **Unverified cross-boundary assumptions**: Code assumes external state exists without checking
-  - DB row assumed to exist because "another process creates it" (no null check on fetch)
-  - File assumed present because "setup script creates it" (no existence check)
-  - Config assumed loaded because "main() loads it first" (no initialization check)
-  - Queue message assumed processed because "worker runs before API" (no verification)
+- **Implicit dependencies on external operations**: Code relies on side effects of another process rather than explicit data flow
+  - Fetching from DB instead of receiving as parameter—depends on another operation having written it
+  - Relying on order-of-operations ("auth runs before this") instead of explicit handoff
+  - Reading from shared state (cache, global, file) that "should have been" populated elsewhere
+  - The dependency exists but isn't visible in the function signature
 
-The test for assumptions: "If the assumed precondition isn't met, does this code check or crash?"
+The test: "Is this code depending on something it didn't receive explicitly? Could the caller even know this dependency exists?"
+
+Note: Missing null checks are a symptom. The root issue is invisible coupling—the code has a contract with another system that isn't enforced or visible.
 
 **Category 7 - Observable Incorrect Behavior**
 - Code produces wrong output for valid input (verifiable against spec, tests, or clear intent)
@@ -219,10 +221,10 @@ Severity reflects operational impact, not technical complexity:
 - **Critical**: Blocks release. Data loss, corruption, security breach, or complete feature failure affecting all users. No workarounds exist. Examples: silent data deletion, authentication bypass, crash on startup, `secure = false` default on auth/payment endpoints, `overwrite = true` default on file operations.
   - Action: Must be fixed before code can ship.
 
-- **High**: Blocks merge. Core functionality broken—any CRUD operation (Create, Read, Update, Delete), any API endpoint, or any user-facing workflow is non-functional for inputs that appear in tests, documentation examples, or represent the primary data type (e.g., non-empty strings for text fields, positive integers for counts). Affects the happy path documented in comments, tests, or specs, or affects any operation in the file's main exported function or primary entry point. Workarounds may exist but are unacceptable for production. Examples: feature fails for common input types, race condition under typical concurrent load, incorrect calculations in business logic, `timeout = 0` (no timeout) on external API calls, `retries = Infinity` without backoff, unverified assumption that DB row exists when fetched in main API path.
+- **High**: Blocks merge. Core functionality broken—any CRUD operation (Create, Read, Update, Delete), any API endpoint, or any user-facing workflow is non-functional for inputs that appear in tests, documentation examples, or represent the primary data type (e.g., non-empty strings for text fields, positive integers for counts). Affects the happy path documented in comments, tests, or specs, or affects any operation in the file's main exported function or primary entry point. Workarounds may exist but are unacceptable for production. Examples: feature fails for common input types, race condition under typical concurrent load, incorrect calculations in business logic, `timeout = 0` (no timeout) on external API calls, `retries = Infinity` without backoff, implicit dependency on DB state in main API path (fetches row assuming another process created it).
   - Action: Must be fixed before PR is merged.
 
-- **Medium**: Fix in current sprint. Edge cases, degraded behavior, or failures for inputs requiring explicit edge-case handling (e.g., empty collections, null, negative numbers, unicode, values at numeric limits)—requires 2+ preconditions, affects code paths only reachable through optional parameters or error recovery flows. Examples: breaks only with empty input + specific flag combo, memory leak only in sessions >4 hours, error message shows wrong info, `validate = false` default on internal utility functions, unverified assumption in error recovery or background job paths.
+- **Medium**: Fix in current sprint. Edge cases, degraded behavior, or failures for inputs requiring explicit edge-case handling (e.g., empty collections, null, negative numbers, unicode, values at numeric limits)—requires 2+ preconditions, affects code paths only reachable through optional parameters or error recovery flows. Examples: breaks only with empty input + specific flag combo, memory leak only in sessions >4 hours, error message shows wrong info, `validate = false` default on internal utility functions, implicit coupling in background jobs or error recovery paths.
   - Action: Should be fixed soon but doesn't block merge.
 
 - **Low**: Fix eventually. Rare scenarios that require 3+ unusual preconditions, have documented workarounds, or match the provided Low examples. Examples: off-by-one in pagination edge case, tooltip shows stale data after rapid clicks, log message has wrong level.

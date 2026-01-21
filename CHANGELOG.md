@@ -6,11 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [vibe-workflow] v2.17.0 - Expand Category 6 in bugs-reviewer to cover unverified assumptions:
-  - Renamed to "State Inconsistencies & Unverified Assumptions"
-  - Catches code that assumes external state exists without checking
-  - Examples: DB row "created by another process", file "created by setup", config "loaded by main()"
-  - Test: "If the assumed precondition isn't met, does this code check or crash?"
+- [vibe-workflow] v2.17.0 - Expand Category 6 in bugs-reviewer to cover implicit coupling:
+  - Renamed to "State Inconsistencies & Implicit Coupling"
+  - Catches code that relies on side effects of another process rather than explicit data flow
+  - Examples: fetching from DB instead of receiving as parameter, relying on order-of-operations
+  - Test: "Is this code depending on something it didn't receive explicitly?"
+  - Root issue is invisible coupling—dependency exists but isn't visible in function signature
   - High severity for main API paths, Medium for background/error recovery paths
 
 - [vibe-workflow] v2.16.0 - Add "Dangerous Defaults" category to code-bugs-reviewer:
