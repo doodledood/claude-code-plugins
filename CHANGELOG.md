@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.16.0 - Add "Dangerous Defaults" category to code-bugs-reviewer:
+  - Catches defaults that cause silent failures, security holes, or unbounded resource consumption
+  - Test: "If a tired developer calls this with minimal args, will something bad happen?"
+  - Examples: `timeout = 0`, `retries = Infinity`, `secure = false`, `validate = false`, `overwrite = true`
+  - Severity based on impact: Critical for security/data loss, High for hangs/unbounded ops, Medium for internal utils
+
 - [vibe-workflow] v2.15.0 - Expand cohesion to cover function and type levels in maintainability reviewer:
   - Module cohesion (existing): module handles unrelated concerns
   - Function cohesion (new): function does multiple things, name doesn't match behavior

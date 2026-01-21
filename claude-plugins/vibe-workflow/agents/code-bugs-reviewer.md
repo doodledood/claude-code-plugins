@@ -64,7 +64,7 @@ For each changed file in scope:
 
 ### Step 5: Bug Detection Categories (check all)
 
-**Exhaust all categories**: Check every category regardless of findings. A Critical bug in Category 1 does not stop analysis of Categories 2-8. Apply all 8 categories to each file in scope. For large diffs (>10 files), batch files by grouping: prefer (1) files in the same directory; if a directory has >5 files, subdivide by (2) files with the same extension that import from the same top-level module. Note which files were batched together in the report.
+**Exhaust all categories**: Check every category regardless of findings. A Critical bug in Category 1 does not stop analysis of Categories 2-9. Apply all 9 categories to each file in scope. For large diffs (>10 files), batch files by grouping: prefer (1) files in the same directory; if a directory has >5 files, subdivide by (2) files with the same extension that import from the same top-level module. Note which files were batched together in the report.
 
 **Category 1 - Race Conditions & Concurrency**
 - Async state changes without proper synchronization
@@ -117,6 +117,17 @@ are handled by code-maintainability-reviewer.
 - Event listeners not cleaned up
 - Timers/intervals not cleared
 - Memory accumulation in long-running processes
+
+**Category 9 - Dangerous Defaults**
+- `timeout = 0` or `timeout = Infinity` (hangs forever or never times out)
+- `retries = Infinity` or unbounded retry loops
+- `validate = false`, `skipValidation = true` (skips safety checks by default)
+- `secure = false`, `verifySSL = false` (insecure by default)
+- `dryRun = false` (destructive operation by default when dry-run exists)
+- `force = true`, `overwrite = true` (destructive by default)
+- `limit = 0` meaning "no limit" (unbounded operations)
+
+The test: "If a tired developer calls this with minimal args, will something bad happen?" Focus on defaults that cause silent failures, security holes, or unbounded resource consumption.
 
 ### Step 6: Actionability Filter
 
@@ -198,13 +209,13 @@ Your output MUST follow this exact structure:
 
 Severity reflects operational impact, not technical complexity:
 
-- **Critical**: Blocks release. Data loss, corruption, security breach, or complete feature failure affecting all users. No workarounds exist. Examples: silent data deletion, authentication bypass, crash on startup.
+- **Critical**: Blocks release. Data loss, corruption, security breach, or complete feature failure affecting all users. No workarounds exist. Examples: silent data deletion, authentication bypass, crash on startup, `secure = false` default on auth/payment endpoints, `overwrite = true` default on file operations.
   - Action: Must be fixed before code can ship.
 
-- **High**: Blocks merge. Core functionality broken—any CRUD operation (Create, Read, Update, Delete), any API endpoint, or any user-facing workflow is non-functional for inputs that appear in tests, documentation examples, or represent the primary data type (e.g., non-empty strings for text fields, positive integers for counts). Affects the happy path documented in comments, tests, or specs, or affects any operation in the file's main exported function or primary entry point. Workarounds may exist but are unacceptable for production. Examples: feature fails for common input types, race condition under typical concurrent load, incorrect calculations in business logic.
+- **High**: Blocks merge. Core functionality broken—any CRUD operation (Create, Read, Update, Delete), any API endpoint, or any user-facing workflow is non-functional for inputs that appear in tests, documentation examples, or represent the primary data type (e.g., non-empty strings for text fields, positive integers for counts). Affects the happy path documented in comments, tests, or specs, or affects any operation in the file's main exported function or primary entry point. Workarounds may exist but are unacceptable for production. Examples: feature fails for common input types, race condition under typical concurrent load, incorrect calculations in business logic, `timeout = 0` (no timeout) on external API calls, `retries = Infinity` without backoff.
   - Action: Must be fixed before PR is merged.
 
-- **Medium**: Fix in current sprint. Edge cases, degraded behavior, or failures for inputs requiring explicit edge-case handling (e.g., empty collections, null, negative numbers, unicode, values at numeric limits)—requires 2+ preconditions, affects code paths only reachable through optional parameters or error recovery flows. Examples: breaks only with empty input + specific flag combo, memory leak only in sessions >4 hours, error message shows wrong info.
+- **Medium**: Fix in current sprint. Edge cases, degraded behavior, or failures for inputs requiring explicit edge-case handling (e.g., empty collections, null, negative numbers, unicode, values at numeric limits)—requires 2+ preconditions, affects code paths only reachable through optional parameters or error recovery flows. Examples: breaks only with empty input + specific flag combo, memory leak only in sessions >4 hours, error message shows wrong info, `validate = false` default on internal utility functions.
   - Action: Should be fixed soon but doesn't block merge.
 
 - **Low**: Fix eventually. Rare scenarios that require 3+ unusual preconditions, have documented workarounds, or match the provided Low examples. Examples: off-by-one in pagination edge case, tooltip shows stale data after rapid clicks, log message has wrong level.
