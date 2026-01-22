@@ -46,6 +46,8 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
+**Prefer automated verification** - Use bash commands when possible. For inspections that aren't easily bash-verifiable, use a subagent to review the codebase. Reserve manual verification for criteria that no automated method can validate.
+
 ## What the Manifest Needs
 
 Both can cover **output** or **process**:

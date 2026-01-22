@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.20.1 - Add verification preference constraint to /define:
+  - Prefer bash > subagent > manual for verification methods
+  - Addresses model defaulting to manual verification unnecessarily
+
 - [vibe-experimental] v0.20.0 - Sync reviewers from vibe-workflow v2.17.0:
   - code-bugs-reviewer: dangerous defaults category, hidden contracts cross-reference
   - code-maintainability-reviewer: hidden contracts, function/type cohesion expansion, extensibility risk
