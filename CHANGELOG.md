@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-extras] v1.7.0 - Rewrite `/rewrite-history` skill with clean-copy approach:
+  - Creates backup branch, reimplements on fresh branch from main, verifies byte-identical, then replaces original
+  - Non-negotiable verification: abort if any diff between backup and result
+  - Reduced from 252 lines to 64 lines following prompt principles (WHAT not HOW)
+
 - [vibe-experimental] v0.20.1 - Add verification preference constraint to /define:
   - Prefer bash > subagent > manual for verification methods
   - Addresses model defaulting to manual verification unnecessarily

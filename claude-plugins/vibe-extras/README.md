@@ -6,7 +6,7 @@ Standalone utilities for common development tasks.
 
 **Git utilities:**
 - `/rebase-on-main` - Safe rebasing with conflict resolution guidance
-- `/rewrite-history` - Restructure commits for clean, reviewer-friendly PRs (automatic backup)
+- `/rewrite-history` - Rewrite branch into narrative-quality commits (backup + byte-identical verification)
 
 **Code maintenance:**
 - `/clean-slop` - Remove AI-generated noise (redundant comments, verbose patterns)
