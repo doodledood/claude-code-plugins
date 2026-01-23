@@ -70,6 +70,7 @@ A two-level approach to task definition and execution:
 | Agent | Purpose |
 |-------|---------|
 | `criteria-checker` | Verifies a single criterion with type awareness |
+| `manifest-verifier` | Reviews manifests for gaps, outputs actionable continuation steps |
 
 ## Hooks
 
