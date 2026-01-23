@@ -34,6 +34,8 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
+4. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize user cognitive load per exchange.
+
 ## Constraints
 
 **When uncertain, ask** - Never assume or infer requirements. If you're unsure, probe—don't produce an answer.

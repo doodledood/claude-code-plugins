@@ -6,6 +6,11 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.20.3 - Add "Efficient" principle to /define:
+  - Prioritize questions that eliminate the most uncertainty
+  - Minimize user cognitive load per exchange
+  - Trusts model to derive batching, defaults, ordering from this constraint
+
 - [vibe-extras] v1.7.0 - Rewrite `/rewrite-history` skill with clean-copy approach:
   - Creates backup branch, reimplements on fresh branch from main, verifies byte-identical, then replaces original
   - Non-negotiable verification: abort if any diff between backup and result
