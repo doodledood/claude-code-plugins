@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.22.0 - Improve /define and manifest-verifier to catch missing constraints:
+  - Add "Confirm before encoding" constraint: discovered technical constraints require user confirmation
+  - Add "Encode explicit constraints" constraint: user-stated preferences/requirements must become INV/AC
+  - Add "Probe for approach constraints" constraint: ask HOW (tools, methods) not just WHAT
+  - manifest-verifier: new gap types for unencoded constraints, unconfirmed discoveries, missing approach
+
 - [vibe-experimental] v0.21.1 - Add latent criteria gap detection to manifest-verifier:
   - New gap category: unstated assumptions, domain conventions, hidden preferences
   - Complements /define's existing latent criteria discovery techniques

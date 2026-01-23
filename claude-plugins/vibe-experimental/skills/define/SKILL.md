@@ -40,6 +40,12 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **When uncertain, ask** - Never assume or infer requirements. If you're unsure, probe—don't produce an answer.
 
+**Confirm before encoding** - When you discover constraints from codebase analysis (technical limits, architecture patterns, API boundaries), present them to the user before encoding as invariants. "I found X in the codebase—should this be a hard constraint?" Discovered ≠ confirmed.
+
+**Encode explicit constraints** - When users state preferences, requirements, or constraints (not clarifying remarks or exploratory responses), these must map to an INV or AC. "Manual optimization only" → process invariant. "Target < 1500" → acceptance criterion. Don't let explicit constraints get lost in the interview log.
+
+**Probe for approach constraints** - Beyond WHAT to build, ask HOW it should be done. Tools to use or avoid? Methods required or forbidden? Automation vs manual? These become process invariants.
+
 **Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-interview-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
 
 **Write to log as you go** - Don't wait until the end.

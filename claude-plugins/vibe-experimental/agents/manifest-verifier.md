@@ -24,6 +24,9 @@ Given the task type and discussion:
 3. **Vague criteria** - manifest items that need specificity (thresholds, conditions, edge cases)
 4. **Missing edge cases** - failure modes, error scenarios not addressed
 5. **Latent criteria** - unstated assumptions or hidden preferences the user hasn't articulated (domain conventions, implicit constraints, edge cases user hasn't considered)
+6. **Unencoded constraints** - user stated explicit preferences, requirements, or constraints in the log that have no corresponding INV or AC in manifest (e.g., user said "manual optimization only" but no constraint prevents automated tools). Ignore clarifying remarks and exploratory responses.
+7. **Unconfirmed discoveries** - technical constraints discovered from codebase analysis that were encoded as invariants without user confirmation (log shows discovery but no user validation)
+8. **Missing approach constraints** - user specified HOW to do the work (methods, tools, automation level) but manifest only captures WHAT
 
 ## Constraints
 
@@ -53,6 +56,9 @@ Status: COMPLETE | CONTINUE
 - [INV-G1]: Currently "{vague text}" → ask user for specific threshold/condition
 - [AC-2.1]: Missing edge case → probe: what happens when X?
 - [Latent]: [Unstated assumption or hidden preference to surface]
+- [Unencoded]: User constraint "manual optimization only" has no corresponding INV
+- [Unconfirmed]: Technical constraint "{X}" discovered from codebase but not confirmed by user
+- [Approach]: User specified method/tool preference but manifest lacks process constraint
 ```
 
 ## Status Logic
