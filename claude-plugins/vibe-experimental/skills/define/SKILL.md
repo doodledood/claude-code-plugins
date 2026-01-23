@@ -32,9 +32,11 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
-3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
+3. **Domain-grounded** - Before probing for criteria, understand the domain: explore codebase for patterns/constraints, research unfamiliar domains, ask for business context. Latent criteria emerge from domain understanding—you can't surface what you don't know.
 
-4. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage.
+4. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
+
+5. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage.
 
 ## Constraints
 
@@ -46,15 +48,15 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Probe for approach constraints** - Beyond WHAT to build, ask HOW it should be done. Tools to use or avoid? Methods required or forbidden? Automation vs manual? These become process invariants.
 
-**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-interview-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
+**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-discovery-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
 
-**Write to log as you go** - Don't wait until the end.
+**Write to log as you go** - Domain findings and interview answers alike. Don't wait until the end.
 
 **Refresh before synthesis** - Read full interview log to restore context.
 
-**Stop when converged** - Before marking any area complete, verify you've challenged it from multiple angles. Prefer "I haven't fully explored X" over premature closure. Move to synthesis when probing genuinely yields no new criteria, or user signals "enough".
+**Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
 
-**Verify before finalizing** - After writing manifest, spawn manifest-verifier: `Task("manifest-verifier", "Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-interview-{ts}.md")`. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
+**Verify before finalizing** - After writing manifest, spawn manifest-verifier: `Task("manifest-verifier", "Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-discovery-{ts}.md")`. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 

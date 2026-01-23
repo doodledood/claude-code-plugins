@@ -6,6 +6,17 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.23.3 - Tighten convergence constraint in /define:
+  - Reframe from reactive ("yields nothing new") to proactive confidence check ("very confident further questions would yield nothing")
+  - Shorter, higher signal - no checklist, just raised bar for stopping
+
+- [vibe-experimental] v0.23.2 - Add "Domain-grounded" principle to /define:
+  - Before probing for criteria, understand the domain through codebase exploration, research, user context
+  - Key insight: latent criteria emerge from domain understanding—you can't surface what you don't know
+  - manifest-verifier: new "Shallow domain understanding" gap type to flag thin Mental Model or missing domain exploration
+  - Rename log file to `define-discovery-{ts}.md` (was `define-interview-{ts}.md`) to signal broader scope
+  - Clarify logging constraint: "Domain findings and interview answers alike"
+
 - [vibe-experimental] v0.23.1 - Add structural example to Non-Functional AC type in /define:
   - Signals that refactor tasks (where structure IS the deliverable) fit the existing schema
   - Example: "All handlers follow Repository pattern" alongside "Response time < 200ms"
