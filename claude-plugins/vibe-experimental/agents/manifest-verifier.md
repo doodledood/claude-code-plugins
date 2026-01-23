@@ -11,7 +11,7 @@ Review the manifest and interview log. Find gaps that can be filled by continuin
 
 ## Input
 
-Prompt format: `Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-interview-{ts}.md`
+Prompt format: `Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-discovery-{ts}.md`
 
 Extract both paths and read the files.
 
