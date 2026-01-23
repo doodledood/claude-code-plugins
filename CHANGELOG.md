@@ -6,6 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.23.0 - Add Process Guidance (PG-*) section to manifest schema:
+  - New section for non-verifiable constraints on HOW to work (approach, methodology, tool preferences)
+  - Separates verifiable Invariants (INV-G*) from guidance-only constraints (PG-*)
+  - /define: Updated schema, principles, and ID scheme to include PG-*
+  - /do: Now reads and follows Process Guidance during execution
+  - /verify: Documents that PG-* items are intentionally not verified
+  - manifest-verifier: Detects misplaced non-verifiable constraints in INV section
+
 - [vibe-experimental] v0.22.0 - Improve /define and manifest-verifier to catch missing constraints:
   - Add "Confirm before encoding" constraint: discovered technical constraints require user confirmation
   - Add "Encode explicit constraints" constraint: user-stated preferences/requirements must become INV/AC

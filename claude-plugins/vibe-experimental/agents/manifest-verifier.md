@@ -26,7 +26,8 @@ Given the task type and discussion:
 5. **Latent criteria** - unstated assumptions or hidden preferences the user hasn't articulated (domain conventions, implicit constraints, edge cases user hasn't considered)
 6. **Unencoded constraints** - user stated explicit preferences, requirements, or constraints in the log that have no corresponding INV or AC in manifest (e.g., user said "manual optimization only" but no constraint prevents automated tools). Ignore clarifying remarks and exploratory responses.
 7. **Unconfirmed discoveries** - technical constraints discovered from codebase analysis that were encoded as invariants without user confirmation (log shows discovery but no user validation)
-8. **Missing approach constraints** - user specified HOW to do the work (methods, tools, automation level) but manifest only captures WHAT
+8. **Missing approach constraints** - user specified HOW to do the work (methods, tools, automation level) but manifest lacks corresponding Process Guidance (PG-*) or verifiable Invariant (INV-G*)
+9. **Misplaced non-verifiable constraints** - INV-G* items with `method: manual` verification that can't actually be verified from output (e.g., "manual optimization only" - you can't tell from final code how it was written). These should be Process Guidance (PG-*), not invariants.
 
 ## Constraints
 
@@ -56,9 +57,10 @@ Status: COMPLETE | CONTINUE
 - [INV-G1]: Currently "{vague text}" → ask user for specific threshold/condition
 - [AC-2.1]: Missing edge case → probe: what happens when X?
 - [Latent]: [Unstated assumption or hidden preference to surface]
-- [Unencoded]: User constraint "manual optimization only" has no corresponding INV
+- [Unencoded]: User constraint "X" has no corresponding INV or PG
 - [Unconfirmed]: Technical constraint "{X}" discovered from codebase but not confirmed by user
-- [Approach]: User specified method/tool preference but manifest lacks process constraint
+- [Approach]: User specified method/tool preference → add as PG-* (if non-verifiable) or INV-G* (if verifiable)
+- [Misplaced]: Non-verifiable constraint in INV with `method: manual` → move to Process Guidance (PG-*)
 ```
 
 ## Status Logic

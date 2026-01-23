@@ -28,7 +28,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Principles
 
-1. **Verifiable** - Every criterion has a verification method (bash, subagent, manual). If you can't verify it, it's not a criterion.
+1. **Verifiable** - Every Invariant and AC has a verification method (bash, subagent, manual). Constraints that can't be verified from output go in Process Guidance.
 
 2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
@@ -62,9 +62,10 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## What the Manifest Needs
 
-Both can cover **output** or **process**:
+Three categories, each covering **output** or **process**:
 
-- **Global Invariants** - "Don't do X" (negative constraints, ongoing). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
+- **Global Invariants** - "Don't do X" (negative constraints, ongoing, verifiable). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
+- **Process Guidance** - Non-verifiable constraints on HOW to work. Approach requirements, methodology, tool preferences that cannot be checked from the output alone (e.g., "manual optimization only" - you can't tell from the final code whether it was manually written or generated). These guide the implementer but aren't gates.
 - **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
   - *Functional*: "Clicking Login redirects to Dashboard"
   - *Non-Functional*: "Response time < 200ms"
@@ -127,7 +128,12 @@ verify:
     prompt: "[if subagent]"
   ```
 
-## 3. Deliverables (The Work)
+## 3. Process Guidance (Non-Verifiable)
+*Constraints on HOW to work. Not gates—guidance for the implementer.*
+
+- [PG-1] Description: ...
+
+## 4. Deliverables (The Work)
 *Ordered by dependency, then importance.*
 
 ### Deliverable 1: [Name]
@@ -149,6 +155,7 @@ verify:
 | Type | Format | Example |
 |------|--------|---------|
 | Global Invariant | INV-G{N} | INV-G1, INV-G2 |
+| Process Guidance | PG-{N} | PG-1, PG-2 |
 | Acceptance Criteria | AC-{D}.{N} | AC-1.1, AC-2.3 |
 
 ## Amendment Protocol

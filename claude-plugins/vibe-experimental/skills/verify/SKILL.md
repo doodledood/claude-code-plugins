@@ -109,3 +109,6 @@ Call `/done`.
 |------|---------|----------------|
 | Global Invariant | INV-G{N} | Task fails |
 | Acceptance Criteria | AC-{D}.{N} | Deliverable incomplete |
+| Process Guidance | PG-{N} | Not verified (guidance only) |
+
+Note: PG-* items are non-verifiable guidance on HOW to work. They're followed during /do but not checked by /verify.
