@@ -36,13 +36,15 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 ## Constraints
 
+**When uncertain, ask** - Never assume or infer requirements. If you're unsure, probe—don't produce an answer.
+
 **Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-interview-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, acceptance criteria ("; done when X"). Update after every action.
 
 **Write to log as you go** - Don't wait until the end.
 
 **Refresh before synthesis** - Read full interview log to restore context.
 
-**Stop when converged** - When probing yields no new criteria, or user signals "enough", move to synthesis.
+**Stop when converged** - Before marking any area complete, verify you've challenged it from multiple angles. Prefer "I haven't fully explored X" over premature closure. Move to synthesis when probing genuinely yields no new criteria, or user signals "enough".
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
@@ -60,36 +62,9 @@ Both can cover **output** or **process**:
 
 ### Code Quality Gates (for coding tasks)
 
-For tasks involving code, ask users to **multi-select** which quality aspects they care about. Present both questions together.
+For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Present as multi-select with the first option marked "(Recommended)" to reduce cognitive load. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
 
 **Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
-
-```
-questions: [
-  {
-    question: "Which code quality checks should apply as global invariants?",
-    header: "Quality",
-    options: [
-      { label: "No HIGH/CRITICAL bugs (Recommended)", description: "Logic errors, race conditions, error handling" },
-      { label: "Type safety", description: "No any abuse, proper narrowing, invalid states unrepresentable" },
-      { label: "Maintainability", description: "DRY, low coupling, consistency, no dead code" },
-      { label: "Simplicity", description: "No over-engineering, appropriate complexity" }
-    ],
-    multiSelect: true
-  },
-  {
-    question: "Additional quality checks:",
-    header: "More quality",
-    options: [
-      { label: "Test coverage", description: "New/changed code has adequate tests" },
-      { label: "Testability", description: "Code structure allows easy testing (low mock count)" },
-      { label: "Documentation", description: "Docs and comments match code" },
-      { label: "CLAUDE.md adherence", description: "Follows project-specific standards" }
-    ],
-    multiSelect: true
-  }
-]
-```
 
 **Map selections to reviewer agents:**
 
@@ -120,10 +95,6 @@ verify:
   method: bash
   command: "[command from CLAUDE.md]"
 ```
-
-## Question Format
-
-When presenting options, mark the first as "(Recommended)" to reduce cognitive load.
 
 ## The Manifest Schema
 
