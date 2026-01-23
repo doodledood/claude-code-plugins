@@ -54,7 +54,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Refresh before synthesis** - Read full interview log to restore context.
 
-**Stop when converged** - Before marking any area complete, verify you've challenged it from multiple angles. Prefer "I haven't fully explored X" over premature closure. Move to synthesis when probing genuinely yields no new criteria, or user signals "enough".
+**Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
 
 **Verify before finalizing** - After writing manifest, spawn manifest-verifier: `Task("manifest-verifier", "Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-discovery-{ts}.md")`. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
 
