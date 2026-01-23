@@ -28,6 +28,7 @@ Given the task type and discussion:
 7. **Unconfirmed discoveries** - technical constraints discovered from codebase analysis that were encoded as invariants without user confirmation (log shows discovery but no user validation)
 8. **Missing approach constraints** - user specified HOW to do the work (methods, tools, automation level) but manifest lacks corresponding Process Guidance (PG-*) or verifiable Invariant (INV-G*)
 9. **Misplaced non-verifiable constraints** - INV-G* items with `method: manual` verification that can't actually be verified from output (e.g., "manual optimization only" - you can't tell from final code how it was written). These should be Process Guidance (PG-*), not invariants.
+10. **Shallow domain understanding** - Task requires domain knowledge but Mental Model is thin/generic, or log shows no evidence of domain grounding (codebase exploration for technical tasks, research for unfamiliar domains, business context questions). Latent criteria can't be surfaced without domain understanding.
 
 ## Constraints
 
@@ -61,6 +62,7 @@ Status: COMPLETE | CONTINUE
 - [Unconfirmed]: Technical constraint "{X}" discovered from codebase but not confirmed by user
 - [Approach]: User specified method/tool preference → add as PG-* (if non-verifiable) or INV-G* (if verifiable)
 - [Misplaced]: Non-verifiable constraint in INV with `method: manual` → move to Process Guidance (PG-*)
+- [Domain]: Mental Model thin/generic → explore codebase, research domain, ask for business context
 ```
 
 ## Status Logic

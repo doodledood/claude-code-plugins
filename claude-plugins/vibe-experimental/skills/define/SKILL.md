@@ -32,9 +32,11 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
-3. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
+3. **Domain-grounded** - Before probing for criteria, understand the domain: explore codebase for patterns/constraints, research unfamiliar domains, ask for business context. Latent criteria emerge from domain understanding—you can't surface what you don't know.
 
-4. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage.
+4. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
+
+5. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage.
 
 ## Constraints
 
