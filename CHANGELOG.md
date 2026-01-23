@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.21.1 - Add latent criteria gap detection to manifest-verifier:
+  - New gap category: unstated assumptions, domain conventions, hidden preferences
+  - Complements /define's existing latent criteria discovery techniques
+
 - [vibe-experimental] v0.21.0 - Add manifest-verifier agent to /define workflow:
   - New agent reviews manifests for gaps and outputs actionable continuation steps
   - /define now loops verification until COMPLETE status reached

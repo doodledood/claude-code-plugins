@@ -23,6 +23,7 @@ Given the task type and discussion:
 2. **Shallow areas** - topics touched but not probed (no follow-up, accepted first answer)
 3. **Vague criteria** - manifest items that need specificity (thresholds, conditions, edge cases)
 4. **Missing edge cases** - failure modes, error scenarios not addressed
+5. **Latent criteria** - unstated assumptions or hidden preferences the user hasn't articulated (domain conventions, implicit constraints, edge cases user hasn't considered)
 
 ## Constraints
 
@@ -51,6 +52,7 @@ Status: COMPLETE | CONTINUE
 ### Criteria to Refine (if any)
 - [INV-G1]: Currently "{vague text}" → ask user for specific threshold/condition
 - [AC-2.1]: Missing edge case → probe: what happens when X?
+- [Latent]: [Unstated assumption or hidden preference to surface]
 ```
 
 ## Status Logic
