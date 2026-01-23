@@ -68,7 +68,7 @@ Three categories, each covering **output** or **process**:
 - **Process Guidance** - Non-verifiable constraints on HOW to work. Approach requirements, methodology, tool preferences that cannot be checked from the output alone (e.g., "manual optimization only" - you can't tell from the final code whether it was manually written or generated). These guide the implementer but aren't gates.
 - **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
   - *Functional*: "Clicking Login redirects to Dashboard"
-  - *Non-Functional*: "Response time < 200ms"
+  - *Non-Functional*: "Response time < 200ms", "All handlers follow Repository pattern"
   - *Process*: "README.md contains section 'Authentication'"
 
 ### Code Quality Gates (for coding tasks)

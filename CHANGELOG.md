@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.23.1 - Add structural example to Non-Functional AC type in /define:
+  - Signals that refactor tasks (where structure IS the deliverable) fit the existing schema
+  - Example: "All handlers follow Repository pattern" alongside "Response time < 200ms"
+
 - [vibe-experimental] v0.23.0 - Add Process Guidance (PG-*) section to manifest schema:
   - New section for non-verifiable constraints on HOW to work (approach, methodology, tool preferences)
   - Separates verifiable Invariants (INV-G*) from guidance-only constraints (PG-*)
