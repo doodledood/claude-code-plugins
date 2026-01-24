@@ -36,7 +36,7 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 **Structure**:
 - Buried critical info (important rules hidden in middle)
 - No hierarchy (all instructions treated as equal priority)
-- Redundant instructions (same thing said multiple ways)
+- Unintentional redundancy (but: repetition can be intentional emphasis—don't remove if it reinforces critical rules)
 
 ## Anti-Patterns to Eliminate
 
@@ -51,6 +51,8 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 | Over-engineering | 10 phases for a simple task | Match complexity to need |
 
 ## When Updating Prompts
+
+**High-signal changes only**: Every change must address a real failure mode or materially improve clarity. Don't change for the sake of change.
 
 **Right-sized changes**: Don't overcorrect. One edge case doesn't warrant restructuring.
 
