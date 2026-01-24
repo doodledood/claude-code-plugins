@@ -6,6 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.0.1 - Add issue types and over-engineering warnings to /prompt-engineering; simplify prompt-reviewer to invoke skill
+
+- [prompt-engineering] v2.0.0 - BREAKING: Consolidate skills around /prompt-engineering
+  - Remove /optimize-prompt-precision, /optimize-prompt-goal, /apply-prompt-feedback (use /prompt-engineering instead)
+  - Remove prompt-precision-verifier, prompt-goal-verifier, prompt-feedback-verifier agents
+  - Update prompt-reviewer agent to use /prompt-engineering principles
+  - Add /prompt-engineering skill for crafting and updating prompts from first principles
+
 - [consultant] v1.9.1 - Replace hardcoded tool names with natural language in prompts
 - [vibe-workflow] v2.17.1 - Replace hardcoded tool names with natural language in prompts
 - [vibe-experimental] v0.23.4 - Replace hardcoded tool names with natural language; add recommended option guidance to /define efficiency principle

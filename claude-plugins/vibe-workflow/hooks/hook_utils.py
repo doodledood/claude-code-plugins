@@ -4,6 +4,7 @@ Shared utilities for vibe-workflow hooks.
 
 Contains transcript parsing, state extraction, and common reminder strings.
 """
+
 from __future__ import annotations
 
 import json

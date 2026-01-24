@@ -4,6 +4,7 @@ Stop hook that prevents premature stops during /implement and /implement-inplace
 
 Blocks stop attempts when todos are incomplete, with a safety valve after max blocks.
 """
+
 from __future__ import annotations
 
 import json

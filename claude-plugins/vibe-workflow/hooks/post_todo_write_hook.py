@@ -9,6 +9,7 @@ This hook:
 2. Checks if a todo was just marked completed
 3. If so, adds a gentle reminder to update the progress/log file
 """
+
 from __future__ import annotations
 
 import json

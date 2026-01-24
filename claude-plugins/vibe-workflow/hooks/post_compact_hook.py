@@ -8,6 +8,7 @@ This hook:
 1. Injects the same reminders as session start (agent preferences)
 2. If in the middle of an implement workflow, reminds Claude to read plan/log files
 """
+
 from __future__ import annotations
 
 import json

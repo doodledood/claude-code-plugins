@@ -12,6 +12,7 @@ Decision matrix:
 - /do only: BLOCK (must verify first)
 - /do + /verify only: BLOCK (verify returned failures, keep working)
 """
+
 from __future__ import annotations
 
 import json
