@@ -6,6 +6,13 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [consultant] v1.9.1 - Replace hardcoded tool names with natural language in prompts
+- [vibe-workflow] v2.17.1 - Replace hardcoded tool names with natural language in prompts
+- [vibe-experimental] v0.23.4 - Replace hardcoded tool names with natural language; add recommended option guidance to /define efficiency principle
+- [solo-dev] v1.20.1 - Replace hardcoded tool names with natural language in prompts
+- [prompt-engineering] v1.18.1 - Replace hardcoded tool names with natural language in prompts
+- [life-ops] v1.8.1 - Replace hardcoded tool names with natural language in prompts
+
 - [vibe-experimental] v0.23.3 - Tighten convergence constraint in /define:
   - Reframe from reactive ("yields nothing new") to proactive confidence check ("very confident further questions would yield nothing")
   - Shorter, higher signal - no checklist, just raised bar for stopping
