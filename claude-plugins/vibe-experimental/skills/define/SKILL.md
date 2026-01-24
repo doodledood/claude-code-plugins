@@ -51,17 +51,13 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Probe for approach constraints** - Beyond WHAT to build, ask HOW it should be done. Tools to use or avoid? Methods required or forbidden? Automation vs manual? These become process invariants.
 
-**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-discovery-{timestamp}.md`), `→log` after discovery, `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
-
-**Write to log as you go** - Domain findings and interview answers alike. Don't wait until the end.
-
-**Refresh before synthesis** - Read full interview log to restore context.
+**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-discovery-{timestamp}.md`), `→log` after discovery (domain findings + interview answers), `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
 
 **Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
 
 **Verify before finalizing** - After writing manifest, verify completeness using the manifest-verifier agent with the manifest and discovery log as input. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
 
-**Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
+**Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. Don't include insights that aren't encoded as criteria.
 
 **Prefer automated verification** - Automated methods (commands, subagent review) before manual. Reserve manual verification for criteria that no automated method can validate.
 
@@ -69,7 +65,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 After defining deliverables, probe for implementation direction. Skip for simple tasks with obvious approach.
 
-**Architecture** - Generate 2-3 concrete architectural options based on codebase patterns. "Given the intent, here are approaches: [A], [B], [C]. Which aligns with your codebase?" Architecture is direction (components, patterns, data flow), not step-by-step script.
+**Architecture** - Generate concrete architectural options based on codebase patterns. "Given the intent, here are approaches: [A], [B], [C]. Which aligns with your codebase?" Architecture is direction (components, patterns, data flow), not step-by-step script.
 
 **Execution Order** - Propose order based on dependencies. "Suggested order: D1 → D2 → D3. Rationale: [X]. Adjust?" Include why (dependencies, risk reduction, etc.).
 
@@ -94,7 +90,7 @@ Three categories, each covering **output** or **process**:
 
 ### Code Quality Gates (for coding tasks)
 
-For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Present as multi-select with the first option marked "(Recommended)" to reduce cognitive load. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
+For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Present as multi-select, marking the most appropriate option(s) as "(Recommended)" based on task context. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
 
 **Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
 
