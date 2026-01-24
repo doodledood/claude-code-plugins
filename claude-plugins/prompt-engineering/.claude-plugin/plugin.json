@@ -1,7 +1,7 @@
 {
   "name": "prompt-engineering",
   "description": "Tools for crafting, reviewing, analyzing, refining, and optimizing LLM prompts for clarity, precision, goal effectiveness, and token efficiency",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"

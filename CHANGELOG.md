@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.3.1 - Simplify /auto-optimize-prompt: remove prescriptive steps, capability instructions, verbose templates (162→43 lines)
+
 - [prompt-engineering] v2.3.0 - prompt-reviewer now always reports high-confidence issues only (low-confidence = noise); /auto-optimize-prompt refactored for DRY (delegates to prompt-engineering skill for fixes)
 
 - [prompt-engineering] v2.2.1 - Improve Context Discovery interview method: generate candidates with recommendations, outside view/pre-mortem probing, discovered≠confirmed pattern, stop when converged
