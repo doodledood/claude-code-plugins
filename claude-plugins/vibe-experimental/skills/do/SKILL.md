@@ -30,72 +30,18 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 
 **Must call /verify** - Can't declare done without verification. When all deliverables addressed, invoke the vibe-experimental:verify skill with the manifest and log paths.
 
-## Todo Discipline
+## Memento Pattern
 
-**Create todo list immediately** based on manifest structure—deliverables and their ACs. Use `D{N}:` prefix. Adapt to THIS manifest's complexity.
+Externalize your progress continuously—this survives context loss and enables recovery.
 
-**Required elements:**
-- Log file creation (`/tmp/do-log-{timestamp}.md`)
-- `→log` after implementation steps (externalizes progress)
-- `(expand: ...)` when sub-tasks will emerge during implementation
-- `Refresh: read full log` before calling /verify
-- Acceptance criteria on each todo ("; done when X")
+**Todos**: Create from manifest structure (deliverables → ACs). Update after every substantive action. Include completion criteria on each item.
 
-**Update todos after every substantive action**—no batching completions.
+**Execution log**: Write to `/tmp/do-log-{timestamp}.md`. Log approaches tried and outcomes as you work. Read the full log before calling /verify to restore context.
 
-## Log Discipline
+## Execution
 
-**Create execution log** - Write to `/tmp/do-log-{timestamp}.md`. This is your working memory.
-
-**Write as you go** - After each significant action, update the log. Don't wait until the end.
-
-**Refresh before /verify** - Read the full log to restore context before verification.
-
-## What to Do
-
-**Read the manifest** - Extract intent, global invariants, process guidance (PG-* items on HOW to work), deliverables with their ACs, tradeoffs.
-
-**Work through deliverables** - For each, satisfy its acceptance criteria. Log your work.
-
-**Call /verify** - When all deliverables addressed, verify everything passes.
-
-**Handle failures** - Fix specific failing criteria, call /verify again. Loop until pass.
-
-**Escalate when stuck** - If you've tried 3+ approaches on a criterion and can't satisfy it, invoke the vibe-experimental:escalate skill with the criterion ID and what you've tried.
-
-## Log Structure
-
-```markdown
-# Execution Log
-
-Manifest: [path]
-Started: [timestamp]
-
-## Intent
-**Goal:** [from manifest]
-
-## Deliverable 1: [Name]
-
-### AC-1.1: [description]
-- Approach: [what you tried]
-- Result: [outcome]
-
-### Status: [COMPLETE/IN PROGRESS]
-
-## Verification Attempts
-
-### Attempt 1
-- Results: [summary]
-- Action: [what to fix]
-```
-
-## Flow
-
-```
-1. Read manifest (intent, invariants, process guidance, deliverables)
-2. Create todos + log
-3. For each deliverable: work toward ACs (following PG-* guidance), log progress
-4. Call /verify
-5. If failures: fix specific criteria, /verify again
-6. All pass: /verify calls /done
-```
+1. **Extract from manifest**: Intent, global invariants, process guidance (PG-* items), deliverables with ACs, tradeoffs
+2. **Work through deliverables**: Satisfy acceptance criteria, log progress
+3. **Verify**: Invoke vibe-experimental:verify with manifest and log paths
+4. **Handle failures**: Fix specific failing criteria, verify again
+5. **Escalate when stuck**: Invoke vibe-experimental:escalate with criterion ID and approaches tried
