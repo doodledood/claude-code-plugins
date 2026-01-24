@@ -72,9 +72,9 @@ This ensures a fair comparison with different answers on identical input.
 **CRITICAL: Background Execution & Parallel Invocation**
 
 For multi-model consultations, you MUST:
-1. **Run all CLI calls in background mode** - Use the Bash tool with `run_in_background: true`
-2. **Launch all models in parallel** - Send a single message with multiple Bash tool calls (one per model)
-3. **Poll each session every 30 seconds** - Use BashOutput to check status until completion
+1. **Run all CLI calls in background mode** - Execute commands with background mode enabled
+2. **Launch all models in parallel** - Send a single message with multiple command invocations (one per model)
+3. **Poll each session every 30 seconds** - Check background command output until completion
 
 This is essential because:
 - LLM API calls can take minutes to complete
@@ -87,17 +87,17 @@ This is essential because:
 2. Create the artifact directory with all files ONCE
 3. **Launch all CLI calls in parallel using background mode:**
    ```
-   # In a SINGLE message, send multiple Bash calls with run_in_background: true
-   # Example: 3 models = 3 parallel Bash calls in one message
+   # In a SINGLE message, send multiple background command invocations
+   # Example: 3 models = 3 parallel command calls in one message
 
-   Bash(command="uvx ... --model gpt-5.2 ...", run_in_background=true)
-   Bash(command="uvx ... --model claude-opus-4-5 ...", run_in_background=true)
-   Bash(command="uvx ... --model gemini/gemini-3-pro-preview ...", run_in_background=true)
+   # Run: uvx ... --model gpt-5.2 ... (background)
+   # Run: uvx ... --model claude-opus-4-5 ... (background)
+   # Run: uvx ... --model gemini/gemini-3-pro-preview ... (background)
    ```
 4. **Monitor all sessions every 30 seconds:**
-   - Use BashOutput with each shell_id to check progress
+   - Check output of each background session to monitor progress
    - Continue polling until all sessions complete or error
-   - Check all sessions in parallel (multiple BashOutput calls in one message)
+   - Check all sessions in parallel (multiple output checks in one message)
 5. Save each model's output to a separate file:
    ```
    consultant_response_<model1>.md
@@ -115,7 +115,7 @@ Relay each model's output verbatim—let the user draw conclusions.
 
 ## MANDATORY: Create Todo List First
 
-**Before starting any work**, create a todo list using TodoWrite with all workflow steps. Work through each step one by one, marking as in_progress when starting and completed when done.
+**Before starting any work**, create a todo list with all workflow steps. Work through each step one by one, marking as in_progress when starting and completed when done.
 
 **Use this template (single model):**
 
@@ -141,8 +141,8 @@ Relay each model's output verbatim—let the user draw conclusions.
 [ ] Gather context (files, diffs, documentation)
 [ ] Create temp directory and organize artifacts
 [ ] Construct the prompt
-[ ] Launch all CLI calls in background mode (parallel Bash calls with run_in_background: true)
-[ ] Poll all sessions every 30 seconds using BashOutput until completion
+[ ] Launch all CLI calls in background mode (parallel background command invocations)
+[ ] Poll all sessions every 30 seconds until completion
 [ ] Save each model's output to consultant_response_<model>.md
 [ ] Relay all outputs and report all file paths
 ```
@@ -408,13 +408,13 @@ For **single-model** consultations where the CLI times out, or for **multi-model
 All CLI calls are launched in background mode. You MUST poll every 30 seconds:
 
 ```
-# After launching all models in parallel with run_in_background: true,
+# After launching all models in parallel in background mode,
 # you'll have multiple shell IDs (e.g., shell_1, shell_2, shell_3)
 
-# Poll ALL sessions in parallel using BashOutput:
-BashOutput(bash_id="shell_1")
-BashOutput(bash_id="shell_2")
-BashOutput(bash_id="shell_3")
+# Poll ALL sessions in parallel by checking their output:
+# Check output of shell_1
+# Check output of shell_2
+# Check output of shell_3
 
 # Check status of each:
 # - If "running" or no final output → wait 30 seconds and poll again
@@ -427,7 +427,7 @@ BashOutput(bash_id="shell_3")
 **Polling workflow:**
 
 1. After launching background processes, wait ~30 seconds
-2. Send a single message with BashOutput calls for ALL active sessions
+2. Send a single message to check output for ALL active sessions
 3. For each session, check if output contains final RESPONSE/METADATA sections
 4. If any session still running → wait 30 seconds and repeat
 5. Once all complete → proceed to Phase 6

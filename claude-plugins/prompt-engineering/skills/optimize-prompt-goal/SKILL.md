@@ -19,11 +19,11 @@ This skill transforms goal-misaligned prompts into effective ones through:
 
 **Key principle**: Don't try to optimize in one pass. The verifier drives all changes - if it finds no issues, the prompt is already optimal.
 
-**Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally and proceed without external todo tracking.
+**Required**: This skill requires agent spawning capability to launch the verifier agent. If agent spawning is unavailable, report error: "Agent spawning required for verification loop." This skill uses todo tracking to track progress. If todo tracking is unavailable, track progress internally and proceed without external todo tracking.
 
 ## Workflow
 
-### Phase 0: Create Todo List (TodoWrite immediately)
+### Phase 0: Create Todo List (create todos immediately)
 
 Create todos tracking workflow phases. Todos represent areas of work that may expand during execution.
 

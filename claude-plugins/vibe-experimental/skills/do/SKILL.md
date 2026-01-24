@@ -28,10 +28,7 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 
 ## Constraints
 
-**Must call /verify** - Can't declare done without verification. When all deliverables addressed:
-```
-Skill("vibe-experimental:verify", "/tmp/manifest-{ts}.md /tmp/do-log-{ts}.md")
-```
+**Must call /verify** - Can't declare done without verification. When all deliverables addressed, invoke the vibe-experimental:verify skill with the manifest and log paths.
 
 ## Todo Discipline
 
@@ -64,10 +61,7 @@ Skill("vibe-experimental:verify", "/tmp/manifest-{ts}.md /tmp/do-log-{ts}.md")
 
 **Handle failures** - Fix specific failing criteria, call /verify again. Loop until pass.
 
-**Escalate when stuck** - If you've tried 3+ approaches on a criterion and can't satisfy it:
-```
-Skill("vibe-experimental:escalate", "[criterion ID] blocking after 3 attempts")
-```
+**Escalate when stuck** - If you've tried 3+ approaches on a criterion and can't satisfy it, invoke the vibe-experimental:escalate skill with the criterion ID and what you've tried.
 
 ## Log Structure
 

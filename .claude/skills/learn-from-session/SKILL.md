@@ -321,9 +321,8 @@ grep -oE 'Skill\s*\(\s*"[^"]+:[^"]+"' {session-file} | sort | uniq -c
 **Step 2**: Find ALL relevant files for each skill.
 
 **Option A - If codebase-explorer skill is available**:
-```
-Skill("vibe-workflow:explore-codebase", "medium - find all files related to the {skill-name} skill: SKILL.md definition, related agents it spawns, hooks that affect it, and any shared utilities")
-```
+
+Invoke the vibe-workflow:explore-codebase skill with: "medium - find all files related to the {skill-name} skill: SKILL.md definition, related agents it spawns, hooks that affect it, and any shared utilities"
 
 **Option B - Manual search fallback**:
 ```bash

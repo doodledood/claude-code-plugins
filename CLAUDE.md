@@ -69,7 +69,7 @@ Skills are the primary way to extend Claude Code. Each skill lives in `skills/{s
 **Invocation modes**:
 - **Auto-invoked**: Claude discovers and invokes skills based on semantic matching with the description
 - **User-invoked**: Users can explicitly invoke via `/skill-name` (controlled by `user-invocable` frontmatter, defaults to `true`)
-- **Programmatic**: Other skills invoke via `Skill("plugin:skill-name", "$ARGUMENTS")`
+- **Programmatic**: Other skills can invoke skills by referencing them (e.g., "invoke the spec skill with arguments")
 
 **Skill frontmatter**:
 ```yaml
@@ -131,27 +131,27 @@ description: 'Investigates and fixes bugs systematically. Use when asked to debu
 
 ### Invoking Skills from Skills
 
-When a skill needs to invoke another skill, use the explicit Skill tool pattern:
+When a skill needs to invoke another skill, use clear directive language:
 
 ```markdown
-Use the Skill tool to <action>: Skill("<plugin>:<skill>", "$ARGUMENTS")
+Invoke the <plugin>:<skill> skill with: "<arguments>"
 ```
 
 Examples:
-- `Use the Skill tool to build a requirements spec: Skill("vibe-workflow:spec", "$ARGUMENTS")`
-- `Use the Skill tool to craft a CUSTOMER.md document: Skill("solo-dev:define-customer-profile")`
+- `Invoke the vibe-workflow:spec skill with: "$ARGUMENTS"`
+- `Invoke the solo-dev:define-customer-profile skill`
 
-**Why**: Natural language like "Use the X skill" is ambiguous—Claude may just read the skill file instead of invoking it. The explicit `Skill(...)` pattern ensures the Skill tool is actually called.
+**Why**: Vague language like "consider using the X skill" is ambiguous—Claude may just read the skill file instead of invoking it. Clear directives like "Invoke the X skill" ensure the skill is actually called.
 
-**Common agent patterns**:
-- Has `Bash` → add `BashOutput` (for long-running commands)
-- Uses todo tracking → add `TodoWrite`
-- Writes files (logs, notes) → add `Write`
-- Invokes other skills → add `Skill`
-- Spawns sub-agents → add `Task`
-- Searches files → add `Glob`, `Grep`
+**Common agent capabilities to declare in frontmatter**:
+- Running commands → needs command execution tools
+- Tracking progress → needs todo/task management tools
+- Writing files (logs, notes) → needs file writing tools
+- Invoking other skills → needs skill invocation tools
+- Spawning sub-agents → needs agent spawning tools
+- Searching files → needs file search tools
 
-**Agent audit**: Read the skill/prompt the agent follows, identify every tool mentioned (explicit or implicit), verify all are in frontmatter.
+**Agent audit**: Read the skill/prompt the agent follows, identify every capability mentioned (explicit or implicit), verify all are declared in frontmatter.
 
 ### Memento Pattern for Non-Trivial Workflows
 
@@ -164,7 +164,7 @@ Skills and agents with multi-phase workflows MUST use the memento pattern. This 
 | Limitation | Research Finding | Pattern Response |
 |------------|------------------|------------------|
 | **Context rot** | Information in the middle of context gets "lost"—U-shaped attention curve with >20% accuracy degradation for middle-positioned content | Write findings to external file after EACH step; file persists where conversation content degrades |
-| **Working memory** | LLMs reliably track only 5-10 variables; beyond this, state management fails | TodoWrite externalizes all tracked areas; each todo = one "variable" in external memory |
+| **Working memory** | LLMs reliably track only 5-10 variables; beyond this, state management fails | Todo lists externalize all tracked areas; each todo = one "variable" in external memory |
 | **Holistic synthesis failure** | <50% accuracy on synthesis tasks at 32K tokens; models excel at needle retrieval but fail at aggregation across full context | Read full log file BEFORE synthesis—converts degraded scattered context into concentrated recent content |
 | **Recency bias** | Models pay highest attention to content at context end | Refresh step moves ALL findings to context end where attention is strongest |
 | **Premature completion** | Agents mark tasks "done" without verification; later instances see partial progress and "declare the job done" | Expansion placeholders signal incompleteness; explicit write-to-log todos ensure nothing is skipped |

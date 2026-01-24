@@ -35,7 +35,7 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 
 **IMMEDIATELY after reading this skill**, before ANY user interaction:
 1. Run `date +%Y%m%d-%H%M%S` for timestamp
-2. Create todo list using TodoWrite (see 1.2 template)
+2. Create todo list (see 1.2 template)
 3. Mark first todo `in_progress`
 
 **Why non-negotiable**: Without todo list, phases skipped, write-to-log forgotten, synthesis fails from context rot. Todo list IS the workflow—not optional.
@@ -44,9 +44,9 @@ Guide users through decisions via **exhaustive discovery**, **targeted research*
 
 ---
 
-**Required tools**: AskUserQuestion, Read, Write, TodoWrite; WebSearch or Task (web-researcher) for external decisions
+**Required capabilities**: User questions, file reading/writing, todo tracking; web search or web-researcher agent for external decisions
 
-**Tool syntax**: `Task(subagent_type:'<plugin>:<agent>', prompt:'...', description:'...')`. Task unavailable → use WebSearch.
+**Agent spawning**: Launch agents by specifying plugin:agent and prompt. Agent spawning unavailable → use direct web search.
 
 **Partial availability**: Core tools unavailable → inform user, exit. WebSearch/Task unavailable → skip research, self-knowledge flow. web-researcher not found → WebSearch directly.
 

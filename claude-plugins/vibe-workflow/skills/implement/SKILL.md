@@ -107,7 +107,7 @@ Build todos with 4 items per chunk, plus finalization:
 [ ] (Expand: fix review issues as findings emerge)
 ```
 
-All todos created at once via TodoWrite, status `pending`. Fix loop placeholder is marked completed and replaced with implement/verify pairs during Phase 3 (see 3.1).
+All todos created at once (status `pending`). Fix loop placeholder is marked completed and replaced with implement/verify pairs during Phase 3 (see 3.1).
 
 ### 1.6 Handle Resume
 
@@ -119,7 +119,7 @@ If `--progress` argument provided:
 
 ## Phase 2: Execute Chunks (Subagent Orchestration)
 
-**Prerequisites**: TodoWrite tool, Task tool with subagent_type support, installed agents: `vibe-workflow:chunk-implementor`, `vibe-workflow:chunk-verifier`.
+**Prerequisites**: Todo list tracking, agent spawning capability, installed agents: `vibe-workflow:chunk-implementor`, `vibe-workflow:chunk-verifier`.
 
 **CRITICAL**: Execute continuously without pauses.
 
@@ -129,7 +129,7 @@ For each chunk in dependency order:
 
 1. Mark implement todo `in_progress`
 2. **Update progress file**: chunk status → `IN_PROGRESS`, `Last updated` timestamp
-3. Use Task tool with `subagent_type: "vibe-workflow:chunk-implementor"`:
+3. Launch a `vibe-workflow:chunk-implementor` agent with this prompt:
 
 ```
 Implement chunk N: [Name]
@@ -171,7 +171,7 @@ Fix Direct first. For Indirect: fix in your files if possible, else edit listed 
 ### 2.2 Spawn Verifier Agent
 
 1. Mark verify todo `in_progress`
-2. Use Task tool with `subagent_type: "vibe-workflow:chunk-verifier"`:
+2. Launch a `vibe-workflow:chunk-verifier` agent with this prompt:
 
 ```
 Verify chunk N: [Name]
@@ -252,7 +252,7 @@ From verifier output, identify:
 ### 3.3 Respawn Implementor with Fix Context
 
 1. Mark fix implement todo `in_progress`
-2. Spawn implementor via Task tool (as in 2.1), including the full chunk definition AND the `## Fix Context` section with attempt number, verifier log path, and categorized issues
+2. Spawn implementor agent (as in 2.1), including the full chunk definition AND the `## Fix Context` section with attempt number, verifier log path, and categorized issues
 3. **Update progress file**: new `Implementor log`, updated files, `Last updated`
 4. Mark fix implement todo `completed`
 
@@ -345,7 +345,7 @@ Skip if `--no-review` was set.
 ### 5.1 Run Review
 
 1. Mark "Run review" todo `in_progress`
-2. Invoke: `Skill("vibe-workflow:review", "--autonomous")`
+2. Invoke the vibe-workflow:review skill with: "--autonomous"
 3. Mark "Run review" todo `completed`
 4. If no issues → mark fix placeholder `completed`, done; else → 5.2
 
@@ -359,9 +359,9 @@ Skip if `--no-review` was set.
    [ ] (Expand: additional fix iterations if needed)
    ```
 2. Mark "Fix critical/high" `in_progress`
-3. Invoke: `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")`
+3. Invoke the vibe-workflow:fix-review-issues skill with: "--severity critical,high --autonomous"
 4. Mark "Fix critical/high" `completed`, mark "Re-run review" `in_progress`
-5. Invoke: `Skill("vibe-workflow:review", "--autonomous")`
+5. Invoke the vibe-workflow:review skill with: "--autonomous"
 6. Mark "Re-run review" `completed`
 7. If issues remain → expand placeholder, repeat (max 3 cycles)
 8. After 3 cycles or clean → mark placeholders `completed`, report status
@@ -437,7 +437,7 @@ implement (Task) → verify (Task) → [implement → verify]* → commit
 ```
 
 Main agent ONLY:
-- Calls Task tool (implementor/verifier)
+- Spawns agents (implementor/verifier)
 - Updates progress file
 - Runs git commit after verification passes
 

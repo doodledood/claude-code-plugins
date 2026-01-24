@@ -36,7 +36,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 4. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
-5. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage.
+5. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
 
 ## Constraints
 

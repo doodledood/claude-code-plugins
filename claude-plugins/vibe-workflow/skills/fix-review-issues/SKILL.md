@@ -145,13 +145,13 @@ placeholder: "e.g., src/auth/ or src/utils.ts, src/helpers.ts"
 6. Simplicity
 7. Docs
 
-Use the Skill tool to create the implementation plan: Skill("vibe-workflow:plan", "Fix these review issues in priority order (bugs → CLAUDE.md adherence → type safety → coverage → maintainability → simplicity → docs): [summary of issues within confirmed scope, grouped by priority]")
+Invoke the vibe-workflow:plan skill with: "Fix these review issues in priority order (bugs → CLAUDE.md adherence → type safety → coverage → maintainability → simplicity → docs): [summary of issues within confirmed scope, grouped by priority]"
 
 Once the plan is approved, note the plan file path (typically `/tmp/plan-*.md`) and proceed to execution.
 
 ### Phase 4: Execute Fixes
 
-Use the Skill tool to execute the plan: Skill("vibe-workflow:implement", "<plan-file-path>")
+Invoke the vibe-workflow:implement skill with: "<plan-file-path>"
 
 The `/implement` skill handles dependency-ordered execution, progress tracking, and auto-fixing gate failures.
 

@@ -21,7 +21,7 @@ Build requirements spec through structured discovery interview. Defines WHAT and
 
 ## Phase 1: Initial Setup
 
-### 1.1 Create todo list (TodoWrite immediately)
+### 1.1 Create todo list (immediately)
 
 Todos = **areas to discover**, not interview steps. Each todo reminds you what conceptual area needs resolution. List continuously expands as user answers reveal new areas. "Finalize spec" is fixed anchor; all others are dynamic.
 
@@ -126,11 +126,11 @@ Started: {timestamp}
 
 ---
 
-**Prerequisites** (for code work only): Requires vibe-workflow plugin with codebase-explorer and web-researcher agents installed. If Task tool fails with agent not found, inform user: "Required agent {name} not available. Install vibe-workflow plugin or proceed with manual research?" If proceeding manually, use Read/Glob/Grep for codebase exploration and note `[LIMITED RESEARCH: {agent} unavailable]` in interview log.
+**Prerequisites** (for code work only): Requires vibe-workflow plugin with codebase-explorer and web-researcher agents installed. If agent launch fails with agent not found, inform user: "Required agent {name} not available. Install vibe-workflow plugin or proceed with manual research?" If proceeding manually, use file reading and searching for codebase exploration and note `[LIMITED RESEARCH: {agent} unavailable]` in interview log.
 
 ### 2.1 Launch codebase-explorer (code work only)
 
-Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` to understand context. Launch multiple in parallel (single message) for cross-cutting work. Limit to 3 parallel researchers per batch. If findings conflict, immediately present both perspectives to user via AskUserQuestion: "Research found conflicting information about {topic}: {perspective A} vs {perspective B}. Which applies to your situation?" If user cannot resolve, document both perspectives in spec with `[CONTEXT-DEPENDENT: {perspective A} applies when X; {perspective B} applies when Y]` and ask follow-up to clarify applicability. If 3 researchers don't cover all needed areas, run additional batches sequentially.
+Launch `vibe-workflow:codebase-explorer` agents to understand context. Launch multiple in parallel (single message) for cross-cutting work. Limit to 3 parallel researchers per batch. If findings conflict, immediately present both perspectives to user via AskUserQuestion: "Research found conflicting information about {topic}: {perspective A} vs {perspective B}. Which applies to your situation?" If user cannot resolve, document both perspectives in spec with `[CONTEXT-DEPENDENT: {perspective A} applies when X; {perspective B} applies when Y]` and ask follow-up to clarify applicability. If 3 researchers don't cover all needed areas, run additional batches sequentially.
 
 Explore: product purpose, existing patterns, user flows, terminology, product docs (CUSTOMER.md, SPEC.md, PRD.md, BRAND_GUIDELINES.md, DESIGN_GUIDELINES.md, README.md), existing specs in `docs/` or `specs/`. For bug fixes: also explore bug context, related code, potential causes.
 
@@ -140,7 +140,7 @@ Read ALL files from researcher prioritized reading lists - no skipping.
 
 ### 2.3 Launch web-researcher (if needed, code work only)
 
-Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` when you cannot answer a question from codebase research alone and the answer requires: domain concepts unfamiliar to you, current industry standards or best practices, regulatory/compliance requirements, or competitor UX patterns. Do not use for questions answerable from codebase or general knowledge. Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
+Launch `vibe-workflow:web-researcher` agents when you cannot answer a question from codebase research alone and the answer requires: domain concepts unfamiliar to you, current industry standards or best practices, regulatory/compliance requirements, or competitor UX patterns. Do not use for questions answerable from codebase or general knowledge. Returns all findings in response - no additional file reads needed. Continue launching throughout interview as gaps emerge.
 
 ### 2.4 Update interview log (code work only)
 
