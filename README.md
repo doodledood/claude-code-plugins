@@ -102,11 +102,11 @@ Foundational documents for solo developers and small teams. Define once, referen
 
 ### prompt-engineering
 
-Analyze and optimize prompts for clarity, precision, and goal effectiveness.
+Craft, analyze, and optimize prompts from first principles.
 
+- `/prompt-engineering` - Craft or update prompts from first principles (WHAT/WHY not HOW)
 - `/review-prompt` - Analyze against 10-Layer Architecture framework (read-only)
-- `/optimize-prompt-precision` - Iteratively optimize for precision, eliminating ambiguities
-- `/optimize-prompt-goal` - Iteratively optimize for goal effectiveness
+- `/optimize-prompt-token-efficiency` - Iteratively optimize for token efficiency
 - `/compress-prompt` - Compress into single dense paragraph for context injection
 
 ### frontend-design
