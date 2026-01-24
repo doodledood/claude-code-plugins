@@ -8,25 +8,32 @@ user-invocable: false
 
 Orchestrate verification of all criteria from a Manifest by spawning parallel verifiers. Report results grouped by type.
 
-**Input**: `$ARGUMENTS` = "<manifest-file-path> <execution-log-path> [--scope=files]"
+**User request**: $ARGUMENTS
+
+Format: `<manifest-file-path> <execution-log-path> [--scope=files]`
+
+If paths missing: Return error "Usage: /verify <manifest-path> <log-path>"
 
 ## Principles
 
 | Principle | Rule |
 |-----------|------|
 | **Orchestrate, don't verify** | Spawn agents to verify. You coordinate results, never run checks yourself. |
-| **Single parallel launch** | All criteria in one call. Order: slow (tests, builds, reviewers) before fast (lint, typecheck). |
+| **Maximize parallelism** | Launch all verifiers together for efficiency. In limited-parallelism environments, launch slow checks (tests, builds, reviewers) before fast (lint, typecheck) to maximize throughput. |
 | **Globals are critical** | Global Invariant failures mean task failure. Highlight prominently. |
 | **Actionable feedback** | Pass through file:line, expected vs actual, fix hints. |
 
 ## Verification Methods
 
-| Type | What |
-|------|------|
-| `bash` | Shell commands (tests, lint, typecheck) |
-| `subagent` | Reviewer agents |
-| `codebase` | Code pattern checks |
-| `manual` | Set aside for human verification |
+| Type | What | Handler |
+|------|------|---------|
+| `bash` | Shell commands (tests, lint, typecheck) | criteria-checker |
+| `codebase` | Code pattern checks | criteria-checker |
+| `subagent` | Specialized reviewer agents | Named agent (e.g., code-bugs-reviewer) |
+| `research` | External info (API docs, dependencies) | criteria-checker |
+| `manual` | Set aside for human verification | /escalate |
+
+Note: criteria-checker handles any automated verification requiring commands, file analysis, reasoning, or web research.
 
 ## Criterion Types
 

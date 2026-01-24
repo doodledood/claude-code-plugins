@@ -4,10 +4,11 @@ Manifest-driven workflows separating **what to build** (Deliverables) from **rul
 
 ## Overview
 
-A two-level approach to task definition and execution:
+A structured approach to task definition and execution:
 
-1. **Global Invariants** - Rules that apply to the ENTIRE task (e.g., "tests must pass")
-2. **Deliverables** - Specific items to complete, each with **Acceptance Criteria**
+1. **Approach** (complex tasks) - Validated implementation direction: architecture, execution order, risks, trade-offs
+2. **Global Invariants** - Rules that apply to the ENTIRE task (e.g., "tests must pass")
+3. **Deliverables** - Specific items to complete, each with **Acceptance Criteria**
    - ACs can be positive ("user can log in") or negative ("passwords are hashed")
 
 ## The Manifest Schema
@@ -19,11 +20,21 @@ A two-level approach to task definition and execution:
 - **Goal:** [High-level purpose]
 - **Mental Model:** [Key concepts/architecture]
 
-## 2. Global Invariants (The Constitution)
+## 2. Approach (Complex Tasks Only)
+*Validated implementation direction.*
+
+- **Architecture:** [High-level HOW - validated direction]
+- **Execution Order:** D1 → D2 → D3 | Rationale: [why]
+- **Risk Areas:**
+  - [R-1] [What could go wrong] | Detect: [how you'd know]
+- **Trade-offs:**
+  - [T-1] [A] vs [B] → Prefer [A] because [reason]
+
+## 3. Global Invariants (The Constitution)
 - [INV-G1] Description | Verify: [method]
 - [INV-G2] Description | Verify: [method]
 
-## 3. Deliverables (The Work)
+## 4. Deliverables (The Work)
 
 ### Deliverable 1: [Name]
 - **Acceptance Criteria**:
@@ -33,10 +44,13 @@ A two-level approach to task definition and execution:
 
 ## ID Scheme
 
-| Type | Pattern | Scope | Failure Impact |
-|------|---------|-------|----------------|
-| Global Invariant | INV-G{N} | Entire task | Task fails |
-| Acceptance Criteria | AC-{D}.{N} | Deliverable D | Deliverable incomplete |
+| Type | Pattern | Purpose | Used By |
+|------|---------|---------|---------|
+| Global Invariant | INV-G{N} | Task-level rules | /verify (verified) |
+| Process Guidance | PG-{N} | Non-verifiable HOW constraints | /do (followed) |
+| Risk Area | R-{N} | Pre-mortem flags | /do (watched) |
+| Trade-off | T-{N} | Decision criteria for adjustment | /do (consulted) |
+| Acceptance Criteria | AC-{D}.{N} | Deliverable completion | /verify (verified) |
 
 ## Interview Philosophy
 
@@ -46,7 +60,8 @@ A two-level approach to task definition and execution:
 1. Intent & Context (task type, scope, risk)
 2. Deliverables (what are we building?)
 3. Acceptance Criteria (how do we know each is done?)
-4. Global Invariants (auto-detect + generate candidates)
+4. Approach (complex tasks: architecture, execution order, risks, trade-offs)
+5. Global Invariants & Process Guidance (auto-detect + generate candidates)
 
 ## Skills
 
@@ -85,12 +100,17 @@ A two-level approach to task definition and execution:
 /define "task" → Interview → Manifest file
                     │
                     ├─ Intent & Context
-                    ├─ Global Invariants
-                    └─ Deliverables (with ACs)
+                    ├─ Deliverables (with ACs)
+                    ├─ Approach (complex tasks: architecture, order, risks, trade-offs)
+                    └─ Global Invariants & Process Guidance
                                    ↓
-/do manifest.md → For each Deliverable:
-                    - Satisfy ACs
-                         ↓
+/do manifest.md → Follow execution order, watch for risks
+                    │
+                    ├─ Risk detected? → Consult trade-offs → Adjust approach
+                    │                   (ACs achievable? Continue : /escalate)
+                    │
+                    └─ For each Deliverable: Satisfy ACs
+                                   ↓
                   /verify → (failures) → Fix specific criterion → /verify again
                          ↓
                   All pass → /done

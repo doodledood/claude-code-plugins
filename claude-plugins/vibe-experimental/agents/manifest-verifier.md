@@ -27,6 +27,12 @@ Given the task type and discussion:
 8. **Missing approach constraints** - user specified HOW to do the work (methods, tools, automation level) but manifest lacks corresponding Process Guidance (PG-*) or verifiable Invariant (INV-G*)
 9. **Misplaced non-verifiable constraints** - INV-G* items with `method: manual` verification that can't actually be verified from output (e.g., "manual optimization only" - you can't tell from final code how it was written). These should be Process Guidance (PG-*), not invariants.
 10. **Shallow domain understanding** - Task requires domain knowledge but Mental Model is thin/generic, or log shows no evidence of domain grounding (codebase exploration for technical tasks, research for unfamiliar domains, business context questions). Latent criteria can't be surfaced without domain understanding.
+11. **Missing approach (complex tasks)** - Multi-deliverable task, architectural decisions, or unfamiliar domain but no Approach section. Complex tasks need validated direction.
+12. **Vague architecture** - Approach section exists but architecture is too generic ("implement the feature") or too prescriptive (step-by-step script). Architecture should be direction, not script.
+13. **Missing execution order** - Multiple deliverables but no execution order or rationale. Dependencies unclear.
+14. **Inconsistent execution order** - Execution order doesn't match deliverable dependencies (e.g., D2 depends on D1's output but order says D2 first)
+15. **Missing risk areas** - Complex task with potential failure modes but no risk areas (R-*) defined. Pre-mortem outputs help /do watch for problems.
+16. **Missing trade-offs** - Discussion revealed competing concerns or tensions but no trade-offs (T-*) captured. /do needs decision criteria for autonomous adjustment.
 
 ## Constraints
 
@@ -58,9 +64,14 @@ Status: COMPLETE | CONTINUE
 - [Latent]: [Unstated assumption or hidden preference to surface]
 - [Unencoded]: User constraint "X" has no corresponding INV or PG
 - [Unconfirmed]: Technical constraint "{X}" discovered from codebase but not confirmed by user
-- [Approach]: User specified method/tool preference → add as PG-* (if non-verifiable) or INV-G* (if verifiable)
+- [Approach-method]: User specified method/tool preference → add as PG-* (if non-verifiable) or INV-G* (if verifiable)
 - [Misplaced]: Non-verifiable constraint in INV with `method: manual` → move to Process Guidance (PG-*)
 - [Domain]: Mental Model thin/generic → explore codebase, research domain, ask for business context
+- [Approach-missing]: Complex task needs Approach section → probe for architecture, execution order, risks, trade-offs
+- [Approach-vague]: Architecture too generic/prescriptive → probe for specific direction (components, patterns, data flow)
+- [Approach-order]: Execution order missing/inconsistent → probe for dependencies and rationale
+- [Approach-risks]: Complex task missing risk areas → pre-mortem: what could cause this to fail?
+- [Approach-tradeoffs]: Competing concerns without trade-offs → probe: when X vs Y, which priority?
 ```
 
 ## Status Logic
