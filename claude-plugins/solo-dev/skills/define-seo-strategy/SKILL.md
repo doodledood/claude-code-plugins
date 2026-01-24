@@ -48,7 +48,7 @@ This skill guides you through:
 
 ## Workflow
 
-### Initial Setup (TodoWrite immediately)
+### Initial Setup (create todos immediately)
 
 **Create todo list** - areas to research/validate, not fixed steps.
 
@@ -212,9 +212,9 @@ options:
 
 **Mark "Research" todo `in_progress`.**
 
-Launch 3 seo-researcher agents in parallel using the Task tool. Send all three Task calls in a single message.
+Launch 3 seo-researcher agents in parallel. Send all three agent invocations in a single message.
 
-**IMPORTANT**: Use the Task tool with `subagent_type: seo-researcher` for each agent.
+**IMPORTANT**: Use the `seo-researcher` agent for each research task.
 
 **Agent 1: Industry Analysis**
 

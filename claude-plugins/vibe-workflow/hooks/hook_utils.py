@@ -23,8 +23,8 @@ class TranscriptState:
 # Session reminder strings
 CODEBASE_EXPLORER_REMINDER = (
     "When you need to find relevant files for a task - whether for answering questions, "
-    "planning implementation, debugging, or onboarding - prefer using the `explore-codebase` skill "
-    '(Skill("vibe-workflow:explore-codebase", "your query")) instead of the built-in Explore agent. '
+    "planning implementation, debugging, or onboarding - prefer invoking the vibe-workflow:explore-codebase "
+    'skill (e.g., "invoke vibe-workflow:explore-codebase with: your query") instead of the built-in Explore agent. '
     "It returns a structural overview + prioritized file list with precise line ranges. For thorough+ "
     "queries, it automatically launches parallel agents to explore orthogonal angles (implementation, "
     "usage, tests, config) and synthesizes a comprehensive reading list."
@@ -32,9 +32,9 @@ CODEBASE_EXPLORER_REMINDER = (
 
 WEB_RESEARCHER_REMINDER = (
     "For non-trivial web research tasks - technology comparisons, best practices, API documentation, "
-    "library evaluations, or any question requiring synthesis of multiple sources - prefer using "
-    'the `research-web` skill (Skill("vibe-workflow:research-web", "your query")) instead of calling '
-    "WebSearch directly. For thorough+ queries, it launches parallel investigators across orthogonal "
+    "library evaluations, or any question requiring synthesis of multiple sources - prefer invoking "
+    'the vibe-workflow:research-web skill (e.g., "invoke vibe-workflow:research-web with: your query") instead of '
+    "calling WebSearch directly. For thorough+ queries, it launches parallel investigators across orthogonal "
     "facets, continues waves until satisficed, and synthesizes findings with confidence levels and "
     "source citations."
 )

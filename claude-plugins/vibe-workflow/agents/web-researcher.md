@@ -313,7 +313,7 @@ Finished: {YYYY-MM-DD HH:MM:SS} | Sources: {count} | Sub-questions: {count}
 
 ### 4.2 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: Read the FULL research notes file using the Read tool to restore ALL findings, sources, and confidence assessments into context.
+**CRITICAL**: Read the FULL research notes file to restore ALL findings, sources, and confidence assessments into context.
 
 **Why this matters**: By this point, findings from multiple search batches have been written to the research notes. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
 

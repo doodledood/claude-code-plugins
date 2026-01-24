@@ -37,7 +37,7 @@ The discovery questions give you a solid starting point, but **the real magic ha
 
 ## Workflow
 
-### Initial Setup (TodoWrite immediately)
+### Initial Setup (create todos immediately)
 
 **Create todo list** - areas to discover, not steps. List expands as user answers reveal new areas.
 
@@ -365,7 +365,7 @@ Only proceed to Phase 2/3 when gaps are filled.
 
 If user requested research, launch 2-3 parallel opus agents to gather data. **Skip this phase if user said "No research"**.
 
-**IMPORTANT**: Use the Task tool to launch these agents IN PARALLEL (single message with multiple Task calls):
+**IMPORTANT**: Launch these agents IN PARALLEL (single message with multiple agent invocations):
 
 **Agent 1: ICP Pattern Researcher**
 ```

@@ -12,7 +12,7 @@ You are an expert bug investigator and fixer specializing in systematic debuggin
 1. **Deep Investigation Phase**
 
    - Ultrathink about the bug description to understand all possible implications
-   - Use the Skill tool to explore the codebase: Skill("vibe-workflow:explore-codebase", "<bug area and related components>")
+   - Invoke the vibe-workflow:explore-codebase skill with: "<bug area and related components>"
    - Form hypotheses about potential root causes based on comprehensive understanding
 
 2. **Root Cause Analysis**

@@ -302,7 +302,7 @@ After decomposition, update the file:
 
 ### 3.1 Launch web-researcher agents
 
-Use Task tool with `subagent_type: "vibe-workflow:web-researcher"` for each research angle. **Launch agents in parallel** (single message with multiple Task tool calls) to maximize efficiency.
+Launch `vibe-workflow:web-researcher` agents for each research angle. **Launch agents in parallel** (single message with multiple agent invocations) to maximize efficiency.
 
 **Wave 1 prompt template** (broad exploration with boundaries):
 ```
@@ -522,7 +522,7 @@ When continuing to a new wave:
    - Narrower scope than Wave 1 agents
 
 4. **Launch 1-3 agents** for this wave (focused investigation)
-   - Use Task tool with `subagent_type: "vibe-workflow:web-researcher"`
+   - Launch `vibe-workflow:web-researcher` agents
    - Prompts reference specific gaps, not broad topics
 
 5. **Collect findings** and return to 4.2 (cross-reference including new findings)
@@ -533,7 +533,7 @@ When continuing to a new wave:
 
 ### 5.1 Refresh context (MANDATORY - never skip)
 
-**CRITICAL**: Read the FULL orchestration file using the Read tool to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
+**CRITICAL**: Read the FULL orchestration file to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
 
 **Why this matters**: By this point, findings from multiple agents across potentially multiple waves have been written to the orchestration file. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
 
@@ -621,7 +621,7 @@ Research completed: {timestamp}
 For quick (single-fact) queries, skip orchestration:
 
 1. State: `**Thoroughness**: quick — [reason]`
-2. Launch single web-researcher agent: `Task("vibe-workflow:web-researcher", "{query}")`
+2. Launch a `vibe-workflow:web-researcher` agent with: "{query}"
 3. Return agent's findings directly (no synthesis overhead)
 
 ## Key Principles

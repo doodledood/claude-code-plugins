@@ -44,7 +44,7 @@ Determine what to review using this priority:
 
 For each file identified in scope:
 
-- **Read the full file** using the Read tool—not just the diff. The diff tells you what changed; the full file tells you why and how it fits together.
+- **Read the full file**—not just the diff. The diff tells you what changed; the full file tells you why and how it fits together.
 - Use the diff to focus your attention on changed sections, but analyze them within full file context.
 - For cross-file changes, read all related files in the diff before drawing conclusions about bugs that span modules. You may read unchanged files for context (e.g., imported modules, base classes), but only report bugs in code lines that were added or modified in this change (for diff-based review) or in the specified paths (for explicit path review).
 

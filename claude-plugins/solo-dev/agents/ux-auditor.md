@@ -6,21 +6,21 @@ description: Use this agent when you need to audit UI/UX changes in a specific f
 Context: The user has made UI changes to a checkout flow and wants a UX review before merging.
 user: "I've finished the checkout redesign, can you review the UX?"
 assistant: "I'll use the ux-auditor agent to review the UX changes in the checkout area."
-<Task tool call to ux-auditor with focus area: checkout>
+<launches ux-auditor agent with focus area: checkout>
 </example>
 
 <example>
 Context: After implementing a new navigation component, the developer wants to ensure it meets accessibility standards.
 user: "Check if the new nav component follows our design guidelines"
 assistant: "I'll launch the ux-auditor agent to audit the navigation component against your design docs."
-<Task tool call to ux-auditor with focus area: navigation>
+<launches ux-auditor agent with focus area: navigation>
 </example>
 
 <example>
 Context: A PR contains multiple UI changes and needs comprehensive UX review before approval.
 user: "Review the UX for all the form changes in this branch"
 assistant: "I'll use the ux-auditor agent to perform a comprehensive UX audit of the form-related changes."
-<Task tool call to ux-auditor with focus area: forms>
+<launches ux-auditor agent with focus area: forms>
 </example>
 tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
 model: opus
@@ -44,7 +44,7 @@ You will be given a specific focus area to audit (e.g., "checkout", "navigation"
 
 ## AUDIT PROCESS
 
-1. **Activate Context**: If the frontend-design skill is available, use the Skill tool: Skill("example-skills:frontend-design") to access design patterns and component guidelines.
+1. **Activate Context**: If the frontend-design skill is available, invoke the example-skills:frontend-design skill to access design patterns and component guidelines.
 
 2. **Gather Reference Materials**: Read and internalize:
    - Design system documentation and guidelines

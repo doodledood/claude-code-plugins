@@ -49,7 +49,7 @@ Autonomously execute implementation in-place. Supports plan files, inline tasks,
 [ ] Run review on implemented changes
 [ ] (Expand: fix review issues as findings emerge)
 ```
-All todos created at once via TodoWrite (status `pending`). If TodoWrite unavailable, use `/tmp/implement-progress.md` with markdown checkboxes: `- [ ] pending`, `- [~] in progress`, `- [x] completed`, with timestamp prefix `[HH:MM:SS]`.
+All todos created at once (status `pending`). If todo tracking unavailable, use `/tmp/implement-progress.md` with markdown checkboxes: `- [ ] pending`, `- [~] in progress`, `- [x] completed`, with timestamp prefix `[HH:MM:SS]`.
 
 **Spec file** (`--spec <path>`): Read before implementation for requirements/acceptance criteria. If path doesn't exist, add to Notes: "Warning: Spec not found: [path]" and continue. Spec is only used when explicitly provided via --spec.
 
@@ -104,7 +104,7 @@ Unless `--no-review` → proceed to Phase 5.
 
 Skip if `--no-review` was set.
 
-1. Mark "Run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+1. Mark "Run review" `in_progress` → invoke the vibe-workflow:review skill with "--autonomous" → mark `completed`
 2. If no issues → mark fix placeholder `completed`, done
 3. Expand fix placeholder:
    ```
@@ -113,8 +113,8 @@ Skip if `--no-review` was set.
    [ ] Re-run review to verify fixes
    [ ] (Expand: additional fix iterations if needed)
    ```
-4. Mark "Fix critical/high" `in_progress` → invoke `Skill("vibe-workflow:fix-review-issues", "--severity critical,high --autonomous")` → mark `completed`
-5. Mark "Re-run review" `in_progress` → invoke `Skill("vibe-workflow:review", "--autonomous")` → mark `completed`
+4. Mark "Fix critical/high" `in_progress` → invoke the vibe-workflow:fix-review-issues skill with "--severity critical,high --autonomous" → mark `completed`
+5. Mark "Re-run review" `in_progress` → invoke the vibe-workflow:review skill with "--autonomous" → mark `completed`
 6. Repeat fix/review cycle until clean or max 3 cycles
 
 ## Edge Cases
@@ -131,7 +131,7 @@ Skip if `--no-review` was set.
 | CLAUDE.md gate commands fail | Fall back to config-based detection (see Gate Detection) |
 | No CLAUDE.md or no matching sections | Skip to config-based detection |
 | Circular dependencies | Error: "Circular dependency detected: [chunk A] ↔ [chunk B]". List cycle, abort. |
-| TodoWrite unavailable | Track progress via `/tmp/implement-progress.md` with checkbox format |
+| Todo tracking unavailable | Track progress via `/tmp/implement-progress.md` with checkbox format |
 | Spec file doesn't exist | Add to Notes: "Warning: Spec not found: [path]", continue without spec |
 
 ## Principles

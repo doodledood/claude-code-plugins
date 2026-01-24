@@ -7,7 +7,7 @@ Investigate bug: $ARGUMENTS
 
 ---
 
-Use the Task tool with `subagent_type='consultant:consultant'`. The agent gathers symptoms, invokes the consultant CLI, and reports root cause analysis.
+Launch the consultant:consultant agent. The agent gathers symptoms, invokes the consultant CLI, and reports root cause analysis.
 
 **Investigation focus**:
 1. **Root cause**: What's actually broken and why

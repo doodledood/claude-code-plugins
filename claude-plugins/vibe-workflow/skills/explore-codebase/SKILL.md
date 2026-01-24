@@ -43,9 +43,7 @@ State: `**Thoroughness**: [level] — [reason]` then proceed.
 
 ### 1. Launch single agent
 
-```
-Task(subagent_type: "vibe-workflow:codebase-explorer", prompt: "$ARGUMENTS")
-```
+Launch a `vibe-workflow:codebase-explorer` agent with: "$ARGUMENTS"
 
 ### 2. Return agent output directly
 
@@ -184,7 +182,7 @@ Thoroughness: {level}
 
 #### 3.1 Launch agents in single message
 
-Use Task tool with `subagent_type: "vibe-workflow:codebase-explorer"` for each angle. **Launch all agents in parallel** (single message with multiple Task tool calls).
+Launch `vibe-workflow:codebase-explorer` agents for each angle. **Launch all agents in parallel** (single message with multiple agent invocations).
 
 **Agent prompt template:**
 ```
@@ -369,7 +367,7 @@ After gap-fill agents return, write findings to orchestration file and update cr
 
 #### 5.1 Refresh context (MANDATORY)
 
-**CRITICAL**: Read the FULL orchestration file using Read tool to restore ALL agent findings into context.
+**CRITICAL**: Read the FULL orchestration file to restore ALL agent findings into context.
 
 ```
 - [x] Refresh context: read full orchestration file  ← Must complete BEFORE synthesis

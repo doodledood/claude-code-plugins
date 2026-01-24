@@ -23,11 +23,11 @@ This skill applies feedback through:
 - **Regression prevention**: Preserve everything feedback didn't mention
 - **Verifier validates**: Verifier catches over-fitting, under-fitting, and regressions
 
-**Required tools**: This skill requires Task tool to launch the verifier agent. If Task is unavailable, report error: "Task tool required for verification loop." This skill uses TodoWrite to track progress. If TodoWrite is unavailable, track progress internally.
+**Required**: This skill requires agent spawning capability to launch the verifier agent. If agent spawning is unavailable, report error: "Agent spawning required for verification loop." This skill uses todo tracking to track progress. If todo tracking is unavailable, track progress internally.
 
 ## Workflow
 
-### Phase 0: Create Todo List (TodoWrite immediately)
+### Phase 0: Create Todo List (create todos immediately)
 
 Create todos tracking workflow phases:
 
@@ -111,9 +111,7 @@ Apply the feedback to the prompt using Application Techniques (see below). Write
 
 **Step 2.3: Verify application**
 
-Launch prompt-feedback-verifier agent via Task tool:
-- subagent_type: "prompt-engineering:prompt-feedback-verifier"
-- prompt: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
+Launch the prompt-engineering:prompt-feedback-verifier agent with: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
 
 **Step 2.4: Handle verifier response**
 
@@ -143,9 +141,7 @@ For each iteration from 1 to 5:
    - Only address issues the verifier identified
    - If Write tool fails: display error, proceed to Phase 4 with most recent version
 
-2. **Re-verify**: Launch prompt-feedback-verifier agent via Task tool:
-   - subagent_type: "prompt-engineering:prompt-feedback-verifier"
-   - prompt: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
+2. **Re-verify**: Launch the prompt-engineering:prompt-feedback-verifier agent with: "Verify feedback application. Original: {original_path}. Modified: {working_path}. Feedback: {feedback}. Check for: feedback not addressed, partial incorporation, over-fitting, over-specification, regression, information density loss. Report VERIFIED or ISSUES_FOUND with specific details."
 
 3. **Handle response**:
    - If "VERIFIED": mark todo completed, exit loop, proceed to Phase 4
@@ -279,7 +275,7 @@ Review the changes manually.
 | Vague feedback | Apply reasonable interpretation; verifier will catch over/under-fitting |
 | Conflicting feedback | Apply most recent/prominent request; note conflict in output |
 | Verifier fails | Retry once; if fails, output with warning: "Verification failed - manual review recommended." |
-| Task tool unavailable | Error: "Task tool required for verification loop." |
+| Agent spawning unavailable | Error: "Agent spawning required for verification loop." |
 
 ## Example Usage
 

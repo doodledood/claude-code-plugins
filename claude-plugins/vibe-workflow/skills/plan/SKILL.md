@@ -24,9 +24,9 @@ Build implementation plan through structured discovery. Takes spec (from `/spec`
 
 ## Phase 1: Initial Setup
 
-### 1.1 Create todos (TodoWrite immediately)
+### 1.1 Create todos (immediately)
 
-If TodoWrite unavailable: use research log `## Todos` section with markdown checkboxes.
+If todo tracking unavailable: use research log `## Todos` section with markdown checkboxes.
 
 Todos = **areas to research/decide**, not steps. Expand when research reveals: (a) files/modules beyond current todos, (b) 2+ valid patterns with trade-offs, (c) unanalyzed dependencies, (d) questions blocking existing todos.
 
@@ -82,7 +82,7 @@ Started: {timestamp} | Spec: {path or "inline"}
 
 ## Phase 2: Context Gathering
 
-**Prerequisites**: Requires `vibe-workflow:codebase-explorer`. If Task tool fails (timeout >120s, agent not found, incomplete) OR returns <3 files when expecting multi-module changes (spec lists 3+ components OR feature description contains "across/connects/bridges/end-to-end/spans/links/integrates/coordinates/orchestrates"): do supplementary research with Read/Glob/Grep, note `[SUPPLEMENTED RESEARCH: codebase-explorer insufficient - {reason}]`. Don't retry timeouts.
+**Prerequisites**: Requires `vibe-workflow:codebase-explorer`. If agent launch fails (timeout >120s, agent not found, incomplete) OR returns <3 files when expecting multi-module changes (spec lists 3+ components OR feature description contains "across/connects/bridges/end-to-end/spans/links/integrates/coordinates/orchestrates"): do supplementary research with file reading and searching, note `[SUPPLEMENTED RESEARCH: codebase-explorer insufficient - {reason}]`. Don't retry timeouts.
 
 **If all research fails**: Log `[RESEARCH BLOCKED: {reason}]`, ask user via AskUserQuestion: (a) proceed with assumptions or (b) pause for manual context.
 
@@ -106,13 +106,13 @@ questions: [{
 ```
 
 **Handle response**:
-- **Run /spec**: Use Skill tool: `Skill("vibe-workflow:spec", "{original user request}")`. After spec completes, resume planning with spec file path.
+- **Run /spec**: Invoke the vibe-workflow:spec skill with: "{original user request}". After spec completes, resume planning with spec file path.
 - **Provide requirements**: Wait for user input, then re-evaluate requirement count.
 - **Proceed with assumptions**: Document inferred requirements in research log under `## Inferred Requirements`, continue to 2.2. Plan-verifier will flag gaps before approval.
 
 ### 2.2 Launch codebase-explorer
 
-Task tool with `subagent_type: "vibe-workflow:codebase-explorer"`. Launch multiple in parallel for cross-cutting work (spans modules/layers, e.g., frontend+backend or auth+logging).
+Launch `vibe-workflow:codebase-explorer` agents. Launch multiple in parallel for cross-cutting work (spans modules/layers, e.g., frontend+backend or auth+logging).
 
 Explore: existing implementations, files to modify, patterns, integration points, test patterns.
 
@@ -274,7 +274,7 @@ Architecture decisions: `- {Area}: {choice} — {rationale}`
 
 1. **Prioritize questions that eliminate others** - If knowing X makes Y irrelevant, ask X first
 
-2. **Interleave discovery and questions**: User answer reveals new area → codebase-explorer; need external context → web-researcher via Task (subagent_type: "vibe-workflow:web-researcher"; if unavailable: ask user "Need context about {topic}. Provide: {specific info}"); update plan after each iteration
+2. **Interleave discovery and questions**: User answer reveals new area → codebase-explorer; need external context → launch vibe-workflow:web-researcher agent (if unavailable: ask user "Need context about {topic}. Provide: {specific info}"); update plan after each iteration
 
 3. **Question priority**:
 
@@ -357,13 +357,12 @@ while attempt <= 5:
 
 **Launch verifier**:
 
+Launch the vibe-workflow:plan-verifier agent with this prompt:
 ```
-Task(subagent_type: "vibe-workflow:plan-verifier", prompt: "
 Plan file: {plan path}
 Spec file: {spec path or 'none'}
 Research log: {research log path}
 Attempt: {attempt}/5
-")
 ```
 
 **Per-attempt todo expansion** (if ISSUES_FOUND):
