@@ -146,6 +146,30 @@ User-validated priorities. Decision criteria when facing competing concerns.
 - [T-2] Complete solution vs. Incremental → Prefer Incremental because we can iterate
 ```
 
+## Architecture vs Process Guidance
+
+Both are "HOW" guidance. The distinction:
+
+| Aspect | Architecture | Process Guidance (PG) |
+|--------|--------------|----------------------|
+| **What** | Structural decisions | Methodology constraints |
+| **Scope** | Components, patterns, data flow | Tools, manual vs automated, approach preferences |
+| **Verified** | Indirectly (through ACs) | Never (followed during /do) |
+| **Adjustable** | Yes, with trade-off guidance | No, these are constraints |
+
+**Examples:**
+
+| Statement | Classification | Why |
+|-----------|---------------|-----|
+| "Add AuthService wrapping token logic" | Architecture | Structural decision about components |
+| "Use Repository pattern for data access" | Architecture | Pattern choice affecting structure |
+| "No ORM, raw SQL only" | Process Guidance | Tool constraint, not structure |
+| "Manual optimization only, no auto-formatters" | Process Guidance | Methodology constraint |
+| "Extend Parser class with new node types" | Architecture | Structural decision |
+| "Use TDD approach" | Process Guidance | Methodology preference |
+
+**Rule of thumb:** If it describes WHAT components/patterns/structure → Architecture. If it constrains HOW you work (tools, methods, automation) → Process Guidance.
+
 ## Autonomous Adjustment During /do
 
 When approach hits reality and needs adjustment:
@@ -197,15 +221,15 @@ The line between autonomous adjustment and escalation:
 │   Phase 1: Intent & Context                                             │
 │       - Goal, mental model, task type                                   │
 │                                                                         │
-│   Phase 2: Approach    ← NEW                                            │
+│   Phase 2: Deliverables                                                 │
+│       - What are we building?                                           │
+│       - Acceptance criteria for each                                    │
+│                                                                         │
+│   Phase 3: Approach    ← NEW (requires deliverables to define order)    │
 │       - Architecture (generate options, validate)                       │
 │       - Execution order (dependencies, rationale)                       │
 │       - Risk areas (pre-mortem: what could go wrong?)                   │
 │       - Trade-offs (priorities when facing competing concerns)          │
-│                                                                         │
-│   Phase 3: Deliverables                                                 │
-│       - What are we building?                                           │
-│       - Acceptance criteria for each                                    │
 │                                                                         │
 │   Phase 4: Invariants & Process Guidance                                │
 │       - Global rules (auto-detect + generate candidates)                │
@@ -293,7 +317,7 @@ The line between autonomous adjustment and escalation:
 
 **Changes:**
 - Add Approach section to manifest schema
-- Add interview phase for Approach (between Intent and Deliverables)
+- Add interview phase for Approach (AFTER Deliverables - needs deliverables to define execution order)
 - Add probing for: architecture options, execution order, risk areas (pre-mortem), trade-offs
 - Update manifest template
 
@@ -376,15 +400,17 @@ The line between autonomous adjustment and escalation:
 
 ## Open Questions
 
-1. **Approach complexity scaling**: Should simple tasks (1 deliverable) require full Approach section, or is it optional/minimal?
+1. **Trade-off format**: Is "A vs B → Prefer A because X" sufficient, or do we need more structure (weights, conditions)?
 
-2. **Trade-off format**: Is "A vs B → Prefer A because X" sufficient, or do we need more structure (weights, conditions)?
+2. **Risk area granularity**: How many risks are enough? Too few misses things, too many is noise.
 
-3. **Risk area granularity**: How many risks are enough? Too few misses things, too many is noise.
-
-4. **Adjustment logging**: What format for logging approach adjustments? Needs to be useful for context recovery.
+3. **Adjustment logging**: What format for logging approach adjustments? Needs to be useful for context recovery.
 
 ---
 
-*Plan version: 1.0*
-*Created: 2025-01-24*
+*Plan version: 1.1*
+*Updated: 2025-01-24*
+
+## Changelog
+
+- v1.1: Fixed interview order (Deliverables before Approach), added Architecture vs Process Guidance distinction, removed complexity scaling question (handled naturally by interview dynamics)
