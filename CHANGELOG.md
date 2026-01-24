@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.2.0 - Add Context Discovery section to /prompt-engineering skill; emphasizes engaging user for domain knowledge, ambiguity resolution, and missing context before writing prompts
+
 - [prompt-engineering] v2.1.0 - Add /auto-optimize-prompt skill for iterative prompt optimization until converged; uses prompt-reviewer in a loop, asks user for ambiguity resolution, only reports high-confidence issues
 
 - [prompt-engineering] v2.0.1 - Add issue types and over-engineering warnings to /prompt-engineering; simplify prompt-reviewer to invoke skill

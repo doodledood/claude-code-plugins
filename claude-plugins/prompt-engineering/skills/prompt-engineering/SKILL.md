@@ -11,6 +11,40 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 
 **If updating**: Read existing prompt, identify issues against principles, make targeted fixes.
 
+## Context Discovery
+
+Before writing or improving a prompt, surface all required context through user engagement. Missing domain knowledge creates ambiguous prompts.
+
+**What to discover**:
+
+| Context Type | Questions to Ask |
+|--------------|------------------|
+| **Domain knowledge** | "What domain is this for? Are there industry-specific terms or conventions?" |
+| **User types** | "Who will interact with this? What's their expertise level?" |
+| **Success criteria** | "What does a good output look like? What makes it fail?" |
+| **Edge cases** | "What unusual inputs might occur? How should those be handled?" |
+| **Constraints** | "Are there hard limits (length, format, tone)? What's non-negotiable?" |
+| **Integration context** | "Where does this prompt fit? What comes before/after?" |
+
+**Engagement principles**:
+
+- **Ask, don't assume**: If domain terminology appears, ask what it means rather than guessing
+- **Surface implicit expectations**: "You mentioned X should be 'good'—what specifically makes it good?"
+- **Probe for failure modes**: "What would make this output unusable? What's happened before that didn't work?"
+- **Verify understanding**: Before writing, summarize back: "So the goal is... with constraints... correct?"
+
+**When to engage user**:
+
+| Situation | Action |
+|-----------|--------|
+| Vague request | Ask for concrete success criteria |
+| Domain-specific terms | Ask for definitions and examples |
+| Ambiguous scope | Ask what's in/out of scope |
+| Unclear audience | Ask who will use this and their context |
+| Missing examples | Ask for good/bad output examples |
+
+**Never proceed with ambiguity**: If something could be interpreted multiple ways, ask. A prompt built on assumptions will fail in ways the user didn't expect.
+
 ## Core Principles
 
 | Principle | What It Means |
@@ -164,6 +198,8 @@ description: 'Craft or update LLM prompts from first principles. Use when creati
 
 Before finalizing any prompt:
 
+- [ ] All ambiguities resolved through user questions
+- [ ] Domain context gathered (terms, conventions, constraints)
 - [ ] Goals stated, not steps prescribed
 - [ ] No arbitrary numbers (or justified if present)
 - [ ] Weak language replaced with direct imperatives
