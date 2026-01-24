@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v1.19.0 - Add /prompt-engineering skill for crafting and updating prompts from first principles
+
 - [consultant] v1.9.1 - Replace hardcoded tool names with natural language in prompts
 - [vibe-workflow] v2.17.1 - Replace hardcoded tool names with natural language in prompts
 - [vibe-experimental] v0.23.4 - Replace hardcoded tool names with natural language; add recommended option guidance to /define efficiency principle
