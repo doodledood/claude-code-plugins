@@ -16,7 +16,7 @@ Build a **comprehensive Manifest** that captures:
 
 Comprehensive means surfacing **latent criteria**—requirements the user doesn't know they have until probed. Users know their surface-level needs; your job is to discover the constraints and edge cases they haven't thought about.
 
-You can't get to 100% upfront—some criteria only emerge during implementation. But strive for high coverage. The manifest supports amendments for what's discovered later.
+100% upfront is impossible—some criteria only emerge during implementation. But strive for high coverage. The manifest supports amendments for what's discovered later.
 
 Output: `/tmp/manifest-{timestamp}.md`
 
@@ -56,11 +56,11 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
 
-**Verify before finalizing** - After writing manifest, spawn manifest-verifier: `Task("manifest-verifier", "Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-discovery-{ts}.md")`. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
+**Verify before finalizing** - After writing manifest, verify completeness using the manifest-verifier agent with the manifest and discovery log as input. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
-**Prefer automated verification** - Use bash commands when possible. For inspections that aren't easily bash-verifiable, use a subagent to review the codebase. Reserve manual verification for criteria that no automated method can validate.
+**Prefer automated verification** - Automated methods (commands, subagent review) before manual. Reserve manual verification for criteria that no automated method can validate.
 
 ## What the Manifest Needs
 
@@ -102,7 +102,7 @@ verify:
 
 ### Project Gates (auto-detect from CLAUDE.md)
 
-For coding tasks, read CLAUDE.md and extract verifiable commands (typecheck, lint, test, format). Add as Global Invariants with bash verification:
+For coding tasks, extract verifiable commands from project configuration (typecheck, lint, test, format). Add as Global Invariants with bash verification:
 ```yaml
 verify:
   method: bash
