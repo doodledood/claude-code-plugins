@@ -29,7 +29,7 @@ description: |
   Bug investigations benefit from comprehensive context gathering and structured output format.
   </commentary>
   </example>
-tools: Glob, Grep, Read, Write, WebFetch, WebSearch, Skill, SlashCommand, Bash, BashOutput, KillShell, TodoWrite
+tools: Glob, Grep, Read, Write, WebFetch, WebSearch, Skill, SlashCommand, Bash, BashOutput, KillShell, TaskCreate
 model: sonnet
 ---
 

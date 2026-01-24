@@ -22,7 +22,7 @@ user: "Before I merge, can you check if docs are up to date?"
 assistant: "I'll use the docs-reviewer agent to audit your documentation against the branch changes and report what needs updating."
 <launches docs-reviewer agent>
 </example>
-tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
+tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill
 model: opus
 ---
 

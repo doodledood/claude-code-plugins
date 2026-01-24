@@ -19,7 +19,7 @@ Context: User just created a new CUSTOMER.md and wants to verify existing design
 user: "I've redefined our ICP in CUSTOMER.md. Do our design guidelines still make sense?"
 assistant: "I'll use the design-quality-auditor agent to audit whether your existing design guidelines properly serve your newly defined ideal customer profile."
 </example>
-tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
+tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill
 model: opus
 ---
 

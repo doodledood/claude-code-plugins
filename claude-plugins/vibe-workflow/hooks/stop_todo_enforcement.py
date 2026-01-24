@@ -2,7 +2,7 @@
 """
 Stop hook that prevents premature stops during /implement and /implement-inplace workflows.
 
-Blocks stop attempts when todos are incomplete, with a safety valve after max blocks.
+Blocks stop attempts when tasks are incomplete, with a safety valve after max blocks.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ def main() -> None:
     if not state.in_implement_workflow:
         sys.exit(0)
 
-    if not state.incomplete_todos:
+    if not state.incomplete_tasks:
         sys.exit(0)
 
     max_blocks = int(os.environ.get("IMPLEMENT_MAX_BLOCKS", "5"))
@@ -48,14 +48,14 @@ def main() -> None:
         print(json.dumps(output))
         sys.exit(0)
 
-    todo_count = len(state.incomplete_todos)
+    task_count = len(state.incomplete_tasks)
     output = {
         "decision": "block",
-        "reason": f"{todo_count} todos remain incomplete",
+        "reason": f"{task_count} tasks remain incomplete",
         "systemMessage": (
-            f"HOLD: You have {todo_count} pending/in-progress todos and an /implement "
+            f"HOLD: You have {task_count} pending/in-progress tasks and an /implement "
             f"workflow was detected in this session. If you're still implementing a plan, "
-            f"continue working through the remaining todos autonomously. If the user has "
+            f"continue working through the remaining tasks autonomously. If the user has "
             f"moved on to different work, you may proceed. Bias toward completion."
         ),
     }

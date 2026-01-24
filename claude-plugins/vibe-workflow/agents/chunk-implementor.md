@@ -1,7 +1,7 @@
 ---
 name: chunk-implementor
 description: Implements a single plan chunk. Reads context files, writes/edits code to complete tasks, logs progress to /tmp/. Does NOT run quality gates (typecheck/test/lint—verifier handles that). Used by /implement for subagent-based plan execution.
-tools: Bash, Glob, Grep, Read, Edit, Write, TodoWrite, BashOutput, Skill
+tools: Bash, Glob, Grep, Read, Edit, Write, TaskCreate, BashOutput, Skill
 model: opus
 ---
 
@@ -83,7 +83,7 @@ Created: []
 Modified: []
 ```
 
-**1.2 Create todo list (TodoWrite)**
+**1.2 Create task list (TaskCreate)**
 
 Extract tasks from chunk, create granular todos:
 ```

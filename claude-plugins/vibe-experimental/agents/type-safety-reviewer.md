@@ -22,7 +22,7 @@ user: "I'm cleaning up the API layer, help me make the types bulletproof"
 assistant: "I'll use the type-safety-reviewer agent to identify where we can leverage the type system better—discriminated unions, branded types, and proper narrowing."
 <launches type-safety-reviewer agent>
 </example>
-tools: Bash, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, Skill
+tools: Bash, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, BashOutput, Skill
 model: opus
 ---
 

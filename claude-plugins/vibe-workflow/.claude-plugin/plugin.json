@@ -46,8 +46,8 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "TodoWrite",
-        "description": "Remind to update progress/log files after todo completion during implement workflows",
+        "matcher": "TaskUpdate",
+        "description": "Remind to update progress/log files after task completion during implement workflows",
         "hooks": [
           {
             "type": "command",

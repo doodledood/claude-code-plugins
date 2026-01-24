@@ -11,7 +11,7 @@ from hook_utils import (
     build_session_reminders,
     build_system_reminder,
     count_block_marker_in_line,
-    get_incomplete_todos,
+    get_incomplete_tasks,
     is_implement_skill_call,
     is_implement_workflow,
     parse_transcript,
@@ -167,31 +167,37 @@ class TestIsImplementSkillCall:
         assert is_implement_skill_call(data) is False
 
 
-class TestGetIncompleteTodos:
-    """Tests for get_incomplete_todos function."""
+class TestGetIncompleteTasks:
+    """Tests for get_incomplete_tasks function."""
 
-    def test_extracts_incomplete_todos(self, assistant_message_todo_write_incomplete):
-        result = get_incomplete_todos(assistant_message_todo_write_incomplete)
+    def test_extracts_pending_task_from_task_create(self, assistant_message_task_create):
+        result = get_incomplete_tasks(assistant_message_task_create)
         assert result is not None
-        assert len(result) == 2
-        statuses = [t["status"] for t in result]
-        assert "in_progress" in statuses
-        assert "pending" in statuses
-        assert "completed" not in statuses
+        assert len(result) == 1
+        assert result[0]["status"] == "pending"
+        assert "subject" in result[0]
 
-    def test_returns_empty_list_when_all_complete(
-        self, assistant_message_todo_write_all_complete
+    def test_extracts_incomplete_task_from_task_update(
+        self, assistant_message_task_update_incomplete
     ):
-        result = get_incomplete_todos(assistant_message_todo_write_all_complete)
+        result = get_incomplete_tasks(assistant_message_task_update_incomplete)
+        assert result is not None
+        assert len(result) == 1
+        assert result[0]["status"] == "in_progress"
+
+    def test_returns_empty_list_when_task_completed(
+        self, assistant_message_task_update_complete
+    ):
+        result = get_incomplete_tasks(assistant_message_task_update_complete)
         assert result is not None
         assert len(result) == 0
 
-    def test_returns_none_for_non_todowrite(self, assistant_message_regular):
-        result = get_incomplete_todos(assistant_message_regular)
+    def test_returns_none_for_non_task_tool(self, assistant_message_regular):
+        result = get_incomplete_tasks(assistant_message_regular)
         assert result is None
 
     def test_returns_none_for_user_message(self, user_message_regular):
-        result = get_incomplete_todos(user_message_regular)
+        result = get_incomplete_tasks(user_message_regular)
         assert result is None
 
     def test_returns_none_for_string_content(self):
@@ -199,42 +205,44 @@ class TestGetIncompleteTodos:
             "type": "assistant",
             "message": {"content": "Just text"},
         }
-        result = get_incomplete_todos(data)
+        result = get_incomplete_tasks(data)
         assert result is None
 
-    def test_handles_empty_todos_list(self):
+    def test_handles_task_create_with_minimal_input(self):
         data = {
             "type": "assistant",
             "message": {
                 "content": [
                     {
                         "type": "tool_use",
-                        "name": "TodoWrite",
-                        "input": {"todos": []},
+                        "name": "TaskCreate",
+                        "input": {"subject": "Test task"},
                     }
                 ]
             },
         }
-        result = get_incomplete_todos(data)
+        result = get_incomplete_tasks(data)
         assert result is not None
-        assert len(result) == 0
+        assert len(result) == 1
+        assert result[0]["status"] == "pending"
 
-    def test_handles_missing_todos_key(self):
+    def test_handles_task_update_pending(self):
         data = {
             "type": "assistant",
             "message": {
                 "content": [
                     {
                         "type": "tool_use",
-                        "name": "TodoWrite",
-                        "input": {},
+                        "name": "TaskUpdate",
+                        "input": {"taskId": "1", "status": "pending"},
                     }
                 ]
             },
         }
-        result = get_incomplete_todos(data)
+        result = get_incomplete_tasks(data)
         assert result is not None
-        assert len(result) == 0
+        assert len(result) == 1
+        assert result[0]["status"] == "pending"
 
 
 class TestCountBlockMarkerInLine:
@@ -286,7 +294,7 @@ class TestParseTranscript:
         path = temp_transcript([])
         result = parse_transcript(path)
         assert result.in_implement_workflow is False
-        assert result.incomplete_todos == []
+        assert result.incomplete_tasks == []
         assert result.prior_block_count == 0
 
     def test_detects_implement_workflow_from_user_command(
@@ -303,63 +311,50 @@ class TestParseTranscript:
         result = parse_transcript(path)
         assert result.in_implement_workflow is True
 
-    def test_extracts_latest_incomplete_todos(
-        self, temp_transcript, assistant_message_todo_write_incomplete
+    def test_extracts_task_from_task_create(
+        self, temp_transcript, assistant_message_task_create
     ):
-        path = temp_transcript([assistant_message_todo_write_incomplete])
+        path = temp_transcript([assistant_message_task_create])
         result = parse_transcript(path)
-        assert len(result.incomplete_todos) == 2
+        assert len(result.incomplete_tasks) == 1
+        assert result.incomplete_tasks[0]["status"] == "pending"
 
-    def test_uses_latest_todo_write(self, temp_transcript):
-        first_todos = {
+    def test_uses_latest_task_state(self, temp_transcript):
+        first_task = {
             "type": "assistant",
             "message": {
                 "content": [
                     {
                         "type": "tool_use",
-                        "name": "TodoWrite",
+                        "name": "TaskCreate",
                         "input": {
-                            "todos": [
-                                {
-                                    "content": "Old task",
-                                    "status": "pending",
-                                    "activeForm": "Old",
-                                },
-                            ]
+                            "subject": "Old task",
+                            "description": "Old description",
+                            "activeForm": "Working on old task",
                         },
                     }
                 ]
             },
         }
-        second_todos = {
+        second_task = {
             "type": "assistant",
             "message": {
                 "content": [
                     {
                         "type": "tool_use",
-                        "name": "TodoWrite",
+                        "name": "TaskUpdate",
                         "input": {
-                            "todos": [
-                                {
-                                    "content": "New task 1",
-                                    "status": "pending",
-                                    "activeForm": "New 1",
-                                },
-                                {
-                                    "content": "New task 2",
-                                    "status": "in_progress",
-                                    "activeForm": "New 2",
-                                },
-                            ]
+                            "taskId": "1",
+                            "status": "in_progress",
                         },
                     }
                 ]
             },
         }
-        path = temp_transcript([first_todos, second_todos])
+        path = temp_transcript([first_task, second_task])
         result = parse_transcript(path)
-        assert len(result.incomplete_todos) == 2
-        assert result.incomplete_todos[0]["content"] == "New task 1"
+        assert len(result.incomplete_tasks) == 1
+        assert result.incomplete_tasks[0]["status"] == "in_progress"
 
     def test_counts_block_markers(
         self, temp_transcript, assistant_message_with_block_marker
@@ -376,7 +371,7 @@ class TestParseTranscript:
     def test_handles_file_not_found(self):
         result = parse_transcript("/nonexistent/path/transcript.jsonl")
         assert result.in_implement_workflow is False
-        assert result.incomplete_todos == []
+        assert result.incomplete_tasks == []
         assert result.prior_block_count == 0
 
     def test_handles_invalid_json_lines(self, temp_transcript, tmp_path):
@@ -401,7 +396,7 @@ class TestParseTranscript:
         assert isinstance(result, TranscriptState)
 
     def test_full_workflow_scenario(self, temp_transcript):
-        """Test a realistic workflow with implement command, todos, and blocks."""
+        """Test a realistic workflow with implement command, tasks, and blocks."""
         lines = [
             {
                 "type": "user",
@@ -415,25 +410,11 @@ class TestParseTranscript:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "completed",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "in_progress",
-                                        "activeForm": "T2",
-                                    },
-                                    {
-                                        "content": "Task 3",
-                                        "status": "pending",
-                                        "activeForm": "T3",
-                                    },
-                                ]
+                                "subject": "Implement feature X",
+                                "description": "Detailed plan for feature X",
+                                "activeForm": "Implementing feature X",
                             },
                         }
                     ]
@@ -441,12 +422,12 @@ class TestParseTranscript:
             },
             {
                 "type": "assistant",
-                "message": {"content": "HOLD: You have 2 pending todos"},
+                "message": {"content": "HOLD: You have 1 pending tasks"},
             },
         ]
         path = temp_transcript(lines)
         result = parse_transcript(path)
 
         assert result.in_implement_workflow is True
-        assert len(result.incomplete_todos) == 2
+        assert len(result.incomplete_tasks) == 1
         assert result.prior_block_count == 1

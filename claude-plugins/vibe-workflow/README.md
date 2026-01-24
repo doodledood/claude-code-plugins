@@ -72,8 +72,8 @@ Start simple. Escalate if you hit ambiguity.
 ### Hooks
 - `SessionStart` - Reminds Claude to prefer codebase-explorer and web-researcher agents
 - `PostCompact` - Re-anchors session after compaction; adds implement workflow recovery
-- `PostToolUse (TodoWrite)` - Reminds to update progress/log files during implement workflows
-- `Stop` - Prevents premature stops during `/implement` when todos are incomplete
+- `PostToolUse (TaskUpdate)` - Reminds to update progress/log files during implement workflows
+- `Stop` - Prevents premature stops during `/implement` when tasks are incomplete
 
 ## Installation
 

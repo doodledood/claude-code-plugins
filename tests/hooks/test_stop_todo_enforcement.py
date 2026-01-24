@@ -81,11 +81,11 @@ class TestStopHookNoImplementWorkflow:
         assert result.returncode == 0
 
 
-class TestStopHookImplementWorkflowNoTodos:
-    """Tests for implement workflow with no incomplete todos."""
+class TestStopHookImplementWorkflowNoTasks:
+    """Tests for implement workflow with no incomplete tasks."""
 
-    def test_exits_zero_when_all_todos_complete(self, tmp_path):
-        """Should allow stop when all todos are completed."""
+    def test_exits_zero_when_task_completed(self, tmp_path):
+        """Should allow stop when task is completed."""
         lines = [
             {
                 "type": "user",
@@ -99,20 +99,10 @@ class TestStopHookImplementWorkflowNoTodos:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskUpdate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "completed",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "completed",
-                                        "activeForm": "T2",
-                                    },
-                                ]
+                                "taskId": "task-1",
+                                "status": "completed",
                             },
                         }
                     ]
@@ -123,8 +113,8 @@ class TestStopHookImplementWorkflowNoTodos:
         assert result.returncode == 0
         assert result.stdout == ""
 
-    def test_exits_zero_when_no_todo_writes(self, tmp_path):
-        """Should allow stop when implement detected but no TodoWrite calls."""
+    def test_exits_zero_when_no_task_calls(self, tmp_path):
+        """Should allow stop when implement detected but no TaskCreate/TaskUpdate calls."""
         lines = [
             {
                 "type": "user",
@@ -141,11 +131,11 @@ class TestStopHookImplementWorkflowNoTodos:
         assert result.returncode == 0
 
 
-class TestStopHookBlocksWithIncompleteTodos:
-    """Tests for blocking when todos are incomplete."""
+class TestStopHookBlocksWithIncompleteTasks:
+    """Tests for blocking when tasks are incomplete."""
 
-    def test_blocks_with_pending_todos(self, tmp_path):
-        """Should block stop when pending todos exist."""
+    def test_blocks_with_pending_task_from_create(self, tmp_path):
+        """Should block stop when pending task exists from TaskCreate."""
         lines = [
             {
                 "type": "user",
@@ -159,20 +149,11 @@ class TestStopHookBlocksWithIncompleteTodos:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "completed",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "pending",
-                                        "activeForm": "T2",
-                                    },
-                                ]
+                                "subject": "Implement feature",
+                                "description": "Detailed description",
+                                "activeForm": "Implementing feature",
                             },
                         }
                     ]
@@ -183,10 +164,10 @@ class TestStopHookBlocksWithIncompleteTodos:
         assert result.returncode == 0
         output = json.loads(result.stdout)
         assert output["decision"] == "block"
-        assert "1 todos remain incomplete" in output["reason"]
+        assert "1 tasks remain incomplete" in output["reason"]
 
-    def test_blocks_with_in_progress_todos(self, tmp_path):
-        """Should block stop when in_progress todos exist."""
+    def test_blocks_with_in_progress_task(self, tmp_path):
+        """Should block stop when in_progress task exists."""
         lines = [
             {
                 "type": "user",
@@ -200,15 +181,10 @@ class TestStopHookBlocksWithIncompleteTodos:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskUpdate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "in_progress",
-                                        "activeForm": "T1",
-                                    },
-                                ]
+                                "taskId": "task-1",
+                                "status": "in_progress",
                             },
                         }
                     ]
@@ -234,15 +210,11 @@ class TestStopHookBlocksWithIncompleteTodos:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -252,50 +224,6 @@ class TestStopHookBlocksWithIncompleteTodos:
         result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
         output = json.loads(result.stdout)
         assert "HOLD: You have" in output["systemMessage"]
-
-    def test_counts_multiple_incomplete_todos(self, tmp_path):
-        """Should correctly count multiple incomplete todos."""
-        lines = [
-            {
-                "type": "user",
-                "message": {
-                    "content": "<command-name>/vibe-workflow:implement</command-name>"
-                },
-            },
-            {
-                "type": "assistant",
-                "message": {
-                    "content": [
-                        {
-                            "type": "tool_use",
-                            "name": "TodoWrite",
-                            "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "pending",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "in_progress",
-                                        "activeForm": "T2",
-                                    },
-                                    {
-                                        "content": "Task 3",
-                                        "status": "pending",
-                                        "activeForm": "T3",
-                                    },
-                                ]
-                            },
-                        }
-                    ]
-                },
-            },
-        ]
-        result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
-        output = json.loads(result.stdout)
-        assert "3 todos remain incomplete" in output["reason"]
 
 
 class TestStopHookSafetyValve:
@@ -317,15 +245,11 @@ class TestStopHookSafetyValve:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -337,7 +261,7 @@ class TestStopHookSafetyValve:
             lines.append(
                 {
                     "type": "assistant",
-                    "message": {"content": "HOLD: You have pending todos"},
+                    "message": {"content": "HOLD: You have pending tasks"},
                 }
             )
 
@@ -361,15 +285,11 @@ class TestStopHookSafetyValve:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -404,15 +324,11 @@ class TestStopHookSafetyValve:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -448,15 +364,11 @@ class TestStopHookImplementDetection:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -488,15 +400,11 @@ class TestStopHookImplementDetection:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -527,15 +435,11 @@ class TestStopHookImplementDetection:
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task",
-                                        "status": "pending",
-                                        "activeForm": "T",
-                                    }
-                                ],
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
                             },
                         }
                     ]
@@ -572,8 +476,8 @@ class TestStopHookEdgeCases:
         )
         assert result.returncode == 0
 
-    def test_uses_latest_todo_state(self, tmp_path):
-        """Should use the latest TodoWrite state, not accumulate."""
+    def test_uses_latest_task_state(self, tmp_path):
+        """Should use the latest task state, not accumulate."""
         lines = [
             {
                 "type": "user",
@@ -581,53 +485,34 @@ class TestStopHookEdgeCases:
                     "content": "<command-name>/vibe-workflow:implement</command-name>"
                 },
             },
-            # First TodoWrite with pending
+            # First TaskCreate - creates pending task
             {
                 "type": "assistant",
                 "message": {
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskCreate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "pending",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "pending",
-                                        "activeForm": "T2",
-                                    },
-                                ]
+                                "subject": "Task 1",
+                                "description": "Description 1",
+                                "activeForm": "Working on task 1",
                             },
                         }
                     ]
                 },
             },
-            # Second TodoWrite - all complete
+            # TaskUpdate - marks task complete
             {
                 "type": "assistant",
                 "message": {
                     "content": [
                         {
                             "type": "tool_use",
-                            "name": "TodoWrite",
+                            "name": "TaskUpdate",
                             "input": {
-                                "todos": [
-                                    {
-                                        "content": "Task 1",
-                                        "status": "completed",
-                                        "activeForm": "T1",
-                                    },
-                                    {
-                                        "content": "Task 2",
-                                        "status": "completed",
-                                        "activeForm": "T2",
-                                    },
-                                ]
+                                "taskId": "task-1",
+                                "status": "completed",
                             },
                         }
                     ]
@@ -635,6 +520,6 @@ class TestStopHookEdgeCases:
             },
         ]
         result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
-        # Should allow stop since latest state is all complete
+        # Should allow stop since latest state is completed
         assert result.returncode == 0
         assert result.stdout == ""

@@ -103,33 +103,19 @@ def assistant_message_skill_implement_inplace() -> dict[str, Any]:
 
 
 @pytest.fixture
-def assistant_message_todo_write_incomplete() -> dict[str, Any]:
-    """Assistant message with TodoWrite containing incomplete todos."""
+def assistant_message_task_create() -> dict[str, Any]:
+    """Assistant message with TaskCreate (always creates pending task)."""
     return {
         "type": "assistant",
         "message": {
             "content": [
                 {
                     "type": "tool_use",
-                    "name": "TodoWrite",
+                    "name": "TaskCreate",
                     "input": {
-                        "todos": [
-                            {
-                                "content": "Task 1",
-                                "status": "completed",
-                                "activeForm": "Completing task 1",
-                            },
-                            {
-                                "content": "Task 2",
-                                "status": "in_progress",
-                                "activeForm": "Working on task 2",
-                            },
-                            {
-                                "content": "Task 3",
-                                "status": "pending",
-                                "activeForm": "Starting task 3",
-                            },
-                        ]
+                        "subject": "Implement feature X",
+                        "description": "Detailed description of the task",
+                        "activeForm": "Implementing feature X",
                     },
                 }
             ]
@@ -138,33 +124,60 @@ def assistant_message_todo_write_incomplete() -> dict[str, Any]:
 
 
 @pytest.fixture
-def assistant_message_todo_write_all_complete() -> dict[str, Any]:
-    """Assistant message with TodoWrite where all todos are complete."""
+def assistant_message_task_update_incomplete() -> dict[str, Any]:
+    """Assistant message with TaskUpdate marking task as in_progress."""
     return {
         "type": "assistant",
         "message": {
             "content": [
                 {
                     "type": "tool_use",
-                    "name": "TodoWrite",
+                    "name": "TaskUpdate",
                     "input": {
-                        "todos": [
-                            {
-                                "content": "Task 1",
-                                "status": "completed",
-                                "activeForm": "Completing task 1",
-                            },
-                            {
-                                "content": "Task 2",
-                                "status": "completed",
-                                "activeForm": "Completing task 2",
-                            },
-                        ]
+                        "taskId": "task-1",
+                        "status": "in_progress",
                     },
                 }
             ]
         },
     }
+
+
+@pytest.fixture
+def assistant_message_task_update_complete() -> dict[str, Any]:
+    """Assistant message with TaskUpdate marking task as completed."""
+    return {
+        "type": "assistant",
+        "message": {
+            "content": [
+                {
+                    "type": "tool_use",
+                    "name": "TaskUpdate",
+                    "input": {
+                        "taskId": "task-1",
+                        "status": "completed",
+                    },
+                }
+            ]
+        },
+    }
+
+
+# Backwards compatibility aliases for tests that still use old names
+@pytest.fixture
+def assistant_message_todo_write_incomplete(
+    assistant_message_task_create,
+) -> dict[str, Any]:
+    """Deprecated: Use assistant_message_task_create instead."""
+    return assistant_message_task_create
+
+
+@pytest.fixture
+def assistant_message_todo_write_all_complete(
+    assistant_message_task_update_complete,
+) -> dict[str, Any]:
+    """Deprecated: Use assistant_message_task_update_complete instead."""
+    return assistant_message_task_update_complete
 
 
 @pytest.fixture

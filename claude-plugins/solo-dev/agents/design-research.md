@@ -28,7 +28,7 @@ assistant: "I'll use the design-research agent to analyze your customer profile 
 The user needs design research specific to their customer segment. The design-research agent will read the customer profile, research industry patterns, and provide tailored recommendations.
 </commentary>
 </example>
-tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
+tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill
 model: opus
 ---
 

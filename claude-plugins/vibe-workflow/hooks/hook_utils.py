@@ -17,8 +17,13 @@ class TranscriptState:
     """State extracted from transcript parsing."""
 
     in_implement_workflow: bool
-    incomplete_todos: list[dict[str, Any]]
+    incomplete_tasks: list[dict[str, Any]]
     prior_block_count: int
+
+    @property
+    def incomplete_todos(self) -> list[dict[str, Any]]:
+        """Deprecated: Use incomplete_tasks instead."""
+        return self.incomplete_tasks
 
 
 # Session reminder strings
@@ -107,8 +112,12 @@ def is_implement_skill_call(line_data: dict[str, Any]) -> bool:
     return False
 
 
-def get_incomplete_todos(line_data: dict[str, Any]) -> list[dict[str, Any]] | None:
-    """Extract incomplete todos from a TodoWrite tool call, or None if not a TodoWrite."""
+def get_incomplete_tasks(line_data: dict[str, Any]) -> list[dict[str, Any]] | None:
+    """Extract incomplete tasks from TaskCreate/TaskUpdate tool calls, or None if not a task tool.
+
+    TaskCreate creates tasks with pending status by default.
+    TaskUpdate can change task status to pending/in_progress/completed.
+    """
     if line_data.get("type") != "assistant":
         return None
 
@@ -124,13 +133,41 @@ def get_incomplete_todos(line_data: dict[str, Any]) -> list[dict[str, Any]] | No
             continue
         if block.get("type") != "tool_use":
             continue
-        if block.get("name") != "TodoWrite":
+        tool_name = block.get("name")
+        if tool_name not in ("TaskCreate", "TaskUpdate"):
             continue
         tool_input = block.get("input", {})
-        todos = tool_input.get("todos", [])
-        return [t for t in todos if t.get("status") in ("pending", "in_progress")]
+
+        if tool_name == "TaskCreate":
+            # TaskCreate creates a single task, always starts as pending
+            return [
+                {
+                    "subject": tool_input.get("subject", ""),
+                    "description": tool_input.get("description", ""),
+                    "activeForm": tool_input.get("activeForm", ""),
+                    "status": "pending",
+                }
+            ]
+        elif tool_name == "TaskUpdate":
+            # TaskUpdate updates a task's status
+            status = tool_input.get("status", "pending")
+            if status in ("pending", "in_progress"):
+                return [
+                    {
+                        "taskId": tool_input.get("taskId", ""),
+                        "status": status,
+                    }
+                ]
+            # If status is completed, return empty list (no incomplete tasks)
+            return []
 
     return None
+
+
+# Backwards compatibility alias
+def get_incomplete_todos(line_data: dict[str, Any]) -> list[dict[str, Any]] | None:
+    """Deprecated: Use get_incomplete_tasks instead."""
+    return get_incomplete_tasks(line_data)
 
 
 def count_block_marker_in_line(
@@ -162,7 +199,7 @@ def count_block_marker_in_line(
 def parse_transcript(transcript_path: str) -> TranscriptState:
     """Parse transcript JSONL to extract implementation state."""
     in_implement = False
-    latest_incomplete_todos: list[dict[str, Any]] = []
+    latest_incomplete_tasks: list[dict[str, Any]] = []
     block_count = 0
 
     try:
@@ -179,27 +216,27 @@ def parse_transcript(transcript_path: str) -> TranscriptState:
                 if is_implement_workflow(data) or is_implement_skill_call(data):
                     in_implement = True
 
-                todos = get_incomplete_todos(data)
-                if todos is not None:
-                    latest_incomplete_todos = todos
+                tasks = get_incomplete_tasks(data)
+                if tasks is not None:
+                    latest_incomplete_tasks = tasks
 
                 block_count += count_block_marker_in_line(data)
 
     except FileNotFoundError:
         return TranscriptState(
             in_implement_workflow=False,
-            incomplete_todos=[],
+            incomplete_tasks=[],
             prior_block_count=0,
         )
     except OSError:
         return TranscriptState(
             in_implement_workflow=False,
-            incomplete_todos=[],
+            incomplete_tasks=[],
             prior_block_count=0,
         )
 
     return TranscriptState(
         in_implement_workflow=in_implement,
-        incomplete_todos=latest_incomplete_todos,
+        incomplete_tasks=latest_incomplete_tasks,
         prior_block_count=block_count,
     )
