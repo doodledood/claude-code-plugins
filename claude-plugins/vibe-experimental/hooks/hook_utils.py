@@ -4,6 +4,7 @@ Shared utilities for vibe-experimental hooks.
 
 Contains transcript parsing for skill invocation detection.
 """
+
 from __future__ import annotations
 
 import json

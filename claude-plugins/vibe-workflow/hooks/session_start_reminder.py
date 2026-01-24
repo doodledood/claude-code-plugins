@@ -2,6 +2,7 @@
 """
 SessionStart hook that reminds Claude to prefer vibe-workflow agents over built-in alternatives.
 """
+
 import json
 import sys
 

@@ -10,6 +10,7 @@ Decision matrix:
 - /do + /verify: ALLOW (genuinely tried)
 - /do only: BLOCK (must verify first)
 """
+
 from __future__ import annotations
 
 import json
