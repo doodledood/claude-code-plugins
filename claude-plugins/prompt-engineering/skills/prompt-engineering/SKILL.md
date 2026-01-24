@@ -34,22 +34,14 @@ Before writing or improving a prompt, surface all required context through user 
 | **Mark recommended options** | Reduce cognitive load. For single-select, mark one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. |
 | **Outside view** | "What typically fails in prompts like this?" "What have you seen go wrong before?" |
 | **Pre-mortem** | "If this prompt failed in production, what would likely cause it?" |
-| **Discovered ≠ confirmed** | When you infer constraints from context, confirm before encoding: "I'm inferring X should be a constraint—correct?" |
+| **Discovered ≠ confirmed** | When you infer constraints from context, confirm before encoding: "I'm inferring X should be a constraint?" Includes ambiguous scope (list in/out assumptions). |
 | **Encode explicit statements** | When user states a preference or requirement, it must appear in the final prompt. Don't let constraints get lost. |
-
-**When to engage**:
-
-| Situation | Action |
-|-----------|--------|
-| Vague request | Propose concrete options with recommendation |
-| Domain terms | Ask for definitions, don't guess |
-| Ambiguous scope | List what you assume is in/out, ask to confirm |
-| Missing examples | Ask for good/bad output examples |
-| Inferred constraint | "I'm assuming X—correct?" |
+| **Domain terms** | Ask for definitions, don't guess. Jargon you don't understand creates ambiguous prompts. |
+| **Missing examples** | Ask for good/bad output examples when success criteria are unclear. |
 
 **Stopping rule**: Continue probing until very confident further questions would yield nothing new, or user signals "enough". Err toward more probing—every requirement discovered now is one fewer failure later.
 
-**Never proceed with ambiguity**: If something could be interpreted multiple ways, ask. A prompt built on assumptions will fail in ways the user didn't expect.
+**Handling ambiguity**: Critical ambiguities (those that would cause prompt failure) require clarification even if user wants to move on. Minor ambiguities can be documented with chosen defaults and proceed. When in doubt, ask—a prompt built on assumptions will fail in ways the user didn't expect.
 
 ## Core Principles
 
@@ -195,7 +187,6 @@ description: 'Helps with prompts'
 description: 'Craft or update LLM prompts from first principles. Use when creating new prompts, updating existing ones, or reviewing prompt structure.'
 ```
 
-- Third person ("Crafts...", "Analyzes...")
 - Include trigger terms users say
 - Specify when to use
 - Under 1024 chars

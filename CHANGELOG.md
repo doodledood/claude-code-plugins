@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.3.3 - /prompt-engineering: consolidate "When to engage" into Interview method, differentiate critical vs minor ambiguities, remove "Third person" style rule
+
 - [prompt-engineering] v2.3.2 - Further simplify /auto-optimize-prompt: remove redundant numbered loop section (43→31 lines)
 
 - [prompt-engineering] v2.3.1 - Simplify /auto-optimize-prompt: remove prescriptive steps, capability instructions, verbose templates (162→43 lines)
