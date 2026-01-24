@@ -21,6 +21,23 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 | **Avoid arbitrary values** | "Max 4 rounds" becomes rigid. State the principle: "stop when converged". |
 | **Output structure when needed** | Define format only if artifact requires it. Otherwise let agent decide. |
 
+## Issue Types
+
+**Clarity**:
+- Ambiguous instructions (multiple interpretations)
+- Vague language ("be helpful", "use good judgment", "when appropriate")
+- Implicit expectations (unstated assumptions)
+
+**Conflict**:
+- Contradictory rules ("Be concise" vs "Explain thoroughly")
+- Priority collisions (two MUST rules that can't both be satisfied)
+- Edge case gaps (what happens when rules don't cover a situation?)
+
+**Structure**:
+- Buried critical info (important rules hidden in middle)
+- No hierarchy (all instructions treated as equal priority)
+- Redundant instructions (same thing said multiple ways)
+
 ## Anti-Patterns to Eliminate
 
 | Anti-pattern | Example | Fix |
@@ -42,6 +59,12 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 - Am I adding complexity to solve a rare case?
 - Can this be said in fewer words?
 - Am I turning a principle into a rigid rule?
+
+**Over-engineering warning signs**:
+- Prompt length doubled or tripled
+- Adding edge cases that won't happen
+- "Improving" clear language into verbose language
+- Adding examples for obvious behaviors
 
 ## Memento Pattern (Multi-Phase Workflows Only)
 

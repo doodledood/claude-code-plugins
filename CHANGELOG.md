@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.0.1 - Add issue types and over-engineering warnings to /prompt-engineering; simplify prompt-reviewer to invoke skill
+
 - [prompt-engineering] v2.0.0 - BREAKING: Consolidate skills around /prompt-engineering
   - Remove /optimize-prompt-precision, /optimize-prompt-goal, /apply-prompt-feedback (use /prompt-engineering instead)
   - Remove prompt-precision-verifier, prompt-goal-verifier, prompt-feedback-verifier agents
