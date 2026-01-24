@@ -10,6 +10,7 @@ user-invocable: true
 
 Build a **comprehensive Manifest** that captures:
 - **What we build** (Deliverables with Acceptance Criteria)
+- **How we'll get there** (Approach - validated direction)
 - **Rules we must follow** (Global Invariants)
 
 **Why thoroughness matters**: Every criterion discovered NOW is one fewer rejection during implementation/review. The goal is a PR that passes on first submission—no "oh, I also needed X" after the work is done.
@@ -36,7 +37,9 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 4. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
-5. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
+5. **Directed** - For complex tasks, establish validated implementation direction (Approach) before execution. Architecture defines direction, not step-by-step script. Trade-offs enable autonomous adjustment.
+
+6. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
 
 ## Constraints
 
@@ -61,6 +64,22 @@ If no arguments provided, ask: "What would you like to build or change?"
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. No standalone value.
 
 **Prefer automated verification** - Automated methods (commands, subagent review) before manual. Reserve manual verification for criteria that no automated method can validate.
+
+## Approach Section (Complex Tasks)
+
+After defining deliverables, probe for implementation direction. Skip for simple tasks with obvious approach.
+
+**Architecture** - Generate 2-3 concrete architectural options based on codebase patterns. "Given the intent, here are approaches: [A], [B], [C]. Which aligns with your codebase?" Architecture is direction (components, patterns, data flow), not step-by-step script.
+
+**Execution Order** - Propose order based on dependencies. "Suggested order: D1 → D2 → D3. Rationale: [X]. Adjust?" Include why (dependencies, risk reduction, etc.).
+
+**Risk Areas** - Pre-mortem outputs. "What could cause this to fail? Candidates: [R1], [R2], [R3]." Each risk has detection criteria. Not exhaustive—focus on likely/high-impact.
+
+**Trade-offs** - Decision criteria for competing concerns. "When facing [tension], priority? [A] vs [B]?" Format: `[T-N] A vs B → Prefer A because X`. Enables autonomous adjustment during /do.
+
+**When to include Approach**: Multi-deliverable tasks, unfamiliar domains, architectural decisions, high-risk implementations. The interview naturally reveals if it's needed.
+
+**Architecture vs Process Guidance**: Architecture = structural decisions (components, patterns). Process Guidance = methodology constraints (tools, manual vs automated). "Add AuthService wrapping token logic" is Architecture. "No ORM, raw SQL only" is Process Guidance.
 
 ## What the Manifest Needs
 
@@ -118,7 +137,24 @@ verify:
 - **Goal:** [High-level purpose]
 - **Mental Model:** [Key concepts to understand]
 
-## 2. Global Invariants (The Constitution)
+## 2. Approach (Complex Tasks Only)
+*Validated implementation direction. Omit for simple tasks.*
+
+- **Architecture:** [High-level HOW - validated direction, not step-by-step]
+
+- **Execution Order:**
+  - D1 → D2 → D3
+  - Rationale: [why this order - dependencies, risk reduction, etc.]
+
+- **Risk Areas:**
+  - [R-1] [What could go wrong] | Detect: [how you'd know]
+  - [R-2] [What could go wrong] | Detect: [how you'd know]
+
+- **Trade-offs:**
+  - [T-1] [Priority A] vs [Priority B] → Prefer [A] because [reason]
+  - [T-2] [Priority X] vs [Priority Y] → Prefer [Y] because [reason]
+
+## 3. Global Invariants (The Constitution)
 *Rules that apply to the ENTIRE execution. If these fail, the task fails.*
 
 - [INV-G1] Description: ... | Verify: [Method]
@@ -130,13 +166,13 @@ verify:
     prompt: "[if subagent]"
   ```
 
-## 3. Process Guidance (Non-Verifiable)
+## 4. Process Guidance (Non-Verifiable)
 *Constraints on HOW to work. Not gates—guidance for the implementer.*
 
 - [PG-1] Description: ...
 
-## 4. Deliverables (The Work)
-*Ordered by dependency, then importance.*
+## 5. Deliverables (The Work)
+*Ordered by execution order from Approach, or by dependency then importance.*
 
 ### Deliverable 1: [Name]
 
@@ -154,11 +190,13 @@ verify:
 
 ## ID Scheme
 
-| Type | Format | Example |
-|------|--------|---------|
-| Global Invariant | INV-G{N} | INV-G1, INV-G2 |
-| Process Guidance | PG-{N} | PG-1, PG-2 |
-| Acceptance Criteria | AC-{D}.{N} | AC-1.1, AC-2.3 |
+| Type | Format | Example | Used By |
+|------|--------|---------|---------|
+| Global Invariant | INV-G{N} | INV-G1, INV-G2 | /verify (verified) |
+| Process Guidance | PG-{N} | PG-1, PG-2 | /do (followed) |
+| Risk Area | R-{N} | R-1, R-2 | /do (watched) |
+| Trade-off | T-{N} | T-1, T-2 | /do (consulted) |
+| Acceptance Criteria | AC-{D}.{N} | AC-1.1, AC-2.3 | /verify (verified) |
 
 ## Amendment Protocol
 

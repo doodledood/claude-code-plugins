@@ -6,6 +6,14 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.24.0 - Add Approach section to manifest schema:
+  - New manifest section for validated implementation direction (architecture, execution order, risks, trade-offs)
+  - /define: New interview phase for Approach (after Deliverables), probes for architecture options, order rationale, pre-mortem risks, decision trade-offs
+  - /do: Follows execution order, watches for risk triggers, consults trade-offs for autonomous adjustment, escalates only when ACs unachievable
+  - manifest-verifier: New gap types for missing/vague approach, inconsistent order, missing risks/trade-offs
+  - New ID types: R-{N} (risk areas), T-{N} (trade-offs)
+  - Key insight: Trade-offs enable autonomous adjustment during execution without escalating
+
 - [vibe-experimental] v0.23.8 - /verify: optimize via auto-optimize-prompt (remove prescriptive "What to Do" steps, convert code-like decision logic to table, condense output examples, 46% line reduction)
 
 - [vibe-experimental] v0.23.7 - /do: optimize via auto-optimize-prompt (consolidate todo/log discipline into Memento Pattern, remove prescriptive log structure and redundant Flow section, 53% line reduction)
