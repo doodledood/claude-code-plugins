@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.23.8 - /verify: optimize via auto-optimize-prompt (remove prescriptive "What to Do" steps, convert code-like decision logic to table, condense output examples, 46% line reduction)
+
 - [vibe-experimental] v0.23.7 - /do: optimize via auto-optimize-prompt (consolidate todo/log discipline into Memento Pattern, remove prescriptive log structure and redundant Flow section, 53% line reduction)
 
 - [vibe-experimental] v0.23.6 - manifest-verifier: optimize via auto-optimize-prompt (remove prescriptive Process section, remove capability instruction)
