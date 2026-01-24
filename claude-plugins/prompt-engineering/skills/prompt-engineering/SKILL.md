@@ -11,6 +11,46 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 
 **If updating**: Read existing prompt, identify issues against principles, make targeted fixes.
 
+## Context Discovery
+
+Before writing or improving a prompt, surface all required context through user engagement. Missing domain knowledge creates ambiguous prompts. You can't surface latent requirements you don't understand.
+
+**What to discover**:
+
+| Context Type | What to Surface |
+|--------------|-----------------|
+| **Domain knowledge** | Industry terms, conventions, patterns, constraints |
+| **User types** | Who interacts, expertise level, expectations |
+| **Success criteria** | What good output looks like, what makes it fail |
+| **Edge cases** | Unusual inputs, error handling, boundary conditions |
+| **Constraints** | Hard limits (length, format, tone), non-negotiables |
+| **Integration context** | Where prompt fits, what comes before/after |
+
+**Interview method**:
+
+| Principle | How |
+|-----------|-----|
+| **Generate candidates, learn from reactions** | Don't ask open-ended "what do you want?" Propose concrete options: "Should this be formal or conversational? (Recommended: formal for enterprise context)" |
+| **Mark recommended options** | Reduce cognitive load. For single-select, mark one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. |
+| **Outside view** | "What typically fails in prompts like this?" "What have you seen go wrong before?" |
+| **Pre-mortem** | "If this prompt failed in production, what would likely cause it?" |
+| **Discovered ≠ confirmed** | When you infer constraints from context, confirm before encoding: "I'm inferring X should be a constraint—correct?" |
+| **Encode explicit statements** | When user states a preference or requirement, it must appear in the final prompt. Don't let constraints get lost. |
+
+**When to engage**:
+
+| Situation | Action |
+|-----------|--------|
+| Vague request | Propose concrete options with recommendation |
+| Domain terms | Ask for definitions, don't guess |
+| Ambiguous scope | List what you assume is in/out, ask to confirm |
+| Missing examples | Ask for good/bad output examples |
+| Inferred constraint | "I'm assuming X—correct?" |
+
+**Stopping rule**: Continue probing until very confident further questions would yield nothing new, or user signals "enough". Err toward more probing—every requirement discovered now is one fewer failure later.
+
+**Never proceed with ambiguity**: If something could be interpreted multiple ways, ask. A prompt built on assumptions will fail in ways the user didn't expect.
+
 ## Core Principles
 
 | Principle | What It Means |
@@ -164,6 +204,8 @@ description: 'Craft or update LLM prompts from first principles. Use when creati
 
 Before finalizing any prompt:
 
+- [ ] All ambiguities resolved through user questions
+- [ ] Domain context gathered (terms, conventions, constraints)
 - [ ] Goals stated, not steps prescribed
 - [ ] No arbitrary numbers (or justified if present)
 - [ ] Weak language replaced with direct imperatives
