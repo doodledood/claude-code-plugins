@@ -6,102 +6,27 @@ user-invocable: false
 
 # /verify - Manifest Verification Runner
 
-## Goal
+Orchestrate verification of all criteria from a Manifest by spawning parallel verifiers. Report results grouped by type.
 
-Run all verification methods from a Manifest. Spawn one verifier agent per criterion in parallel. Report results grouped by type.
-
-## Input
-
-`$ARGUMENTS` = "<manifest-file-path> <execution-log-path> [--scope=files]"
+**Input**: `$ARGUMENTS` = "<manifest-file-path> <execution-log-path> [--scope=files]"
 
 ## Principles
 
-1. **Don't run checks yourself** - Spawn agents to verify. You orchestrate, they verify.
+| Principle | Rule |
+|-----------|------|
+| **Orchestrate, don't verify** | Spawn agents to verify. You coordinate results, never run checks yourself. |
+| **Single parallel launch** | All criteria in one call. Order: slow (tests, builds, reviewers) before fast (lint, typecheck). |
+| **Globals are critical** | Global Invariant failures mean task failure. Highlight prominently. |
+| **Actionable feedback** | Pass through file:line, expected vs actual, fix hints. |
 
-2. **Single parallel launch** - All criteria in one call, slow ones first (tests, builds, reviewers before lint/typecheck).
+## Verification Methods
 
-3. **Global failures are critical** - Highlight prominently. Task can't succeed while these fail.
-
-4. **Actionable feedback** - Pass through file:line, expected vs actual, fix hints.
-
-## What to Do
-
-**Parse inputs** - Extract all criteria with verification methods from manifest. Read execution log for context.
-
-**Categorize by method:**
-- `bash`: Shell commands (tests, lint, typecheck)
-- `subagent`: Reviewer agents
-- `codebase`: Code pattern checks
-- `manual`: Set aside for human verification
-
-**Launch verifiers** - One Task per criterion, all in parallel. Use the agent type specified in the manifest's verification block. Pass criterion ID, description, verification method, and relevant context.
-
-**Collect and report results** - Group by Global Invariants first, then by Deliverable.
-
-## Decision Logic
-
-```
-if any Global Invariant failed:
-    → Return ALL failures, globals highlighted prominently
-
-elif any AC failed:
-    → Return failures grouped by deliverable
-
-elif all automated pass AND manual exists:
-    → Return manual criteria, hint to call /escalate
-
-elif all pass:
-    → Call /done
-```
-
-## Output Format
-
-**On failure:**
-```markdown
-## Verification Results
-
-### Global Invariants
-
-#### Failed (N)
-- **INV-G1**: [description]
-  Method: [method]
-  [failure details with location, expected/actual, fix hint]
-
-#### Passed (M)
-- INV-G2, INV-G3
-
----
-
-### Deliverable 1: [Name]
-
-#### Failed
-- **AC-1.2**: [description]
-  [failure details]
-
-#### Passed
-- AC-1.1
-
----
-
-**Summary:**
-- Global Invariants: X/Y failed (fix first)
-- Deliverable 1: A/B ACs failed
-```
-
-**On success with manual:**
-```markdown
-## Verification Results
-
-All automated criteria pass.
-
-### Manual Verification Required
-- **AC-1.3**: [description] - How to verify: [from manifest]
-
-Call /escalate to surface for human review.
-```
-
-**On full success:**
-Call `/done`.
+| Type | What |
+|------|------|
+| `bash` | Shell commands (tests, lint, typecheck) |
+| `subagent` | Reviewer agents |
+| `codebase` | Code pattern checks |
+| `manual` | Set aside for human verification |
 
 ## Criterion Types
 
@@ -111,4 +36,26 @@ Call `/done`.
 | Acceptance Criteria | AC-{D}.{N} | Deliverable incomplete |
 | Process Guidance | PG-{N} | Not verified (guidance only) |
 
-Note: PG-* items are non-verifiable guidance on HOW to work. They're followed during /do but not checked by /verify.
+Note: PG-* items guide HOW to work. Followed during /do, not checked by /verify.
+
+## Outcome Handling
+
+| Condition | Action |
+|-----------|--------|
+| Any Global Invariant failed | Return all failures, globals highlighted |
+| Any AC failed | Return failures grouped by deliverable |
+| All automated pass, manual exists | Return manual criteria, hint to call /escalate |
+| All pass | Call /done |
+
+## Output Format
+
+Report verification results grouped by Global Invariants first, then by Deliverable.
+
+**On failure** - Show for each failed criterion:
+- Criterion ID and description
+- Verification method
+- Failure details: location, expected vs actual, fix hint
+
+**On success with manual** - List manual criteria with how-to-verify from manifest, suggest /escalate.
+
+**On full success** - Call /done.
