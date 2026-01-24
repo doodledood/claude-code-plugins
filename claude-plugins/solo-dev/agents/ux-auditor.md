@@ -22,7 +22,7 @@ user: "Review the UX for all the form changes in this branch"
 assistant: "I'll use the ux-auditor agent to perform a comprehensive UX audit of the form-related changes."
 <launches ux-auditor agent with focus area: forms>
 </example>
-tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
+tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill
 model: opus
 ---
 

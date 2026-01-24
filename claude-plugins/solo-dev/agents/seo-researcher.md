@@ -28,7 +28,7 @@ assistant: "I'll use the seo-researcher agent to research the citation patterns 
 The user needs platform-specific research. The seo-researcher agent will gather current data on how each AI platform selects sources.
 </commentary>
 </example>
-tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Skill
+tools: Bash, BashOutput, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill
 model: opus
 ---
 

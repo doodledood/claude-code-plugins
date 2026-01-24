@@ -1,7 +1,7 @@
 ---
 name: plan-verifier
 description: Verifies implementation plans before execution. Checks plan skill rules, spec coverage, dependency consistency, and completeness. Read-only - does not modify plan. Used by /plan before presenting for approval.
-tools: Glob, Grep, Read, TodoWrite
+tools: Glob, Grep, Read, TaskCreate
 model: opus
 ---
 

@@ -22,7 +22,7 @@ user: "Someone said my code is over-engineered. Can you review it?"
 assistant: "I'll use the code-simplicity-reviewer agent to identify any premature abstractions, unnecessary flexibility, or complexity that exceeds what the problem requires."
 <Task tool invocation to launch code-simplicity-reviewer agent>
 </example>
-tools: Bash, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, Skill
+tools: Bash, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, BashOutput, Skill
 model: opus
 ---
 

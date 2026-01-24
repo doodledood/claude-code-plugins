@@ -21,7 +21,7 @@ This skill transforms verbose prompts into token-efficient versions through:
 
 ## Workflow
 
-### Phase 0: Create Todo List (TodoWrite immediately)
+### Phase 0: Create Task List (use task management immediately)
 
 Create todos tracking workflow phases. List reflects areas of work, not fixed steps.
 
@@ -196,7 +196,7 @@ Review the changes manually.
 |-----------|------|
 | **Verify first** | Always run verifier before any optimization; maybe prompt is already efficient |
 | **Verifier-driven** | Only fix inefficiencies the verifier identifies - no independent analysis or improvements |
-| **Track progress** | TodoWrite to track phases; expand todos on iteration |
+| **Track progress** | Use task management to track phases; expand tasks on iteration |
 | **Losslessness** | Never sacrifice semantic information for density; every fact must be preserved |
 | **Nuance preservation** | Keep emphasis, intentional hedging, priority signals; 10% with nuance > 40% without |
 | **No ambiguity** | Compressed must be as unambiguous as original |

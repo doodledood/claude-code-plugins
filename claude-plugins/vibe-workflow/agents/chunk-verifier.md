@@ -1,7 +1,7 @@
 ---
 name: chunk-verifier
 description: Verifies a chunk implementation by running quality gates and checking acceptance criteria. Reads implementor's log for context, detects repeated errors to prevent loops. Read-only - does not modify code. Used by /implement for subagent-based plan execution.
-tools: Bash, Glob, Grep, Read, BashOutput, TodoWrite, Write
+tools: Bash, Glob, Grep, Read, BashOutput, TaskCreate, Write
 model: opus
 ---
 
@@ -90,7 +90,7 @@ Implementor log: {path}
 (populated if retry with previous errors)
 ```
 
-**1.2 Create todo list (TodoWrite)**
+**1.2 Create task list (use task management)**
 
 ```
 [ ] Read implementor log file
