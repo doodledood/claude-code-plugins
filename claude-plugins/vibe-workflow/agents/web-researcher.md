@@ -56,7 +56,7 @@ Check for "YOUR ASSIGNED SCOPE:" and "DO NOT RESEARCH:" sections:
 
 ## Phase 1: Initial Setup
 
-### 1.1 Establish current date & create task list (TaskCreate immediately)
+### 1.1 Establish current date & create task list (use task management immediately)
 
 Run `date '+%Y-%m-%d %H%M%S'` to get today's date and timestamp (use the 6-digit time portion as HHMMSS throughout). This is critical because:
 - You need accurate "recency" judgments when evaluating sources

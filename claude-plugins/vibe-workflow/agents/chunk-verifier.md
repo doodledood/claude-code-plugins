@@ -90,7 +90,7 @@ Implementor log: {path}
 (populated if retry with previous errors)
 ```
 
-**1.2 Create task list (TaskCreate)**
+**1.2 Create task list (use task management)**
 
 ```
 [ ] Read implementor log file

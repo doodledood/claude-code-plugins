@@ -83,7 +83,7 @@ Created: []
 Modified: []
 ```
 
-**1.2 Create task list (TaskCreate)**
+**1.2 Create task list (use task management)**
 
 Extract tasks from chunk, create granular todos:
 ```
