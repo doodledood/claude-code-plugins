@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.2.1 - Improve Context Discovery interview method: generate candidates with recommendations, outside view/pre-mortem probing, discovered≠confirmed pattern, stop when converged
+
 - [prompt-engineering] v2.2.0 - Add Context Discovery section to /prompt-engineering skill; emphasizes engaging user for domain knowledge, ambiguity resolution, and missing context before writing prompts
 
 - [prompt-engineering] v2.1.0 - Add /auto-optimize-prompt skill for iterative prompt optimization until converged; uses prompt-reviewer in a loop, asks user for ambiguity resolution, only reports high-confidence issues

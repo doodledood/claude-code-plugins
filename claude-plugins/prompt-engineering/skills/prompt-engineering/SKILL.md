@@ -13,35 +13,41 @@ Create or update an LLM prompt. Prompts act as manifests: clear goal, clear cons
 
 ## Context Discovery
 
-Before writing or improving a prompt, surface all required context through user engagement. Missing domain knowledge creates ambiguous prompts.
+Before writing or improving a prompt, surface all required context through user engagement. Missing domain knowledge creates ambiguous prompts. You can't surface latent requirements you don't understand.
 
 **What to discover**:
 
-| Context Type | Questions to Ask |
-|--------------|------------------|
-| **Domain knowledge** | "What domain is this for? Are there industry-specific terms or conventions?" |
-| **User types** | "Who will interact with this? What's their expertise level?" |
-| **Success criteria** | "What does a good output look like? What makes it fail?" |
-| **Edge cases** | "What unusual inputs might occur? How should those be handled?" |
-| **Constraints** | "Are there hard limits (length, format, tone)? What's non-negotiable?" |
-| **Integration context** | "Where does this prompt fit? What comes before/after?" |
+| Context Type | What to Surface |
+|--------------|-----------------|
+| **Domain knowledge** | Industry terms, conventions, patterns, constraints |
+| **User types** | Who interacts, expertise level, expectations |
+| **Success criteria** | What good output looks like, what makes it fail |
+| **Edge cases** | Unusual inputs, error handling, boundary conditions |
+| **Constraints** | Hard limits (length, format, tone), non-negotiables |
+| **Integration context** | Where prompt fits, what comes before/after |
 
-**Engagement principles**:
+**Interview method**:
 
-- **Ask, don't assume**: If domain terminology appears, ask what it means rather than guessing
-- **Surface implicit expectations**: "You mentioned X should be 'good'—what specifically makes it good?"
-- **Probe for failure modes**: "What would make this output unusable? What's happened before that didn't work?"
-- **Verify understanding**: Before writing, summarize back: "So the goal is... with constraints... correct?"
+| Principle | How |
+|-----------|-----|
+| **Generate candidates, learn from reactions** | Don't ask open-ended "what do you want?" Propose concrete options: "Should this be formal or conversational? (Recommended: formal for enterprise context)" |
+| **Mark recommended options** | Reduce cognitive load. For single-select, mark one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. |
+| **Outside view** | "What typically fails in prompts like this?" "What have you seen go wrong before?" |
+| **Pre-mortem** | "If this prompt failed in production, what would likely cause it?" |
+| **Discovered ≠ confirmed** | When you infer constraints from context, confirm before encoding: "I'm inferring X should be a constraint—correct?" |
+| **Encode explicit statements** | When user states a preference or requirement, it must appear in the final prompt. Don't let constraints get lost. |
 
-**When to engage user**:
+**When to engage**:
 
 | Situation | Action |
 |-----------|--------|
-| Vague request | Ask for concrete success criteria |
-| Domain-specific terms | Ask for definitions and examples |
-| Ambiguous scope | Ask what's in/out of scope |
-| Unclear audience | Ask who will use this and their context |
+| Vague request | Propose concrete options with recommendation |
+| Domain terms | Ask for definitions, don't guess |
+| Ambiguous scope | List what you assume is in/out, ask to confirm |
 | Missing examples | Ask for good/bad output examples |
+| Inferred constraint | "I'm assuming X—correct?" |
+
+**Stopping rule**: Continue probing until very confident further questions would yield nothing new, or user signals "enough". Err toward more probing—every requirement discovered now is one fewer failure later.
 
 **Never proceed with ambiguity**: If something could be interpreted multiple ways, ask. A prompt built on assumptions will fail in ways the user didn't expect.
 
