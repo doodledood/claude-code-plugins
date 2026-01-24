@@ -11,22 +11,10 @@ Iteratively optimize a prompt until no issues remain.
 
 ## Goal
 
-Loop: **review → clarify ambiguities with user → fix → repeat** until prompt-reviewer finds no issues.
+Loop until prompt-reviewer finds no issues: review → resolve NEEDS_USER_INPUT with user → fix via prompt-engineering → repeat.
 
 - **No path provided**: Ask which file to optimize
 - **Working copy**: Use `/tmp/auto-optimize-*.md` during iterations; apply to original only when converged
-
-## Loop
-
-1. **Review**: Use prompt-reviewer agent on working copy
-2. **If no issues**: Done → apply working copy to original, report summary
-3. **If NEEDS_USER_INPUT issues**: Ask user to resolve ambiguities before fixing
-4. **Fix**: Invoke `prompt-engineering:prompt-engineering` to fix each issue
-5. **Repeat** from step 1
-
-## User Clarification
-
-For NEEDS_USER_INPUT issues, ask with context: what the issue is, current text, specific question with concrete options. If user declines, skip that issue.
 
 ## Constraints
 
@@ -35,7 +23,7 @@ For NEEDS_USER_INPUT issues, ask with context: what the issue is, current text, 
 | **Converge, don't cap** | No iteration limits—run until no issues |
 | **Atomic output** | Original unchanged until fully converged |
 | **DRY** | Delegate review to prompt-reviewer, fixes to prompt-engineering |
-| **User-in-the-loop** | Only user can resolve true ambiguities |
+| **User-in-the-loop** | NEEDS_USER_INPUT issues require user resolution (with context, options); skip if user declines |
 
 ## Output
 
