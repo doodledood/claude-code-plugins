@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.23.6 - manifest-verifier: optimize via auto-optimize-prompt (remove prescriptive Process section, remove capability instruction)
+
 - [vibe-experimental] v0.23.5 - /define: optimize via auto-optimize-prompt (remove capability instructions, fix weak language, clarify verification constraint)
 
 - [prompt-engineering] v2.3.3 - /prompt-engineering: consolidate "When to engage" into Interview method, differentiate critical vs minor ambiguities, remove "Third person" style rule

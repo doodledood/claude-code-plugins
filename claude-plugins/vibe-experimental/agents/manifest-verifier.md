@@ -13,8 +13,6 @@ Review the manifest and interview log. Find gaps that can be filled by continuin
 
 Prompt format: `Manifest: /tmp/manifest-{ts}.md | Log: /tmp/define-discovery-{ts}.md`
 
-Extract both paths and read the files.
-
 ## Find Gaps
 
 Given the task type and discussion:
@@ -69,11 +67,3 @@ Status: COMPLETE | CONTINUE
 
 - `COMPLETE`: No high-confidence gaps found
 - `CONTINUE`: Actionable gaps identified - output tells main agent exactly what to do next
-
-## Process
-
-1. Read the manifest to understand what was captured
-2. Read the interview log to understand what was discussed
-3. Identify gaps between task scope and coverage
-4. Generate specific, ready-to-use questions for each gap
-5. Return structured output with status
