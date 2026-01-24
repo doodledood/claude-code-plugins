@@ -12,11 +12,11 @@ Iteratively optimize a prompt through automated review-fix cycles until no high-
 ## Overview
 
 This skill automates the prompt optimization loop:
-1. **Review** - Launch prompt-reviewer agent to find HIGH-confidence issues only
-2. **Triage** - Separate issues requiring human input from auto-fixable issues
+1. **Review** - Spawn prompt-reviewer agent (only reports high-confidence issues)
+2. **Triage** - Separate NEEDS_USER_INPUT from AUTO_FIXABLE issues
 3. **Clarify** - Ask user for missing context or ambiguity resolution
-4. **Fix** - Apply fixes for all identified issues
-5. **Repeat** - Loop until reviewer finds no high-confidence issues
+4. **Fix** - Invoke prompt-engineering skill to apply fixes
+5. **Repeat** - Loop until reviewer finds no issues
 
 **Key principle**: Only stop when converged. No arbitrary iteration limits.
 
@@ -40,43 +40,23 @@ Loop until no high-confidence issues found:
 
 #### Step 1.1: Launch Reviewer
 
-Spawn prompt-reviewer agent via Task tool:
-- **subagent_type**: "prompt-engineering:prompt-reviewer"
-- **prompt**:
-  ```
-  Review this prompt file for issues: {working_path}
+Spawn prompt-reviewer agent:
+```
+Review this prompt file: {working_path}
+```
 
-  CRITICAL: Only report HIGH-CONFIDENCE issues. Skip anything uncertain or marginal.
-
-  High-confidence criteria:
-  - Clear violation of prompt-engineering principles (WHAT/WHY not HOW)
-  - Unambiguous anti-patterns (prescribing steps, arbitrary limits, capability instructions)
-  - Definite clarity issues (multiple valid interpretations, vague language)
-  - Obvious conflicts (contradictory rules, priority collisions)
-  - Structural problems (buried critical info, no hierarchy)
-
-  Do NOT report:
-  - Style preferences
-  - Minor wording improvements
-  - Uncertain issues ("might be", "could potentially")
-  - Low-severity items
-
-  For each issue, indicate if it requires user input:
-  - NEEDS_USER_INPUT: Ambiguity that only the author can resolve, missing domain context, unclear intent
-  - AUTO_FIXABLE: Clear fix exists based on prompt-engineering principles
-  ```
+The agent only reports high-confidence issues and tags each as NEEDS_USER_INPUT or AUTO_FIXABLE.
 
 #### Step 1.2: Parse Reviewer Response
 
-Parse the reviewer's report:
-- **Assessment: Excellent Prompt** or **Score: 9-10/10 with no issues**: Exit loop, proceed to Output
+- **Assessment: Excellent Prompt** or **no issues**: Exit loop → Phase 2
 - **Issues found**: Continue to Step 1.3
 
 #### Step 1.3: Triage Issues
 
-Separate issues into two lists:
-1. **needs_user_input**: Issues marked NEEDS_USER_INPUT
-2. **auto_fixable**: Issues marked AUTO_FIXABLE
+Separate issues by tag:
+1. **needs_user_input**: Issues tagged NEEDS_USER_INPUT
+2. **auto_fixable**: Issues tagged AUTO_FIXABLE
 
 #### Step 1.4: Resolve User-Input Issues
 
@@ -106,21 +86,19 @@ Wait for user response. Store resolution for fix phase.
 
 For each issue (both auto-fixable and user-resolved):
 
-1. **Load principles**: Reference prompt-engineering principles for fix approach
-2. **Apply fix**: Edit working file to resolve the issue
-3. **Log change**: Track what was changed for final report
+Invoke `prompt-engineering:prompt-engineering` with:
+```
+Update the prompt at {working_path}
 
-**Fix approach by issue type**:
+Fix this issue: {issue description}
+Location: {line/section}
+Current text: "{exact quote}"
+{If user-resolved: User clarification: {user response}}
 
-| Issue Type | Fix Strategy |
-|------------|--------------|
-| Prescribes HOW | Remove steps, state goal only |
-| Arbitrary limits | Replace with principle ("until converged") |
-| Capability instructions | Remove entirely |
-| Vague language | Make direct ("try to" → "do") |
-| Buried critical info | Move to prominent position |
-| Contradictory rules | Resolve based on user input or remove weaker rule |
-| Missing context | Add based on user clarification |
+Apply the fix following prompt-engineering principles.
+```
+
+The prompt-engineering skill contains the fix strategies (WHAT/WHY not HOW, remove arbitrary limits, etc.). Don't duplicate that logic here.
 
 #### Step 1.6: Re-verify
 
@@ -159,11 +137,11 @@ Status: Converged - no high-confidence issues remain
 
 | Principle | Rule |
 |-----------|------|
-| **High-confidence only** | Reviewer reports only clear issues, not marginal improvements |
-| **User-in-the-loop** | Ambiguities and missing context require human resolution |
+| **High-confidence only** | Reviewer only reports definite issues (low-confidence = noise) |
+| **User-in-the-loop** | NEEDS_USER_INPUT issues require human resolution |
 | **Converge, don't cap** | No arbitrary iteration limits - run until no issues found |
 | **Atomic output** | Original unchanged until optimization complete |
-| **Principle-based fixes** | All fixes grounded in prompt-engineering principles |
+| **DRY** | Delegate to prompt-reviewer for review, prompt-engineering for fixes |
 
 ## Edge Cases
 
@@ -173,13 +151,11 @@ Status: Converged - no high-confidence issues remain
 | File not found | Error with path |
 | Already excellent | Report: "Prompt is already well-optimized. No high-confidence issues found." |
 | User declines all clarifications | Proceed with auto-fixable issues only |
-| Reviewer returns unexpected format | Retry once; if fails, ask user to review manually |
 | Same issue persists across iterations | Ask user for guidance on how to resolve |
 
 ## Never Do
 
-- Report low-confidence or uncertain issues
-- Apply fixes without loading prompt-engineering principles first
-- Skip asking user for genuinely ambiguous issues
+- Duplicate prompt-engineering principles or fix strategies
+- Skip asking user for NEEDS_USER_INPUT issues
 - Set arbitrary iteration limits
 - Modify original file until fully converged

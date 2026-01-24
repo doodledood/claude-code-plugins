@@ -52,6 +52,27 @@ Not every prompt needs all 10 layers. Assess based on prompt's purpose.
 **Priority**: {Highest impact change first}
 ```
 
+## High-Confidence Issues Only
+
+Only report issues you're confident about. Low-confidence findings are noise.
+
+**Report**:
+- Clear principle violations (WHAT/WHY not HOW)
+- Unambiguous anti-patterns (prescribing steps, arbitrary limits, capability instructions)
+- Definite clarity issues (multiple valid interpretations, vague language)
+- Obvious conflicts (contradictory rules, priority collisions)
+- Structural problems (buried critical info, no hierarchy)
+
+**Skip**:
+- Style preferences
+- Minor wording improvements
+- Uncertain issues ("might be", "could potentially")
+- Low-severity items
+
+**Tag each issue**:
+- `NEEDS_USER_INPUT` - Ambiguity only author can resolve, missing domain context, unclear intent
+- `AUTO_FIXABLE` - Clear fix exists based on prompt-engineering principles
+
 ## Rules
 
 - **Read the skill first** - principles are the evaluation criteria

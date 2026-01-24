@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.3.0 - prompt-reviewer now always reports high-confidence issues only (low-confidence = noise); /auto-optimize-prompt refactored for DRY (delegates to prompt-engineering skill for fixes)
+
 - [prompt-engineering] v2.2.1 - Improve Context Discovery interview method: generate candidates with recommendations, outside view/pre-mortem probing, discovered≠confirmed pattern, stop when converged
 
 - [prompt-engineering] v2.2.0 - Add Context Discovery section to /prompt-engineering skill; emphasizes engaging user for domain knowledge, ambiguity resolution, and missing context before writing prompts
