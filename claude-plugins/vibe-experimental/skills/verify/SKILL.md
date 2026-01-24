@@ -25,12 +25,15 @@ If paths missing: Return error "Usage: /verify <manifest-path> <log-path>"
 
 ## Verification Methods
 
-| Type | What |
-|------|------|
-| `bash` | Shell commands (tests, lint, typecheck) |
-| `subagent` | Reviewer agents |
-| `codebase` | Code pattern checks |
-| `manual` | Set aside for human verification |
+| Type | What | Handler |
+|------|------|---------|
+| `bash` | Shell commands (tests, lint, typecheck) | criteria-checker |
+| `codebase` | Code pattern checks | criteria-checker |
+| `subagent` | Specialized reviewer agents | Named agent (e.g., code-bugs-reviewer) |
+| `research` | External info (API docs, dependencies) | criteria-checker |
+| `manual` | Set aside for human verification | /escalate |
+
+Note: criteria-checker handles any automated verification requiring commands, file analysis, reasoning, or web research.
 
 ## Criterion Types
 

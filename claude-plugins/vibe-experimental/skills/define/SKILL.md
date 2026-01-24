@@ -156,10 +156,10 @@ verify:
 - [INV-G1] Description: ... | Verify: [Method]
   ```yaml
   verify:
-    method: bash | subagent | manual
+    method: bash | codebase | subagent | research | manual
     command: "[if bash]"
     agent: "[if subagent]"
-    prompt: "[if subagent]"
+    prompt: "[if subagent or research]"
   ```
 
 ## 4. Process Guidance (Non-Verifiable)
@@ -176,7 +176,7 @@ verify:
 - [AC-1.1] Description: ... | Verify: ...
   ```yaml
   verify:
-    method: bash | subagent | codebase | manual
+    method: bash | codebase | subagent | research | manual
     [details]
   ```
 
