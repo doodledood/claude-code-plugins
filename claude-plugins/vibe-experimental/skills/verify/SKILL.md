@@ -19,7 +19,8 @@ If paths missing: Return error "Usage: /verify <manifest-path> <log-path>"
 | Principle | Rule |
 |-----------|------|
 | **Orchestrate, don't verify** | Spawn agents to verify. You coordinate results, never run checks yourself. |
-| **Maximize parallelism** | Launch all verifiers together for efficiency. In limited-parallelism environments, launch slow checks (tests, builds, reviewers) before fast (lint, typecheck) to maximize throughput. |
+| **ALL criteria, no exceptions** | Every INV-G* and AC-*.* criterion MUST be verified. Skipping any criterion is a critical failure. |
+| **Maximize parallelism** | Launch all verifiers in a SINGLE message with multiple Task tool calls. Never launch one at a time. |
 | **Globals are critical** | Global Invariant failures mean task failure. Highlight prominently. |
 | **Actionable feedback** | Pass through file:line, expected vs actual, fix hints. |
 
@@ -44,6 +45,12 @@ Note: criteria-checker handles any automated verification requiring commands, fi
 | Process Guidance | PG-{N} | Not verified (guidance only) |
 
 Note: PG-* items guide HOW to work. Followed during /do, not checked by /verify.
+
+## Never Do
+
+- Skip criteria (even "obvious" ones)
+- Launch verifiers sequentially across multiple messages
+- Verify criteria yourself instead of spawning agents
 
 ## Outcome Handling
 

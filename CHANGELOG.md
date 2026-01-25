@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.24.8 - /do: Add "Verify fixes first" principle for faster iteration feedback
+
+- [vibe-experimental] v0.24.7 - /verify: Strengthen prompt to enforce all criteria verified in single parallel launch, explicit Never Do anti-patterns
+
 - [vibe-workflow] v2.17.3 - Reviewers: Standardize git diff commands to include uncommitted/staged changes (`&& git diff`) and use `origin/main` consistently
 - [vibe-experimental] v0.24.6 - Reviewers: Standardize git diff commands to include uncommitted/staged changes (`&& git diff`) and use `origin/main` consistently
 

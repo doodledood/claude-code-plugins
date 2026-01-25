@@ -1,6 +1,6 @@
 {
   "name": "vibe-experimental",
-  "version": "0.24.6",
+  "version": "0.24.8",
   "description": "Experimental manifest-driven workflows for structured task execution with verification gates.",
   "keywords": [
     "experimental",

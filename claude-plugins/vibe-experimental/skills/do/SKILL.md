@@ -25,6 +25,7 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 | **ACs define success** | Work toward acceptance criteria however makes sense. Manifest says WHAT, you decide HOW. |
 | **Architecture is direction** | Follow approach's architecture as starting direction. Adapt tactics freely—architecture guides, doesn't constrain. |
 | **Target failures specifically** | On verification failure, fix the specific failing criterion. Don't restart. Don't touch passing criteria. |
+| **Verify fixes first** | After fixing a failure, confirm the fix works before re-running full verification. |
 | **Trade-offs guide adjustment** | When risks (R-*) materialize, consult trade-offs (T-*) for decision criteria. Log adjustments with rationale. |
 
 ## Constraints
