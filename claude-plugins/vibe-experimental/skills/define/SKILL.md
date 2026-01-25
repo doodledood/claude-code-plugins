@@ -39,7 +39,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 5. **Directed** - For complex tasks, establish validated implementation direction (Approach) before execution. Architecture defines direction, not step-by-step script. Trade-offs enable autonomous adjustment.
 
-6. **Efficient** - Prioritize questions that eliminate the most uncertainty. Minimize cognitive load per exchange. Reduce friction, not coverage. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
+6. **Efficient** - Maximize information per question, not minimize questions. One missed criterion costs more than one extra question. Prioritize questions that eliminate the most uncertainty. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
 
 ## Constraints
 
@@ -50,6 +50,8 @@ If no arguments provided, ask: "What would you like to build or change?"
 **Encode explicit constraints** - When users state preferences, requirements, or constraints (not clarifying remarks or exploratory responses), these must map to an INV or AC. "Manual optimization only" → process invariant. "Target < 1500" → acceptance criterion. Don't let explicit constraints get lost in the interview log.
 
 **Probe for approach constraints** - Beyond WHAT to build, ask HOW it should be done. Tools to use or avoid? Methods required or forbidden? Automation vs manual? These become process invariants.
+
+**Probe input artifacts** - When input references external documents (file paths, URLs), ask: "Should [document] be a verification source?" If yes, encode as Global Invariant.
 
 **Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-discovery-{timestamp}.md`), `→log` after discovery (domain findings + interview answers), `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
 
@@ -90,7 +92,7 @@ Three categories, each covering **output** or **process**:
 
 ### Code Quality Gates (for coding tasks)
 
-For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Present as multi-select, marking the most appropriate option(s) as "(Recommended)" based on task context. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
+For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Note: AskUserQuestion limits to 4 options per question. Mark the most appropriate option(s) as "(Recommended)" based on task context. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
 
 **Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
 
@@ -123,6 +125,8 @@ verify:
   method: bash
   command: "[command from CLAUDE.md]"
 ```
+
+**Probe e2e verification** - When CLAUDE.md or codebase reveals API endpoints relevant to deliverables, ask: "Should we verify via [endpoint]? What test data can we use?" If yes, encode as Global Invariant with bash verification.
 
 ## The Manifest Schema
 

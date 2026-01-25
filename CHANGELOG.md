@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.24.1 - /define: Add probing for input artifacts as verification sources, e2e verification when CLAUDE.md mentions relevant APIs, document AskUserQuestion 4-option limit, reframe Efficient principle to prioritize thoroughness over fewer questions
+
 - [vibe-experimental] v0.24.0 - Add Approach section to manifest schema:
   - New manifest section for validated implementation direction (architecture, execution order, risks, trade-offs)
   - /define: New interview phase for Approach (after Deliverables), probes for architecture options, order rationale, pre-mortem risks, decision trade-offs
