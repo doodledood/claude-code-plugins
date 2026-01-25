@@ -55,7 +55,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Log after every action** - Write to `/tmp/define-discovery-{timestamp}.md` immediately after each discovery (domain findings, interview answers, codebase insights). Goal: another agent reading only the log could resume the interview. Read full log before synthesis.
 
-**Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
+**Stop when converged** - Err on more probing. Convergence requires: pre-mortem checked, domain understood, edge cases probed, and no obvious areas left unexplored. Only then, if very confident further questions would yield nothing new, move to synthesis. User can signal "enough" to override.
 
 **Verify before finalizing** - After writing manifest, verify completeness using the manifest-verifier agent with the manifest and discovery log as input. If status is CONTINUE, ask the outputted questions, log new answers, update manifest, re-verify. Loop until COMPLETE or user signals "enough".
 

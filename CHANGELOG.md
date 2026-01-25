@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.24.5 - manifest-verifier: Rewrite with principles-based gap detection; /define: Make convergence criteria explicit (pre-mortem, domain grounded, edge cases) before synthesis
+
 - [vibe-workflow] v2.17.2 - Stop hook: Allow stops on API errors (529 Overloaded, etc.) to prevent infinite blocking loops when API failures occur during /implement workflows
 
 - [vibe-experimental] v0.24.4 - Stop hook: Allow stops on API errors (529 Overloaded, etc.) to prevent infinite blocking loops when API failures occur during /do workflows
