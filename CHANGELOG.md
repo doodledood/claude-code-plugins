@@ -6,6 +6,9 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.17.3 - Reviewers: Standardize git diff commands to include uncommitted/staged changes (`&& git diff`) and use `origin/main` consistently
+- [vibe-experimental] v0.24.6 - Reviewers: Standardize git diff commands to include uncommitted/staged changes (`&& git diff`) and use `origin/main` consistently
+
 - [vibe-experimental] v0.24.5 - manifest-verifier: Rewrite with principles-based gap detection; /define: Make convergence criteria explicit (pre-mortem, domain grounded, edge cases) before synthesis
 
 - [vibe-workflow] v2.17.2 - Stop hook: Allow stops on API errors (529 Overloaded, etc.) to prevent infinite blocking loops when API failures occur during /implement workflows

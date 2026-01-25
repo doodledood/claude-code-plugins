@@ -195,7 +195,7 @@ Note: Whether the current runtime null check is CORRECT (will it crash?) is hand
 
 1. **Scope Identification**: Determine what to review using this priority:
    1. If user specifies files/directories → review those
-   2. Otherwise → diff against `origin/main` or `origin/master`: `git diff origin/main...HEAD --name-only && git diff --name-only`
+   2. Otherwise → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD && git diff`
    3. If ambiguous or no changes found → ask user to clarify scope before proceeding
 
    **IMPORTANT: Stay within scope.** Only audit typed language files identified above. Skip generated files, vendored dependencies, and type stubs/declarations from external packages.

@@ -40,7 +40,7 @@ Audit documentation AND code comments accuracy against code changes compared to 
 
 1. **Scope Identification**: Determine what to review using this priority:
    1. If user specifies files/directories → focus on docs related to those
-   2. Otherwise → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD --name-only && git diff --name-only`
+   2. Otherwise → diff against `origin/main` or `origin/master` (includes both staged and unstaged changes): `git diff origin/main...HEAD && git diff`
    3. If ambiguous or no changes found → ask user to clarify scope before proceeding
 
    **IMPORTANT: Stay within scope.** Only audit documentation related to the identified code changes. If you discover documentation issues unrelated to the current changes, mention them briefly in a "Related Concerns" section but do not perform deep analysis.

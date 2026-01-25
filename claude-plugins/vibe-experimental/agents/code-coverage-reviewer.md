@@ -39,7 +39,7 @@ For each file identified in scope:
 
 ### Step 3: Identify Changed Files
 
-1. Execute `git diff main...HEAD --name-only` to get the list of changed files
+1. Execute `git diff origin/main...HEAD --name-only && git diff --name-only` to get the list of changed files (includes both committed and uncommitted changes)
 2. Filter for files containing logic (exclude pure config, assets, documentation):
    - Include: Source files with logic (`.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.go`, `.rs`, `.java`, etc.)
    - Exclude: Test files, type definition files, config files, constants-only files
@@ -57,7 +57,7 @@ For each file with logic changes:
 
 1. **Gather context**:
 
-   - Run `git diff main...HEAD -- <filepath>` to see what changed
+   - Run `git diff origin/main...HEAD -- <filepath> && git diff -- <filepath>` to see what changed (includes both committed and uncommitted changes)
    - **Read the full file**—not just the diff. The diff tells you what changed; the full file tells you what the function actually does and how it fits together.
    - For test files, read the full test file to understand existing coverage before flagging gaps.
 
