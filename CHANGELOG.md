@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.24.3 - /define, /do: Surface logging discipline as first constraint with clear rationale ("disaster recovery"), remove prescriptive format/notation
+
 - [vibe-experimental] v0.24.2 - /define: Simplify e2e verification probing - apply to all coding tasks unconditionally, state WHAT to surface not HOW to ask
 
 - [vibe-experimental] v0.24.1 - /define: Add probing for input artifacts as verification sources, e2e verification when CLAUDE.md mentions relevant APIs, document AskUserQuestion 4-option limit, reframe Efficient principle to prioritize thoroughness over fewer questions

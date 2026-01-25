@@ -29,6 +29,8 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 
 ## Constraints
 
+**Log after every action** - Write to execution log immediately after each AC attempt. No exceptions. This is disaster recovery—if context is lost, the log is the only record of what happened.
+
 **Must call /verify** - Can't declare done without verification. Invoke vibe-experimental:verify with manifest and log paths.
 
 **Escalation boundary** - Escalate only when ACs can't be met as written (contract broken). If ACs remain achievable, adjust and continue autonomously.
@@ -37,11 +39,8 @@ If no arguments: Output error "Usage: /do <manifest-file-path>"
 
 ## Memento Pattern
 
-Externalize progress continuously—survives context loss, enables recovery.
+Externalize progress to survive context loss. The log IS the disaster recovery mechanism.
 
-**Todos**: Create from manifest (deliverables → ACs). Follow execution order from Approach. Update after each AC completed. Include completion criteria on each item.
+**Execution log**: Create `/tmp/do-log-{timestamp}.md` at start. After EACH AC attempt, append what happened and the outcome. Goal: another agent reading only the log could resume work.
 
-**Execution log**: Write to `/tmp/do-log-{timestamp}.md`. Log:
-- Approaches tried and outcomes
-- Risk detections: when R-* triggers observed, what was detected
-- Approach adjustments: what changed, which T-* informed the decision, why ACs remain achievable
+**Todos**: Create from manifest (deliverables → ACs). Follow execution order from Approach. Update todo status after logging (log first, todo second).

@@ -53,7 +53,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Probe input artifacts** - When input references external documents (file paths, URLs), ask: "Should [document] be a verification source?" If yes, encode as Global Invariant.
 
-**Todo list immediately** - Adapt to task. Required: log file (`/tmp/define-discovery-{timestamp}.md`), `→log` after discovery (domain findings + interview answers), `(expand: ...)` for emerging areas, `Refresh: read full log` before synthesis, `Verify manifest` → `(fix gaps if CONTINUE)` loop, acceptance criteria ("; done when X"). Update after every action.
+**Log after every action** - Write to `/tmp/define-discovery-{timestamp}.md` immediately after each discovery (domain findings, interview answers, codebase insights). Goal: another agent reading only the log could resume the interview. Read full log before synthesis.
 
 **Stop when converged** - Err on more probing. Move to synthesis only when very confident further questions would yield nothing new, or user signals "enough".
 
