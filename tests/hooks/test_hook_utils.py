@@ -12,6 +12,7 @@ from hook_utils import (
     build_system_reminder,
     count_block_marker_in_line,
     get_incomplete_tasks,
+    has_recent_api_error,
     is_implement_skill_call,
     is_implement_workflow,
     parse_transcript,
@@ -431,3 +432,93 @@ class TestParseTranscript:
         assert result.in_implement_workflow is True
         assert len(result.incomplete_tasks) == 1
         assert result.prior_block_count == 1
+
+
+class TestHasRecentApiError:
+    """Tests for has_recent_api_error function."""
+
+    def test_returns_true_for_api_error(self, temp_transcript):
+        """Should return True when last assistant message is API error."""
+        lines = [
+            {"type": "user", "message": {"content": "Help me"}},
+            {
+                "type": "assistant",
+                "isApiErrorMessage": True,
+                "message": {"content": "API Error: 529 Overloaded"},
+            },
+        ]
+        path = temp_transcript(lines)
+        assert has_recent_api_error(path) is True
+
+    def test_returns_false_for_normal_message(self, temp_transcript):
+        """Should return False when last assistant message is normal."""
+        lines = [
+            {"type": "user", "message": {"content": "Help me"}},
+            {
+                "type": "assistant",
+                "message": {"content": "I'll help you with that"},
+            },
+        ]
+        path = temp_transcript(lines)
+        assert has_recent_api_error(path) is False
+
+    def test_returns_false_after_recovery(self, temp_transcript):
+        """Should return False when API error is followed by normal message."""
+        lines = [
+            {"type": "user", "message": {"content": "Help me"}},
+            {
+                "type": "assistant",
+                "isApiErrorMessage": True,
+                "message": {"content": "API Error: 529 Overloaded"},
+            },
+            {
+                "type": "assistant",
+                "message": {"content": "Continuing after retry..."},
+            },
+        ]
+        path = temp_transcript(lines)
+        assert has_recent_api_error(path) is False
+
+    def test_returns_false_for_explicit_false_flag(self, temp_transcript):
+        """Should return False when isApiErrorMessage is explicitly False."""
+        lines = [
+            {"type": "user", "message": {"content": "Help me"}},
+            {
+                "type": "assistant",
+                "isApiErrorMessage": False,
+                "message": {"content": "Normal message"},
+            },
+        ]
+        path = temp_transcript(lines)
+        assert has_recent_api_error(path) is False
+
+    def test_returns_false_for_empty_transcript(self, temp_transcript):
+        """Should return False for empty transcript."""
+        path = temp_transcript([])
+        assert has_recent_api_error(path) is False
+
+    def test_returns_false_for_missing_file(self):
+        """Should return False when transcript file doesn't exist."""
+        assert has_recent_api_error("/nonexistent/path.jsonl") is False
+
+    def test_handles_user_message_after_api_error(self, temp_transcript):
+        """Should still check last assistant message, ignoring user messages."""
+        lines = [
+            {
+                "type": "assistant",
+                "isApiErrorMessage": True,
+                "message": {"content": "API Error: 529 Overloaded"},
+            },
+            # User message after API error
+            {"type": "user", "message": {"content": "What happened?"}},
+        ]
+        path = temp_transcript(lines)
+        # Last *assistant* message was an API error
+        assert has_recent_api_error(path) is True
+
+    def test_handles_malformed_json(self, tmp_path):
+        """Should return False on parse errors."""
+        transcript_file = tmp_path / "bad.jsonl"
+        with open(transcript_file, "w") as f:
+            f.write("not valid json\n")
+        assert has_recent_api_error(str(transcript_file)) is False

@@ -1,7 +1,7 @@
 {
   "name": "vibe-experimental",
-  "version": "0.24.3",
-  "description": "Manifest-driven workflows separating Deliverables (what to build) from Invariants (rules to follow). Two-level verification: Global Invariants (task-level rules) and Acceptance Criteria (per-deliverable).",
+  "version": "0.24.4",
+  "description": "Experimental manifest-driven workflows for structured task execution with verification gates.",
   "keywords": [
     "experimental",
     "manifest",

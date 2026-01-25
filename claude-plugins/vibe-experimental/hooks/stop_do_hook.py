@@ -6,6 +6,7 @@ Blocks stop attempts unless /done or /escalate was called after /do.
 This prevents the LLM from declaring "done" without verification.
 
 Decision matrix:
+- API error: ALLOW (system failure, not voluntary stop)
 - No /do: ALLOW (not in flow)
 - /do + /done: ALLOW (verified complete)
 - /do + /escalate: ALLOW (properly escalated)
@@ -18,7 +19,7 @@ from __future__ import annotations
 import json
 import sys
 
-from hook_utils import parse_do_flow
+from hook_utils import has_recent_api_error, parse_do_flow
 
 
 def main() -> None:
@@ -32,6 +33,10 @@ def main() -> None:
 
     transcript_path = hook_input.get("transcript_path", "")
     if not transcript_path:
+        sys.exit(0)
+
+    # API errors are system failures, not voluntary stops - always allow
+    if has_recent_api_error(transcript_path):
         sys.exit(0)
 
     state = parse_do_flow(transcript_path)

@@ -451,6 +451,137 @@ class TestStopHookImplementDetection:
         assert output["decision"] == "block"
 
 
+class TestStopHookApiErrors:
+    """Tests for API error handling."""
+
+    def test_allows_stop_on_api_error(self, tmp_path):
+        """Stop should be allowed when most recent assistant message is an API error."""
+        lines = [
+            {
+                "type": "user",
+                "message": {
+                    "content": "<command-name>/vibe-workflow:implement</command-name>"
+                },
+            },
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [
+                        {
+                            "type": "tool_use",
+                            "name": "TaskCreate",
+                            "input": {
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
+                            },
+                        }
+                    ]
+                },
+            },
+            # API error message (like 529 Overloaded)
+            {
+                "type": "assistant",
+                "isApiErrorMessage": True,
+                "message": {
+                    "content": [
+                        {"type": "text", "text": "API Error: Repeated 529 Overloaded errors"}
+                    ]
+                },
+            },
+        ]
+        result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
+        # Should allow stop (no output = allow)
+        assert result.returncode == 0
+        assert result.stdout == ""
+
+    def test_blocks_after_api_error_recovery(self, tmp_path):
+        """Stop should be blocked after API error recovery (normal message follows)."""
+        lines = [
+            {
+                "type": "user",
+                "message": {
+                    "content": "<command-name>/vibe-workflow:implement</command-name>"
+                },
+            },
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [
+                        {
+                            "type": "tool_use",
+                            "name": "TaskCreate",
+                            "input": {
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
+                            },
+                        }
+                    ]
+                },
+            },
+            # API error
+            {
+                "type": "assistant",
+                "isApiErrorMessage": True,
+                "message": {
+                    "content": [
+                        {"type": "text", "text": "API Error: Repeated 529 Overloaded errors"}
+                    ]
+                },
+            },
+            # Normal message after API error (recovery)
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [{"type": "text", "text": "Continuing with the work..."}]
+                },
+            },
+        ]
+        result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
+        output = json.loads(result.stdout)
+        # Should block because api error is no longer recent
+        assert output["decision"] == "block"
+
+    def test_allows_api_error_with_explicit_false_flag(self, tmp_path):
+        """Normal message with explicit isApiErrorMessage=false should still be blocked."""
+        lines = [
+            {
+                "type": "user",
+                "message": {
+                    "content": "<command-name>/vibe-workflow:implement</command-name>"
+                },
+            },
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [
+                        {
+                            "type": "tool_use",
+                            "name": "TaskCreate",
+                            "input": {
+                                "subject": "Task",
+                                "description": "Description",
+                                "activeForm": "Working",
+                            },
+                        }
+                    ]
+                },
+            },
+            {
+                "type": "assistant",
+                "isApiErrorMessage": False,  # Explicitly false
+                "message": {
+                    "content": [{"type": "text", "text": "I'm working on this..."}]
+                },
+            },
+        ]
+        result = run_stop_hook(transcript_lines=lines, tmp_path=tmp_path)
+        output = json.loads(result.stdout)
+        # Should block because there's no API error
+        assert output["decision"] == "block"
+
+
 class TestStopHookEdgeCases:
     """Edge case tests for the stop hook."""
 

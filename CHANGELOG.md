@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-workflow] v2.17.2 - Stop hook: Allow stops on API errors (529 Overloaded, etc.) to prevent infinite blocking loops when API failures occur during /implement workflows
+
+- [vibe-experimental] v0.24.4 - Stop hook: Allow stops on API errors (529 Overloaded, etc.) to prevent infinite blocking loops when API failures occur during /do workflows
+
 - [vibe-experimental] v0.24.3 - /define, /do: Surface logging discipline as first constraint with clear rationale ("disaster recovery"), remove prescriptive format/notation
 
 - [vibe-experimental] v0.24.2 - /define: Simplify e2e verification probing - apply to all coding tasks unconditionally, state WHAT to surface not HOW to ask

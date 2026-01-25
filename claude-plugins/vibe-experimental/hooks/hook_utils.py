@@ -75,6 +75,36 @@ def is_user_skill_command(line_data: dict[str, Any], skill_name: str) -> bool:
     return False
 
 
+def has_recent_api_error(transcript_path: str) -> bool:
+    """
+    Check if the most recent assistant message was an API error.
+
+    API errors (like 529 Overloaded) are marked with isApiErrorMessage=true.
+    These are system failures, not voluntary stops, so hooks should allow them.
+    """
+    last_assistant_is_error = False
+
+    try:
+        with open(transcript_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    data = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
+                # Track if the last assistant message was an API error
+                if data.get("type") == "assistant":
+                    last_assistant_is_error = data.get("isApiErrorMessage", False)
+
+    except (FileNotFoundError, OSError):
+        return False
+
+    return last_assistant_is_error
+
+
 def parse_do_flow(transcript_path: str) -> DoFlowState:
     """
     Parse transcript to determine the state of /do workflow.

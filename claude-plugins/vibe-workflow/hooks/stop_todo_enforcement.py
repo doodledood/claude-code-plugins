@@ -3,6 +3,13 @@
 Stop hook that prevents premature stops during /implement and /implement-inplace workflows.
 
 Blocks stop attempts when tasks are incomplete, with a safety valve after max blocks.
+
+Decision matrix:
+- API error: ALLOW (system failure, not voluntary stop)
+- Not in implement workflow: ALLOW
+- No incomplete tasks: ALLOW
+- Max blocks reached: ALLOW (safety valve)
+- Incomplete tasks remain: BLOCK
 """
 
 from __future__ import annotations
@@ -11,7 +18,7 @@ import json
 import os
 import sys
 
-from hook_utils import parse_transcript
+from hook_utils import has_recent_api_error, parse_transcript
 
 
 def main() -> None:
@@ -24,6 +31,10 @@ def main() -> None:
 
     transcript_path = hook_input.get("transcript_path", "")
     if not transcript_path:
+        sys.exit(0)
+
+    # API errors are system failures, not voluntary stops - always allow
+    if has_recent_api_error(transcript_path):
         sys.exit(0)
 
     state = parse_transcript(transcript_path)

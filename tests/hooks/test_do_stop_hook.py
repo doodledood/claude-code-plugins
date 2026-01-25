@@ -263,6 +263,86 @@ class TestStopHookFreshStack:
         assert result["decision"] == "block"
 
 
+class TestStopHookApiErrors:
+    """Tests for API error handling."""
+
+    def test_allows_stop_on_api_error(
+        self,
+        experimental_hook_path: Path,
+        temp_transcript,
+        user_do_command: dict[str, Any],
+    ):
+        """Stop should be allowed when most recent assistant message is an API error."""
+        # API error message (like 529 Overloaded)
+        api_error_message = {
+            "type": "assistant",
+            "isApiErrorMessage": True,
+            "message": {
+                "content": [{"type": "text", "text": "API Error: Repeated 529 Overloaded errors"}]
+            },
+        }
+        transcript_path = temp_transcript([user_do_command, api_error_message])
+        hook_input = {"transcript_path": transcript_path}
+
+        result = run_hook(experimental_hook_path, hook_input)
+
+        # None means no output, which means allow (exit 0)
+        assert result is None
+
+    def test_blocks_after_api_error_recovery(
+        self,
+        experimental_hook_path: Path,
+        temp_transcript,
+        user_do_command: dict[str, Any],
+    ):
+        """Stop should be blocked after API error recovery (normal message follows)."""
+        api_error_message = {
+            "type": "assistant",
+            "isApiErrorMessage": True,
+            "message": {
+                "content": [{"type": "text", "text": "API Error: Repeated 529 Overloaded errors"}]
+            },
+        }
+        # Normal assistant message after API error (recovery)
+        normal_message = {
+            "type": "assistant",
+            "message": {
+                "content": [{"type": "text", "text": "Continuing with the work..."}]
+            },
+        }
+        transcript_path = temp_transcript([user_do_command, api_error_message, normal_message])
+        hook_input = {"transcript_path": transcript_path}
+
+        result = run_hook(experimental_hook_path, hook_input)
+
+        # Should block because /do is in progress and no /done (api error is no longer recent)
+        assert result is not None
+        assert result["decision"] == "block"
+
+    def test_allows_api_error_with_explicit_false_flag(
+        self,
+        experimental_hook_path: Path,
+        temp_transcript,
+        user_do_command: dict[str, Any],
+    ):
+        """Normal message with explicit isApiErrorMessage=false should still be blocked."""
+        normal_message = {
+            "type": "assistant",
+            "isApiErrorMessage": False,  # Explicitly false
+            "message": {
+                "content": [{"type": "text", "text": "I'm working on this..."}]
+            },
+        }
+        transcript_path = temp_transcript([user_do_command, normal_message])
+        hook_input = {"transcript_path": transcript_path}
+
+        result = run_hook(experimental_hook_path, hook_input)
+
+        # Should block because /do is in progress and no /done
+        assert result is not None
+        assert result["decision"] == "block"
+
+
 class TestStopHookEdgeCases:
     """Tests for edge cases and error handling."""
 
