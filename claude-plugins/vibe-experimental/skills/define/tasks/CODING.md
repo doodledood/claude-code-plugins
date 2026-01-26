@@ -19,8 +19,6 @@ Surface which quality aspects matter. Mark recommended defaults based on task co
 
 **Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
 
-**Note**: AskUserQuestion limits to 4 options per question. Mark the most appropriate option(s) as "(Recommended)" based on task context.
-
 **Encoding**: Add selected quality gates as Global Invariants with subagent verification:
 ```yaml
 verify:

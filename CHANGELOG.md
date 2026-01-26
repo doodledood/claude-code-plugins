@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.26.1 - /define: Move AskUserQuestion 4-option limit from CODING.md to main skill constraint (universal, not coding-specific)
+
 - [vibe-experimental] v0.26.0 - /define: Make domain-agnostic with conditional task resources (CODING.md, DOCUMENT.md), task classification, neutralize code-biased examples
 
 - [vibe-experimental] v0.25.3 - /define: add space-splitting prioritization to Efficient principle (scope and constraints before details)
