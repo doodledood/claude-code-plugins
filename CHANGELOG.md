@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.26.3 - /define: DOCUMENT.md — automate quality gates (subagent, not manual), remove prescriptive probing sections (trust capability); main skill — strengthen verification constraint ("automate" not "prefer")
+
 - [vibe-experimental] v0.26.2 - /define: Neutralize remaining coding-specific terminology in universal constraints and principles (codebase → project/exploration, code → output)
 
 - [vibe-experimental] v0.26.1 - /define: Move AskUserQuestion 4-option limit from CODING.md to main skill constraint (universal, not coding-specific)

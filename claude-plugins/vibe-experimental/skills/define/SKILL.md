@@ -85,7 +85,7 @@ After parsing input, classify the deliverable type:
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. Don't include insights that aren't encoded as criteria.
 
-**Prefer automated verification** - Automated methods (commands, subagent review) before manual. Reserve manual verification for criteria that no automated method can validate.
+**Automate verification** - Use automated methods (commands, subagent review). Manual verification only when no automated method can validate the criterion or the user explicitly requests it.
 
 ## Approach Section (Complex Tasks)
 
