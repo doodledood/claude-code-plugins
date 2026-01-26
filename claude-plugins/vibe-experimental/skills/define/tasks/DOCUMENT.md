@@ -19,6 +19,7 @@ Surface which quality aspects matter. Mark recommended defaults based on task co
 verify:
   method: subagent
   agent: general-purpose
+  model: opus
   prompt: "Review document for [quality aspect] issues"
 ```
 

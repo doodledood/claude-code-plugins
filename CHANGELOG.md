@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.26.5 - /define: Default to opus model for general-purpose subagent verification; add model field to manifest schema
+
 - [vibe-experimental] v0.26.4 - /define: When criterion seems manual-only, probe user for ways to make it automatable before accepting manual fallback
 
 - [vibe-experimental] v0.26.3 - /define: DOCUMENT.md — automate quality gates (subagent, not manual), remove prescriptive probing sections (trust capability); main skill — strengthen verification constraint ("automate" not "prefer")
