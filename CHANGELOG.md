@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.27.2 - /define: Refine BLOG.md with blog-specific interview probes (content format, voice/brand doc discovery, anti-slop stance), voice compliance and anti-slop quality gates, blog-specific risks/trade-offs, and process guidance for voice docs and outline-first drafting
+
 - [vibe-experimental] v0.27.1 - /define: Refine RESEARCH.md with research-specific interview probes, source authority hierarchy, decomposition architecture patterns, research risks/trade-offs, cross-referencing rigor, and external memory process guidance (inspired by web-researcher agent)
 
 - [vibe-experimental] v0.27.0 - /define: Add RESEARCH.md and BLOG.md task types; trim capability instructions from existing task files (CODING.md E2E probing, DOCUMENT.md scope); all task files follow lean pattern (quality gates + AC patterns only)
