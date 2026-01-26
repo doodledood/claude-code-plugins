@@ -40,11 +40,6 @@ verify:
 
 Probe for testable endpoints, health checks, test data. If actionable, encode as Global Invariant with bash verification.
 
-Questions to surface:
-- "Are there endpoints I can hit to verify the change works?"
-- "Is there test data or a seed script?"
-- "Is there a health check or smoke test?"
-
 ## Coding-Specific AC Patterns
 
 **Functional**

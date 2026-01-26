@@ -1,6 +1,6 @@
 # DOCUMENT Task Guidance
 
-Task-specific guidance for document deliverables: specs, proposals, reports, articles, documentation.
+Task-specific guidance for document deliverables: specs, proposals, reports, documentation.
 
 ## Document Quality Gates
 

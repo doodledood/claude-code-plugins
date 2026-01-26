@@ -34,8 +34,10 @@ After parsing input, classify the deliverable type:
 | Type | Indicators | Action |
 |------|------------|--------|
 | **Code** | Files, APIs, features, fixes, refactors, tests | Read `tasks/CODING.md` |
-| **Document** | Specs, proposals, reports, articles, docs | Read `tasks/DOCUMENT.md` |
-| **Other** | Research, analysis, or doesn't fit above | Proceed with universal flow |
+| **Document** | Specs, proposals, reports, formal docs | Read `tasks/DOCUMENT.md` |
+| **Research** | Investigations, analyses, comparisons, competitive reviews | Read `tasks/RESEARCH.md` |
+| **Blog** | Blog posts, articles, tutorials, newsletters | Read `tasks/BLOG.md` |
+| **Other** | Doesn't fit above | Proceed with universal flow |
 
 **Confirm with user**: "This appears to be a [TYPE] deliverable. Correct?" If user indicates a different type or "none of these", adjust accordingly.
 

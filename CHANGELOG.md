@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.27.0 - /define: Add RESEARCH.md and BLOG.md task types; trim capability instructions from existing task files (CODING.md E2E probing, DOCUMENT.md scope); all task files follow lean pattern (quality gates + AC patterns only)
+
 - [vibe-experimental] v0.26.5 - /define: Default to opus model for general-purpose subagent verification; add model field to manifest schema
 
 - [vibe-experimental] v0.26.4 - /define: When criterion seems manual-only, probe user for ways to make it automatable before accepting manual fallback
