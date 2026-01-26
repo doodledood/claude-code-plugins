@@ -6,6 +6,18 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.27.0 - /define: Add RESEARCH.md and BLOG.md task types; trim capability instructions from existing task files (CODING.md E2E probing, DOCUMENT.md scope); all task files follow lean pattern (quality gates + AC patterns only)
+
+- [vibe-experimental] v0.26.5 - /define: Default to opus model for general-purpose subagent verification; add model field to manifest schema
+
+- [vibe-experimental] v0.26.4 - /define: When criterion seems manual-only, probe user for ways to make it automatable before accepting manual fallback
+
+- [vibe-experimental] v0.26.3 - /define: DOCUMENT.md — automate quality gates (subagent, not manual), remove prescriptive probing sections (trust capability); main skill — strengthen verification constraint ("automate" not "prefer")
+
+- [vibe-experimental] v0.26.2 - /define: Neutralize remaining coding-specific terminology in universal constraints and principles (codebase → project/exploration, code → output)
+
+- [vibe-experimental] v0.26.1 - /define: Move AskUserQuestion 4-option limit from CODING.md to main skill constraint (universal, not coding-specific)
+
 - [vibe-experimental] v0.26.0 - /define: Make domain-agnostic with conditional task resources (CODING.md, DOCUMENT.md), task classification, neutralize code-biased examples
 
 - [vibe-experimental] v0.25.3 - /define: add space-splitting prioritization to Efficient principle (scope and constraints before details)

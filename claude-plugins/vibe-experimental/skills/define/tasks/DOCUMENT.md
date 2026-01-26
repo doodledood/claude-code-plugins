@@ -1,41 +1,27 @@
 # DOCUMENT Task Guidance
 
-Task-specific guidance for document deliverables: specs, proposals, reports, articles, documentation.
+Task-specific guidance for document deliverables: specs, proposals, reports, documentation.
 
 ## Document Quality Gates
 
-| Aspect | Method | When |
-|--------|--------|------|
-| Structure completeness | Manual | Always |
-| Audience fit | Manual | Technical docs, specs |
-| Clarity | Manual | Always |
-| Consistency | Manual | Long docs, multi-section |
-| Accuracy | Manual | Research-based, references claims |
+Surface which quality aspects matter. Mark recommended defaults based on task context.
 
-**Encoding**: Add selected gates as Global Invariants with manual verification.
+| Aspect | Agent | Threshold |
+|--------|-------|-----------|
+| Structure completeness | general-purpose | All required sections present and complete |
+| Audience fit | general-purpose | Language and depth match target reader |
+| Clarity | general-purpose | No ambiguous terms or undefined jargon |
+| Consistency | general-purpose | Terminology and style uniform throughout |
+| Accuracy | general-purpose | Claims supported, no contradictions |
 
-## Structure Probing
-
-Questions to surface:
-- "What sections are required?" (summary? appendix? references? changelog?)
-- "Are there length constraints?" (max pages, word count, section limits)
-- "What format?" (markdown, PDF, specific template)
-- "Is there a template or exemplar to follow?"
-
-## Audience Probing
-
-Questions to surface:
-- "Who are the primary readers?" (engineers, executives, customers, regulators)
-- "What's their expertise level?" (expert, familiar, novice)
-- "What decisions will they make from this?" (approve, implement, evaluate)
-- "What can you assume they already know?"
-
-## Tone & Style Probing
-
-Questions to surface:
-- "Formal or conversational?"
-- "Technical depth?" (high-level overview vs implementation detail)
-- "Are there style guides to follow?"
+**Encoding**: Add selected gates as Global Invariants with subagent verification:
+```yaml
+verify:
+  method: subagent
+  agent: general-purpose
+  model: opus
+  prompt: "Review document for [quality aspect] issues"
+```
 
 ## Document-Specific AC Patterns
 

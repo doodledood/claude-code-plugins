@@ -34,8 +34,10 @@ After parsing input, classify the deliverable type:
 | Type | Indicators | Action |
 |------|------------|--------|
 | **Code** | Files, APIs, features, fixes, refactors, tests | Read `tasks/CODING.md` |
-| **Document** | Specs, proposals, reports, articles, docs | Read `tasks/DOCUMENT.md` |
-| **Other** | Research, analysis, or doesn't fit above | Proceed with universal flow |
+| **Document** | Specs, proposals, reports, formal docs | Read `tasks/DOCUMENT.md` |
+| **Research** | Investigations, analyses, comparisons, competitive reviews | Read `tasks/RESEARCH.md` |
+| **Blog** | Blog posts, articles, tutorials, newsletters | Read `tasks/BLOG.md` |
+| **Other** | Doesn't fit above | Proceed with universal flow |
 
 **Confirm with user**: "This appears to be a [TYPE] deliverable. Correct?" If user indicates a different type or "none of these", adjust accordingly.
 
@@ -49,7 +51,7 @@ After parsing input, classify the deliverable type:
 
 2. **Validated** - You drive the interview. Generate concrete candidates; learn from user reactions.
 
-3. **Domain-grounded** - Before probing for criteria, understand the domain: explore codebase for patterns/constraints, research unfamiliar domains, ask for business context. Latent criteria emerge from domain understanding—you can't surface what you don't know.
+3. **Domain-grounded** - Before probing for criteria, understand the domain: explore existing materials for patterns/constraints, research unfamiliar domains, ask for context. Latent criteria emerge from domain understanding—you can't surface what you don't know.
 
 4. **Complete** - Surface hidden requirements through outside view (what typically fails in similar projects?), pre-mortem (what could go wrong?), and non-obvious probing (what hasn't user considered?).
 
@@ -59,13 +61,13 @@ After parsing input, classify the deliverable type:
 
 ## Constraints
 
-**Discoverable unknowns — search first** - Facts about the codebase or system (file locations, API shapes, existing patterns, config values) are discoverable. Exhaust codebase search before asking the user. Only ask about discoverable facts when: multiple plausible candidates exist, searches yield nothing but the fact is needed, or the ambiguity is actually about intent not fact. When asking, present what you found and recommend one option.
+**Discoverable unknowns — search first** - Facts about the project (existing structure, patterns, conventions, prior decisions) are discoverable. Exhaust exploration before asking the user. Only ask about discoverable facts when: multiple plausible candidates exist, searches yield nothing but the fact is needed, or the ambiguity is actually about intent not fact. When asking, present what you found and recommend one option.
 
-**Preference unknowns — ask early** - Trade-offs, priorities, scope decisions, and style preferences cannot be discovered from code. Ask these directly. Provide concrete options with a recommended default. If genuinely low-impact and the user signals "enough", proceed with the recommended default and record as a Known Assumption in the manifest.
+**Preference unknowns — ask early** - Trade-offs, priorities, scope decisions, and style preferences cannot be discovered through exploration. Ask these directly. Provide concrete options with a recommended default. If genuinely low-impact and the user signals "enough", proceed with the recommended default and record as a Known Assumption in the manifest.
 
-**Mark a recommended option** - Every question with options must include a recommended default. For single-select, mark exactly one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. Reduces cognitive load — users accept, reject, or adjust rather than evaluating from scratch.
+**Mark a recommended option** - Every question with options must include a recommended default. For single-select, mark exactly one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. Reduces cognitive load — users accept, reject, or adjust rather than evaluating from scratch. AskUserQuestion supports max 4 options per question.
 
-**Confirm before encoding** - When you discover constraints from codebase analysis (technical limits, architecture patterns, API boundaries), present them to the user before encoding as invariants. "I found X in the codebase—should this be a hard constraint?" Discovered ≠ confirmed.
+**Confirm before encoding** - When you discover constraints from exploration (structural patterns, conventions, existing boundaries), present them to the user before encoding as invariants. "I found X—should this be a hard constraint?" Discovered ≠ confirmed.
 
 **Encode explicit constraints** - When users state preferences, requirements, or constraints (not clarifying remarks or exploratory responses), these must map to an INV or AC. "Single-author writing only" → process invariant. "Target < 1500 words" → acceptance criterion. Don't let explicit constraints get lost in the interview log.
 
@@ -73,7 +75,7 @@ After parsing input, classify the deliverable type:
 
 **Probe input artifacts** - When input references external documents (file paths, URLs), ask: "Should [document] be a verification source?" If yes, encode as Global Invariant.
 
-**Log after every action** - Write to `/tmp/define-discovery-{timestamp}.md` immediately after each discovery (domain findings, interview answers, codebase insights). Goal: another agent reading only the log could resume the interview. Read full log before synthesis.
+**Log after every action** - Write to `/tmp/define-discovery-{timestamp}.md` immediately after each discovery (domain findings, interview answers, exploration insights). Goal: another agent reading only the log could resume the interview. Read full log before synthesis.
 
 **Confirm understanding periodically** - Before transitioning to a new topic area or after resolving a cluster of related questions, synthesize your current understanding back to the user: "Here's what I've established so far: [summary]. Correct?" This catches interpretation drift early—a misunderstanding in round 2 compounds through round 8 if never checked.
 
@@ -85,13 +87,13 @@ After parsing input, classify the deliverable type:
 
 **Insights become criteria** - Outside view findings, pre-mortem risks, non-obvious discoveries → convert to INV-G* or AC-*. Don't include insights that aren't encoded as criteria.
 
-**Prefer automated verification** - Automated methods (commands, subagent review) before manual. Reserve manual verification for criteria that no automated method can validate.
+**Automate verification** - Use automated methods (commands, subagent review). When using general-purpose subagent, default to opus model. When a criterion seems to require manual verification, probe the user: suggest how it could be made automatable, or ask if they have ideas. Manual only as a last resort or when the user explicitly requests it.
 
 ## Approach Section (Complex Tasks)
 
 After defining deliverables, probe for implementation direction. Skip for simple tasks with obvious approach.
 
-**Architecture** - Generate concrete architectural options based on codebase patterns. "Given the intent, here are approaches: [A], [B], [C]. Which aligns with your codebase?" Architecture is direction (components, patterns, data flow), not step-by-step script.
+**Architecture** - Generate concrete options based on existing patterns. "Given the intent, here are approaches: [A], [B], [C]. Which fits best?" Architecture is direction (structure, patterns, flow), not step-by-step script.
 
 **Execution Order** - Propose order based on dependencies. "Suggested order: D1 → D2 → D3. Rationale: [X]. Adjust?" Include why (dependencies, risk reduction, etc.).
 
@@ -108,7 +110,7 @@ After defining deliverables, probe for implementation direction. Skip for simple
 Three categories, each covering **output** or **process**:
 
 - **Global Invariants** - "Don't do X" (negative constraints, ongoing, verifiable). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
-- **Process Guidance** - Non-verifiable constraints on HOW to work. Approach requirements, methodology, tool preferences that cannot be checked from the output alone (e.g., "manual optimization only" - you can't tell from the final code whether it was manually written or generated). These guide the implementer but aren't gates.
+- **Process Guidance** - Non-verifiable constraints on HOW to work. Approach requirements, methodology, tool preferences that cannot be checked from the output alone (e.g., "manual optimization only" - you can't tell from the output whether it was manually crafted or generated). These guide the implementer but aren't gates.
 - **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
   - *Functional*: "Section X explains concept Y"
   - *Non-Functional*: "Document under 2000 words", "All sections follow template structure"
@@ -149,6 +151,7 @@ Three categories, each covering **output** or **process**:
     method: bash | codebase | subagent | research | manual
     command: "[if bash]"
     agent: "[if subagent]"
+    model: "[if subagent, default opus for general-purpose]"
     prompt: "[if subagent or research]"
   ```
 
