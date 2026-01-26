@@ -73,7 +73,7 @@ Two-phase pipeline: **Discovery → Synthesis**
 
 - [PG-1] Begin D1 by asking the user: "What prompt(s) would you like to create or update? Describe the goal and any context." Then drive discovery using the prompt-engineering skill's interview method: generate concrete candidates with recommended options, use outside view ("what typically fails in prompts like this?"), run pre-mortem ("if this prompt failed in production, what would cause it?"), encode explicit statements immediately.
 - [PG-2] Context discovery covers all 6 types from the prompt-engineering skill: domain knowledge, user types, success criteria, edge cases, constraints, integration context. Surface each through targeted questions, not open-ended probing.
-- [PG-3] Determine prompt type early in interview — Skill, Agent, or System instruction. Different types have different structure templates and frontmatter requirements. Confirm with user.
+- [PG-3] Determine prompt type and format early in interview. Common types in the plugin ecosystem include Skills (SKILL.md with frontmatter), Agents (agent .md with tools/model frontmatter), and System instructions (Role/Approach/Constraints/Output) — but prompts can be anything: API system prompts, chat templates, tool descriptions, evaluation rubrics, etc. Discover the format requirements from the user. Confirm with user.
 - [PG-4] Ask user for target file path(s) for prompt output. Don't assume standard paths.
 - [PG-5] For update flows: read existing prompt first, analyze against the 7 anti-patterns (prescriptive HOW, arbitrary limits, capability instructions, rigid checklists, weak language, buried critical info, over-engineering). Surface findings to user: "I found these issues: [list]. Should I encode fixes for these in the manifest?"
 - [PG-6] Confirm inferred constraints before encoding: "I'm inferring X — should this be a hard constraint?" Discovered ≠ confirmed. Ambiguous scope: list in/out assumptions and confirm.
@@ -82,7 +82,7 @@ Two-phase pipeline: **Discovery → Synthesis**
 ## 5. Known Assumptions
 
 - [ASM-1] `prompt-reviewer` agent exists in prompt-engineering plugin and is available for M2 verification | Default: available at `claude-plugins/prompt-engineering/agents/prompt-reviewer.md` | Impact if wrong: M2 verification must fall back to general-purpose subagent with opus model and explicit prompt-engineering principles in the prompt
-- [ASM-2] Prompt files follow standard plugin structure (`skills/{name}/SKILL.md`, `agents/{name}.md`) unless user specifies otherwise | Default: standard paths | Impact if wrong: user provides custom path during interview (covered by PG-4)
+- [ASM-2] User will specify target file path(s) during interview — no assumed directory structure | Default: ask during D1 (covered by PG-4) | Impact if wrong: none, path is always confirmed
 
 ## 6. Deliverables (The Work)
 
@@ -101,13 +101,13 @@ Interview user and explore codebase to surface all requirements for the prompt(s
     prompt: "Read discovery log at {discovery_log_path}. Confirm it records a clear prompt goal (what to create/update and why) attributed to the user."
   ```
 
-- [AC-1.2] Prompt type determined and confirmed with user (Skill, Agent, or System instruction) | Verify:
+- [AC-1.2] Prompt type and format determined and confirmed with user — includes structure requirements, frontmatter needs (if any), and output format conventions | Verify:
   ```yaml
   verify:
     method: subagent
     agent: general-purpose
     model: opus
-    prompt: "Read discovery log at {discovery_log_path}. Confirm it records a prompt type (Skill, Agent, or System instruction) with explicit user confirmation."
+    prompt: "Read discovery log at {discovery_log_path}. Confirm it records a prompt type/format with explicit user confirmation, including any structural requirements (frontmatter, sections, format conventions)."
   ```
 
 - [AC-1.3] All 6 context types covered with substantive findings: domain knowledge, user types, success criteria, edge cases, constraints, integration context | Verify:
@@ -177,13 +177,13 @@ Read full discovery log, then produce M2 — a prompt-specific manifest executab
     prompt: "Read M2 at {m2_path}. Confirm each deliverable corresponds to exactly one prompt file with target path specified. No deliverable should cover multiple files."
   ```
 
-- [AC-2.3] Each prompt deliverable includes correct structure template for its type — Skill (frontmatter with name/description + `$ARGUMENTS` + sections), Agent (frontmatter with name/description/tools/model + instructions), System instruction (Role + Approach + Constraints + Output) | Verify:
+- [AC-2.3] Each prompt deliverable includes structural requirements for its type as ACs or Process Guidance — format, sections, frontmatter, conventions discovered during D1. For known plugin types (Skill, Agent, System instruction), use the prompt-engineering skill's Prompt Structure Reference. For other prompt types, encode the format requirements discovered from the user. | Verify:
   ```yaml
   verify:
     method: subagent
     agent: general-purpose
     model: opus
-    prompt: "Read M2 at {m2_path}. For each prompt deliverable, confirm the ACs or Process Guidance specify the correct structure template for its declared type (Skill, Agent, or System instruction) per the prompt-engineering skill's Prompt Structure Reference."
+    prompt: "Read M2 at {m2_path}. For each prompt deliverable, confirm ACs or Process Guidance specify structural requirements (format, sections, frontmatter, conventions). These must be specific to the prompt type, not generic."
   ```
 
 - [AC-2.4] M2 Global Invariants encode prompt-engineering validation checklist and anti-pattern prohibitions, each verified by `prompt-reviewer` agent | Verify:
@@ -195,13 +195,13 @@ Read full discovery log, then produce M2 — a prompt-specific manifest executab
     prompt: "Read M2 at {m2_path}. Confirm Global Invariants cover: validation items (goals not steps, no arbitrary values, direct imperatives, critical rules prominent, complexity matches task, information density, memento if applicable) AND anti-patterns (no prescriptive HOW, no capability instructions, no rigid checklists, no weak language, no buried critical info, no over-engineering). Each must specify prompt-reviewer as verification agent."
   ```
 
-- [AC-2.5] M2 description skill pattern applied — every Skill deliverable in M2 has an AC requiring a strong description (What + When + Triggers, under 1024 chars) | Verify:
+- [AC-2.5] For prompt types that have a description or discovery mechanism (e.g., Skill descriptions, Agent descriptions, API prompt metadata), M2 includes an AC requiring a strong description following the What + When + Triggers pattern. If the prompt type has no description field, this AC passes automatically. | Verify:
   ```yaml
   verify:
     method: subagent
     agent: general-purpose
     model: opus
-    prompt: "Read M2 at {m2_path}. For each Skill-type deliverable, confirm there is an AC requiring a description following the What + When + Triggers pattern. If no Skill-type deliverables exist, output PASS."
+    prompt: "Read M2 at {m2_path}. For any deliverable whose prompt type includes a description or metadata field, confirm there is an AC requiring a description that states what it does, when to use it, and trigger terms. If no deliverables have description fields, output PASS."
   ```
 
 - [AC-2.6] M2 written to `/tmp/prompt-manifest-{timestamp}.md` | Verify:
