@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.26.2 - /define: Neutralize remaining coding-specific terminology in universal constraints and principles (codebase → project/exploration, code → output)
+
 - [vibe-experimental] v0.26.1 - /define: Move AskUserQuestion 4-option limit from CODING.md to main skill constraint (universal, not coding-specific)
 
 - [vibe-experimental] v0.26.0 - /define: Make domain-agnostic with conditional task resources (CODING.md, DOCUMENT.md), task classification, neutralize code-biased examples
