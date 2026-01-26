@@ -39,7 +39,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 5. **Directed** - For complex tasks, establish validated implementation direction (Approach) before execution. Architecture defines direction, not step-by-step script. Trade-offs enable autonomous adjustment.
 
-6. **Efficient** - Every question must pass a quality gate: it **materially changes the manifest**, **locks an assumption**, or **chooses between meaningful trade-offs**. If a question fails all three, don't ask it. One missed criterion costs more than one extra question—err toward asking, but never ask trivia.
+6. **Efficient** - Every question must pass a quality gate: it **materially changes the manifest**, **locks an assumption**, or **chooses between meaningful trade-offs**. If a question fails all three, don't ask it. One missed criterion costs more than one extra question—err toward asking, but never ask trivia. Prioritize questions that split the space—scope and constraints before details.
 
 ## Constraints
 
