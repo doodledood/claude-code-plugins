@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.25.0 - /define + manifest-verifier: categorize unknowns (discoverable vs. preference), periodic synthesis confirmation, Known Assumptions (ASM-*) manifest section, assumptions audit in verifier
+
 - [vibe-experimental] v0.24.8 - /do: Add "Verify fixes first" principle for faster iteration feedback
 
 - [vibe-experimental] v0.24.7 - /verify: Strengthen prompt to enforce all criteria verified in single parallel launch, explicit Never Do anti-patterns
