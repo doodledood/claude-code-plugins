@@ -39,7 +39,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 5. **Directed** - For complex tasks, establish validated implementation direction (Approach) before execution. Architecture defines direction, not step-by-step script. Trade-offs enable autonomous adjustment.
 
-6. **Efficient** - Maximize information per question, not minimize questions. One missed criterion costs more than one extra question. Prioritize questions that eliminate the most uncertainty.
+6. **Efficient** - Every question must pass a quality gate: it **materially changes the manifest**, **locks an assumption**, or **chooses between meaningful trade-offs**. If a question fails all three, don't ask it. One missed criterion costs more than one extra question—err toward asking, but never ask trivia.
 
 ## Constraints
 
@@ -60,6 +60,8 @@ If no arguments provided, ask: "What would you like to build or change?"
 **Log after every action** - Write to `/tmp/define-discovery-{timestamp}.md` immediately after each discovery (domain findings, interview answers, codebase insights). Goal: another agent reading only the log could resume the interview. Read full log before synthesis.
 
 **Confirm understanding periodically** - Before transitioning to a new topic area or after resolving a cluster of related questions, synthesize your current understanding back to the user: "Here's what I've established so far: [summary]. Correct?" This catches interpretation drift early—a misunderstanding in round 2 compounds through round 8 if never checked.
+
+**Batch related questions** - Group related questions into a single turn rather than asking one at a time. Batching keeps momentum and reduces round-trips without sacrificing depth. Each batch should cover a coherent topic area—don't mix unrelated concerns in one batch.
 
 **Stop when converged** - Err on more probing. Convergence requires: pre-mortem checked, domain understood, edge cases probed, and no obvious areas left unexplored. Only then, if very confident further questions would yield nothing new, move to synthesis. Remaining low-impact unknowns that don't warrant further probing are recorded as Known Assumptions in the manifest. User can signal "enough" to override.
 

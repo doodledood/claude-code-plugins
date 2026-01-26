@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.25.2 - /define: add question quality gate (must materially change manifest, lock assumption, or choose trade-off) and batch related questions constraint for interview momentum
+
 - [vibe-experimental] v0.25.1 - /define: promote "Mark a recommended option" from principle detail to standalone constraint for reliable enforcement
 
 - [vibe-experimental] v0.25.0 - /define + manifest-verifier: categorize unknowns (discoverable vs. preference), periodic synthesis confirmation, Known Assumptions (ASM-*) manifest section, assumptions audit in verifier
