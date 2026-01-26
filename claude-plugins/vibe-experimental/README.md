@@ -72,6 +72,18 @@ A structured approach to task definition and execution:
 | `/define` | Manifest builder - YOU generate candidates, user validates (no open-ended questions) |
 | `/do` | Manifest executor - iterates deliverables, satisfies ACs, calls /verify |
 
+### Task-Specific Guidance
+
+`/define` is domain-agnostic and works for any deliverable type. Task-specific guidance is loaded conditionally:
+
+| Task Type | File | When Loaded |
+|-----------|------|-------------|
+| Code | `skills/define/tasks/CODING.md` | APIs, features, fixes, refactors, tests |
+| Document | `skills/define/tasks/DOCUMENT.md` | Specs, proposals, reports, articles, docs |
+| Other | (none) | Research, analysis, or doesn't fit above |
+
+The universal flow (core principles, manifest schema) works without any task file.
+
 ### Internal
 
 | Skill | Purpose |

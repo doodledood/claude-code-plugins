@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.26.0 - /define: Make domain-agnostic with conditional task resources (CODING.md, DOCUMENT.md), task classification, neutralize code-biased examples
+
 - [vibe-experimental] v0.25.3 - /define: add space-splitting prioritization to Efficient principle (scope and constraints before details)
 
 - [vibe-experimental] v0.25.2 - /define: add question quality gate (must materially change manifest, lock assumption, or choose trade-off) and batch related questions constraint for interview momentum

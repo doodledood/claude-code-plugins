@@ -13,7 +13,7 @@ Build a **comprehensive Manifest** that captures:
 - **How we'll get there** (Approach - validated direction)
 - **Rules we must follow** (Global Invariants)
 
-**Why thoroughness matters**: Every criterion discovered NOW is one fewer rejection during implementation/review. The goal is a PR that passes on first submission—no "oh, I also needed X" after the work is done.
+**Why thoroughness matters**: Every criterion discovered NOW is one fewer rejection during implementation/review. The goal is a deliverable that passes review on first submission—no "oh, I also needed X" after the work is done.
 
 Comprehensive means surfacing **latent criteria**—requirements the user doesn't know they have until probed. Users know their surface-level needs; your job is to discover the constraints and edge cases they haven't thought about.
 
@@ -26,6 +26,22 @@ Output: `/tmp/manifest-{timestamp}.md`
 `$ARGUMENTS` = task description, optionally with context/research
 
 If no arguments provided, ask: "What would you like to build or change?"
+
+## Task Classification
+
+After parsing input, classify the deliverable type:
+
+| Type | Indicators | Action |
+|------|------------|--------|
+| **Code** | Files, APIs, features, fixes, refactors, tests | Read `tasks/CODING.md` |
+| **Document** | Specs, proposals, reports, articles, docs | Read `tasks/DOCUMENT.md` |
+| **Other** | Research, analysis, or doesn't fit above | Proceed with universal flow |
+
+**Confirm with user**: "This appears to be a [TYPE] deliverable. Correct?" If user indicates a different type or "none of these", adjust accordingly.
+
+**If task file exists**: Read it and incorporate domain-specific guidance into the interview.
+
+**If no task file applies**: Proceed with universal flow—the core principles and manifest schema work for any deliverable.
 
 ## Principles
 
@@ -51,7 +67,7 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 **Confirm before encoding** - When you discover constraints from codebase analysis (technical limits, architecture patterns, API boundaries), present them to the user before encoding as invariants. "I found X in the codebase—should this be a hard constraint?" Discovered ≠ confirmed.
 
-**Encode explicit constraints** - When users state preferences, requirements, or constraints (not clarifying remarks or exploratory responses), these must map to an INV or AC. "Manual optimization only" → process invariant. "Target < 1500" → acceptance criterion. Don't let explicit constraints get lost in the interview log.
+**Encode explicit constraints** - When users state preferences, requirements, or constraints (not clarifying remarks or exploratory responses), these must map to an INV or AC. "Single-author writing only" → process invariant. "Target < 1500 words" → acceptance criterion. Don't let explicit constraints get lost in the interview log.
 
 **Probe for approach constraints** - Beyond WHAT to build, ask HOW it should be done. Tools to use or avoid? Methods required or forbidden? Automation vs manual? These become process invariants.
 
@@ -85,7 +101,7 @@ After defining deliverables, probe for implementation direction. Skip for simple
 
 **When to include Approach**: Multi-deliverable tasks, unfamiliar domains, architectural decisions, high-risk implementations. The interview naturally reveals if it's needed.
 
-**Architecture vs Process Guidance**: Architecture = structural decisions (components, patterns). Process Guidance = methodology constraints (tools, manual vs automated). "Add AuthService wrapping token logic" is Architecture. "No ORM, raw SQL only" is Process Guidance.
+**Architecture vs Process Guidance**: Architecture = structural decisions (components, patterns, structure). Process Guidance = methodology constraints (tools, manual vs automated). "Add executive summary section covering X, Y, Z" is Architecture. "No bullet points in summary sections" is Process Guidance.
 
 ## What the Manifest Needs
 
@@ -94,47 +110,9 @@ Three categories, each covering **output** or **process**:
 - **Global Invariants** - "Don't do X" (negative constraints, ongoing, verifiable). Output: "No breaking changes to public API." Process: "Don't edit files in /legacy."
 - **Process Guidance** - Non-verifiable constraints on HOW to work. Approach requirements, methodology, tool preferences that cannot be checked from the output alone (e.g., "manual optimization only" - you can't tell from the final code whether it was manually written or generated). These guide the implementer but aren't gates.
 - **Deliverables + ACs** - "Must have done X" (positive milestones). Three types:
-  - *Functional*: "Clicking Login redirects to Dashboard"
-  - *Non-Functional*: "Response time < 200ms", "All handlers follow Repository pattern"
-  - *Process*: "README.md contains section 'Authentication'"
-
-### Code Quality Gates (for coding tasks)
-
-For coding tasks, surface which quality aspects matter: bugs, type safety, maintainability, simplicity, coverage, testability, documentation, CLAUDE.md adherence. Note: AskUserQuestion limits to 4 options per question. Mark the most appropriate option(s) as "(Recommended)" based on task context. Map selections to corresponding reviewer agents with "no HIGH/CRITICAL" thresholds (docs uses "no MEDIUM+").
-
-**Filter through project preferences**: CLAUDE.md is auto-loaded into context—check it for quality gate preferences. Users may have disabled certain default gates (e.g., "skip documentation checks") or added custom ones (e.g., "always run security scan"). Exclude disabled gates from the selection, and include any custom gates the user has defined.
-
-**Map selections to reviewer agents:**
-
-| Quality Aspect | Agent | Threshold |
-|---------------|-------|-----------|
-| No bugs | code-bugs-reviewer | no HIGH/CRITICAL |
-| Type safety | type-safety-reviewer | no HIGH/CRITICAL |
-| Maintainability | code-maintainability-reviewer | no HIGH/CRITICAL |
-| Simplicity | code-simplicity-reviewer | no HIGH/CRITICAL |
-| Test coverage | code-coverage-reviewer | no HIGH/CRITICAL |
-| Testability | code-testability-reviewer | no HIGH/CRITICAL |
-| Documentation | docs-reviewer | no MEDIUM+ (max severity is MEDIUM) |
-| CLAUDE.md adherence | claude-md-adherence-reviewer | no HIGH/CRITICAL |
-
-Add selected quality gates as Global Invariants with subagent verification:
-```yaml
-verify:
-  method: subagent
-  agent: [agent-name-from-table]
-  prompt: "Review for [quality aspect] issues in the changed files"
-```
-
-### Project Gates (auto-detect from CLAUDE.md)
-
-For coding tasks, extract verifiable commands from project configuration (typecheck, lint, test, format). Add as Global Invariants with bash verification:
-```yaml
-verify:
-  method: bash
-  command: "[command from CLAUDE.md]"
-```
-
-**Probe e2e verification** - For coding tasks, surface e2e verification opportunities: endpoints, services, test data. If actionable, encode as Global Invariant with bash verification.
+  - *Functional*: "Section X explains concept Y"
+  - *Non-Functional*: "Document under 2000 words", "All sections follow template structure"
+  - *Process*: "Deliverable contains section 'Executive Summary'"
 
 ## The Manifest Schema
 
