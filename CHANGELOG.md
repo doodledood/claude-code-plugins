@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-experimental] v0.25.1 - /define: promote "Mark a recommended option" from principle detail to standalone constraint for reliable enforcement
+
 - [vibe-experimental] v0.25.0 - /define + manifest-verifier: categorize unknowns (discoverable vs. preference), periodic synthesis confirmation, Known Assumptions (ASM-*) manifest section, assumptions audit in verifier
 
 - [vibe-experimental] v0.24.8 - /do: Add "Verify fixes first" principle for faster iteration feedback

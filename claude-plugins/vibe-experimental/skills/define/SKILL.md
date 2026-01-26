@@ -39,13 +39,15 @@ If no arguments provided, ask: "What would you like to build or change?"
 
 5. **Directed** - For complex tasks, establish validated implementation direction (Approach) before execution. Architecture defines direction, not step-by-step script. Trade-offs enable autonomous adjustment.
 
-6. **Efficient** - Maximize information per question, not minimize questions. One missed criterion costs more than one extra question. Prioritize questions that eliminate the most uncertainty. Mark recommended option(s): for single-select questions, mark exactly one option "(Recommended)"; for multi-select, mark zero or more based on context (none if all equally valid, or sensible defaults if applicable).
+6. **Efficient** - Maximize information per question, not minimize questions. One missed criterion costs more than one extra question. Prioritize questions that eliminate the most uncertainty.
 
 ## Constraints
 
 **Discoverable unknowns — search first** - Facts about the codebase or system (file locations, API shapes, existing patterns, config values) are discoverable. Exhaust codebase search before asking the user. Only ask about discoverable facts when: multiple plausible candidates exist, searches yield nothing but the fact is needed, or the ambiguity is actually about intent not fact. When asking, present what you found and recommend one option.
 
 **Preference unknowns — ask early** - Trade-offs, priorities, scope decisions, and style preferences cannot be discovered from code. Ask these directly. Provide concrete options with a recommended default. If genuinely low-impact and the user signals "enough", proceed with the recommended default and record as a Known Assumption in the manifest.
+
+**Mark a recommended option** - Every question with options must include a recommended default. For single-select, mark exactly one "(Recommended)". For multi-select, mark sensible defaults or none if all equally valid. Reduces cognitive load — users accept, reject, or adjust rather than evaluating from scratch.
 
 **Confirm before encoding** - When you discover constraints from codebase analysis (technical limits, architecture patterns, API boundaries), present them to the user before encoding as invariants. "I found X in the codebase—should this be a hard constraint?" Discovered ≠ confirmed.
 
