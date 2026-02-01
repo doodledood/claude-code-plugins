@@ -302,7 +302,7 @@ After decomposition, update the file:
 
 ### 3.1 Launch web-researcher agents
 
-Launch `vibe-workflow:web-researcher` agents for each research angle. **Launch agents in parallel** (single message with multiple agent invocations) to maximize efficiency.
+Launch `vibe-extras:web-researcher` agents for each research angle. **Launch agents in parallel** (single message with multiple agent invocations) to maximize efficiency.
 
 **Wave 1 prompt template** (broad exploration with boundaries):
 ```
@@ -522,7 +522,7 @@ When continuing to a new wave:
    - Narrower scope than Wave 1 agents
 
 4. **Launch 1-3 agents** for this wave (focused investigation)
-   - Launch `vibe-workflow:web-researcher` agents
+   - Launch `vibe-extras:web-researcher` agents
    - Prompts reference specific gaps, not broad topics
 
 5. **Collect findings** and return to 4.2 (cross-reference including new findings)
@@ -621,7 +621,7 @@ Research completed: {timestamp}
 For quick (single-fact) queries, skip orchestration:
 
 1. State: `**Thoroughness**: quick — [reason]`
-2. Launch a `vibe-workflow:web-researcher` agent with: "{query}"
+2. Launch a `vibe-extras:web-researcher` agent with: "{query}"
 3. Return agent's findings directly (no synthesis overhead)
 
 ## Key Principles

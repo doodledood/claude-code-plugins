@@ -6,6 +6,12 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- **BREAKING**: Removed vibe-workflow and vibe-experimental plugins (moved to [manifest-dev](https://github.com/doodledood/manifest-dev))
+- [vibe-extras] v2.0.0 - Added explore-codebase and research-web skills with codebase-explorer and web-researcher agents (migrated from vibe-workflow)
+- [life-ops] Updated decide skill to use vibe-extras:web-researcher instead of vibe-workflow:web-researcher
+
+## 2026-01-27 (archived entries for removed plugins)
+
 - [vibe-experimental] v0.27.2 - /define: Refine BLOG.md with blog-specific interview probes (content format, voice/brand doc discovery, anti-slop stance), voice compliance and anti-slop quality gates, blog-specific risks/trade-offs, and process guidance for voice docs and outline-first drafting
 
 - [vibe-experimental] v0.27.1 - /define: Refine RESEARCH.md with research-specific interview probes, source authority hierarchy, decomposition architecture patterns, research risks/trade-offs, cross-referencing rigor, and external memory process guidance (inspired by web-researcher agent)

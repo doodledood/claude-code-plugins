@@ -10,11 +10,9 @@
   "plugins": [
     { "name": "consultant", "source": "./claude-plugins/consultant" },
     { "name": "prompt-engineering", "source": "./claude-plugins/prompt-engineering" },
-    { "name": "vibe-workflow", "source": "./claude-plugins/vibe-workflow" },
     { "name": "solo-dev", "source": "./claude-plugins/solo-dev" },
     { "name": "vibe-extras", "source": "./claude-plugins/vibe-extras" },
     { "name": "frontend-design", "source": "./claude-plugins/frontend-design" },
-    { "name": "life-ops", "source": "./claude-plugins/life-ops" },
-    { "name": "vibe-experimental", "source": "./claude-plugins/vibe-experimental" }
+    { "name": "life-ops", "source": "./claude-plugins/life-ops" }
   ]
 }

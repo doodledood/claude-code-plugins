@@ -43,7 +43,7 @@ State: `**Thoroughness**: [level] — [reason]` then proceed.
 
 ### 1. Launch single agent
 
-Launch a `vibe-workflow:codebase-explorer` agent with: "$ARGUMENTS"
+Launch a `vibe-extras:codebase-explorer` agent with: "$ARGUMENTS"
 
 ### 2. Return agent output directly
 
@@ -182,7 +182,7 @@ Thoroughness: {level}
 
 #### 3.1 Launch agents in single message
 
-Launch `vibe-workflow:codebase-explorer` agents for each angle. **Launch all agents in parallel** (single message with multiple agent invocations).
+Launch `vibe-extras:codebase-explorer` agents for each angle. **Launch all agents in parallel** (single message with multiple agent invocations).
 
 **Agent prompt template:**
 ```

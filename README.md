@@ -23,42 +23,10 @@ Browse and install:
 
 ```bash
 /plugin list
-/plugin install vibe-workflow@claude-code-plugins-marketplace
+/plugin install vibe-extras@claude-code-plugins-marketplace
 ```
 
 ## Available Plugins
-
-### vibe-workflow
-
-Structured development workflow that front-loads requirements to reduce iteration cycles. Phases build on each other: spec → plan → implement.
-
-**Core workflow:**
-- `/spec` - Interactive requirements builder with structured interview
-- `/plan` - Create implementation plans with codebase research
-- `/implement` - Execute plans via subagents with verification loops
-- `/implement-inplace` - Single-agent implementation for simpler tasks
-
-**Code review:**
-- `/review` - Parallel review agents (bugs, types, maintainability, simplicity, testability, coverage, docs)
-- `/review-bugs` - Focused bug detection
-- `/review-type-safety` - Type safety analysis
-- `/review-maintainability` - Code quality and maintainability
-- `/review-simplicity` - Over-engineering and cognitive complexity
-- `/review-testability` - Identify code requiring excessive mocking to test
-- `/review-coverage` - Test coverage gaps
-- `/review-docs` - Documentation completeness
-- `/review-claude-md-adherence` - Check adherence to project instructions
-- `/fix-review-issues` - Address findings from review
-
-**Research & debugging:**
-- `/bugfix` - Root cause analysis with test-driven verification
-- `/research-web` - Deep web research with parallel investigators (quick/medium/thorough/very-thorough)
-- `/explore-codebase` - Structural overview with prioritized file list
-
-**Hooks** (automatic behaviors):
-- Session start reminders for agent preferences
-- Post-compaction recovery for implement workflows
-- Stop enforcement to prevent premature completion
 
 ### consultant
 
@@ -74,7 +42,11 @@ Requires Python 3.9+ and [uv](https://docs.astral.sh/uv/). Supports any provider
 
 ### vibe-extras
 
-Standalone utilities for common development tasks.
+Standalone utilities for codebase exploration, web research, git operations, and code maintenance.
+
+**Research & exploration:**
+- `/explore-codebase` - Structural overview with prioritized file list (quick/medium/thorough/very-thorough)
+- `/research-web` - Deep web research with parallel investigators and multi-wave synthesis
 
 **Git utilities:**
 - `/rebase-on-main` - Safe rebasing with conflict resolution guidance
@@ -83,7 +55,8 @@ Standalone utilities for common development tasks.
 **Code maintenance:**
 - `/clean-slop` - Remove AI-generated noise (redundant comments, verbose patterns)
 - `/update-claude-md` - Create or maintain CLAUDE.md project instructions
-- `maximize-info-density` - Compress docs/prompts losslessly (auto-invoked)
+
+> **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
 ### solo-dev
 
@@ -121,15 +94,6 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 - `/decide` - Situation discovery → targeted research → decision framework → ranked recommendation
 
-### vibe-experimental
-
-Experimental verification-first workflows. Invest heavily in definition with verification built-in, then execute autonomously with enforced verification gates.
-
-- `/define` - Verification-first requirements builder with proactive interview
-- `/do` - Autonomous execution with enforced verification
-
-**Hooks** prevent premature stopping—can't stop without verification passing or proper escalation.
-
 ## Repository Structure
 
 ```
@@ -137,10 +101,8 @@ claude-code-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json       # Marketplace configuration
 ├── claude-plugins/
-│   ├── vibe-workflow/         # Spec → plan → implement with code review
-│   ├── vibe-experimental/     # Verification-first experimental workflows
 │   ├── consultant/            # Multi-provider LLM consultations
-│   ├── vibe-extras/           # Git, docs, cleanup utilities
+│   ├── vibe-extras/           # Research, git, docs, cleanup utilities
 │   ├── solo-dev/              # Customer profiles, brand, design docs
 │   ├── prompt-engineering/    # Prompt analysis and refinement
 │   ├── frontend-design/       # Frontend design patterns

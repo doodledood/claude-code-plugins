@@ -10,9 +10,6 @@ Claude Code plugins marketplace - a curated collection of plugins with agents, s
 # Lint, format, typecheck
 ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
 
-# Test hooks (run after ANY hook changes)
-pytest tests/hooks/ -v
-
 # Test plugin locally
 /plugin marketplace add /path/to/claude-code-plugins
 /plugin install consultant@claude-code-plugins-marketplace
@@ -40,7 +37,6 @@ Each plugin can contain:
 - `agents/` - Specialized agent definitions (markdown)
 - `skills/` - Skills with `SKILL.md` files (replaces deprecated commands)
 - `hooks/` - Event handlers for Claude Code events
-- `tests/hooks/` - Test suite for hooks (at repo root)
 
 **Naming convention**: Use kebab-case (`-`) for all file and skill names (e.g., `bug-fixer.md`, `clean-slop`).
 
@@ -48,19 +44,9 @@ Each plugin can contain:
 
 Hooks are Python scripts in `hooks/` that respond to Claude Code events. Shared utilities live in `hook_utils.py`.
 
-**Hook structure** (vibe-workflow):
-- `hook_utils.py` - Shared transcript parsing, reminder strings, state extraction
-- `session_start_reminder.py` - Injects agent preference reminders at session start
-- `post_compact_hook.py` - Re-anchors after compaction with session reminders + implement recovery
-- `post_todo_write_hook.py` - Reminds to update log files after todo completion during implement workflows
-- `stop_todo_enforcement.py` - Blocks premature stops during implement workflows
-
 **When modifying hooks**:
-1. Run tests: `pytest tests/hooks/ -v`
-2. Run linting: `ruff check --fix claude-plugins/vibe-workflow/hooks/ && black claude-plugins/vibe-workflow/hooks/`
-3. Run type check: `mypy claude-plugins/vibe-workflow/hooks/`
-
-**Test coverage**: Tests in `tests/hooks/` cover edge cases (invalid JSON, missing files, malformed transcripts), workflow detection, todo state extraction, and hook output format. Add tests for any new hook logic.
+1. Run linting: `ruff check --fix claude-plugins/<plugin>/hooks/ && black claude-plugins/<plugin>/hooks/`
+2. Run type check: `mypy claude-plugins/<plugin>/hooks/`
 
 ### Skills
 
@@ -99,7 +85,7 @@ Invoke the <plugin>:<skill> skill with: "<arguments>"
 ```
 
 Examples:
-- `Invoke the vibe-workflow:spec skill with: "$ARGUMENTS"`
+- `Invoke the vibe-extras:explore-codebase skill with: "$ARGUMENTS"`
 - `Invoke the solo-dev:define-customer-profile skill`
 
 **Why**: Vague language like "consider using the X skill" is ambiguous—Claude may just read the skill file instead of invoking it. Clear directives like "Invoke the X skill" ensure the skill is actually called.
@@ -151,9 +137,6 @@ When adding agents, skills, or hooks:
 ```bash
 # Lint, format, typecheck
 ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
-
-# Run hook tests if hooks were modified
-pytest tests/hooks/ -v
 ```
 
 Bump plugin version if plugin files changed.

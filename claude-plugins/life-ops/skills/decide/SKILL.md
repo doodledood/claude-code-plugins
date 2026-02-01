@@ -495,7 +495,7 @@ Minimum acceptable? Not ideal—what you could live with."
 
 **Research context if needed**:
 ```
-Task(subagent_type:"vibe-workflow:web-researcher",prompt:"quick - Typical {factor} ranges in {category}? Basic/mid/premium.",description:"Market context")
+Task(subagent_type:"vibe-extras:web-researcher",prompt:"quick - Typical {factor} ranges in {category}? Basic/mid/premium.",description:"Market context")
 ```
 
 ## 3.3 Categorize Factors
@@ -543,7 +543,7 @@ Before elimination, capture intuition:
 ## 4.2 Option Discovery
 
 ```
-Task(subagent_type:"vibe-workflow:web-researcher",prompt:"medium - Options for {decision}.
+Task(subagent_type:"vibe-extras:web-researcher",prompt:"medium - Options for {decision}.
 
 REQUIREMENTS:
 - Must: {non-negotiables}
@@ -593,7 +593,7 @@ If interdependent: Note in log, consider hybrids, adjust for leverage/sequencing
 **CRITICAL**: Use Task (not Skill) to preserve todo state.
 
 ```
-Task(subagent_type:"vibe-workflow:web-researcher",prompt:"{thoroughness} - Research {decision}.
+Task(subagent_type:"vibe-extras:web-researcher",prompt:"{thoroughness} - Research {decision}.
 
 OPTIONS: {list}
 
@@ -640,7 +640,7 @@ Scan for factors: important (multiple sources), NOT in discovery, could change r
 ```
 
 **Missing cell for Non-Negotiable/Important**:
-1. Targeted: `Task(subagent_type:"vibe-workflow:web-researcher", prompt:"quick - {Factor} for {Option}", description:"Fill gap")`
+1. Targeted: `Task(subagent_type:"vibe-extras:web-researcher", prompt:"quick - {Factor} for {Option}", description:"Fill gap")`
 2. Still unavailable:
    ```json
    {"questions":[{"question":"No data for {Option}'s {Factor}. How proceed?","header":"Data Gap","options":[{"label":"Assume meets","description":"Optimistic"},{"label":"Assume fails","description":"Conservative"},{"label":"Skip option","description":"Can't evaluate"}],"multiSelect":false}]}

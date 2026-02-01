@@ -35,7 +35,7 @@ Personal decision advisor that guides you from question to confident recommendat
 - Tracks uncertainty and probability
 - Uses 10-10-10 regret framework
 - Asks targeted tie-breaker questions when options are close
-- Works without vibe-workflow (Opus fallback)
+- Works without vibe-extras (Opus fallback)
 
 ## Installation
 
@@ -46,7 +46,7 @@ Personal decision advisor that guides you from question to confident recommendat
 
 ## Integration
 
-Works best with `vibe-workflow:research-web` for thorough web research. Falls back to Opus agent with WebSearch if vibe-workflow is not installed.
+Works best with `vibe-extras:research-web` for thorough web research. Falls back to Opus agent with WebSearch if vibe-extras is not installed.
 
 ## Design Philosophy
 

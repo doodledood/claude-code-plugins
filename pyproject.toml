@@ -18,8 +18,7 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 files = [
-    "claude-plugins/consultant/skills/consultant/scripts",
-    "claude-plugins/planning/hooks"
+    "claude-plugins/consultant/skills/consultant/scripts"
 ]
 explicit_package_bases = true
 ignore_missing_imports = true
