@@ -7,6 +7,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 ## [Unreleased]
 
 - **BREAKING**: Removed vibe-workflow and vibe-experimental plugins (moved to [manifest-dev](https://github.com/doodledood/manifest-dev))
+- [vibe-extras] v2.1.0 - Added address-pr-comments skill for triaging and fixing PR review feedback
 - [vibe-extras] v2.0.0 - Added explore-codebase and research-web skills with codebase-explorer and web-researcher agents (migrated from vibe-workflow)
 - [life-ops] Updated decide skill to use vibe-extras:web-researcher instead of vibe-workflow:web-researcher
 
