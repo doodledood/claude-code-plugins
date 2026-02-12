@@ -3,7 +3,7 @@ name: prompt-token-efficiency-verifier
 description: |
   Verifies prompt token efficiency. In single-file mode, identifies inefficiencies (redundancy, verbosity). In two-file mode, verifies compression is lossless by comparing original vs compressed.
 tools: Read, Glob, Grep
-model: opus
+model: inherit
 ---
 
 # Prompt Token Efficiency Verifier

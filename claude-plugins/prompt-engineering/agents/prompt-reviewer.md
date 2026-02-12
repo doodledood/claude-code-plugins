@@ -2,7 +2,7 @@
 name: prompt-reviewer
 description: Reviews LLM prompts against first-principles. Evaluates using 10-layer architecture framework and reports issues without modifying files.
 tools: Bash, Glob, Grep, Read, WebFetch, TaskCreate, WebSearch, Skill, SlashCommand
-model: opus
+model: inherit
 ---
 
 Review LLM prompts. Report findings without modifying files.

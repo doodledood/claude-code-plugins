@@ -6,6 +6,10 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [consultant] v1.9.2 - Update consultant agent to use model: inherit instead of hardcoded model
+- [vibe-extras] v2.1.2 - Update slop-cleaner, web-researcher, codebase-explorer agents to use model: inherit instead of hardcoded models
+- [solo-dev] v1.20.2 - Update design-research, ux-auditor, design-quality-auditor, seo-researcher agents to use model: inherit instead of hardcoded models
+- [prompt-engineering] v2.3.4 - Update prompt-reviewer, prompt-compression-verifier, prompt-token-efficiency-verifier agents to use model: inherit instead of hardcoded models
 - **BREAKING**: Removed vibe-workflow and vibe-experimental plugins (moved to [manifest-dev](https://github.com/doodledood/manifest-dev))
 - [vibe-extras] v2.1.0 - Added address-pr-comments skill for triaging and fixing PR review feedback
 - [vibe-extras] v2.1.1 - Improve address-pr-comments: clarify style vs naming boundary, add resolve-thread option per fix, add completion summary
