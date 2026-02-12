@@ -56,6 +56,9 @@ Standalone utilities for codebase exploration, web research, git operations, and
 - `/clean-slop` - Remove AI-generated noise (redundant comments, verbose patterns)
 - `/update-claude-md` - Create or maintain CLAUDE.md project instructions
 
+**Code review:**
+- `/build-review-persona` - Mine GitHub review history to generate a calibrated review-as-me skill
+
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
 ### solo-dev

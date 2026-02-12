@@ -15,7 +15,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | Plugin | What It Does |
 |--------|--------------|
 | `consultant` | Multi-provider LLM consultations via LiteLLM. Get perspectives from OpenAI, Google, local models without leaving Claude Code. |
-| `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup. |
+| `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup, review persona generation. |
 | `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems, author voice capture. |
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |

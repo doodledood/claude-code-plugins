@@ -6,6 +6,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-extras] v2.2.0 - Added build-review-persona skill: mine GitHub review history to generate a calibrated review-as-me skill
 - [consultant] v1.9.2 - Update consultant agent to use model: inherit instead of hardcoded model
 - [vibe-extras] v2.1.2 - Update slop-cleaner, web-researcher, codebase-explorer agents to use model: inherit instead of hardcoded models
 - [solo-dev] v1.20.2 - Update design-research, ux-auditor, design-quality-auditor, seo-researcher agents to use model: inherit instead of hardcoded models
