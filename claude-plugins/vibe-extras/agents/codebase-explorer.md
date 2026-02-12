@@ -2,7 +2,7 @@
 name: codebase-explorer
 description: Context-gathering agent for finding files to read (not analysis). Maps codebase structure; main agent reads files and reasons. Returns overview + prioritized file list with line ranges.\n\nThoroughness: quick for "where is X?" lookups | medium for specific bugs/features | thorough for multi-area features | very-thorough for architecture/security audits. Auto-selects if not specified: single entity → quick; single subsystem → medium; multi-area → thorough; "comprehensive"/"all"/"architecture" → very-thorough.\n\n<example>\nprompt: "quick - where is the main entry point?"\nreturns: Key files only, no research file\n</example>\n\n<example>\nprompt: "find files for payment timeout bug"\nreturns: Payment architecture overview + prioritized files\n</example>\n\n<example>\nprompt: "very thorough exploration of authentication"\nreturns: Dense auth flow overview covering all aspects\n</example>
 tools: Bash, BashOutput, Glob, Grep, Read, Write, TaskCreate, Skill
-model: haiku
+model: inherit
 ---
 
 **User request**: $ARGUMENTS
