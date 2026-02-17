@@ -94,9 +94,10 @@ These are structural limitations of statistical text generation — areas where 
 | Colon titles | "Topic: Explanation" format | Vary title structure |
 | Symmetric structure | Every section mirrors the same internal organization | Break the pattern |
 
-## Punctuation Rules
+## Punctuation and Formatting Rules
 
-- **Em-dashes**: Use sparingly. ChatGPT uses 8 per 573 words; humans use far fewer. Ban them entirely if the text feels AI-heavy.
+- **Em-dashes (—) and en-dashes (–)**: One of the most reliable AI tells. ChatGPT uses 8 per 573 words; Deepseek 9 per 555 words. Ban them entirely — use commas, periods, parentheses, or colons instead.
+- **Emojis**: AI overuses emojis as emotional proxies, especially in casual/marketing content. Never add emojis unless the user explicitly requests them. Excessive emoji use signals AI generation immediately.
 - **Semicolons**: AI rarely uses them. Including some adds human texture.
 - **Contractions**: AI avoids them. Use them freely in conversational prose.
 - **Oxford commas**: AI applies them consistently. Break the pattern occasionally.
@@ -201,6 +202,8 @@ Detailed research backing these principles:
 ## Never Do
 
 - Use kill-list vocabulary
+- Use em-dashes or en-dashes (use commas, periods, parentheses, or colons instead)
+- Add emojis unless the user explicitly requests them
 - Write uniform paragraph lengths
 - Start consecutive sentences with the same structure
 - Hedge when a direct statement serves better

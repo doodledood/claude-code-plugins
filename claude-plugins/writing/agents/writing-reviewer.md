@@ -23,7 +23,7 @@ Evaluate across these dimensions. Not every text triggers all categories — ass
 
 | Category | What to Evaluate |
 |----------|------------------|
-| **Vocabulary** | Kill-list words present, verb substitution (simple → elaborate), false intensifiers, hedging phrases, generic openers |
+| **Vocabulary** | Kill-list words present, verb substitution (simple → elaborate), false intensifiers, hedging phrases, generic openers, em-dashes/en-dashes, emoji overuse |
 | **Structure** | Paragraph length uniformity, list addiction, formulaic scaffolding, grammar perfection as tell, meta-commentary, recap conclusions |
 | **Tone** | Uniform register (no tonal shifts), relentless positivity, equal professional distance across all subjects, risk aversion |
 | **Rhetoric** | Tricolon obsession (rule of three), perfect antithesis, rhetorical questions as staging, excessive hedging, compulsive signposting, opinion-avoidant framing |
