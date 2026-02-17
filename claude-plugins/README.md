@@ -20,6 +20,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
+| `human-writer` | Research-backed writing toolkit for prose that doesn't sound AI-generated. Vocabulary kill-lists, four-layer editing, iterative review loop. |
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
@@ -42,6 +43,9 @@ Frontend design patterns including scrollytelling (scroll-driven storytelling wi
 
 ### life-ops
 Personal decision-making advisor. `/decide` guides you through situation discovery (underlying needs, time horizons, constraints), conducts targeted research, and applies a decision framework to produce ranked recommendations with tie-breakers.
+
+### human-writer
+Research-backed anti-AI writing toolkit. `human-writing` provides base knowledge (vocabulary kill-list, four-layer editing, craft fundamentals, detection science). `/write` runs the full workflow: gather your context, write with principles applied, review via `writing-reviewer` agent, auto-fix HIGH+ issues, loop until clean.
 
 ## Contributing
 

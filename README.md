@@ -97,6 +97,13 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 - `/decide` - Situation discovery → targeted research → decision framework → ranked recommendation
 
+### human-writer
+
+Research-backed writing toolkit for prose that doesn't sound AI-generated. Distills 70+ sources on AI tells, humanizing techniques, and detection science.
+
+- `human-writing` - Base knowledge skill with vocabulary kill-list, four-layer editing, craft fundamentals (auto-invoked for prose)
+- `/write` - Full workflow: gather context → write → review → auto-fix → loop until clean
+
 ## Repository Structure
 
 ```
@@ -109,7 +116,8 @@ claude-code-plugins/
 │   ├── solo-dev/              # Customer profiles, brand, design docs
 │   ├── prompt-engineering/    # Prompt analysis and refinement
 │   ├── frontend-design/       # Frontend design patterns
-│   └── life-ops/              # Personal decision-making advisor
+│   ├── life-ops/              # Personal decision-making advisor
+│   └── human-writer/          # Research-backed anti-AI writing
 └── README.md
 ```
 
