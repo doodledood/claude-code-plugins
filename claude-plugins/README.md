@@ -16,11 +16,11 @@ First-principles workflows for Claude Code. Quality output you can trust.
 |--------|--------------|
 | `consultant` | Multi-provider LLM consultations via LiteLLM. Get perspectives from OpenAI, Google, local models without leaving Claude Code. |
 | `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup, review persona generation. |
-| `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems, author voice capture. |
+| `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems. |
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
-| `human-writer` | Research-backed writing toolkit for prose that doesn't sound AI-generated. Vocabulary kill-lists, four-layer editing, iterative review loop. |
+| `writing` | Writing toolkit: anti-AI prose principles, iterative review loop, author voice capture, voice-matched content generation. |
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
@@ -33,7 +33,7 @@ Requires Python 3.9+ and uv. Supports any LiteLLM provider. Includes `/ask` for 
 Standalone utilities that work independently. `/explore-codebase` for structural codebase exploration; `/research-web` for deep web research with parallel investigators; `/clean-slop` removes AI-generated noise; `/rewrite-history` restructures commits for clean PRs.
 
 ### solo-dev
-Define customer profiles and brand guidelines once, reference consistently across sessions. Includes author voice capture for content generation.
+Define customer profiles and brand guidelines once, reference consistently across sessions.
 
 ### prompt-engineering
 Three modes: `/review-prompt` (read-only analysis), `/optimize-prompt-precision` (eliminate ambiguities), `/optimize-prompt-goal` (goal effectiveness).
@@ -44,8 +44,8 @@ Frontend design patterns including scrollytelling (scroll-driven storytelling wi
 ### life-ops
 Personal decision-making advisor. `/decide` guides you through situation discovery (underlying needs, time horizons, constraints), conducts targeted research, and applies a decision framework to produce ranked recommendations with tie-breakers.
 
-### human-writer
-Research-backed anti-AI writing toolkit. `human-writing` provides base knowledge (vocabulary kill-list, four-layer editing, craft fundamentals, detection science). `/write` runs the full workflow: gather your context, write with principles applied, review via `writing-reviewer` agent, auto-fix HIGH+ issues, loop until clean.
+### writing
+All writing skills consolidated. `human-writing` provides research-backed anti-AI principles (vocabulary kill-list, four-layer editing, craft fundamentals, detection science). `/write` runs the full workflow with iterative review. `craft-author-voice` captures your writing style. `/write-as-me` generates content in your voice. `voice-writer` agent applies both your voice and anti-AI principles.
 
 ## Contributing
 

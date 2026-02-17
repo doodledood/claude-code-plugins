@@ -39,7 +39,7 @@ If the user provides a rough draft, extract their existing substance and ask onl
 
 ## Write
 
-Invoke the `human-writer:human-writing` skill to apply research-backed writing principles during generation.
+Invoke the `writing:human-writing` skill to apply research-backed writing principles during generation.
 
 Write the content to `draft-{topic-slug}.md` in the current working directory. Use a slugified version of the topic for the filename.
 

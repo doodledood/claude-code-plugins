@@ -71,9 +71,7 @@ Foundational documents for solo developers and small teams. Define once, referen
 - `define-design-guidelines` - UI/UX patterns for your audience
 - `define-seo-strategy` - Traditional SEO + AI citation optimization
 
-**Content creation:**
-- `craft-author-voice` - Capture your writing style for AI replication
-- `/write-as-me` - Generate content in your voice (requires AUTHOR_VOICE.md)
+**Other:**
 - `/audit-ux` - Check UI changes against your design guidelines
 
 ### prompt-engineering
@@ -97,12 +95,14 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 - `/decide` - Situation discovery → targeted research → decision framework → ranked recommendation
 
-### human-writer
+### writing
 
-Research-backed writing toolkit for prose that doesn't sound AI-generated. Distills 70+ sources on AI tells, humanizing techniques, and detection science.
+All writing skills in one place. Research-backed anti-AI prose, author voice capture, and voice-matched generation.
 
-- `human-writing` - Base knowledge skill with vocabulary kill-list, four-layer editing, craft fundamentals (auto-invoked for prose)
+- `human-writing` - Base knowledge with vocabulary kill-list, four-layer editing, craft fundamentals (auto-invoked for prose)
 - `/write` - Full workflow: gather context → write → review → auto-fix → loop until clean
+- `craft-author-voice` - Capture your writing style into AUTHOR_VOICE.md
+- `/write-as-me` - Generate content in your voice (requires AUTHOR_VOICE.md)
 
 ## Repository Structure
 
@@ -117,7 +117,7 @@ claude-code-plugins/
 │   ├── prompt-engineering/    # Prompt analysis and refinement
 │   ├── frontend-design/       # Frontend design patterns
 │   ├── life-ops/              # Personal decision-making advisor
-│   └── human-writer/          # Research-backed anti-AI writing
+│   └── writing/               # Writing toolkit (anti-AI prose, voice, generation)
 └── README.md
 ```
 

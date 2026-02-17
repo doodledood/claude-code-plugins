@@ -13,17 +13,16 @@ AI-assisted development works better when there's documented context about your 
 - `define-brand-guidelines` - Define how to communicate with your customer
 - `define-design-guidelines` - Create UI/UX guidelines that resonate with your customer
 - `define-seo-strategy` - Traditional SEO + AI citation optimization
-- `craft-author-voice` - Capture your writing style for AI replication
-
 **Commands** (explicit invocation):
-- `/write-as-me <topic>` - Generate content in your voice (requires AUTHOR_VOICE.md)
 - `/audit-ux <area>` - Check UI changes against your design guidelines
+
+> **Note:** Writing skills (`craft-author-voice`, `write-as-me`) have moved to the `writing` plugin.
 
 ## Recommended Order
 
 1. Start with `define-customer-profile` - everything else depends on knowing who you're building for
 2. Then brand guidelines, design guidelines as needed
-3. Author voice is independent - create whenever you want consistent content generation
+3. For writing/voice tools, install the `writing` plugin
 
 ## Installation
 

@@ -9,7 +9,7 @@ Review prose for AI writing tells. Report findings without modifying files.
 
 ## Foundation
 
-**First**: Invoke `human-writer:human-writing` to load the research-backed writing principles. Review the text against those principles (vocabulary kill-list, structural anti-patterns, tonal patterns, rhetorical tells, craft fundamentals, statistical signatures).
+**First**: Invoke `writing:human-writing` to load the research-backed writing principles. Review the text against those principles (vocabulary kill-list, structural anti-patterns, tonal patterns, rhetorical tells, craft fundamentals, statistical signatures).
 
 ## Input
 

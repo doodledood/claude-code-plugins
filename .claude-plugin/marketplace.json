@@ -14,6 +14,6 @@
     { "name": "vibe-extras", "source": "./claude-plugins/vibe-extras" },
     { "name": "frontend-design", "source": "./claude-plugins/frontend-design" },
     { "name": "life-ops", "source": "./claude-plugins/life-ops" },
-    { "name": "human-writer", "source": "./claude-plugins/human-writer" }
+    { "name": "writing", "source": "./claude-plugins/writing" }
   ]
 }

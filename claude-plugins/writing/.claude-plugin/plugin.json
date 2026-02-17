@@ -1,0 +1,12 @@
+{
+  "name": "writing",
+  "description": "Research-backed writing toolkit: anti-AI prose principles, iterative review loop, author voice capture, and voice-matched content generation",
+  "version": "1.0.0",
+  "author": {
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["writing", "human-writing", "ai-detection", "humanize", "prose", "content", "author-voice", "voice", "editing"]
+}

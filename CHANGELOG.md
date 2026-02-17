@@ -6,7 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [human-writer] v1.0.0 - New plugin: Research-backed writing toolkit for prose that avoids AI tells. Base knowledge skill (human-writing) with distilled research from 70+ sources, writing-reviewer agent with severity classification, /write workflow skill with iterative review loop
+- [writing] v1.0.0 - New plugin: consolidated writing toolkit. Includes research-backed anti-AI prose (human-writing skill, writing-reviewer agent, /write workflow with iterative review loop), plus craft-author-voice, write-as-me, and voice-writer agent (moved from solo-dev). Voice-writer agent now applies anti-AI writing principles alongside author voice.
+- [solo-dev] v1.21.0 - Moved craft-author-voice, write-as-me, and voice-writer agent to the new writing plugin
 - [vibe-extras] v2.2.0 - Added build-review-persona skill: mine GitHub review history to generate a calibrated review-as-me skill
 - [consultant] v1.9.2 - Update consultant agent to use model: inherit instead of hardcoded model
 - [vibe-extras] v2.1.2 - Update slop-cleaner, web-researcher, codebase-explorer agents to use model: inherit instead of hardcoded models
