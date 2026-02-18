@@ -8,7 +8,7 @@ context: fork
 
 # Thoroughness Level
 
-**FIRST**: Determine thoroughness before researching. Parse from natural language (e.g., "quick lookup", "thorough research", "comprehensive analysis") or auto-select based on query characteristics.
+**FIRST**: Determine thoroughness before researching. Parse from natural language or auto-select.
 
 **Auto-selection logic**:
 - Single fact/definition/date → quick
@@ -16,20 +16,29 @@ context: fork
 - Comparison, evaluation, or "best" questions → thorough
 - "comprehensive"/"all options"/"complete analysis"/"deep dive" → very-thorough
 
-**Explicit user preference**: If user explicitly specifies a thoroughness level (e.g., "do a quick lookup", "thorough research on X"), honor that request regardless of other triggers in the query.
+**Explicit user preference**: Honor user-specified level regardless of other triggers.
 
-**Trigger conflicts (auto-selection only)**: When auto-selecting and query contains triggers from multiple levels, use the highest level indicated (very-thorough > thorough > medium > quick).
+**Trigger conflicts (auto-selection only)**: Use highest level indicated.
 
 | Level | Agents/Wave | Wave Policy | Behavior | Triggers |
 |-------|-------------|-------------|----------|----------|
 | **quick** | 1 | Single wave | Single web-researcher, no orchestration file, direct answer | "what is", "when did", factual lookups, definitions |
 | **medium** | 1-2 | Single wave | Orchestration file, focused research on 1-2 angles | specific how-to, single technology, focused question |
-| **thorough** | 2-4 | Continue while critical gaps remain | Full logging, parallel agents, cross-reference, follow-up waves for critical gaps | "compare", "best options", "evaluate", "pros and cons" |
-| **very-thorough** | 4-6 | Continue until comprehensive OR diminishing returns | Multi-wave research until all significant gaps addressed or new waves stop yielding value | "comprehensive", "complete analysis", "all alternatives", "deep dive" |
+| **thorough** | 2-4 | Continue while critical gaps remain | Full logging, parallel agents, cross-reference, follow-up waves | "compare", "best options", "evaluate", "pros and cons" |
+| **very-thorough** | 4-6 | Continue until comprehensive OR diminishing returns | Multi-wave until all significant gaps addressed | "comprehensive", "complete analysis", "all alternatives", "deep dive" |
 
-**Multi-wave research**: For thorough and very-thorough levels, research continues in waves until satisficing criteria are met. Each wave can spawn new investigators to address gaps, conflicts, or newly discovered areas from previous waves. There is no hard maximum - waves continue as long as they're productive and gaps remain at the triggering threshold.
+**Multi-wave**: For thorough/very-thorough, waves continue until satisficing criteria are met. No hard maximum — waves continue as long as productive and gaps remain.
 
-**Ambiguous queries**: If thoroughness cannot be determined AND the query is complex (involves comparison, evaluation, or multiple facets), ask the user:
+**Agent count scaling**: Match agent count to genuine research facets, not perceived thoroughness. Each agent should have a distinct domain justifying dedicated research. Over-spawning wastes resources; under-spawning misses facets.
+
+| Task Complexity | Agents | Rationale |
+|----------------|--------|-----------|
+| Simple fact-check | 1 | Single angle sufficient |
+| Direct comparison (2-3 options) | 2-3 | One per option or dimension |
+| Multi-facet evaluation | 3-5 | One per orthogonal facet |
+| Comprehensive landscape | 5-7 | Cover all major dimensions |
+
+**Ambiguous queries**: If thoroughness cannot be determined AND query is complex, ask:
 
 ```
 I can research this at different depths:
@@ -37,143 +46,95 @@ I can research this at different depths:
 - **thorough**: Multi-angle investigation with cross-referencing (~8-12 min)
 - **very-thorough**: Comprehensive analysis covering all facets (~15-20 min)
 
-Which level would you prefer? (Or I can auto-select based on your query)
+Which level would you prefer?
 ```
 
 State: `**Thoroughness**: [level] — [reason]` then proceed.
 
 ---
 
-# Deep Web Research Skill
+# Orchestration
 
-Orchestrate parallel web researchers to comprehensively investigate a topic through iterative waves, then synthesize findings into actionable intelligence.
+Orchestrate parallel web researchers through iterative waves, then synthesize findings.
 
-**Loop**: Determine thoroughness → Decompose topic → Launch Wave 1 → Collect findings → Evaluate gaps → [If gaps significant AND waves remaining: Launch next wave → Collect → Evaluate → Repeat] → Synthesize → Output
+**Loop**: Determine thoroughness → Decompose → Launch Wave 1 → Collect → Cross-reference → Evaluate gaps → [If gaps + productive: next wave] → Synthesize → Output
 
-**Orchestration file**: `/tmp/research-orchestration-{topic-slug}-{YYYYMMDD-HHMMSS}.md` - external memory for tracking multi-wave research progress and synthesis.
+**Orchestration file**: `/tmp/research-orchestration-{topic-slug}-{YYYYMMDD-HHMMSS}.md` — external memory for tracking multi-wave progress.
+
+- **Topic-slug**: 2-4 key terms (nouns/adjectives), lowercase, hyphens. Exclude articles, prepositions, generic words.
+- **Timestamp**: `YYYYMMDD-HHMMSS` via `date +%Y%m%d-%H%M%S`.
 
 ---
 
 # Satisficing Criteria
 
-Research continues in waves until satisficing criteria are met for the given thoroughness level.
-
-## Wave Continuation by Level
+## Wave Continuation
 
 | Level | Continue When | Stop When (Satisficed) |
 |-------|---------------|------------------------|
 | quick | N/A | Always single wave |
 | medium | N/A | Always single wave |
-| thorough | Critical gaps remain AND previous wave was productive AND ≤50% source overlap with prior waves | No critical gaps OR diminishing returns OR >50% source overlap |
-| very-thorough | Significant gaps remain AND previous wave was productive AND ≤50% source overlap with prior waves | Comprehensive coverage (no significant gaps) OR diminishing returns OR >50% source overlap |
+| thorough | Critical gaps remain AND previous wave productive AND ≤50% source overlap | No critical gaps OR diminishing returns OR >50% source overlap |
+| very-thorough | Significant gaps remain AND previous wave productive AND ≤50% source overlap | No significant gaps OR diminishing returns OR >50% source overlap |
 
-**No hard maximum**: For thorough and very-thorough, waves continue based on necessity, not arbitrary limits. The satisficing criteria drive when to stop.
-
-**Source overlap**: Percentage of sources in current wave that were also cited in any previous wave. >50% overlap indicates research is cycling through same sources.
+**Source overlap**: % of sources in current wave also cited in prior waves. >50% = cycling through same sources.
 
 ## Gap Classification
 
-After each wave, classify identified gaps:
-
 | Gap Type | Definition | Triggers New Wave? |
 |----------|------------|-------------------|
-| **Critical** | Core question aspect unanswered, major conflicts unresolved, key comparison missing | Yes (thorough, very-thorough) |
+| **Critical** | Core question unanswered, major conflict unresolved, key comparison missing | Yes (thorough, very-thorough) |
 | **Significant** | Important facet unexplored, partial answer needs depth, newly discovered area | Yes (very-thorough only) |
-| **Minor** | Nice-to-have detail, edge case unclear, tangential info | No - note in limitations |
+| **Minor** | Nice-to-have detail, edge case, tangential | No — note in limitations |
 
 ## Satisficing Evaluation
 
-After Phase 4 (Cross-Reference), evaluate whether to continue:
-
 **Definitions**:
-- **Finding**: A distinct piece of information answering part of the research question, with at least one source citation. Multiple sources confirming the same fact count as one finding with higher confidence.
-- **Substantive finding**: A finding that provides new information not already established in previous waves. Variations or restatements of known information do not count.
-- **High-authority source**: Official documentation, peer-reviewed research, established news outlets (e.g., major tech publications), or sources from recognized domain experts. Company blogs about their own products count as high-authority for factual claims about that product.
-- **Independent sources**: Sources with different underlying information origins. Two articles citing the same primary source count as one source. Multiple pages from the same domain count as one source unless they represent different authors/teams with distinct research.
-- **High confidence**: Finding corroborated by ≥3 independent sources OR ≥2 high-authority sources.
-- **Medium confidence**: Finding corroborated by 2 independent sources OR 1 high-authority source.
-- **Low confidence**: Finding from a single non-authoritative source with no corroboration.
-- **Medium+ confidence**: Confidence level of Medium or High (i.e., not Low, Contested, or Inconclusive).
+- **Finding**: Distinct information answering part of the question, with source citation.
+- **Substantive finding**: New information not already established in prior waves.
+- **High-authority source**: Official docs, peer-reviewed research, established publications, recognized domain experts.
+- **Independent sources**: Different underlying information origins. Two articles citing the same study = one source.
+- **High confidence**: ≥3 independent sources OR ≥2 high-authority sources.
+- **Medium confidence**: 2 independent sources OR 1 high-authority source.
+- **Low confidence**: Single non-authoritative source, no corroboration.
 
 **Satisficed when ANY true**:
 - All critical gaps addressed (thorough) OR all significant gaps addressed (very-thorough)
-- Diminishing returns detected: new wave revealed <2 new substantive findings AND no finding's confidence increased by at least one level AND no new areas discovered
-- User explicitly requested stopping or a specific wave count
-- Comprehensive coverage achieved: all identified facets addressed with medium+ confidence
+- Diminishing returns: <2 new substantive findings AND no confidence increased AND no new areas
+- User requested stopping
+- All facets at medium+ confidence
 
 **Continue when ALL true**:
-- Gaps exist at the triggering threshold:
-  - thorough: Critical gaps remain (core question unanswered, major conflicts)
-  - very-thorough: Significant gaps remain (important facets unexplored, conflicts, newly discovered areas)
-- Previous wave was productive (≥2 new substantive findings OR ≥1 finding's confidence increased by at least one level OR new areas discovered)
-- Research is still yielding value (≤50% of sources in this wave were cited in previous waves)
+- Gaps at triggering threshold (thorough: critical; very-thorough: significant)
+- Previous wave productive (≥2 findings OR confidence improved OR new areas)
+- ≤50% source overlap with prior waves
 
-## Wave Planning
+---
 
-When continuing to a new wave:
-1. Identify specific gaps to address (from Cross-Reference Analysis)
-2. Design targeted research prompts for each gap
-3. Assign 1-3 agents per wave (focused investigation)
-4. Update orchestration file with wave number and assignments
-5. Launch agents and collect findings
-6. Return to gap evaluation
+# Phase 1: Initial Setup (skip for quick)
 
-**Topic-slug format**: Extract 2-4 key terms (nouns and adjectives that identify the topic; exclude articles, prepositions, and generic words like "best", "options", "analysis"), lowercase, replace spaces with hyphens. Example: "best real-time database options 2025" → `real-time-database-options`
+## 1.1 Get timestamp & create todos
 
-**Timestamp format**: `YYYYMMDD-HHMMSS`. Obtain via `date +%Y%m%d-%H%M%S`.
+Run `date +%Y%m%d-%H%M%S` and `date '+%Y-%m-%d %H:%M:%S'`.
 
-## Phase 1: Initial Setup (skip for quick)
-
-### 1.1 Get timestamp & create todo list
-
-Run two commands:
-- `date +%Y%m%d-%H%M%S` → for filename timestamp (e.g., `20260112-060615`)
-- `date '+%Y-%m-%d %H:%M:%S'` → for human-readable "Started" field (e.g., `2026-01-12 06:06:15`)
-
-Todos = **research areas to investigate + write-to-log operations**, not fixed steps. Each research todo represents a distinct angle or facet. List expands as decomposition reveals new areas. Write-to-log todos ensure external memory stays current.
-
-**Starter todos** (seeds - list grows during decomposition):
+Todos = research areas + write-to-log operations. List grows during decomposition.
 
 ```
-- [ ] Create orchestration file; done when file created
-- [ ] Topic decomposition→log; done when all facets identified
+- [ ] Create orchestration file
+- [ ] Topic decomposition→log
 - [ ] (expand: research facets as decomposition reveals)
-- [ ] Launch Wave 1 agents; done when all agents spawned
-- [ ] Collect Wave 1 findings→log; done when all agents returned
-- [ ] Cross-reference findings→log; done when agreements/conflicts mapped
-- [ ] Evaluate gaps→log; done when gaps classified
+- [ ] Launch Wave 1 agents
+- [ ] Collect Wave 1 findings→log
+- [ ] Cross-reference→log
+- [ ] Evaluate gaps→log
 - [ ] (expand: Wave 2+ if continuing)
 - [ ] Refresh: read full orchestration file
-- [ ] Synthesize→final output; done when all findings integrated + sourced
+- [ ] Synthesize→final output
 ```
 
-**Critical todos** (never skip):
-- `→log` after EACH phase/agent completion
-- `Refresh:` ALWAYS before synthesis
+**Critical todos** (never skip): `→log` after each phase/agent; `Refresh:` before synthesis.
 
-**Expansion pattern**: As decomposition reveals facets, add research todos:
-```
-- [x] Create orchestration file; file created
-- [x] Topic decomposition→log; 4 facets identified
-- [ ] Research: real-time database landscape 2025; done when options cataloged
-- [ ] Research: performance benchmarks; done when latency/throughput data found
-- [ ] Research: conflict resolution strategies; done when CRDT/OT patterns documented
-- [ ] Research: production case studies; done when 3+ cases collected
-- [ ] Launch Wave 1 agents (4 parallel); done when all agents spawned
-- [ ] Collect Agent 1→log; done when findings written
-- [ ] Collect Agent 2→log; done when findings written
-- [ ] Collect Agent 3→log; done when findings written
-- [ ] Collect Agent 4→log; done when findings written
-- [ ] Cross-reference→log; done when agreements/conflicts mapped
-- [ ] Evaluate gaps→log; done when gaps classified
-- [ ] (expand: Wave 2 if continuing)
-- [ ] Refresh: read full orchestration file
-- [ ] Synthesize→final output; done when all findings integrated + sourced
-```
-
-### 1.2 Create orchestration file (skip for quick)
-
-Path: `/tmp/research-orchestration-{topic-slug}-{YYYYMMDD-HHMMSS}.md`
+## 1.2 Create orchestration file
 
 ```markdown
 # Web Research Orchestration: {topic}
@@ -183,12 +144,10 @@ Thoroughness: {level}
 Wave Policy: {single wave | continue while critical gaps | continue until comprehensive}
 
 ## Research Question
-{Clear statement of what needs to be researched}
+{Clear statement}
 
 ## Topic Decomposition
-- Core question: {main thing to answer}
-- Facets to investigate: (populated in Phase 2)
-- Expected researcher count: {based on thoroughness level}
+(populated in Phase 2)
 
 ## Wave Tracking
 | Wave | Agents | Focus | Status | New Findings | Decision |
@@ -198,9 +157,6 @@ Wave Policy: {single wave | continue while critical gaps | continue until compre
 ## Research Assignments
 (populated in Phase 2)
 
-## Agent Status
-(updated as agents complete)
-
 ## Collected Findings
 (populated as agents return)
 
@@ -208,525 +164,289 @@ Wave Policy: {single wave | continue while critical gaps | continue until compre
 (populated after each wave)
 
 ## Gap Evaluation
-(populated after each wave - drives continuation decisions)
+(populated after each wave)
 
 ## Synthesis Notes
 (populated in final phase)
 ```
 
-## Phase 2: Topic Decomposition & Agent Assignment
+# Phase 2: Topic Decomposition & Agent Assignment
 
-### 2.1 Decompose the research topic into ORTHOGONAL facets
+## 2.1 Decompose into ORTHOGONAL facets
 
-Before launching agents, analyze the query to identify **non-overlapping** research angles. Each agent should have a distinct domain with clear boundaries.
+Analyze the query to identify **non-overlapping** research angles. Each agent gets a distinct domain with clear boundaries.
 
-1. **Core question**: What is the fundamental thing being asked?
-2. **Facets**: What distinct aspects need investigation? Ensure minimal overlap:
-   - Technical aspects (how it works, implementation details)
-   - Comparison aspects (alternatives, competitors, trade-offs)
-   - Practical aspects (real-world usage, adoption, case studies)
-   - Current state (recent developments, 2025 updates)
-   - Limitations/concerns (drawbacks, issues, criticisms)
+1. **Core question**: What is fundamentally being asked?
+2. **Facets**: What distinct aspects need investigation? (technical, comparison, practical, current state, limitations)
+3. **Orthogonality check**: Each facet covers a distinct domain. No two facets would naturally run the same queries. Boundaries are explicitly statable.
 
-3. **Orthogonality check**: Before assigning agents, verify:
-   - Each facet covers a distinct domain
-   - No two facets would naturally search the same queries
-   - Boundaries are clear enough to state explicitly
+**Bad** (overlapping): Agent 1 = "Research Firebase", Agent 2 = "Research real-time databases"
+**Good** (orthogonal): Agent 1 = "Firebase — features, pricing, limits", Agent 2 = "Non-Firebase alternatives: Supabase, Convex, PlanetScale"
 
-**Bad decomposition** (overlapping):
-- Agent 1: "Research Firebase"
-- Agent 2: "Research real-time databases" ← Firebase is a real-time database, overlap!
+**Orthogonality strategies**: by entity, by dimension, by time horizon, by perspective.
 
-**Good decomposition** (orthogonal):
-- Agent 1: "Research Firebase specifically - features, pricing, limits"
-- Agent 2: "Research non-Firebase alternatives: Supabase, Convex, PlanetScale"
-
-### 2.2 Plan agent assignments with explicit boundaries
+## 2.2 Plan agent assignments with explicit boundaries
 
 | Facet | Research Focus | Explicitly EXCLUDE |
 |-------|----------------|-------------------|
-| {facet 1} | "{what to research}" | "{what other agents cover}" |
-| {facet 2} | "{what to research}" | "{what other agents cover}" |
+| {facet 1} | "{scope}" | "{what others cover}" |
+| {facet 2} | "{scope}" | "{what others cover}" |
 
-**Agent count by level**:
-- medium: 1-2 agents (core + one related angle)
-- thorough: 2-4 agents (core + alternatives + practical + concerns)
-- very-thorough: 4-6 agents (comprehensive coverage of all facets)
+**If more facets than agents allow**: prioritize by (1) directly answers core question, (2) enables comparison, (3) addresses user-specified concerns. Combine related facets. Schedule remaining for Wave 2.
 
-**If decomposition reveals more facets than agent count allows**:
-- Prioritize facets by: (1) directly answers core question, (2) enables comparison if requested, (3) addresses user-specified concerns
-- Combine related facets into single agent assignments where orthogonality allows
-- Schedule remaining facets for Wave 2 if initial wave is productive
+## 2.3 Update orchestration file with decomposition and assignments
 
-**Orthogonality strategies**:
-- By entity: Agent 1 = Product A, Agent 2 = Product B (not both "products")
-- By dimension: Agent 1 = Performance, Agent 2 = Pricing, Agent 3 = Security
-- By time: Agent 1 = Current state, Agent 2 = Historical evolution
-- By perspective: Agent 1 = Official docs, Agent 2 = Community experience
+# Phase 3: Launch Parallel Researchers
 
-### 2.3 Expand todos for each research area
+## 3.1 Launch web-researcher agents
 
-Add a todo for each planned agent assignment:
+Launch `vibe-extras:web-researcher` agents in parallel (single message with multiple invocations).
 
+**Wave 1 prompt template** — uses neutral framing to avoid biasing agent findings:
 ```
-- [x] Topic decomposition & research planning
-- [ ] Research: {facet 1 description}
-- [ ] Research: {facet 2 description}
-- [ ] Research: {facet 3 description}
-- [ ] ...
-- [ ] Collect and cross-reference findings
-- [ ] Synthesize final output
-```
-
-### 2.4 Update orchestration file
-
-After decomposition, update the file:
-
-```markdown
-## Topic Decomposition
-- Core question: {main question}
-- Facets identified:
-  1. {facet 1}: {why this angle matters}
-  2. {facet 2}: {why this angle matters}
-  ...
-
-## Research Assignments
-| Agent | Facet | Prompt | Status |
-|-------|-------|--------|--------|
-| 1 | {facet} | "{prompt}" | Pending |
-| 2 | {facet} | "{prompt}" | Pending |
-...
-```
-
-## Phase 3: Launch Parallel Researchers
-
-### 3.1 Launch web-researcher agents
-
-Launch `vibe-extras:web-researcher` agents for each research angle. **Launch agents in parallel** (single message with multiple agent invocations) to maximize efficiency.
-
-**Wave 1 prompt template** (broad exploration with boundaries):
-```
-{Specific research question for this facet}
+Investigate the relationship between {topic} and {facet area}. Include evidence both supporting and contradicting common assumptions about {topic}.
 
 YOUR ASSIGNED SCOPE:
 - Focus areas: {specific aspect 1}, {specific aspect 2}, {specific aspect 3}
-- This is YOUR domain - go deep on these topics
+- This is YOUR domain — go deep on these topics
 
 DO NOT RESEARCH (other agents cover these):
 - {facet assigned to Agent 2}
 - {facet assigned to Agent 3}
-- {etc.}
 
-Current date context: {YYYY-MM-DD} - prioritize recent sources.
+Current date context: {YYYY-MM-DD} — prioritize recent sources.
 
 ---
 Research context:
 - Wave: 1 (initial investigation)
 - Mode: Broad exploration within your assigned scope
-- Stay within your boundaries - other agents handle the excluded areas
-- Report any gaps or conflicts you discover for potential follow-up waves
+- Report gaps or conflicts for potential follow-up waves
 ```
 
-**Wave 2+ prompt template** (gap-filling):
+**Wave 2+ prompt template** — targeted gap-filling with established context:
 ```
 {Specific gap or conflict to resolve}
 
 Context from previous waves:
-- Previous findings: {summary of relevant findings from earlier waves}
-- Gap being addressed: {specific gap - e.g., "Sources conflict on X" or "Y aspect unexplored"}
-- What we already know: {established facts from Wave 1}
+- Previous findings: {summary of relevant findings}
+- Gap being addressed: {specific gap}
+- Established facts: {what Wave 1 found}
 
 YOUR ASSIGNED SCOPE:
 - Focus narrowly on: {targeted aspect 1}, {targeted aspect 2}
 - This gap was identified because: {why previous research was insufficient}
 
 DO NOT RESEARCH:
-- Topics already well-covered in Wave 1 (don't repeat)
-- {areas other Wave 2 agents are handling}
+- Topics well-covered in Wave 1
+- {areas other Wave 2 agents handle}
 
-Current date context: {YYYY-MM-DD} - prioritize recent sources.
+Current date context: {YYYY-MM-DD} — prioritize recent sources.
 
 ---
 Research context:
 - Wave: {N} (gap-filling)
-- Mode: Targeted investigation - focus narrowly on the gap above
+- Mode: Targeted investigation — focus on the gap above
 - Build on previous findings, don't repeat broad exploration
-- Flag if this gap cannot be resolved (conflicting authoritative sources, no data available, etc.)
+- Flag if gap cannot be resolved
 ```
 
-**Batching rules**:
-- thorough: Launch all 2-4 agents in a single parallel batch
-- very-thorough: Launch in batches of 3-4 agents; for 5 agents use 3+2, for 6 agents use 3+3 (avoid overwhelming context)
-- Wave 2+: Launch 1-3 focused agents per wave
+**Sycophancy guard**: Agent prompts must avoid implying expected findings. Use "investigate the relationship between X and Y" not "research how X improves Y." Include "evidence both supporting and contradicting" to elicit balanced research.
 
-### 3.2 Update orchestration file after each agent completes
+**Batching**: thorough → all 2-4 agents in one batch. very-thorough → batches of 3-4 (5 agents: 3+2; 6 agents: 3+3). Wave 2+ → 1-3 focused agents.
 
-After EACH agent returns, immediately update:
+## 3.2 Update orchestration file after each agent completes
 
-```markdown
-## Agent Status
-| Agent | Facet | Status | Key Finding |
-|-------|-------|--------|-------------|
-| 1 | {facet} | Complete | {1-sentence summary} |
-| 2 | {facet} | Complete | {1-sentence summary} |
-...
+Record agent status, key findings, confidence levels, source citations. Preserve all source URLs.
 
-## Collected Findings
+## 3.3 Handle agent failures
 
-### Agent 1: {facet}
-**Confidence**: {High/Medium/Low/Contested/Inconclusive}
-**Sources**: {count}
+If agent times out or returns incomplete:
+- **Retry** if: covers critical gap, explicitly required for comparison, or user-requested
+- **Mark as gap** if: significant/minor priority, partially covered by others, or synthesis viable without
+- Never block synthesis for single failed agent
+- If ALL agents fail: Wave 1 → retry simpler decomposition; Wave 2+ → proceed with prior findings
 
-{Paste key findings from agent - preserve source citations}
-{If Contested: note the conflicting positions}
-{If Inconclusive: note what couldn't be determined}
+# Phase 4: Cross-Reference, Evaluate & Iterate
 
-### Agent 2: {facet}
-...
-```
+## 4.1 Analyze findings across agents
 
-### 3.3 Handle agent failures
+Identify:
+- **Agreements**: Multiple agents reach similar conclusions
+- **Conflicts**: Findings contradict (includes "Contested" findings from agents)
+- **Inconclusive**: Agents couldn't determine answers
+- **Gaps**: Not covered by any agent
+- **Surprises**: Unexpected findings warranting attention
 
-If an agent times out or returns incomplete results:
-1. Note the gap in orchestration file
-2. Decide based on facet criticality:
-   - **Retry** (narrower prompt) if: facet covers a Critical gap for the research question, OR facet is explicitly required by the research question for comparison/evaluation (e.g., query asks to compare X and Y, and facet covers X or Y), OR user explicitly requested this facet
-   - **Mark as gap** (don't retry) if: facet covers a Significant or Minor gap, OR other agents partially covered the topic, OR research can synthesize without this facet
-3. Never block synthesis for a single failed agent - proceed with available findings and note the limitation
-4. If ALL agents in a wave fail:
-   - For Wave 1: Retry with simpler decomposition (fewer agents, broader prompts)
-   - For Wave 2+: Mark gaps as unresolvable, proceed to synthesis with prior wave findings
-   - Always note the systemic failure in Gaps & Limitations
+**Disagreement classification** — classify conflicts before resolution:
+- *Factual conflicts* (equal-authority sources): investigate deeper, favor higher authority, split if unresolvable
+- *Open-question conflicts* (ongoing investigation): preserve both positions — never force false consensus
+- *Authority asymmetry*: weight toward higher authority unless specific reasons to doubt
 
-## Phase 4: Collect, Cross-Reference & Evaluate Gaps
+## 4.2 Update orchestration file with cross-reference analysis
 
-### 4.1 Mark collection todo in_progress
+Record agreements, conflicts (with classification), gaps, and key insights.
 
-### 4.2 Analyze findings across agents
+## 4.3 Key Assumptions Check (for thorough/very-thorough)
 
-Look for:
-- **Agreements**: Where do multiple agents reach similar conclusions?
-- **Conflicts**: Where do findings contradict? (includes agent-reported "Contested" findings)
-- **Inconclusive**: Areas where agents couldn't determine answers
-- **Gaps**: What wasn't covered by any agent?
-- **Surprises**: Unexpected findings that warrant highlighting
+After cross-referencing, surface hidden assumptions:
+1. What must be true for the emerging conclusions to hold?
+2. Which assumptions are load-bearing (failure collapses most conclusions)?
+3. What information would test weakened assumptions?
 
-**Handling agent confidence levels**:
-- **High/Medium/Low**: Standard confidence - use for cross-referencing
-- **Contested**: Agent found high-authority sources that directly contradict each other - treat as a conflict requiring resolution or presentation of both positions
-- **Inconclusive**: Agent couldn't find agreement among sources - may warrant follow-up wave with different search angles
+Common hidden assumptions: first authoritative source is reliable, topic boundaries correctly drawn, absence of contrary evidence means consensus, search results represent full landscape.
 
-### 4.3 Update orchestration file with cross-reference
+## 4.4 Linchpin analysis (for thorough/very-thorough)
 
-```markdown
-## Cross-Reference Analysis
+Identify 3-5 claims whose failure would collapse the most conclusions. Focus any adversarial or follow-up effort on these linchpin claims first — they have the highest verification ROI.
 
-### Agreements (High Confidence)
-- {Finding}: Supported by agents {1, 3, 4}
-- {Finding}: Confirmed across {count} sources
+## 4.5 Evaluate gaps and decide next wave (skip for quick/medium)
 
-### Conflicts (Requires Judgment)
-- {Topic}: Agent 1 says X, Agent 3 says Y
-  - Resolution: {which to trust and why, or present both}
-- {Topic}: Agent 2 reported as Contested - {Position A} vs {Position B}
-  - Resolution: {present both with supporting sources, or identify which is more authoritative}
-
-### Inconclusive Areas
-- {Topic}: Agent {N} couldn't determine - {reason}
-  - Action: {follow-up wave with different angles, or note as limitation}
-
-### Gaps Identified
-- {What wasn't answered}
-- {Areas needing more research}
-
-### Key Insights
-- {Synthesis observation 1}
-- {Synthesis observation 2}
-```
-
-### 4.4 Evaluate gaps and decide next wave (skip for quick/medium)
-
-**For thorough and very-thorough levels**, classify each gap:
+Classify each gap (critical/significant/minor). Assess wave productivity. Apply satisficing criteria.
 
 ```markdown
 ## Gap Evaluation (Wave {N})
 
-### Critical Gaps (triggers thorough/very-thorough continuation)
-- [ ] {Gap}: {Why critical - core question aspect unanswered}
-- [ ] {Gap}: {Why critical - major conflict unresolved}
+### Critical Gaps
+- [ ] {Gap}: {Why critical}
 
-### Significant Gaps (triggers very-thorough continuation)
-- [ ] {Gap}: {Why significant - important facet unexplored}
-- [ ] {Gap}: {Why significant - partial answer needs depth}
-- [ ] {Gap}: {Why significant - newly discovered area worth exploring}
+### Significant Gaps
+- [ ] {Gap}: {Why significant}
 
-### Minor Gaps (note in limitations, don't pursue)
-- {Gap}: {Why minor - nice-to-have detail}
+### Minor Gaps (note, don't pursue)
+- {Gap}: {Why minor}
 
-### Wave Productivity Assessment
-- New substantive findings this wave: {count}
-- Confidence improvements: {which areas improved}
-- New areas discovered: {list or "none"}
-- Diminishing returns signals: {yes/no - explain}
+### Wave Productivity
+- Substantive findings: {count}
+- Confidence improvements: {which areas}
+- New areas: {list or "none"}
+- Diminishing returns: {yes/no}
 
-### Wave Decision
-- Current wave: {N}
-- Thoroughness level: {level}
-- Wave policy: {single wave | continue while critical gaps | continue until comprehensive}
-- Critical gaps remaining: {count}
-- Significant gaps remaining: {count}
-- Was this wave productive? {yes/no - ≥2 findings OR confidence improved OR new areas}
-- **Decision**: {CONTINUE to Wave N+1 | SATISFICED - proceed to synthesis}
-- **Reason**: {explain based on satisficing criteria - what gaps remain or why comprehensive}
+### Decision
+**{CONTINUE to Wave N+1 | SATISFICED}** — {reason}
 ```
 
-### 4.5 Wave Decision Logic
+## 4.6 Launch next wave (if continuing)
 
-**If SATISFICED** (any of these true):
-- Level is quick or medium → Proceed to Phase 5
-- No critical gaps (thorough) or no significant gaps (very-thorough) → Proceed to Phase 5
-- Diminishing returns: previous wave yielded <2 new substantive findings AND no finding's confidence increased by at least one level AND no new areas discovered → Proceed to Phase 5
-- Comprehensive coverage achieved: all identified facets addressed with medium+ confidence → Proceed to Phase 5
-- User explicitly requested stopping
+1. Update Wave Tracking table
+2. Design targeted prompts for specific gaps (narrower than Wave 1)
+3. Launch 1-3 focused `vibe-extras:web-researcher` agents
+4. Collect findings → return to 4.1
 
-**If CONTINUE** (all of these true):
-- Gaps exist at triggering threshold:
-  - thorough: Critical gaps remain
-  - very-thorough: Significant gaps remain
-- Previous wave was productive (≥2 new substantive findings OR ≥1 finding's confidence increased by at least one level OR new areas discovered)
-- Not cycling through same sources (≤50% of sources in this wave were cited in previous waves)
+# Phase 5: Synthesize & Output
 
-### 4.6 Launch Next Wave (if continuing)
+## 5.1 Refresh context (MANDATORY)
 
-When continuing to a new wave:
+Read the FULL orchestration file. Verify access to: all agent findings, cross-references, gap evaluations, wave tracking, all citations.
 
-1. **Update Wave Tracking table** in orchestration file:
-```markdown
-## Wave Tracking
-| Wave | Agents | Focus | Status | New Findings |
-|------|--------|-------|--------|--------------|
-| 1 | 4 | Initial investigation | Complete | 12 findings |
-| 2 | 2 | Gap-filling: {focus areas} | In Progress | - |
+```
+- [x] Refresh: read full orchestration file  ← Must complete before synthesis
+- [ ] Synthesize→final output
 ```
 
-2. **Add wave-specific todos**:
-```
-- [ ] Wave 2: Investigate {critical gap 1}
-- [ ] Wave 2: Resolve conflict on {topic}
-- [ ] Wave 2: Deep-dive {significant gap}
-```
+## 5.2 Outside view check (for thorough/very-thorough)
 
-3. **Design targeted prompts** for gaps:
-   - Be specific: "Resolve conflict between X and Y regarding Z"
-   - Include context: "Previous research found A, but need clarification on B"
-   - Narrower scope than Wave 1 agents
+Before finalizing, apply reference class reasoning: "How often does research of this type produce reliable conclusions?" Consider whether the research domain is well-covered by high-quality web sources, or if it's a niche area where available evidence may be systematically incomplete.
 
-4. **Launch 1-3 agents** for this wave (focused investigation)
-   - Launch `vibe-extras:web-researcher` agents
-   - Prompts reference specific gaps, not broad topics
+## 5.3 Generate output
 
-5. **Collect findings** and return to 4.2 (cross-reference including new findings)
-
-### 4.7 Mark collection todo complete (when proceeding to synthesis)
-
-## Phase 5: Synthesize & Output
-
-### 5.1 Refresh context (MANDATORY - never skip)
-
-**CRITICAL**: Read the FULL orchestration file to restore ALL findings, cross-references, gap evaluations, and wave tracking into context.
-
-**Why this matters**: By this point, findings from multiple agents across potentially multiple waves have been written to the orchestration file. Context degradation means these details may have faded. Reading the full file immediately before synthesis brings all findings into recent context where attention is strongest.
-
-**Todo must show**:
-```
-- [x] Refresh context: read full orchestration file  ← Must be marked complete before synthesis
-- [ ] Synthesize final output
-```
-
-**Verification**: After reading, you should have access to:
-- All collected findings from every agent
-- Cross-reference analysis (agreements, conflicts, inconclusive)
-- Gap evaluations from each wave
-- Wave tracking with decisions
-- All source citations
-
-### 5.2 Mark synthesis todo in_progress
-
-### 5.3 Generate comprehensive output
-
-**Only after completing 5.1** - synthesize ALL agent findings into a cohesive answer. Include:
+Synthesize ALL agent findings. Use structural confidence — source agreement and evidence quality tiers, not verbal self-reports. Both overconfidence and underconfidence degrade quality.
 
 ```markdown
 ## Research Findings: {Topic}
 
-**Thoroughness**: {level} | **Waves**: {count} | **Researchers**: {total across waves} | **Total Sources**: {aggregate}
-**Overall Confidence**: High/Medium/Low (based on agreement and source quality)
-**Satisficing**: {reason research concluded - e.g., "All significant gaps addressed" or "Diminishing returns after Wave 3"}
+**Thoroughness**: {level} | **Waves**: {count} | **Researchers**: {total} | **Sources**: {aggregate}
+**Overall Confidence**: High/Medium/Low
+**Satisficing**: {why research concluded}
 
 ### Executive Summary
-{4-8 sentences synthesizing the key takeaway. What does the user need to know?}
+{4-8 sentences. Key takeaway for the user.}
 
 ### Detailed Findings
 
-#### {Major Finding Area 1}
-{Synthesized insights with inline source citations from multiple agents}
+#### {Finding Area 1}
+{Synthesized insights with inline citations from multiple agents}
+{State warrant: reasoning connecting evidence to conclusion}
 
-#### {Major Finding Area 2}
+#### {Finding Area 2}
 {...}
 
 ### Comparison/Evaluation (if applicable)
 | Option | Pros | Cons | Best For |
 |--------|------|------|----------|
-| {opt 1} | {from agents} | {from agents} | {synthesis} |
-| {opt 2} | {from agents} | {from agents} | {synthesis} |
+| {opt 1} | {evidence} | {evidence} | {synthesis} |
 
 ### Recommendations
-{Based on synthesized evidence - what should the user consider/do?}
+{Evidence-based suggestions. State conditions under which they would not hold.}
 
 ### Confidence Notes
-- **High confidence**: {findings with strong multi-source agreement}
-- **Medium confidence**: {findings with some support}
-- **Contested**: {where high-authority sources directly contradicted - present both positions}
-- **Inconclusive**: {where agents couldn't determine answers despite searching}
+- **High confidence**: {strong multi-source agreement}
+- **Medium confidence**: {some support}
+- **Contested**: {high-authority sources contradicted — both positions presented}
+- **Inconclusive**: {couldn't determine despite searching}
 - **Low confidence**: {single source or weak agreement}
 
-### Research Progression (for multi-wave)
+### Key Assumptions
+{Load-bearing assumptions that must hold for conclusions to be valid}
+
+### Research Progression (multi-wave)
 | Wave | Focus | Agents | Key Contribution |
 |------|-------|--------|------------------|
-| 1 | Initial investigation | {N} | {what this wave established} |
-| 2 | {Gap focus} | {N} | {what this wave resolved} |
-| ... | ... | ... | ... |
+| 1 | Initial investigation | {N} | {established} |
+| 2 | {Gap focus} | {N} | {resolved} |
 
 ### Gaps & Limitations
-- {What couldn't be definitively answered despite multi-wave investigation}
-- {Areas where more research would help}
-- {Potential biases in available sources}
-- {Gaps intentionally not pursued (minor priority)}
+- {Unanswered questions}
+- {Areas needing more research}
+- {Source biases}
+- {Minor gaps not pursued}
+- {Protocol deviations from initial plan}
 
 ### Source Summary
-| Source | Authority | Date | Used For | Wave |
-|--------|-----------|------|----------|------|
-| {url} | High/Med | {date} | {finding} | 1 |
-...
+| Source | Authority | Confidence | Date | Used For | Wave |
+|--------|-----------|------------|------|----------|------|
+| {url} | High/Med | {GRADE-adjusted} | {date} | {finding} | 1 |
 
 ---
 Orchestration file: {path}
 Research completed: {timestamp}
 ```
 
-### 5.4 Mark all todos complete
-
 ## Quick Mode Flow
 
-For quick (single-fact) queries, skip orchestration:
-
+For quick (single-fact) queries:
 1. State: `**Thoroughness**: quick — [reason]`
-2. Launch a `vibe-extras:web-researcher` agent with: "{query}"
-3. Return agent's findings directly (no synthesis overhead)
+2. Launch single `vibe-extras:web-researcher` agent with the query
+3. Return findings directly (no synthesis overhead)
 
-## Key Principles
+# Principles
 
 | Principle | Rule |
 |-----------|------|
 | Thoroughness first | Determine level before any research |
-| Todos with write-to-log | Each collection gets a todo, followed by a write-to-orchestration-file todo |
-| Write after each phase | Write to orchestration file after EACH phase/agent |
-| Parallel execution | Launch multiple agents simultaneously when possible |
-| Cross-reference | Compare findings across agents before synthesizing |
-| Gap evaluation | Classify gaps after each wave (critical/significant/minor) |
-| Wave iteration | Continue waves until satisficed OR diminishing returns |
-| **Context refresh** | **Read full orchestration file BEFORE synthesis - non-negotiable** |
+| Facet-driven scaling | Match agent count to genuine orthogonal facets, not thoroughness level alone |
+| Write after each phase | Update orchestration file after EVERY phase/agent |
+| Parallel execution | Launch agents simultaneously when possible |
+| Neutral framing | Agent prompts avoid implying expected findings |
+| Cross-reference | Compare findings across agents; classify disagreements before resolving |
+| Gap evaluation | Classify gaps (critical/significant/minor) after each wave |
+| Key Assumptions Check | Surface hidden assumptions after cross-referencing |
+| Linchpin focus | Target verification at claims whose failure collapses most conclusions |
+| Outside view (thorough+) | Apply reference class reasoning before finalizing |
+| Wave iteration | Continue until satisficed OR diminishing returns |
+| **Context refresh** | **Read full orchestration file BEFORE synthesis — non-negotiable** |
 | Source preservation | Maintain citations through synthesis |
-| Gap honesty | Explicitly state what couldn't be answered despite multi-wave effort |
-
-**Log Pattern Summary**:
-1. Create orchestration file at start
-2. Add write-to-log todos after each collection phase
-3. Write to it after EVERY step (decomposition, agent findings, cross-reference, gap evaluation)
-4. "Refresh context: read full orchestration file" todo before synthesis
-5. Read FULL file before synthesis (restores all context)
+| Structural confidence | Assess via source agreement and evidence tiers, not verbal reports |
+| Gap honesty | State what couldn't be answered despite effort |
 
 ## Never Do
 
-- Launch agents without determining thoroughness level
-- Skip write-to-log todos (every collection must be followed by a write todo)
-- Proceed to next phase without writing findings to orchestration file
-- Synthesize without completing "Refresh context: read full orchestration file" todo first
-- Skip orchestration file updates after agent completions
-- Present synthesized findings without source citations
-- Ignore conflicts between agent findings (especially "Contested" findings)
-- Skip gap evaluation for thorough/very-thorough levels
-- Continue waves when diminishing returns detected (wasted effort)
-- Stop prematurely when critical gaps remain (thorough) or significant gaps remain (very-thorough) and waves are still productive
-
-## Example: Technology Comparison
-
-Query: "Compare the best real-time databases for a collaborative app in 2025"
-
-**Thoroughness**: thorough — comparison query requiring multi-angle investigation
-
-**Decomposition**:
-- Facet 1: Real-time database landscape 2025 (what options exist)
-- Facet 2: Performance and scalability comparisons
-- Facet 3: Collaborative app requirements (conflict resolution, sync)
-- Facet 4: Production experiences and case studies
-
-**Agents launched** (parallel):
-1. "Real-time database options 2025: Firebase, Supabase, Convex, others. Current market landscape."
-2. "Real-time database performance benchmarks and scalability. Latency, throughput, concurrent users."
-3. "Conflict resolution and sync strategies for collaborative apps. CRDTs, OT, last-write-wins."
-4. "Production case studies using real-time databases. Companies, scale, lessons learned."
-
-**Output**: Synthesized comparison table with recommendations based on use case, backed by cross-referenced sources from all four agents.
-
-## Example: Multi-Wave Comprehensive Research
-
-Query: "Give me a comprehensive analysis of all the AI coding assistant options in 2025"
-
-**Thoroughness**: very-thorough — "comprehensive analysis" + "all options" triggers maximum depth
-
-### Wave 1: Initial Investigation
-**Decomposition** (6 orthogonal facets):
-- Facet 1: Market landscape - what tools exist (names only, no features/pricing)
-- Facet 2: Feature comparison - autocomplete, chat, agents, IDE support (no pricing)
-- Facet 3: Pricing and licensing - costs, tiers, enterprise deals (no features)
-- Facet 4: Enterprise/security - compliance, SOC2, on-prem (no general features)
-- Facet 5: Developer sentiment - reviews, community feedback (no official docs)
-- Facet 6: Recent news - announcements, launches, acquisitions (no evergreen content)
-
-**Agents launched with explicit boundaries** (parallel batch of 4, then 2):
-1. "AI coding assistant market landscape 2025. YOUR SCOPE: List all tools (Copilot, Cursor, Claude Code, Codeium, etc). DO NOT RESEARCH: features, pricing, reviews."
-2. "AI coding assistant features 2025. YOUR SCOPE: autocomplete, chat, agentic capabilities, IDE support. DO NOT RESEARCH: pricing, enterprise security, user reviews."
-3. "AI coding assistant pricing 2025. YOUR SCOPE: subscription costs, usage-based models, free tiers. DO NOT RESEARCH: features, security compliance."
-4. "Enterprise AI coding assistant compliance 2025. YOUR SCOPE: SOC2, HIPAA, on-premise, data residency. DO NOT RESEARCH: general features, consumer pricing."
-5. "AI coding assistant developer sentiment 2025. YOUR SCOPE: Reddit, HN, Twitter discussions, community feedback. DO NOT RESEARCH: official documentation, pricing pages."
-6. "AI coding assistant news 2025. YOUR SCOPE: recent announcements, launches, acquisitions since Jan 2025. DO NOT RESEARCH: established features, pricing."
-
-**Gap Evaluation (Wave 1)**:
-- Critical gaps: None (all facets had substantial findings)
-- Significant gaps:
-  - Conflict: Sources disagree on which tool has best agentic capabilities
-  - Partial answer: Enterprise pricing not fully detailed for all options
-  - New discovery: Several sources mention "AI code review" as emerging category
-- Minor gaps: Specific latency benchmarks, rare IDE integrations
-
-**Wave Decision**: CONTINUE — 3 significant gaps remain, Wave 1 was productive (18 findings), research still yielding new information
-
-### Wave 2: Gap-Filling
-**Focus**: Resolve agentic capabilities conflict, deepen enterprise pricing, explore AI code review
-
-**Agents launched** (3 focused):
-1. "Compare agentic capabilities: Cursor Composer vs Claude Code vs GitHub Copilot Workspace 2025"
-2. "Enterprise AI coding assistant pricing 2025: Copilot Business, Cursor Teams, volume discounts"
-3. "AI code review tools 2025: CodeRabbit, Sourcery, Codacy AI. Emerging category analysis."
-
-**Gap Evaluation (Wave 2)**:
-- Critical gaps: None
-- Significant gaps: None remaining (conflict resolved, enterprise pricing clarified)
-- Minor gaps: Some niche tools not fully covered
-
-**Wave Decision**: SATISFICED — No significant gaps remaining, 2 waves complete
-
-### Output Summary
-**Thoroughness**: very-thorough | **Waves**: 2 | **Researchers**: 9 | **Sources**: 34
-**Satisficing**: All significant gaps addressed — comprehensive coverage achieved
+- Launch agents without determining thoroughness
+- Skip write-to-log todos or orchestration file updates
+- Synthesize without refreshing from orchestration file
+- Present findings without source citations
+- Ignore conflicts between agents (especially "Contested" findings)
+- Frame agent prompts to imply expected findings
+- Skip gap evaluation for thorough/very-thorough
+- Continue waves when diminishing returns detected
+- Stop when critical/significant gaps remain and waves are still productive
+- Over-spawn agents beyond genuine facet count
