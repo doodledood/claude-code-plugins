@@ -254,9 +254,12 @@ Research context:
 
 **Batching**: thorough → all 2-4 agents in one batch. very-thorough → batches of 3-4 (5 agents: 3+2; 6 agents: 3+3). Wave 2+ → 1-3 focused agents.
 
-## 3.2 Update orchestration file after each agent completes
+## 3.2 Collect agent findings
 
-Record agent status, key findings, confidence levels, source citations. Preserve all source URLs.
+Each agent returns a file path (not inline findings). After each agent completes:
+1. Parse the research file path from the agent's return message
+2. Read the agent's research file to extract full findings
+3. Record agent status, key findings, confidence levels, and source citations in the orchestration file. Preserve all source URLs.
 
 ## 3.3 Handle agent failures
 
@@ -336,10 +339,10 @@ Classify each gap (critical/significant/minor). Assess wave productivity. Apply 
 
 ## 5.1 Refresh context (MANDATORY)
 
-Read the FULL orchestration file. Verify access to: all agent findings, cross-references, gap evaluations, wave tracking, all citations.
+Read the FULL orchestration file AND all agent research files. Verify access to: all agent findings, cross-references, gap evaluations, wave tracking, all citations.
 
 ```
-- [x] Refresh: read full orchestration file  ← Must complete before synthesis
+- [x] Refresh: read full orchestration file + all agent research files  ← Must complete before synthesis
 - [ ] Synthesize→final output
 ```
 
@@ -416,7 +419,8 @@ Research completed: {timestamp}
 For quick (single-fact) queries:
 1. State: `**Thoroughness**: quick — [reason]`
 2. Launch single `vibe-extras:web-researcher` agent with the query
-3. Return findings directly (no synthesis overhead)
+3. Read the agent's research file from the returned path
+4. Present findings directly to user (no synthesis overhead)
 
 # Principles
 

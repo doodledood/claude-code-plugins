@@ -497,6 +497,7 @@ Minimum acceptable? Not ideal—what you could live with."
 ```
 Task(subagent_type:"vibe-extras:web-researcher",prompt:"quick - Typical {factor} ranges in {category}? Basic/mid/premium.",description:"Market context")
 ```
+Read the research file path returned by the agent to get full findings.
 
 ## 3.3 Categorize Factors
 
@@ -554,6 +555,7 @@ FIND: (1) Direct solutions, (2) Alternatives, (3) Creative options
 
 Return by category with descriptions.",description:"Discover options")
 ```
+Read the research file path returned by the agent to get full findings.
 
 ## 4.3 Present Options
 
@@ -605,6 +607,7 @@ CONTEXT: {situation}
 
 FOR EACH: values with sources, strengths/weaknesses, hidden costs, best/worst for",description:"Research options")
 ```
+Read the research file path returned by the agent to get full findings.
 
 **Thoroughness by stakes**: Low→medium, Medium→thorough, High→very thorough
 
@@ -640,7 +643,7 @@ Scan for factors: important (multiple sources), NOT in discovery, could change r
 ```
 
 **Missing cell for Non-Negotiable/Important**:
-1. Targeted: `Task(subagent_type:"vibe-extras:web-researcher", prompt:"quick - {Factor} for {Option}", description:"Fill gap")`
+1. Targeted: `Task(subagent_type:"vibe-extras:web-researcher", prompt:"quick - {Factor} for {Option}", description:"Fill gap")` — read the returned file path for findings
 2. Still unavailable:
    ```json
    {"questions":[{"question":"No data for {Option}'s {Factor}. How proceed?","header":"Data Gap","options":[{"label":"Assume meets","description":"Optimistic"},{"label":"Assume fails","description":"Conservative"},{"label":"Skip option","description":"Can't evaluate"}],"multiSelect":false}]}

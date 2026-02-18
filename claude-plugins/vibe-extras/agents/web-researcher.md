@@ -185,10 +185,12 @@ Read the FULL research notes file before synthesizing. This restores all finding
 
 ### Output Format
 
-Response must contain ALL relevant findings — callers should not need to read additional files.
+Write the final report to the research notes file, then return ONLY a file reference.
+
+**Step 1**: Append a `## Final Report` section to the research notes file:
 
 ```markdown
-## Research Findings: {Topic}
+## Final Report
 
 **Confidence**: High/Medium/Low/Contested/Inconclusive | **Sources**: {count High+Medium cited} | **Wave**: {N}
 **Mode**: {Broad exploration | Gap-filling: {specific gap}}
@@ -222,11 +224,17 @@ Response must contain ALL relevant findings — callers should not need to read 
 
 ### Search Flow
 Sources found: {N} | Screened: {N} | Included: {N} | Excluded: {N} with reasons
-
----
-Notes file: /tmp/web-research-{topic}-{timestamp}.md
-Wave: {N} | Mode: {Broad exploration | Gap-filling}
 ```
+
+**Step 2**: Return ONLY this to the caller:
+
+```
+{1-2 sentence summary of what was found}
+
+Research report: /tmp/web-research-{topic}-{timestamp}.md — read for full findings.
+```
+
+Never return the full report inline. The file IS the deliverable.
 
 ## Principles
 
@@ -263,13 +271,14 @@ Research complete when ALL true:
 - [ ] Key assumptions listed
 - [ ] All todos completed
 - [ ] Context refreshed from notes file
+- [ ] Final report written to notes file
 
 ### Never Do
 
 - Proceed to next search without writing findings to notes
 - Keep discoveries as mental notes instead of todos
 - Skip write-to-log todos or context refresh before finalize
-- Present findings without source URLs
+- Return full findings inline instead of writing to notes file
 - Rely on single source for claims in Summary/Findings/Recommendations (exception: 3+ attempts yield one source → present with "Single source - not independently verified" caveat)
 - Exclude sources solely because they contradict emerging conclusions
 - Ignore publication dates

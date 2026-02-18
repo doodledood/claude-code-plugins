@@ -6,6 +6,8 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [vibe-extras] v2.4.0 - web-researcher agent now writes final report to notes file and returns only file reference (saves caller context); research-web skill updated to read agent files
+- [life-ops] v1.9.0 - Update decide skill to read web-researcher output from file instead of inline response
 - [vibe-extras] v2.3.0 - Rewrite web-researcher agent and research-web skill with 18 research-backed improvements from web-research-methodology meta-research: multi-query search, lateral reading, citation verification, sycophancy-aware framing, anti-cherry-picking with GRADE confidence, bipolar calibration, iterative search with pearl growing, Toulmin warrant identification, disagreement classification, structural confidence assessment, PRISMA output elements, context persistence, agent scaling, linchpin analysis, KAC, outside view. Both prompts compressed (~35-40% reduction).
 - [writing] v1.0.0 - New plugin: consolidated writing toolkit. Includes research-backed anti-AI prose (human-writing skill, writing-reviewer agent, /write workflow with iterative review loop), plus craft-author-voice, write-as-me, and voice-writer agent (moved from solo-dev). Voice-writer agent now applies anti-AI writing principles alongside author voice.
 - [solo-dev] v1.21.0 - Moved craft-author-voice, write-as-me, and voice-writer agent to the new writing plugin
