@@ -80,6 +80,8 @@ Evaluate each post against:
 
 This phase is extremely context-intensive. Context compaction WILL happen during long browsing sessions and will erase your memory of earlier posts. **The log file is the only reliable memory.**
 
+**Before logging, make sure you actually understand the post.** Read it carefully — posts are often sarcastic, referencing prior context, or making a subtle point that isn't obvious from the text alone. Scroll through the top replies to see how people are interpreting it. If the post is part of a thread, read the parent tweets. Misreading the post's intent means your reply angle will be off, which is worse than skipping it entirely.
+
 **Every post you open in a new tab gets logged immediately** — before closing the tab. Write a full structured entry:
 - **URL**: full permalink
 - **Author**: handle and display name
