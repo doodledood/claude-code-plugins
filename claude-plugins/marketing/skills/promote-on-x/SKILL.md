@@ -198,11 +198,13 @@ Present a numbered list for user approval. For each reply:
 5. **Character count** (and tier limit)
 6. **Review notes** (any remaining MEDIUM/LOW findings)
 
-Present all replies as a single batch for approval. The user can approve the batch or provide feedback on individual replies for revision. If feedback is given, revise those replies, re-run the review loop on revised ones, and re-present the full plan.
+Present all replies as a single batch. Write the full approval plan to a file (e.g., `/tmp/promote-on-x-plan-{timestamp}.md`), then **use the ExitPlanMode tool** to request user approval. This gives the user a proper approval gate before anything gets posted.
+
+If the user provides feedback on individual replies, revise those replies, re-run the review loop on revised ones, and re-present the full plan via ExitPlanMode again.
 
 ## Phase 6: Posting
 
-Only proceed after explicit user approval.
+Only proceed after the user approves via ExitPlanMode.
 
 Post each approved reply to its target tweet and verify each was posted successfully. Refer to `references/X_INTERFACE.md` for the posting workflow, especially the JS injection workaround for X's keyboard shortcut conflicts.
 
