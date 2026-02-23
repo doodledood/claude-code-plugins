@@ -40,6 +40,12 @@ Create `/tmp/promote-on-x-{timestamp}.md` immediately at start. This log survive
 - Read full log before crafting replies (Phase 3)
 - Read full log before presenting the approval plan (Phase 5)
 
+## Phase 0: Reply Style Calibration (Optional)
+
+Ask the user via AskUserQuestion: "Want me to review your recent replies on X to calibrate tone and learn what's worked?" with options:
+- **Yes — check my replies** (Recommended): Navigate to `https://x.com/{username}/with_replies` (ask for their X handle if not known). Browse their recent replies to understand: what topics they engage with, their natural voice and tone, which replies got engagement (likes, replies) and which didn't, patterns that work vs fall flat. Log findings to the session file — this calibrates the reply crafting phase.
+- **No — skip this**: Proceed directly to product familiarization.
+
 ## Phase 1: Product Familiarization
 
 Deeply understand the product before browsing X. Reply quality depends entirely on product knowledge.
