@@ -14,7 +14,7 @@ If no arguments: auto-detect the product from the current working directory (rea
 
 Before starting, verify:
 
-1. **Claude in Chrome browser tools** (chrome-devtools MCP) are available. If not: stop and tell the user "This skill requires the Claude in Chrome extension for browser interaction. Please enable it and try again."
+1. **Claude in Chrome browser tools** (`claude-in-chrome` MCP) are available. If not: stop and tell the user "This skill requires the Claude in Chrome extension for browser interaction. Enable it with `claude --chrome` or `/chrome` and try again."
 2. **writing plugin** is installed (writing:human-writing skill and writing:writing-reviewer agent). If not: stop and tell the user "This skill requires the writing plugin. Install with: /plugin install writing@claude-code-plugins-marketplace"
 
 ## Input Parsing
@@ -35,9 +35,10 @@ If tier is unknown, ask via AskUserQuestion: "What's your X subscription tier?" 
 Create `/tmp/promote-on-x-{timestamp}.md` immediately at start. This log survives context compaction during long browsing sessions.
 
 **Disciplines:**
-- Write each discovered post to log IMMEDIATELY after evaluating it (URL + post content summary + why it's relevant + engagement metrics)
-- Read full log before crafting replies
-- Read full log before presenting the approval plan
+- Write to log IMMEDIATELY after inspecting every post opened in a new tab — before closing the tab
+- Never batch log writes or defer to "later" — context compaction erases unlogged findings
+- Read full log before crafting replies (Phase 3)
+- Read full log before presenting the approval plan (Phase 5)
 
 ## Phase 1: Product Familiarization
 
@@ -57,31 +58,39 @@ Read the product's README, docs, landing page, or whatever the user provided. In
 
 Read the reference file at `references/X_INTERFACE.md` before browsing. It contains X character limits, browser interaction patterns, and critical workarounds (especially for typing in reply fields).
 
-Navigate to the feed source and browse for posts where the product adds genuine value to the conversation.
+### Browsing Strategy
 
-**Evaluate each post against:**
+**Preserve scroll position on the main feed at all times.** Navigate to the feed source (home page, or the user-provided list/community URL) and keep scrolling through it to evaluate posts. When inspecting a specific post, open it in a new tab so the main feed stays in place. After capturing details, close the inspection tab and continue scrolling where you left off.
+
+### Evaluation Criteria
+
+Evaluate each post against:
 - **Relevance**: Does the post discuss a problem the product solves, or a topic where the product provides insight?
 - **Engagement**: Does the post have enough visibility (likes, views, replies) to be worth replying to?
 - **Reply gap**: Is there room to add value that existing replies haven't covered?
 - **Fit**: Can you write a reply that helps the poster/readers AND naturally references the product without forcing it?
 
-**Every post you find relevant gets logged immediately.** On discovery, capture the permalink URL (`x.com/{user}/status/{id}`), then write a structured entry to the log file right away:
+### Log Every Post You Click On (Critical)
 
+This phase is extremely context-intensive. Context compaction WILL happen during long browsing sessions and will erase your memory of earlier posts. **The log file is the only reliable memory.**
+
+**Every post you open in a new tab gets logged immediately** — before closing the tab. Write a full structured entry:
 - **URL**: full permalink
 - **Author**: handle and display name
 - **Post content**: full text (and image description if applicable)
 - **Engagement**: likes, retweets, replies, views
-- **Why relevant**: how the product adds value to this conversation
-- **Reply angle**: initial idea for how to reply
+- **Verdict**: relevant (with reply angle) or not relevant (brief reason)
 
-Do NOT defer capture to later or mark posts as "TBD". Context compaction will erase your memory of earlier posts. The log is the only durable record.
+Write to the log **immediately after inspecting each post** in the new tab. Do NOT batch. Do NOT defer. Do NOT mark as "TBD" to fill later. If you opened it, log it — the URL alone is worth preserving even if the post turns out to be irrelevant.
 
-**Continue until** N high-signal posts are logged, or the feed stops yielding relevant posts (diminishing returns).
+### Continue Until
+
+Scroll and evaluate until N high-signal posts are logged.
 
 ### Insufficient Results
 
-If browsing yields diminishing returns before finding N high-signal posts, present the user with options via AskUserQuestion:
-- Lower the quality bar and re-scan
+If you've evaluated ~100 posts without finding N high-signal opportunities, present the user with options via AskUserQuestion:
+- Lower the quality bar and continue scanning
 - Continue scrolling deeper in the feed
 - Switch to a different feed source (ask for URL)
 - Proceed with the posts found so far
@@ -162,7 +171,7 @@ On encountering any of these: stop the current phase and present the issue to th
 | Principle | Rule |
 |-----------|------|
 | Value first | Every reply must genuinely help the conversation. The product link is supplementary, not the point. If a reply can't add genuine insight, the post isn't a valid opportunity. |
-| Log immediately | Write to log file after every discovery. Context compaction WILL erase browser session details. |
+| Log every click immediately | Write to log after inspecting every post opened in a new tab. Context compaction WILL erase browser session details. The log is the only memory that survives. |
 | Refresh before synthesis | Read full log before phases 3 and 5. |
 | Variety over consistency | Replies that look like siblings are worse than no replies at all. |
 | Detect and escalate | Never fail silently. Surface browser issues, rate limits, and insufficient results to the user. |

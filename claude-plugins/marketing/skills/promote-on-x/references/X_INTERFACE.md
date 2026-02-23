@@ -11,74 +11,81 @@ Operational reference for interacting with X (Twitter) via claude-in-chrome MCP 
 
 All URLs are shortened to 23 characters via t.co regardless of actual length. Count 23 chars per URL when calculating reply length.
 
-## Chrome Tool Patterns
+## Claude in Chrome Tool Patterns
+
+The skill uses Anthropic's Claude in Chrome extension (`claude-in-chrome` MCP server), which operates on your real browser session with existing login state.
 
 ### Page Navigation
 
+Use the `navigate` tool to go to URLs:
 ```
-# Navigate to URL
-mcp__chrome-devtools__navigate_page(type: "url", url: "https://x.com/home")
-
-# Navigate back
-mcp__chrome-devtools__navigate_page(type: "back")
+navigate(url: "https://x.com/home")
 ```
 
 ### Reading Page Content
 
-```
-# Text snapshot of page (preferred — faster, structured)
-mcp__chrome-devtools__take_snapshot()
-
-# Screenshot for visual verification
-mcp__chrome-devtools__take_screenshot()
-```
-
-Use snapshots to read post text, engagement metrics (likes, retweets, views, replies), and identify interactive elements by uid. Use screenshots when visual context is needed (images, layout verification).
+Use `read_page` to get structured page content (text, elements, links). Use `computer` tool with screenshot action when visual context is needed (images, layout).
 
 ### Scrolling the Feed
 
+Use the `computer` tool to scroll:
 ```
-# Scroll down through feed — use uid of a visible element, or coordinate-free scroll via keyboard
-mcp__chrome-devtools__press_key(key: "Space")      # scroll down one viewport
-mcp__chrome-devtools__press_key(key: "Shift+Space") # scroll up one viewport
+computer(action: "scroll", coordinate: [640, 400], direction: "down", amount: 3)
 ```
 
-Or target a specific scrollable container element.
+Or use keyboard shortcuts:
+```
+computer(action: "key", text: "space")        # scroll down one viewport
+computer(action: "key", text: "shift+space")  # scroll up one viewport
+```
+
+### Opening Posts in New Tabs (Preserves Scroll Position)
+
+When you find a relevant post while scrolling the feed, open it in a new tab rather than clicking into it. This preserves your scroll position on the main feed.
+
+Use `tabs_create_mcp` to open the post permalink in a new tab:
+```
+tabs_create_mcp(url: "https://x.com/{username}/status/{tweet_id}")
+```
+
+After capturing details from the new tab, close it and return to the main feed tab.
 
 ### Getting Post Permalink URLs
 
 Post permalink format: `https://x.com/{username}/status/{tweet_id}`
 
-To capture a permalink:
-1. Take a snapshot to identify the post
-2. Look for the timestamp link element (e.g., "2h", "44m") — clicking it navigates to the permalink
-3. Alternatively, look for the post's link elements in the snapshot — the status URL is often present as an `<a>` element
-4. The URL is visible in the browser address bar after navigating to the post
-
-### Clicking Into Posts
-
-```
-# Click on a post element by uid from snapshot
-mcp__chrome-devtools__click(uid: "ref_123")
-```
+To capture a permalink from the feed:
+1. Read the page to identify the post
+2. Look for the timestamp link (e.g., "2h", "44m") — its href contains the permalink
+3. Alternatively, look for status URL patterns in link elements
+4. Open the permalink in a new tab to verify and capture full details
 
 ### Reading Post Details
 
-After navigating to a post's permalink page, take a snapshot to read:
+After opening a post permalink (in a new tab), read the page to capture:
 - Full post text
 - Author name and handle
 - Engagement metrics (likes, retweets, replies, views/impressions)
 - Existing reply threads
-- Whether the post contains images/video (described in snapshot)
+- Whether the post contains images/video (describe visual content)
+
+### Clicking Elements
+
+Use the `computer` tool to click on elements:
+```
+computer(action: "click", coordinate: [x, y])
+```
+
+Or use `find` to locate elements, then click by coordinate.
 
 ## Typing Replies — JS Injection (Required Workaround)
 
-**X keyboard shortcuts intercept normal typing.** The `fill` tool and direct keyboard input trigger X's global shortcut handler — the "e" key navigates to Explore, other keys trigger other actions. This causes navigation away from the tweet page instead of text entry.
+**X keyboard shortcuts intercept normal typing.** The `form_input` tool and direct keyboard input via `computer` trigger X's global shortcut handler — the "e" key navigates to Explore, other keys trigger other actions. This causes navigation away from the tweet page instead of text entry.
 
 **Always use JavaScript injection to type reply text:**
 
 ```javascript
-// Use via mcp__chrome-devtools__evaluate_script
+// Use via javascript_tool
 () => {
   const replyBox = document.querySelector('[data-testid="tweetTextarea_0"]');
   if (replyBox) {
@@ -103,15 +110,15 @@ After navigating to a post's permalink page, take a snapshot to read:
 
 ## Reply Posting Workflow
 
-1. **Navigate** to the tweet permalink URL
-2. **Wait** for page load (take snapshot to verify)
-3. **Find reply field** — look for "Post your reply" or the reply compose area in the snapshot
+1. **Navigate** to the tweet permalink URL (in a new tab from the approval plan URLs)
+2. **Wait** for page load (read page to verify)
+3. **Find reply field** — look for "Post your reply" or the reply compose area
 4. **Click** the reply field to expand it (it starts collapsed as a single line)
 5. **Wait** briefly for the reply editor to expand (shows "Replying to @username")
 6. **Inject text** using the JS injection pattern above
-7. **Verify** — take screenshot to confirm text content and any link preview cards
-8. **Click Reply button** — find the "Reply" or "Post" button in the snapshot and click it
-9. **Verify** — take screenshot to confirm successful posting (look for your reply appearing with "now" or "1s" timestamp)
+7. **Verify** — read page or screenshot to confirm text content and any link preview cards
+8. **Click Reply button** — find the "Reply" or "Post" button and click it
+9. **Verify** — read page or screenshot to confirm successful posting (look for your reply appearing)
 
 ## Error States to Detect
 
