@@ -1,0 +1,12 @@
+{
+  "name": "marketing",
+  "description": "Value-first marketing workflows for promoting products on social platforms using browser automation and human-quality prose",
+  "version": "0.1.0",
+  "author": {
+    "name": "doodledood",
+    "email": "aviram.kofman@gmail.com"
+  },
+  "homepage": "https://github.com/doodledood/claude-code-plugins",
+  "license": "MIT",
+  "keywords": ["marketing", "promotion", "twitter", "x", "social-media", "replies", "browser-automation"]
+}
