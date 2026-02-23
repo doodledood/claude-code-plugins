@@ -66,7 +66,9 @@ Read the reference file at `references/X_INTERFACE.md` before browsing. It conta
 
 ### Browsing Strategy
 
-**Preserve scroll position on the main feed at all times.** Navigate to the feed source (home page, or the user-provided list/community URL) and keep scrolling through it to evaluate posts. When inspecting a specific post, open it in a new tab so the main feed stays in place. After capturing details, close the inspection tab and continue scrolling where you left off.
+**Preserve scroll position on the main feed at all times.** Navigate to the feed source (home page, or the user-provided list/community URL) and keep scrolling through it to evaluate posts. When inspecting a specific post, open it in a new tab so the main feed stays in place.
+
+**Close every inspection tab before opening the next one.** The cycle is: open tab → read post + replies → log to file → close tab → back to feed. Never leave inspection tabs open — they pile up and the browser becomes unmanageable.
 
 ### Evaluation Criteria
 
@@ -93,11 +95,22 @@ Write to the log **immediately after inspecting each post** in the new tab. Do N
 
 ### Continue Until
 
-Scroll and evaluate until N high-signal posts are logged.
+Scroll and evaluate until N candidate posts are logged as relevant.
+
+### Quality Gate (Loop)
+
+After collecting N candidate posts, read the full log and filter. Drop any post where:
+
+- **Already replied**: The user has already replied to this post or thread (check the replies while reading the post). Double-replying looks spammy.
+- **Wrong conversation**: The thread's actual discussion doesn't match your reply angle. Read existing replies to see what people are actually talking about — if nobody is discussing the problem your product solves, you'd be answering a question nobody asked.
+- **Author conflict**: The author works on a competing product, or replying would imply their work is incomplete.
+- **Reply would be invisible**: Post has thousands of replies and high engagement — yours would be buried.
+
+Update the log with the reason for each drop. If the filtered set is below N, **go back to browsing and find replacements**. Repeat until you have N clean, non-duplicate, on-target posts. Only then proceed to Phase 3.
 
 ### Insufficient Results
 
-If you've evaluated ~100 posts without finding N high-signal opportunities, present the user with options via AskUserQuestion:
+If you've evaluated ~100 posts without reaching N clean opportunities after filtering, present the user with options via AskUserQuestion:
 - Lower the quality bar and continue scanning
 - Continue scrolling deeper in the feed
 - Switch to a different feed source (ask for URL)
@@ -108,6 +121,21 @@ If you've evaluated ~100 posts without finding N high-signal opportunities, pres
 Read the full log file to restore context on all discovered posts.
 
 Invoke `writing:human-writing` to apply anti-AI prose principles during reply generation.
+
+### Crystallization Over Explanation (Most Important)
+
+The difference between a reply that gets 3 likes and one that gets 37: **naming what the audience feels but can't articulate** vs explaining a concept.
+
+- Bad: "Define acceptance criteria before the AI starts building." (explains a concept — teaches)
+- Good: "The model doesn't trust your codebase." (names the unnamed feeling — crystallizes)
+
+For each reply, find the **crystallization moment** — the short phrase that makes readers think "yes, that's exactly it." People engage with posts that name their feelings, not posts that teach them something.
+
+**Principles from high-performing replies:**
+1. **Name, don't explain**: Find the feeling the audience has but hasn't articulated.
+2. **Elevate the OP, don't correct**: "You basically rediscovered X" > "Wrong frame."
+3. **Let the card sell**: The GitHub link preview shows the value prop. Keep the reply text as pure insight.
+4. **Use community vocabulary**: Reframe using terms the community already debates.
 
 ### Structural Variety (Critical)
 
@@ -130,6 +158,10 @@ Respect the user's X tier limit. Count each URL as 23 characters (t.co shortenin
 
 Include the product link in every reply where it fits naturally. If a reply can't reference the product without forcing it, the post wasn't a high-signal opportunity; drop it from the batch and note why in the log.
 
+### "Works Without the Link" Test
+
+After drafting each reply, mentally remove the product URL. If the reply loses its point or reads as a setup without payoff, it's a pitch — not a contribution. Rewrite it or drop the post from the batch.
+
 ## Phase 4: Review
 
 Review each draft reply using the `writing:writing-reviewer` agent. Launch reviews in parallel where possible.
@@ -137,6 +169,21 @@ Review each draft reply using the `writing:writing-reviewer` agent. Launch revie
 Fix CRITICAL and HIGH severity issues and re-review until clean. Surface remaining MEDIUM and LOW findings in the approval plan (informational, not blocking). If the reviewer flags structural uniformity across the batch, revise to break the pattern before proceeding.
 
 **Convergence guard**: If fixes introduce new HIGH+ issues (count increases), stop and present the situation to the user.
+
+## Phase 4b: Vibe Check
+
+The writing-reviewer catches prose problems. This step catches *insight* problems — replies that are technically clean but wouldn't survive a real person's feed.
+
+Re-read each draft reply alongside its target post. For each reply: **would someone scrolling their feed, who has never heard of the product, stop and like this reply?**
+
+If no — the reply is promotion wearing insight's clothes. Revise until it passes or drop the post. Common failure modes:
+
+- Reply explains what the product does instead of naming what the audience feels
+- Reply corrects the OP instead of elevating them
+- Reply is a reasonable comment but has no crystallization moment — nothing quotable, nothing that triggers "yes, that's exactly it"
+- Reply only makes sense as a vehicle for the link
+
+Log the vibe check results per reply (pass/revised/dropped) before proceeding.
 
 ## Phase 5: Approval Plan
 
@@ -180,6 +227,7 @@ On encountering any of these: stop the current phase and present the issue to th
 |-----------|------|
 | Value first | Every reply must genuinely help the conversation. The product link is supplementary, not the point. If a reply can't add genuine insight, the post isn't a valid opportunity. |
 | Log every click immediately | Write to log after inspecting every post opened in a new tab. Context compaction WILL erase browser session details. The log is the only memory that survives. |
+| Crystallize, don't explain | Every reply must name what the audience feels but can't articulate. If it teaches instead, revise. |
 | Refresh before synthesis | Read full log before phases 3 and 5. |
 | Variety over consistency | Replies that look like siblings are worse than no replies at all. |
 | Detect and escalate | Never fail silently. Surface browser issues, rate limits, and insufficient results to the user. |
@@ -193,4 +241,6 @@ On encountering any of these: stop the current phase and present the issue to th
 - Continue browsing when X shows error states, login walls, or CAPTCHAs
 - Skip the log file or defer logging to "later"
 - Craft replies without reading the product deeply first
+- Write a reply that explains a concept instead of crystallizing an insight
+- Reply to a post the user has already replied to
 - Use kill-list vocabulary (delve, landscape, leverage, seamless, robust, etc.)

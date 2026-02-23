@@ -6,6 +6,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [marketing] v0.4.0 - promote-on-x: crystallization principle (name the unnamed feeling, don't explain concepts), vibe check quality gate before approval, "works without the link" litmus test, duplicate reply detection with collect-filter-replace loop, expanded Never Do list
 - [vibe-extras] v2.4.0 - web-researcher agent now writes final report to notes file and returns only file reference (saves caller context); research-web skill updated to read agent files
 - [life-ops] v1.9.0 - Update decide skill to read web-researcher output from file instead of inline response
 - [vibe-extras] v2.3.0 - Rewrite web-researcher agent and research-web skill with 18 research-backed improvements from web-research-methodology meta-research: multi-query search, lateral reading, citation verification, sycophancy-aware framing, anti-cherry-picking with GRADE confidence, bipolar calibration, iterative search with pearl growing, Toulmin warrant identification, disagreement classification, structural confidence assessment, PRISMA output elements, context persistence, agent scaling, linchpin analysis, KAC, outside view. Both prompts compressed (~35-40% reduction).
