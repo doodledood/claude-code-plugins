@@ -21,6 +21,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
 | `writing` | Writing toolkit: anti-AI prose principles, iterative review loop, author voice capture, voice-matched content generation. |
+| `marketing` | Value-first social media promotion. Browse X, find high-signal posts, craft varied replies with writing review, post after approval. |
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
@@ -46,6 +47,9 @@ Personal decision-making advisor. `/decide` guides you through situation discove
 
 ### writing
 All writing skills consolidated. `human-writing` provides research-backed anti-AI principles (vocabulary kill-list, four-layer editing, craft fundamentals, detection science). `/write` runs the full workflow with iterative review. `craft-author-voice` captures your writing style. `/write-as-me` generates content in your voice. `voice-writer` agent applies both your voice and anti-AI principles.
+
+### marketing
+Value-first promotion on X (Twitter). `/promote-on-x` browses your feed, finds posts where your product adds genuine value, crafts structurally varied replies using the writing plugin, and posts after user approval. Requires Claude in Chrome extension and writing plugin.
 
 ## Contributing
 

@@ -104,6 +104,14 @@ All writing skills in one place. Research-backed anti-AI prose, author voice cap
 - `craft-author-voice` - Capture your writing style into AUTHOR_VOICE.md
 - `/write-as-me` - Generate content in your voice (requires AUTHOR_VOICE.md)
 
+### marketing
+
+Value-first promotion on social platforms. Finds high-signal posts and crafts replies that genuinely help conversations while naturally referencing your product.
+
+- `/promote-on-x` - Browse X feed, find relevant posts, craft structurally varied replies with writing review, post after approval
+
+Requires Claude in Chrome extension and the writing plugin.
+
 ## Repository Structure
 
 ```
@@ -117,7 +125,8 @@ claude-code-plugins/
 │   ├── prompt-engineering/    # Prompt analysis and refinement
 │   ├── frontend-design/       # Frontend design patterns
 │   ├── life-ops/              # Personal decision-making advisor
-│   └── writing/               # Writing toolkit (anti-AI prose, voice, generation)
+│   ├── writing/               # Writing toolkit (anti-AI prose, voice, generation)
+│   └── marketing/             # Value-first social media promotion
 └── README.md
 ```
 
