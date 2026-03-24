@@ -6,6 +6,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
+- [prompt-engineering] v2.4.0 - Add skill-specific architecture patterns reference (references/skills.md) with progressive disclosure, gotchas, setup config, description-as-trigger, and skill type taxonomy from Anthropic's internal skill-building experience. Conditional loading: only when creating/updating skills.
 - [marketing] v0.4.0 - promote-on-x: crystallization principle (name the unnamed feeling, don't explain concepts), vibe check quality gate before approval, "works without the link" litmus test, duplicate reply detection with collect-filter-replace loop, expanded Never Do list
 - [vibe-extras] v2.4.0 - web-researcher agent now writes final report to notes file and returns only file reference (saves caller context); research-web skill updated to read agent files
 - [life-ops] v1.9.0 - Update decide skill to read web-researcher output from file instead of inline response
