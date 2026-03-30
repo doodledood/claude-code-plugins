@@ -15,7 +15,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | Plugin | What It Does |
 |--------|--------------|
 | `consultant` | Multi-provider LLM consultations via LiteLLM. Get perspectives from OpenAI, Google, local models without leaving Claude Code. |
-| `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup, review persona generation. |
+| `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup, review persona generation, autonomous PR merge prep. |
 | `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems. |
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
@@ -31,7 +31,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 Requires Python 3.9+ and uv. Supports any LiteLLM provider. Includes `/ask` for single-model queries and `/ask-council` for multi-model ensemble.
 
 ### vibe-extras
-Standalone utilities that work independently. `/explore-codebase` for structural codebase exploration; `/research-web` for deep web research with parallel investigators; `/clean-slop` removes AI-generated noise; `/rewrite-history` restructures commits for clean PRs.
+Standalone utilities that work independently. `/explore-codebase` for structural codebase exploration; `/research-web` for deep web research with parallel investigators; `/clean-slop` removes AI-generated noise; `/rewrite-history` restructures commits for clean PRs; `/pr-merge-prep` autonomously resolves PR merge blockers (conflicts, CI, comments).
 
 ### solo-dev
 Define customer profiles and brand guidelines once, reference consistently across sessions.
