@@ -20,15 +20,19 @@ After PR detection and draft check, prevent concurrent runs on the same PR. If a
 
 ## Pipeline
 
-Execute phases in order. Log findings to `/tmp/pr-merge-prep-log-{pr-number}.md` after each phase (append to existing log if present, enabling cross-invocation continuity).
+Execute phases in order — fixed sequencing ensures predictable, auditable behavior for unattended cron runs. Log findings to `/tmp/pr-merge-prep-log-{pr-number}.md` after each phase (append to existing log if present, enabling cross-invocation continuity).
 
-**Push rule**: Batch all commits from a phase and push once at the phase boundary. CI and downstream phases depend on the pushed state.
+**Push rule**: Batch all commits from a phase and push once at the phase boundary. CI and downstream phases depend on the pushed state. If a phase-boundary push fails, log the error and discard unpushed local commits — they cannot take effect. Any replies or thread resolutions made during the phase before the push are now orphaned; log them as provisional failures. Continue to the next phase treating this phase as having produced no commits.
 
 **CI wait rule**: After any phase pushes, the next phase that reads CI status must wait for checks to reach terminal status (success or failure). If checks remain pending, log as inconclusive and continue to the next phase — independent phases (comment triage, description sync) should not be blocked by slow CI. Only Phase 6 (re-review) hard-gates on CI terminal status.
 
+**Test discipline**: Every code fix must pass project tests before committing. If tests fail, revert the fix and log it as unresolvable. If no project test commands are discoverable, skip test verification and log the assumption.
+
 ### Phase 1: Merge Conflicts
 
-Update the PR branch to include the latest changes from the base branch (even if the diff is empty — the branch may be behind). Resolve conflicts where only one side modified the region or where changes are in non-overlapping sections. Log all other conflicts as unresolved. If the update strategy does not support partial conflict resolution, log all conflicts as unresolved. If the branch update itself fails (branch protection, force-pushed base, etc.), log the error as "Phase 1 failed" and continue to Phase 2 — CI triage and comment processing are independent of branch update state. Phase 2 should skip code-caused fixes (branch may be stale) but can still retrigger infrastructure failures. Note that if no push occurred this invocation, CI data reflects the prior push state — triage is still valid for infrastructure re-triggers but code-caused classification may be stale.
+Always update the PR branch to include the latest base branch changes, even when there are no conflicts (the branch may be behind). Auto-resolve only conflicts with a clear, safe resolution. Log all others as unresolved. If the update strategy does not support partial conflict resolution, log all conflicts as unresolved. If the update fails, log as "Phase 1 failed" and continue to Phase 2.
+
+**Phase 1 failure impact**: Phase 2 skips code-caused fixes (only infrastructure re-triggers), CI data may reflect a prior push state. Phase 3 reclassifies actionable comments as uncertain. Phase 6 gating condition is not met.
 
 If the PR targets a non-default base branch, handle normally.
 
@@ -37,17 +41,15 @@ If the PR targets a non-default base branch, handle normally.
 **Triage before fixing:**
 - Compare failing checks against the base branch. Pre-existing failures (also failing on base) are not the PR's responsibility — skip them.
 - Infrastructure failures (DNS errors, flaky tests, timeout without code cause) — trigger a CI re-run.
-- Code-caused failures — read the failure logs, identify the root cause, and fix. (If the diff is empty or Phase 1 failed, skip code-caused fixes — only handle infrastructure re-triggers.)
+- Code-caused failures — fix the root cause. If the diff is empty or Phase 1 failed, skip code-caused fixes — only handle infrastructure re-triggers.
 
-Each code fix must be an atomic commit with a descriptive message. Run project tests before committing to verify no regressions — if tests fail, revert the fix and log it as unresolvable. Local test results approximate CI behavior; if the fix passes locally but fails in CI, the next invocation will catch it.
-
-If no project test commands are discoverable, skip the test verification step and log the assumption.
+Each code fix must be an atomic commit with a descriptive message. Local test results approximate CI behavior; if a fix passes locally but fails in CI, the next invocation will catch it.
 
 ### Phase 3: Review Comments
 
 Triage all unresolved PR review comments in a single pass. Note: comments marked "outdated" by GitHub due to rebase (positional staleness from Phase 1) are different from the "Outdated" false-positive pattern below — positionally outdated comments may still be valid and should be triaged normally.
 
-**Classification prerequisites**: Bot/human labeling (see `references/known-bots.md`) and full thread context inform every classification. No comment is classified without both. Classify before fixing. Threads with sub-discussions, follow-up questions, or unanswered replies are uncertain regardless of top-level content.
+**Classification prerequisites**: Every classification requires bot/human labeling (see `references/known-bots.md`) and full thread context. Classify before fixing. Threads with sub-discussions, follow-up questions, or unanswered replies are uncertain regardless of top-level content.
 
 **Classification criteria:**
 
@@ -55,7 +57,7 @@ Triage all unresolved PR review comments in a single pass. Note: comments marked
 |---------------|----------|
 | **Actionable** | Real issue with a clear, safe fix. The fix does not touch core logic or require a large refactor. |
 | **False positive** | Matches a false-positive pattern (see below). Premise contradicts actual code behavior. |
-| **Uncertain** | Unclear validity, risky fix, touches core logic, or requires large refactor. |
+| **Uncertain** | Unclear validity, risky fix, low confidence, touches core logic, or requires large refactor. When in doubt, choose uncertain and log the reasoning. |
 
 **False-positive detection patterns:**
 
@@ -69,33 +71,31 @@ Triage all unresolved PR review comments in a single pass. Note: comments marked
 
 See `references/classification-examples.md` for concrete examples of each classification.
 
-**Actions by classification:**
+**Actions by classification** (every classification includes a reply — bot or human — as audit trail):
 
 | Classification | Action |
 |---------------|--------|
-| **Actionable** | If Phase 1 failed, reclassify as uncertain (branch may be stale) and follow the uncertain action below. Otherwise: fix the issue → run tests → if tests fail, revert and reclassify as uncertain → commit atomically → reply explaining the fix → resolve full thread. If the diff is empty and the comment targets code that no longer exists, reclassify as false positive. |
+| **Actionable** | See actionable flow below |
 | **False positive** | Reply with brief reasoning why it's a false positive → resolve full thread |
 | **Uncertain** | Reply explaining the uncertainty and what would be needed to resolve → leave thread **open** |
 
-**Reply on every comment** — bot or human. Replies serve as the audit trail for this autonomous run.
+**Actionable flow:**
+- If Phase 1 failed, reclassify as uncertain (branch may be stale) and follow the uncertain action above.
+- If the diff is empty and the comment targets code that no longer exists, reclassify as false positive.
+- Otherwise: fix the issue → test per pipeline discipline → commit atomically → reply explaining the fix → resolve full thread. If tests fail, revert and reclassify as uncertain.
 
 **Resolve full threads**, not individual comments. The only exception is uncertain comments — those threads stay open for human review. If thread resolution fails (API error, permission issue), log the failure and treat the thread as unresolved for Phase 6 gating.
 
-**Phase 3 log entry**: After processing all comments, log: final classification counts (after any reclassifications), number of successfully pushed commits (not reverted attempts), count of threads that should have been resolved (only threads whose final classification is actionable or false-positive), count actually resolved, and any failed resolutions. Phase 4 uses the commit count to gate itself. Phase 6 compares "should have resolved" vs "actually resolved" to evaluate its gating condition.
+**Phase 3 log entry**: Log classification outcomes (after reclassifications), commit count, count of threads that should have been resolved (actionable + false-positive, by final classification), count actually resolved, and any failed resolutions. Phase 4 uses the commit count. Phase 6 compares "should have resolved" vs "actually resolved."
 
-**Safety boundary**: If a fix would touch core logic, require a large refactor, or the confidence in the fix is not high — classify as uncertain instead. Log the reasoning.
 
-### Phase 4: Final CI Check
+### Phase 4: Post-Comment CI Check
 
-If Phase 3 produced commits (check the execution log for the commit count), wait for CI per the pipeline CI wait rule, then check whether any new failures appeared. If so, apply the Phase 2 triage-and-fix process once — no further iterations within this invocation. If CI is inconclusive, log it and continue to Phase 5. The next cron invocation handles any remaining failures.
+If Phase 3 produced commits (check the execution log for the commit count), wait for CI per the pipeline CI wait rule, then check whether any new failures appeared. If so, apply the Phase 2 triage-and-fix process for new failures. Defer remaining failures to the next invocation to keep each invocation bounded and auditable. If CI is inconclusive, log it and continue to Phase 5.
 
 ### Phase 5: PR Description Sync
 
-Read the full current diff and the existing PR description.
-
-- **Preserve** manual context: issue references (`#123`, `Fixes #456`), motivation sections, related PR links, deployment notes, or any content that cannot be derived from the diff alone.
-- **Update** the "what changed" sections to accurately reflect the current state of all changes. Write as if creating the PR fresh — not appending "also fixed X." If the diff is empty, preserve the existing description and note that all changes have been reverted.
-- **Rewrite the title** if it no longer accurately describes the PR's current scope.
+Update the PR description and title to accurately reflect the current diff. Preserve content not derivable from the diff (issue references, motivation, deployment notes). For large diffs that exceed context, derive from commit messages and file-level changes. If the diff is empty, preserve the existing description and note that all changes have been reverted.
 
 ### Phase 6: Re-Review Request
 
@@ -123,7 +123,5 @@ Append the final status report to the execution log at `/tmp/pr-merge-prep-log-{
 - **Bot comments repeat after push**: After fixing and pushing, bot reviewers (CodeRabbit, Bugbot) re-scan and may flag new issues. This skill does a single pass — the loop skill handles the next round. Don't chase new bot findings within the same invocation.
 - **Thread resolution is permanent**: Once a thread is resolved, it collapses in the GitHub UI. Always reply before resolving so the reasoning is visible in the thread.
 - **Rebase rewrites history**: After rebasing, all commit SHAs change. Existing review comments may become "outdated" in GitHub's UI. This is positional staleness, not content staleness — triage these comments normally per Phase 3.
-- **CI re-run for infra failures**: Triggering a CI re-run (e.g., empty commit) is only appropriate for infrastructure failures, not code failures.
 - **PR description rewrite can lose context**: Always read the existing description first and preserve anything that can't be derived from the diff (issue links, motivation, deployment notes).
-- **Lock cleanup on crash**: If the concurrency lock isn't released due to a crash, treat it as stale after it exceeds the expected duration of a single run, so subsequent invocations aren't permanently blocked.
-- **Test command discovery varies**: Not all projects have obvious test commands. Check CLAUDE.md, pyproject.toml, package.json, Makefile, etc. If nothing found, skip test verification and log it — don't fail the run.
+- **Lock cleanup on crash**: If the concurrency lock is stale (the process that created it is no longer running), claim it and proceed — don't let a crashed prior run permanently block the pipeline.
