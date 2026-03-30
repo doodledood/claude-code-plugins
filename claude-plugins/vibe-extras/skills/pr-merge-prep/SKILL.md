@@ -1,7 +1,6 @@
 ---
 name: pr-merge-prep
 description: 'Autonomously bring a PR to mergeable state. Resolves merge conflicts, fixes CI failures, addresses review comments, syncs PR description, and requests re-review. Designed for unattended cron execution via loop skill. Use when: "prep pr for merge", "make pr mergeable", "fix pr blockers", "autonomous pr maintenance".'
-user-invocable: true
 ---
 
 **User request**: $ARGUMENTS

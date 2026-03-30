@@ -31,7 +31,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 Requires Python 3.9+ and uv. Supports any LiteLLM provider. Includes `/ask` for single-model queries and `/ask-council` for multi-model ensemble.
 
 ### vibe-extras
-Standalone utilities that work independently. `/explore-codebase` for structural codebase exploration; `/research-web` for deep web research with parallel investigators; `/clean-slop` removes AI-generated noise; `/rewrite-history` restructures commits for clean PRs; `/pr-merge-prep` autonomously resolves PR merge blockers (conflicts, CI, comments).
+Standalone utilities that work independently. `/explore-codebase` for structural codebase exploration; `/research-web` for deep web research with parallel investigators; `/clean-slop` removes AI-generated noise; `/rewrite-history` restructures commits for clean PRs; `/pr-merge-prep` autonomously resolves PR merge blockers (conflicts, CI, comments, description sync, re-review).
 
 ### solo-dev
 Define customer profiles and brand guidelines once, reference consistently across sessions.
