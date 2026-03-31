@@ -60,6 +60,7 @@ Standalone utilities for codebase exploration, web research, git operations, and
 - `/build-review-persona` - Mine GitHub review history to generate a calibrated review-as-me skill
 - `/address-pr-comments` - Triage and fix PR review comments with false positive detection
 - `/pr-merge-prep` - Autonomously bring a PR to mergeable state (conflicts, CI, comments, description sync, re-review)
+- `/babysit-pr` - Loop pr-merge-prep until PR is merge-ready, then ask before merging
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
