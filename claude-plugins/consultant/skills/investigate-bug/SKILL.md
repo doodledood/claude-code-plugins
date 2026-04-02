@@ -1,23 +1,27 @@
 ---
 name: investigate-bug
-description: Deep bug investigation using consultant agent. Identifies root causes and fix suggestions.
+description: "Deep bug investigation via the consultant agent and external LLM analysis. Gathers symptoms, traces execution flow, identifies root causes, and proposes targeted fixes with regression test plans. Use when the user asks to debug, troubleshoot, investigate errors, exceptions, crashes, race conditions, or unexpected behavior."
 ---
 
 Investigate bug: $ARGUMENTS
 
 ---
 
-Launch the consultant:consultant agent. The agent gathers symptoms, invokes the consultant CLI, and reports root cause analysis.
+Launch the consultant:consultant agent to perform deep root-cause analysis via external LLM consultation.
 
-**Investigation focus**:
-1. **Root cause**: What's actually broken and why
-2. **Execution flow**: Path from trigger to failure
-3. **State analysis**: Invalid states, race conditions, timing issues
-4. **Data validation**: Input validation gaps, edge cases
-5. **Error handling**: Missing handlers, improper recovery
+## Workflow
 
-**Severity levels**:
-- **CRITICAL**: Production down, data corruption, widespread impact
-- **HIGH**: Core functionality broken, major user impact
-- **MEDIUM**: Feature partially broken, workaround available
-- **LOW**: Minor issue, limited impact
+1. **Gather symptoms** — collect error messages, stack traces, reproduction steps, and relevant git history from the user's description and codebase
+2. **Identify scope** — determine affected files, services, and blast radius
+3. **Invoke consultant agent** — the agent gathers full context (diffs, related files, architecture docs), constructs a focused investigation prompt, and delegates analysis to the consultant CLI
+4. **Relay findings** — present the root-cause analysis, execution flow trace, and recommended fix verbatim from the consultant output
+
+## Expected output format
+
+The consultant agent produces a structured bug investigation report including:
+
+- **Root cause**: specific file, line range, and explanation of the defect
+- **Execution flow**: step-by-step trace from trigger to failure
+- **Blast radius**: affected systems, users, and data integrity concerns
+- **Recommended fix**: concrete code changes with rationale
+- **Regression test plan**: test scenarios to prevent recurrence
