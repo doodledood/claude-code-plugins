@@ -22,15 +22,13 @@ Output: `/tmp/manifest-{timestamp}.md`
 
 ## Input
 
-`$ARGUMENTS` = task description, optionally with context/research, `--interview <level>`, `--medium <type>`, `--amend <manifest-path>`, and `--visualize`
+`$ARGUMENTS` = task description, optionally with context/research, `--interview <level>`, `--medium <type>`, `--amend <manifest-path>`
 
-Parse `--interview` from arguments (can appear anywhere). Valid values: `minimal`, `autonomous`, `thorough`, `collaborative`. Default: `thorough`. Invalid value → error and halt: "Invalid interview style '<value>'. Valid styles: minimal | autonomous | thorough | collaborative"
+Parse `--interview` from arguments (can appear anywhere). Valid values: `minimal`, `autonomous`, `thorough`. Default: `thorough`. Invalid value → error and halt: "Invalid interview style '<value>'. Valid styles: minimal | autonomous | thorough"
 
 Parse `--medium` from arguments (can appear anywhere). Accepts any value — the LLM adapts to whatever medium is specified (e.g., `slack`, `discord`, `email`, `teams`). Default: `local`. Load the messaging file immediately — see Medium Routing section below.
 
 Parse `--amend <manifest-path>` from arguments (can appear anywhere). `--from-do` flag (optional, used with `--amend`) signals the autonomous fast path.
-
-Parse `--visualize` from arguments (can appear anywhere). Boolean flag (no value). Default: off.
 
 If no arguments provided, ask: "What would you like to build or change?"
 
@@ -128,7 +126,6 @@ Resolve interview style from `--interview` argument → default `thorough`.
 
 Load the interview mode file for behavioral specifics:
 - `thorough` (default): read `references/interview-modes/thorough.md`
-- `collaborative`: read `references/interview-modes/collaborative.md`
 - `minimal`: read `references/interview-modes/minimal.md`
 - `autonomous`: read `references/interview-modes/autonomous.md`
 
@@ -136,7 +133,7 @@ Follow the loaded interview mode's rules for question format, flow structure, ch
 
 **Auto-decided items**: When interview style causes an item to be auto-decided (agent picks recommended option instead of asking), encode it normally as INV/AC/PG with an "(auto)" annotation, AND list it in the Known Assumptions section with the reasoning for the chosen option.
 
-**Style is dynamic**: The `--interview` flag sets the starting posture, not a rigid lock. Shift when the user's behavior signals a different mode: thorough/collaborative user says "enough" or "just build it" → shift to autonomous. Autonomous user asks questions or requests probing → shift to thorough. Thorough user starts contributing reasoning and context beyond picking options → shift to collaborative. Collaborative user says "just decide" → shift to autonomous, or "I want to decide everything" → shift to thorough. When the user or verifier gives feedback on an autonomous manifest, auto-resolve the concerns and stay in autonomous mode unless the user explicitly requests more interaction. Log any style shift to the discovery file.
+**Style is dynamic**: The `--interview` flag sets the starting posture, not a rigid lock. Shift when the user's behavior signals a different mode: thorough user says "enough" or "just build it" → shift to autonomous. Autonomous user asks questions or requests probing → shift to thorough. When the user or verifier gives feedback on an autonomous manifest, auto-resolve the concerns and stay in autonomous mode unless the user explicitly requests more interaction. Log any style shift to the discovery file.
 
 ## Constraints
 
@@ -377,7 +374,7 @@ Three categories, each covering **output** or **process**:
 - **Goal:** [High-level purpose]
 - **Mental Model:** [Key concepts to understand]
 - **Mode:** efficient | balanced | thorough *(optional, default: thorough — controls verification intensity during /do)*
-- **Interview:** minimal | autonomous | thorough | collaborative *(optional, default: thorough — recorded so --amend can inherit the original interview style)*
+- **Interview:** minimal | autonomous | thorough *(optional, default: thorough — recorded so --amend can inherit the original interview style)*
 - **Medium:** local | &lt;any platform&gt; *(optional, default: local — controls communication channel for /do escalations and updates)*
 
 ## 2. Approach (Complex Tasks Only)
@@ -510,19 +507,12 @@ The messaging file defines HOW to interact (tool, format, polling). The intervie
 
 The medium is encoded in the manifest's Intent section as `Medium: <value>` so `/do` knows the communication channel. When a task file exists for the medium (e.g., `tasks/workflow/messaging/SLACK.md` for slack), also load it for platform-specific probing fuel.
 
-## Visualization
-
-When `--visualize` is present and medium is `local`: read `references/VISUALIZE_MODE.md` for visualization behavior.
-
-When medium is not `local`, `--visualize` is silently ignored (user isn't at a terminal).
-
 ## Complete
 
 /define ends here. Output the manifest path and stop.
 
 ```text
 Manifest complete: /tmp/manifest-{timestamp}.md
-Session: ~/.claude/projects/<dir>/<session-id>.jsonl
 
 To execute: /do /tmp/manifest-{timestamp}.md [log-file-path if iterating]
 ```
