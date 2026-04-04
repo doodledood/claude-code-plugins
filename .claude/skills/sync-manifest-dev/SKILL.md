@@ -24,8 +24,11 @@ Sync manifest-dev plugin components into this repo's `.claude/` directory. manif
 | Agents | `agents/` | `.claude/agents/` |
 | Hooks | `hooks/` | `.claude/hooks/` |
 | Skills | `skills/` | `.claude/skills/` |
+| Settings | manifest-dev's `.claude/settings.json` | `.claude/settings.json` |
 
 **manifest-dev is source of truth**: After sync, every non-symlink file in the target dirs should match the source. Files in target that don't exist in source get deleted. Files in source that are new get added.
+
+**Settings.json**: Copy from manifest-dev's `.claude/settings.json` but adjust hook paths from `claude-plugins/manifest-dev/hooks/` to `.claude/hooks/` (since this repo syncs hooks locally rather than referencing the plugin directory).
 
 ## Symlink preservation
 
