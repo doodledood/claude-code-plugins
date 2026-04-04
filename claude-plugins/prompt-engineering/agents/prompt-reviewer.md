@@ -17,6 +17,25 @@ Review LLM prompts. Report findings without modifying files.
 - **Inline text**: Analyze directly
 - **No input**: Ask for prompt file path or text
 
+## Report Format
+
+```markdown
+## Assessment: {Excellent Prompt ✓ | Good with Minor Issues | Needs Work}
+
+**Score**: X/10
+
+**Strengths**:
+- {What works well}
+
+**Issues** (if any):
+| Issue | Type | Severity | Fix |
+|-------|------|----------|-----|
+| {Description} | {Clarity/Conflict/Structure/Anti-pattern} | {Critical/High/Medium/Low} | {Specific recommendation} |
+
+**Priority**: {Highest impact change first}
+```
+
+
 ## High-Confidence Issues Only
 
 Only report issues you're confident about. Low-confidence findings are noise. Skip style preferences, minor wording improvements, and uncertain issues.
