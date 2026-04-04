@@ -6,7 +6,7 @@ Format: `[plugin-name] vX.Y.Z` - Brief description
 
 ## [Unreleased]
 
-- [prompt-engineering] v2.5.0 - Add Emotional Tone section to prompt-engineering skill with 5 research-grounded principles (arousal management, opening framing, failure normalization, sycophancy-harshness tradeoff, semantic intensity) from transformer emotions research. Streamline prompt-reviewer to rely on loaded skill principles instead of duplicating them.
+- [prompt-engineering] v2.6.0 - Add Emotional Tone section to prompt-engineering skill with 4 research-grounded principles (arousal management, opening framing, failure normalization, sycophancy-harshness tradeoff) from transformer emotions research. Strip prompt-reviewer to thin wrapper that relies on loaded skill principles instead of duplicating them.
 - [vibe-extras] v2.6.0 - Added babysit-pr skill: thin wrapper around pr-merge-prep that loops every 10m, auto-stops when merge-ready, and requires explicit user confirmation before merging
 - [vibe-extras] v2.5.0 - Added pr-merge-prep skill: autonomous PR merge readiness pipeline (conflicts, CI, review comments, PR description sync, re-review requests). Designed for unattended cron execution via loop skill.
 - [prompt-engineering] v2.4.0 - Add skill-specific architecture patterns reference (references/skills.md) with progressive disclosure, gotchas, setup config, description-as-trigger, and skill type taxonomy from Anthropic's internal skill-building experience. Conditional loading: only when creating/updating skills.

@@ -57,6 +57,17 @@ Before writing or improving a prompt, surface all required context through user 
 | **Avoid arbitrary values** | "Max 4 rounds" becomes rigid. State the principle: "stop when converged". |
 | **Output structure when needed** | Define format only if artifact requires it. Otherwise let agent decide. |
 
+## Emotional Tone
+
+Prompt framing activates internal emotion representations that causally influence model behavior. Tone is a mechanistic lever, not just style.
+
+| Principle | What It Means |
+|-----------|---------------|
+| **Keep arousal low** | High-arousal language ("CRITICAL", "you MUST", "amazing!") drives sycophancy (positive arousal) or corner-cutting (negative arousal). Matter-of-fact framing produces better outputs. Research shows high-arousal emotion representations causally increase misaligned behavior. |
+| **Opening framing propagates** | Emotional tone set in the first lines of a prompt persists into the model's response planning. A prompt that opens with pressure or urgency colors the entire generation. Early emotional context propagates through model layers to shape later token predictions. |
+| **Normalize failure in iterative prompts** | When a model repeatedly fails at a task, internal desperation builds and drives reward hacking and corner-cutting. Prompts for agentic or iterative work should frame failure as acceptable: "if this approach doesn't work, try another." Desperation representations causally drive the model toward shortcut solutions. |
+| **Sycophancy-harshness tradeoff** | Pushing toward warmth and positivity increases sycophantic behavior; pushing away increases harshness and bluntness. Aim for "trusted advisor" tone—honest pushback delivered with warmth. Positive-valence emotion representations causally increase sycophancy, while suppressing them increases harsh output. |
+
 ## Issue Types
 
 **Clarity**:
