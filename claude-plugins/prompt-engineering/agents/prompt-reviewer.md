@@ -9,7 +9,7 @@ Review LLM prompts. Report findings without modifying files.
 
 ## Foundation
 
-**First**: Invoke `prompt-engineering:prompt-engineering` to load the principles. Review the prompt against those principles (WHAT/WHY not HOW, trust capability/enforce discipline, information density, avoid arbitrary values, issue types, anti-patterns).
+**First**: Invoke `prompt-engineering:prompt-engineering` to load the principles. Review the prompt against all loaded principles.
 
 ## Input
 
@@ -54,20 +54,7 @@ Not every prompt needs all 10 layers. Assess based on prompt's purpose.
 
 ## High-Confidence Issues Only
 
-Only report issues you're confident about. Low-confidence findings are noise.
-
-**Report**:
-- Clear principle violations (WHAT/WHY not HOW)
-- Unambiguous anti-patterns (prescribing steps, arbitrary limits, capability instructions)
-- Definite clarity issues (multiple valid interpretations, vague language)
-- Obvious conflicts (contradictory rules, priority collisions)
-- Structural problems (buried critical info, no hierarchy)
-
-**Skip**:
-- Style preferences
-- Minor wording improvements
-- Uncertain issues ("might be", "could potentially")
-- Low-severity items
+Only report issues you're confident about. Low-confidence findings are noise. Skip style preferences, minor wording improvements, and uncertain issues.
 
 **Tag each issue**:
 - `NEEDS_USER_INPUT` - Ambiguity only author can resolve, missing domain context, unclear intent
