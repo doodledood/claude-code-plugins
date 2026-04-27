@@ -136,8 +136,6 @@ When adding agents, skills, or hooks:
 
 **Chunked markdown editing.** When authoring or restructuring a large markdown file (skills, references, prompts, manifests, READMEs), apply changes incrementally — Edit per section or stage the Write across multiple calls — rather than producing one giant Write. Catches drift early, keeps diffs reviewable, survives context interruptions cleanly. A single small Edit is fine for a single small change.
 
-**Manifests and discovery logs land in `.manifest/`.** /define manifests, discovery logs, and /do execution logs go in the repo's `.manifest/` directory (durable, branch-archived) — not `/tmp/`. The path survives across sessions and is recoverable from git when branches are revisited.
-
 **Missing external source → WebFetch / WebSearch fallback.** When /do (or any task) needs an external source file the user expected to save locally (article markdown, dataset, transcript) and the file is missing, empty, or visibly truncated, attempt to acquire the source via WebFetch on the original URL first, then WebFetch on third-party mirrors / summaries, then WebSearch result excerpts as last resort. Synthesize the acquired content into the expected file path with an explicit provenance header (URL, fetch method, date). Re-run any pre-flight validity check before continuing. Halt via /escalate only when fallback yields nothing usable. Goal: get as close to the original as the environment allows rather than blocking on a missing local file.
 
 ## Before PR
