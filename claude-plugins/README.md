@@ -20,7 +20,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
-| `writing` | Writing toolkit: anti-AI prose principles, iterative review loop, author voice capture, voice-matched content generation. |
+| `writing` | Writing toolkit: anti-AI prose principles (incl. Wikipedia:Signs of AI writing patterns and era-tracked vocabulary), iterative review loop, author voice capture, voice-matched content generation. |
 | `marketing` | Value-first social media promotion. Browse X, find high-signal posts, craft varied replies with writing review, post after approval. |
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
