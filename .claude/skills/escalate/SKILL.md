@@ -144,7 +144,11 @@ Approve amendment, reject and continue with current criterion, or adjust.
 
 ### Self-Amendment
 
-User input or a PR review comment contradicts or extends the manifest. No 3-attempt evidence needed — this is a scope change, not a blocker.
+**Standard reflex for user/reviewer feedback that contradicts or extends the manifest** — not a fallback for ambiguous cases.
+
+Canonical rule: `do/SKILL.md` Mid-Execution Amendment. Applies during /do, during /verify, and after /done (`done/SKILL.md` Post-Completion Feedback) — all three skills route here.
+
+No 3-attempt evidence needed — this is a scope change, not a blocker.
 
 ```markdown
 ## Escalation: Self-Amendment
@@ -162,7 +166,13 @@ User input or a PR review comment contradicts or extends the manifest. No 3-atte
 [Path to execution log]
 ```
 
-**When to use**: The USER or a REVIEWER triggered a scope change — they said something that contradicts or extends the manifest. This is a mechanical exit, not a decision point. /do handles the amendment flow after this escalation.
+**When to use**: The USER or a REVIEWER said something that contradicts or extends the manifest. This is a mechanical exit, not a decision point.
+
+**Re-entry depends on the trigger source:**
+- *Triggered from /do or /verify* — autonomous fast path: `/define --amend <path> --from-do`, then /do resumes with the updated manifest. No interview, no summary-for-approval.
+- *Triggered after /done* — two-step chain (both steps mandatory): (1) Invoke `manifest-dev:define` with `<feedback> --amend <path>` — runs in the manifest's recorded `Interview:` style (autonomous = no questions, thorough = questions, minimal = light probing); (2) Invoke `manifest-dev:do` with `<manifest> <log> --scope <new-or-affected-deliverables>` to implement and verify. /done is terminal; step 2 is the re-entry into /do — stopping after step 1 leaves the manifest amended but unimplemented and unverified. **Canonical source: `done/SKILL.md` Post-Completion Feedback** — the full chain contract (mandatory both-steps framing, --scope inference, full-final-gate guarantee, R-7 amendment loop guard) lives there.
+
+**Carve-out**: pure questions about the manifest or process are answered inline — no Self-Amendment. When ambiguous, amend (silent scope drift is the worse failure).
 
 **vs Proposed Amendment**: If YOU discovered the criterion should change (no user/reviewer trigger), use Proposed Amendment instead — that requires human approval.
 
@@ -186,6 +196,31 @@ User explicitly asked to stop mid-workflow (e.g., "commit so I can deploy", "sto
 ```
 
 **When to use**: User interrupts workflow for legitimate reasons (deploy, review, break). Not a blocker—just a handoff.
+
+### Deferred-Auto Pending
+
+Normal-flow `/verify` completed green, but the manifest contains `method: deferred-auto` criteria that have not yet been verified green via a prior `/verify --deferred` run. This is a coordination handoff, not a blocker — `/done` is unreachable until the user signals readiness and runs `/verify --deferred`. **No 3-attempt evidence required.** Fired by `/verify`, not by `/do`.
+
+```markdown
+## Escalation: Deferred-Auto Pending
+
+**Reason:** Normal-flow verification green; deferred-auto criteria require user signal before they can run.
+
+### Pending Deferred-Auto Criteria
+- [INV-G{N} or AC-{D}.{N}]: [description from manifest]
+- ...
+
+### To Resolve
+When prerequisites are in place (e.g., "all PRs deployed"), invoke:
+
+`/verify <manifest-path> <execution-log-path> --deferred`
+
+After `--deferred` completes green, re-invoke a normal `/verify <manifest-path> <execution-log-path>` (no flags) to reach `/done`.
+```
+
+**When to use**: `/verify` finishes a normal-flow pass green and detects pending deferred-auto criteria — see `verify/SKILL.md` Deferred-Pending Escalation. **Not** a blocker — implementation is done; the user controls when cross-repo / staging / deploy-dependent verification happens.
+
+**Combined with Manual Criteria Review.** When BOTH manual criteria and pending deferred-auto criteria exist after a normal full-mode green pass, compose a single combined escalation: header `## Escalation: Manual Review + Deferred-Auto Pending`, then both sections inline (Manual Criteria block + Pending Deferred-Auto Criteria block + To Resolve combining manual review steps and the `/verify --deferred` instruction). `/done` remains unreachable until both are resolved.
 
 ## Medium Routing
 
