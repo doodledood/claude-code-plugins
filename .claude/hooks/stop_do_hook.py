@@ -21,7 +21,7 @@ import json
 import sys
 
 from hook_utils import (
-    count_consecutive_short_outputs,
+    count_consecutive_idle_outputs,
     has_recent_api_error,
     parse_do_flow,
 )
@@ -60,14 +60,22 @@ def main() -> None:
 
     # Self-Amendment escalation — block stop, must continue to /define --amend
     if state.has_self_amendment:
+        reason = (
+            "A Self-Amendment escalation appears active — the manifest "
+            "looks like it needs revision before /do can continue.\n"
+            "• /define --amend <manifest-path> applies the amendment; "
+            "then resume /do with the updated manifest.\n"
+            "• If the escalation was already resolved and this hook is "
+            "misreading the transcript, proceed — the flow will close "
+            "on the next /done or /escalate."
+        )
         output = {
             "decision": "block",
-            "reason": "Self-Amendment in progress",
+            "reason": reason,
             "systemMessage": (
-                "Stop blocked: Self-Amendment escalation requires "
-                "/define --amend before stopping. Invoke "
-                "/define --amend <manifest-path> to update the manifest, "
-                "then resume /do."
+                "Stop intercepted: Self-Amendment escalation appears "
+                "pending — session continues so the manifest can be "
+                "amended and /do resumed."
             ),
         }
         print(json.dumps(output))
@@ -77,48 +85,54 @@ def main() -> None:
     # The user will re-invoke /do when the external blocker clears.
     if state.has_collab_mode and state.has_verify:
         output = {
-            "decision": "allow",
-            "reason": "Non-local medium: escalation posted to medium",
+            "reason": "Non-local medium: escalation posted externally",
             "systemMessage": (
-                "Escalation posted to the communication medium. "
+                "Verification results posted to the external review channel. "
                 "The user will re-invoke /do with the execution log path "
-                "when the external blocker clears."
+                "once the blocker is resolved."
             ),
         }
         print(json.dumps(output))
         sys.exit(0)
 
     # /do was called but neither /done nor /escalate
-    # Check for infinite loop pattern before blocking
-    consecutive_short = count_consecutive_short_outputs(transcript_path)
+    # Check for idle loop pattern before blocking
+    consecutive_idle = count_consecutive_idle_outputs(transcript_path)
 
-    # If we've had 3+ consecutive short outputs, we're in a loop - allow with warning
-    if consecutive_short >= 3:
+    # If we've had 3+ consecutive idle outputs (no tool use), we're stuck - allow
+    if consecutive_idle >= 3:
         output = {
-            "decision": "allow",
-            "reason": "Loop detected - allowing stop to prevent infinite loop",
+            "reason": "Idle loop detected — allowing stop",
             "systemMessage": (
-                "WARNING: Stop allowed to break infinite loop. "
-                "The /do workflow was NOT properly completed. "
-                "Next time, call /escalate when blocked instead of minimal outputs."
+                "Idle loop detected — stop allowed. "
+                "If waiting for background agents, collect their results "
+                "and resume with /verify. "
+                "If genuinely blocked, call /escalate to formally pause."
             ),
         }
         print(json.dumps(output))
         sys.exit(0)
 
-    # Provide guidance - same message regardless of attempt count
-    # Clear directive: /verify or /escalate, nothing else
-    system_message = (
-        "Stop blocked: /do workflow requires formal exit. "
-        "Options: (1) Run /verify to check criteria - if all pass, /verify calls /done. "
-        "(2) Call /escalate - for blocking issues OR user-requested pauses. "
-        "Short outputs will be blocked. Choose one."
+    # Provide guidance — hedged observation toward /verify or /escalate
+    reason = (
+        "/do appears unfinished — no /verify, /done, or /escalate "
+        "detected since the last /do invocation.\n"
+        "• If implementation looks complete, running /verify against "
+        "the manifest will check the acceptance criteria.\n"
+        "• If waiting on async work or otherwise blocked, /escalate "
+        "formally pauses the flow.\n"
+        "• If the flow is already closed and this hook is misreading "
+        "the transcript, proceed — the idle-loop escape valve will "
+        "release the stop after 3 idle outputs."
     )
 
     output = {
         "decision": "block",
-        "reason": "Execution not verified",
-        "systemMessage": system_message,
+        "reason": reason,
+        "systemMessage": (
+            "Stop intercepted: /do appears active and not yet verified "
+            "— session continues so the agent can run /verify or /escalate."
+        ),
     }
     print(json.dumps(output))
     sys.exit(0)

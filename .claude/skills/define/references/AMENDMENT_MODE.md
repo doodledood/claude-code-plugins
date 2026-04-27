@@ -2,9 +2,21 @@
 
 /define modifies an existing manifest instead of building from scratch.
 
+## Cumulative Manifest Rule
+
+**The manifest is the canonical source of truth for the PR/branch lifetime — or, in multi-repo cases, the entire PR set / branch set lifetime — not for a single task.** After every amendment, the manifest must describe the FULL state of every PR it covers: intent, every deliverable (across every repo when multi-repo), every Global Invariant, every Process Guidance entry, every Known Assumption. The latest increment is layered onto the prior content, never substituted for it.
+
+**No silent drops.** When applying an amendment, prior content is preserved by default. Removal is explicit — if a change supersedes an existing AC/INV/PG, the supersession is logged in the `## Amendments` section with rationale. The amendment receiver is responsible for reading the full prior manifest and confirming nothing valuable was lost.
+
+A manifest at any point in time should be readable as "everything currently in scope for this PR/branch (or PR set)," not "the most recent change request." This is what makes the manifest a useful working artifact for the agent and the user across the PR lifecycle.
+
+**Multi-repo specifics** — when the manifest declares `Repos:` in Intent, the canonical manifest is shared across all repo PRs (`/tmp/manifest-{ts}.md`); any consumer skill that writes amendments operates on the same file, last-writer-wins (no locking). See `MULTI_REPO.md` §f for the convention.
+
+**Deferred-auto re-verification after amendment** — when an amendment substantively changes a `method: deferred-auto` criterion's verify block (`prompt:`, `command:`, etc.), prior `/verify --deferred` coverage is conceptually invalidated for that criterion. Normal `/verify` always re-runs in-scope criteria so amendments are picked up automatically; deferred-auto bypasses the pass and relies on prior coverage. The user is responsible for re-running `/verify --deferred` for the amended criterion before the gate clears. (Consistent with the user-as-coordinator stance — there is no automatic invalidation mechanism.)
+
 ## Core Behavior
 
-Read the manifest at the given path. Existing decisions (ACs, INVs, PGs, Approach, Trade-offs) are preserved unless directly contradicted by the change request. Make targeted changes — only items affected by the amendment are updated. Add new items, modify contradicted items, or remove items that no longer apply.
+Read the manifest at the given path. Existing decisions (ACs, INVs, PGs, Approach, Trade-offs) are preserved unless directly contradicted by the change request. Make targeted changes — only items affected by the amendment are updated. Add new items, modify contradicted items, or remove items that no longer apply (with explicit log entry per the Cumulative Manifest Rule above).
 
 **Coverage goals apply scoped to the change** — not the full manifest. Existing manifest content satisfies goals for unchanged areas.
 
@@ -16,7 +28,7 @@ The conversation context contains the reason — a user's message, a PR review c
 
 When `--interview` is explicitly provided, use it. Otherwise, inherit the interview style from the manifest's metadata (if recorded) or default to `thorough`. The amendment interview is scoped to the change — not a full re-interview of the entire manifest.
 
-## Two Contexts
+## Three Contexts
 
 ### 1. Standalone
 
@@ -31,6 +43,10 @@ User calls `/define --amend <manifest>` directly. Full interactive mode:
 Triggered by `--from-do` flag (e.g., `/define --amend <manifest> --from-do`). This flag is set by /do after Self-Amendment escalation — it signals deterministically that this is an autonomous amendment, not an interactive session.
 
 In /do context, amendment is autonomous and fast — no user approval gates (verification loop, summary approval). Make targeted changes based on the escalation context. Write updated manifest in-place so /do can resume immediately. Log the amendment in the manifest's `## Amendments` section.
+
+### 3. Session-Default
+
+Triggered implicitly by `/define`'s in-session detection of a prior related manifest (no explicit `--amend` flag). See SKILL.md's `## Session-Default Amendment` section for the detection and relatedness rules. Once the agent decides to amend, behavior **follows the Standalone path** — interview scoped to the change (per the active interview mode), verification loop, summary for approval. The interview mode (`thorough` / `minimal` / `autonomous`) is **not** overridden by the trigger context — `/auto` invocations still run autonomously, just amending the prior manifest instead of starting fresh. The user is told upfront via an announcement and can verbally redirect to a fresh manifest if the relatedness call was wrong.
 
 ## What to Preserve
 

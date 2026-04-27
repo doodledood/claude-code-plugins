@@ -27,12 +27,10 @@ class DoFlowState:
 
 
 @dataclass
-class FigureOutFlowState:
-    """State of the /figure-out workflow from transcript parsing."""
+class ThinkingDisciplinesState:
+    """State of thinking disciplines from transcript parsing."""
 
-    has_figure_out: bool  # /figure-out was invoked
-    is_complete: bool  # /figure-out-done called or workflow skill started after
-    figure_out_args: str | None  # raw arguments from /figure-out invocation
+    is_active: bool  # thinking-disciplines skill was invoked and not yet deactivated
 
 
 def build_system_reminder(content: str) -> str:
@@ -233,22 +231,25 @@ def has_recent_api_error(transcript_path: str) -> bool:
     return last_assistant_is_error
 
 
-def count_consecutive_short_outputs(transcript_path: str) -> int:
+def count_consecutive_idle_outputs(transcript_path: str) -> int:
     """
-    Count consecutive short assistant outputs at the end of the transcript.
+    Count consecutive idle assistant outputs at the end of the transcript.
 
-    This detects the infinite loop pattern where the agent outputs minimal
-    content (like "." or "Done.") repeatedly because it's trying to stop
-    but getting blocked by hooks.
+    This detects loop patterns where the agent is stuck — either outputting
+    minimal content or writing long explanations without doing productive work.
+    Productive work means using tools (Read, Edit, Bash, Agent, etc.).
 
-    A "short output" is an assistant message with:
-    - Less than 100 characters of text
-    - No tool uses (or only Skill tool use which might be an /escalate attempt)
+    An "idle" output is an assistant message with no meaningful tool use
+    (only text, or text with Skill-only tool calls). Text length is irrelevant —
+    a 200-char explanation of why the model is waiting is just as idle as ".".
 
-    Returns the count of consecutive short outputs from the end.
+    Skill invocations are excluded from "meaningful" tool use because /escalate
+    attempts are Skill calls and shouldn't mask the stuck pattern.
+
+    Returns the count of consecutive idle outputs from the end.
     """
     # Collect all assistant output classifications
-    output_types: list[str] = []  # 'short' or 'substantial'
+    output_types: list[str] = []  # 'idle' or 'productive'
 
     try:
         with open(transcript_path, encoding="utf-8") as f:
@@ -267,42 +268,35 @@ def count_consecutive_short_outputs(transcript_path: str) -> int:
                 message = data.get("message", {})
                 content = message.get("content", [])
 
-                # Get text content length and check for meaningful tool uses
-                text_len = 0
+                # Check for meaningful tool uses
                 has_meaningful_tool = False
 
-                if isinstance(content, str):
-                    text_len = len(content.strip())
-                elif isinstance(content, list):
+                if isinstance(content, list):
                     for block in content:
                         if isinstance(block, dict):
-                            if block.get("type") == "text":
-                                text_len += len(block.get("text", "").strip())
-                            elif block.get("type") == "tool_use":
+                            if block.get("type") == "tool_use":
                                 tool_name = block.get("name", "")
-                                # Skill invocations don't count as "meaningful" for loop detection
-                                # because /escalate attempts would be Skill calls
                                 if tool_name != "Skill":
                                     has_meaningful_tool = True
 
-                # Classify this output
-                if has_meaningful_tool or text_len >= 100:
-                    output_types.append("substantial")
+                # Classify: only tool use makes an output productive
+                if has_meaningful_tool:
+                    output_types.append("productive")
                 else:
-                    output_types.append("short")
+                    output_types.append("idle")
 
     except (FileNotFoundError, OSError):
         return 0
 
-    # Count consecutive short outputs from the end
-    consecutive_short = 0
+    # Count consecutive idle outputs from the end
+    consecutive_idle = 0
     for output_type in reversed(output_types):
-        if output_type == "short":
-            consecutive_short += 1
+        if output_type == "idle":
+            consecutive_idle += 1
         else:
             break
 
-    return consecutive_short
+    return consecutive_idle
 
 
 def parse_do_flow(transcript_path: str) -> DoFlowState:
@@ -421,21 +415,21 @@ def parse_do_flow(transcript_path: str) -> DoFlowState:
     )
 
 
-# Workflow skills that end a /figure-out session when invoked after it
-_WORKFLOW_SKILLS = ("define", "do", "auto")
+# Skills that deactivate thinking disciplines
+_THINKING_DEACTIVATORS = ("stop-thinking-disciplines", "do")
 
 
-def parse_figure_out_flow(transcript_path: str) -> FigureOutFlowState:
+def parse_thinking_disciplines_flow(
+    transcript_path: str,
+) -> ThinkingDisciplinesState:
     """
-    Parse transcript to determine the state of /figure-out workflow.
+    Parse transcript to determine if thinking disciplines are active.
 
-    Tracks the most recent /figure-out invocation and what happened after it.
-    Each new /figure-out resets the flow state.
-    /figure-out-done or a workflow skill (/define, /do, /auto) marks completion.
+    Activates when thinking-disciplines skill is invoked (by any skill).
+    Deactivates when /stop-thinking-disciplines or /do is invoked.
+    Reactivates if thinking-disciplines is invoked again after deactivation.
     """
-    has_figure_out = False
-    is_complete = False
-    figure_out_args: str | None = None
+    is_active = False
 
     try:
         with open(transcript_path, encoding="utf-8") as f:
@@ -448,45 +442,20 @@ def parse_figure_out_flow(transcript_path: str) -> FigureOutFlowState:
                 except json.JSONDecodeError:
                     continue
 
-                # Check for /figure-out invocation
-                if was_skill_invoked(data, "figure-out"):
-                    # Extract args
-                    args = extract_user_command_args(data, "figure-out")
-                    if not args:
-                        args = get_skill_call_args(data, "figure-out")
+                # Check for thinking-disciplines activation
+                if was_skill_invoked(data, "thinking-disciplines"):
+                    # isMeta expansion follows the initial invocation —
+                    # don't toggle off/on, just ensure active
+                    is_active = True
 
-                    # Avoid resetting on isMeta expansion of the same invocation
-                    # But always reset if previous session is complete
-                    is_new_figure_out = (
-                        not has_figure_out or is_complete or args is not None
-                    )
-
-                    if is_new_figure_out:
-                        has_figure_out = True
-                        is_complete = False
-                        figure_out_args = args
-
-                # Check for /figure-out-done (explicit completion)
-                if has_figure_out and not is_complete:
-                    if was_skill_invoked(data, "figure-out-done"):
-                        is_complete = True
-
-                # Check for workflow skills that implicitly end /figure-out
-                if has_figure_out and not is_complete:
-                    for skill in _WORKFLOW_SKILLS:
+                # Check for deactivation
+                if is_active:
+                    for skill in _THINKING_DEACTIVATORS:
                         if was_skill_invoked(data, skill):
-                            is_complete = True
+                            is_active = False
                             break
 
     except OSError:
-        return FigureOutFlowState(
-            has_figure_out=False,
-            is_complete=False,
-            figure_out_args=None,
-        )
+        return ThinkingDisciplinesState(is_active=False)
 
-    return FigureOutFlowState(
-        has_figure_out=has_figure_out,
-        is_complete=is_complete,
-        figure_out_args=figure_out_args,
-    )
+    return ThinkingDisciplinesState(is_active=is_active)
