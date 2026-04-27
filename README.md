@@ -102,7 +102,7 @@ Personal decision-making advisor. Understands your situation first, then researc
 
 All writing skills in one place. Research-backed anti-AI prose, author voice capture, and voice-matched generation.
 
-- `human-writing` - Base knowledge with vocabulary kill-list, four-layer editing, craft fundamentals (auto-invoked for prose)
+- `human-writing` - Base knowledge with vocabulary kill-list, four-layer editing, craft fundamentals, and Wikipedia:Signs of AI writing patterns including era-tracked vocabulary (auto-invoked for prose)
 - `/write` - Full workflow: gather context → write → review → auto-fix → loop until clean
 - `craft-author-voice` - Capture your writing style into AUTHOR_VOICE.md
 - `/write-as-me` - Generate content in your voice (requires AUTHOR_VOICE.md)

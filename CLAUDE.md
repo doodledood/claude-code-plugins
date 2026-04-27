@@ -132,6 +132,12 @@ When adding agents, skills, or hooks:
 
 **README Guidelines**: Keep READMEs high-level (overview, what it does, how to use). Avoid implementation details that require frequent updates—readers can explore code for specifics.
 
+## Authoring & Workflow Conventions
+
+**Chunked markdown editing.** When authoring or restructuring a large markdown file (skills, references, prompts, manifests, READMEs), apply changes incrementally — Edit per section or stage the Write across multiple calls — rather than producing one giant Write. Catches drift early, keeps diffs reviewable, survives context interruptions cleanly. A single small Edit is fine for a single small change.
+
+**Missing external source → WebFetch / WebSearch fallback.** When /do (or any task) needs an external source file the user expected to save locally (article markdown, dataset, transcript) and the file is missing, empty, or visibly truncated, attempt to acquire the source via WebFetch on the original URL first, then WebFetch on third-party mirrors / summaries, then WebSearch result excerpts as last resort. Synthesize the acquired content into the expected file path with an explicit provenance header (URL, fetch method, date). Re-run any pre-flight validity check before continuing. Halt via /escalate only when fallback yields nothing usable. Goal: get as close to the original as the environment allows rather than blocking on a missing local file.
+
 ## Before PR
 
 ```bash

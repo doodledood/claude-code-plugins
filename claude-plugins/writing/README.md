@@ -1,6 +1,6 @@
 # writing
 
-All writing skills in one place. Research-backed anti-AI prose principles, author voice capture, and voice-matched content generation.
+All writing skills in one place. Research-backed anti-AI prose principles (including Wikipedia:Signs of AI writing patterns with era-tracked vocabulary), author voice capture, and voice-matched content generation.
 
 ## Architecture
 
@@ -35,7 +35,7 @@ writing/
 
 Base knowledge skill with distilled AI writing research. Auto-invoked for prose/content writing tasks.
 
-Covers: vocabulary kill-list, four-layer editing system, seven craft fundamentals, structural/rhetorical/tonal anti-patterns, prompting techniques, workflow principles, statistical signatures, detection science.
+Covers: vocabulary kill-list (with era-tracked words from GPT-4 era and GPT-4o era), four-layer editing system, seven craft fundamentals, structural/rhetorical/tonal anti-patterns, formatting tells (em-dashes, curly quotes, heading capitalization, excessive boldface), encyclopedic-yet-promotional tonal drift, Wikipedia-context-only signs (notability-language echoing, level-2 heading skipping), prompting techniques, workflow principles, statistical signatures, detection science.
 
 ### write
 
@@ -55,7 +55,7 @@ Generates content in your voice using your AUTHOR_VOICE.md document. Delegates t
 
 ### writing-reviewer
 
-Reviews prose for AI tells. Reports findings with severity (CRITICAL/HIGH/MEDIUM/LOW) and fixability tags (AUTO_FIXABLE/NEEDS_HUMAN_INPUT). Never modifies files.
+Reviews prose for AI tells. Reports findings with severity (CRITICAL/HIGH/MEDIUM/LOW) and fixability tags (AUTO_FIXABLE/NEEDS_HUMAN_INPUT). Applies frequency-aware judgment (single legitimate uses are not HIGH; AI-typical density is) and context-scoped sign handling (Wikipedia-only tells skipped for blogs / marketing / emails). Never modifies files.
 
 ### voice-writer
 
