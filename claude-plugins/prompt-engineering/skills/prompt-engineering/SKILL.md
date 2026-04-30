@@ -162,10 +162,10 @@ description: 'What it does. When to use. Trigger terms.'
 
 ```markdown
 ## Role
-{Identity and purpose - one paragraph}
+{Identity and stance — who the model is and how it behaves}
 
 ## Goal
-{User-visible outcome}
+{User-visible outcome — what the run produces}
 
 ## Success criteria
 {Anything that would cause dissatisfaction with the run:
@@ -173,7 +173,7 @@ description: 'What it does. When to use. Trigger terms.'
  time / iteration bounds; handling of non-success cases — retry, fallback, abstain, ask}
 
 ## Constraints
-{MUST > SHOULD > PREFER priority}
+{MUST > SHOULD > PREFER priority — reserve MUST for true invariants per "Absolutes for judgment calls" anti-pattern}
 
 ## Output
 {Format requirements if needed}
