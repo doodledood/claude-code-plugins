@@ -1,12 +1,12 @@
 ---
 name: sync-manifest-dev
-description: 'Sync the manifest-dev plugin from doodledood/manifest-dev into .claude/ for local development. Clones or pulls the repo, copies agents/skills/hooks, removes stale files. Use when asked to sync manifest-dev, update manifest-dev, or pull latest manifest-dev.'
+description: 'Sync the manifest-dev plugin from doodledood/manifest-dev into .claude/ for local development. Clones or pulls the repo, copies agents/skills/hooks, and removes only previously-synced items that disappeared upstream. Other plugins in .claude/ are left alone. Use when asked to sync manifest-dev, update manifest-dev, or pull latest manifest-dev.'
 user-invocable: true
 ---
 
 **User request**: $ARGUMENTS
 
-Sync manifest-dev plugin components into this repo's `.claude/` directory. manifest-dev is the source of truth — `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/` should mirror the plugin's components after sync, except for symlinks.
+Sync manifest-dev plugin components into this repo's `.claude/` directory. manifest-dev OWNS only the files it ships — other plugins (e.g. prompt-engineering, project-local KB skills) coexist in `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/` and must be left alone.
 
 ## Source & Target
 
@@ -16,6 +16,7 @@ Sync manifest-dev plugin components into this repo's `.claude/` directory. manif
 | Local clone | `/tmp/manifest-dev` |
 | Source components | `/tmp/manifest-dev/claude-plugins/manifest-dev/` |
 | Target | `.claude/` in this repo |
+| Tracking file | `.claude/.manifest-dev-sync.json` |
 
 ## Sync scope
 
@@ -24,38 +25,48 @@ Sync manifest-dev plugin components into this repo's `.claude/` directory. manif
 | Agents | `agents/` | `.claude/agents/` |
 | Hooks | `hooks/` | `.claude/hooks/` |
 | Skills | `skills/` | `.claude/skills/` |
-| Settings | manifest-dev's `.claude/settings.json` | `.claude/settings.json` |
 
-**manifest-dev is source of truth**: After sync, every non-symlink file in the target dirs should match the source. Files in target that don't exist in source get deleted. Files in source that are new get added.
+## Territory model
 
-**Settings.json**: Copy from manifest-dev's `.claude/settings.json` but adjust hook paths from `claude-plugins/manifest-dev/hooks/` to `.claude/hooks/` (since this repo syncs hooks locally rather than referencing the plugin directory).
+**Deletion invariant**: only items in `tracked` (the previously-synced set) are eligible for removal when they disappear upstream. Items never in `tracked` are invisible — that's how project-local content (KB skills, prompt-engineering, anything else) stays safe.
 
-## Symlink preservation
+The tracked set lives in `.claude/.manifest-dev-sync.json`:
 
-Some `.claude/` entries are symlinks to other local plugins (e.g., prompt-engineering). **Never overwrite, replace, or remove symlinks.** Skip them during both copy and stale-file cleanup. Note skipped symlinks in the summary.
+```json
+{
+  "version": 1,
+  "last_synced_at": "ISO-8601 timestamp",
+  "agents":  ["change-intent-reviewer.md", "..."],
+  "hooks":   ["hook_utils.py", "..."],
+  "skills":  ["auto", "define", "..."]
+}
+```
 
-## Excluded from sync
+First run (file missing): `tracked` is empty, no deletions happen, file is written at end.
 
-- `.claude-plugin/` and `README.md` (plugin metadata)
-- The manifest-dev repo's own `.claude/` directory (private to that repo)
-- **`sync-manifest-dev/` skill itself** — this skill lives only in this repo, not in manifest-dev. Never delete it during stale-file cleanup.
+## Sync algorithm
+
+For each component (agents/hooks/skills):
+
+- **Copy** every source item over its target path. Skip if target is a symlink.
+- **Delete** items in `tracked − source` from target. Skip if target is a symlink, doesn't exist, or is the `sync-manifest-dev` skill itself.
+- **Refresh** `.claude/.manifest-dev-sync.json` with the current source listing.
+
+Source listing excludes `.claude-plugin/` and `README.md` (plugin metadata, not content).
 
 ## Gotchas
 
-- **Nested skills directory**: Source skills live at `skills/define/`, `skills/do/`, etc. Copy each skill directory into `.claude/skills/` — don't copy the `skills/` folder itself or you get `.claude/skills/skills/`.
-- **learn-from-session exists in both repos**: This skill may exist locally before sync. The manifest-dev version is authoritative — overwrite it.
-- **Network failures on clone/pull**: Retry with backoff before failing.
-- **Symlinks follow through to real files**: When checking for stale files, use `-type l` checks on BOTH the top-level entry AND every file path encountered during recursive traversal. A symlinked directory (e.g., `.claude/skills/prompt-engineering -> ../../claude-plugins/...`) will appear as a regular directory to `find` and file operations — you MUST check with `[ -L path ]` before deleting. Failing to do so will delete the actual plugin files the symlink points to.
+- **Nested skills directory**: Source skills live at `skills/define/`, `skills/do/`, etc. Copy each skill directory into `.claude/skills/<skill-name>/` — don't copy the outer `skills/` folder or you get `.claude/skills/skills/`.
+- **Symlinks look like directories to `cp`/`rm`/`find`**: A symlinked target overwritten by `cp -R` corrupts the linked plugin's source files; a symlinked directory deleted by `rm -rf` removes the link, not the plugin, but a recursive find that follows the link will. Use `[ -L path ]` before every overwrite and every delete.
 
 ## Output
 
-Summary table: files added, updated, removed, and symlinks skipped.
+Summary table per component (agents/hooks/skills): items added, updated, removed, symlinks skipped, and removals refused (e.g. due to symlink). Show the net change to the tracking file.
 
 ## Never
 
-- Overwrite or remove symlinks (check with `[ -L ]` before any delete)
-- Delete the `sync-manifest-dev` skill (it's local-only, not from manifest-dev)
-- Follow symlinks when cleaning stale files — skip the entire symlinked tree
-- Copy plugin metadata (`.claude-plugin/`, `README.md`)
+- Overwrite, remove, or follow into symlinks — check `[ -L path ]` before every copy, delete, or recursive descent
+- Delete items not in the tracked set — even if they're not in source
+- Delete the `sync-manifest-dev` skill
+- Copy plugin metadata (`.claude-plugin/`, `README.md`) or manifest-dev's own `.claude/` directory
 - Modify the source repo
-- Copy manifest-dev's `.claude/` directory
