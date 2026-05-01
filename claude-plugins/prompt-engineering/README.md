@@ -15,7 +15,7 @@ Five complementary workflows:
 ## Components
 
 ### Skills
-- `/prompt-engineering` - Craft or update prompts from first principles
+- `/prompt-engineering` - Craft or update prompts from first principles. References inside the skill: `system-prompt-patterns.md` (technique library — verification loops, retrieval/tool budgets, output contract, ambiguity handling, high-risk self-check, decision-rules) and `metaprompting.md` (diagnose-from-failures → surgical-patch workflow for fixing prompts that fail in production).
 - `/review-prompt` - Analyze a prompt file (read-only)
 - `/auto-optimize-prompt` - Auto-optimize until converged, asks user for ambiguities (modifies file)
 - `/optimize-prompt-token-efficiency` - Iteratively optimize for token efficiency (modifies file)

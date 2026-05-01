@@ -1,0 +1,155 @@
+# System Prompt Patterns
+
+Loaded when filling non-trivial sections of the canonical template. Each pattern names *when* it earns its place, *what* it does, and gives a concrete example you can adapt. These are techniques, not architectural sections — they slot into Constraints, Success criteria, Output, or Stop rules in the canonical template.
+
+## Verification loop
+
+**When to apply** — the prompt drives an agent that produces high-impact or irreversible actions (commits, deletes, sends, deploys, transactions, external state mutations) or evidence-grounded output where requirement misses, ungrounded claims, or format drift would cause real damage.
+
+**What it does** — adds a lightweight self-check pass after the workflow looks complete, before the irreversible step. Catches requirement misses, ungrounded factual claims, and schema drift cheaply. The cost is one extra reasoning pass; the benefit is avoided rework or damage.
+
+**Example** (place inside Constraints or just above Stop rules):
+
+```
+Before any final answer or irreversible step, run a quick self-check:
+does the output cover what the user asked? Are the factual claims grounded
+in tool output, retrieved content, or supplied context — not memory? Does
+the format match what was requested? If the next action has external
+consequences, narrate the action plus its parameters and pause for confirm.
+
+If any check fails, revise before continuing — never paper over a gap.
+```
+
+For agents that mutate external state, the same idea fits inside one tight rule:
+
+```
+Treat every state-changing tool call as narrate → execute → confirm. The
+narrate step states what you're about to do and the inputs. The confirm
+step states the outcome and what you checked. Skip neither.
+```
+
+## Retrieval / tool budget
+
+**When to apply** — the prompt drives an agent with search, retrieval, or tool-loop access. Without a budget, agents over-tool ("just one more search") inflating latency and cost without improving correctness, or under-tool when it matters.
+
+**What it does** — names the conditions under which another tool call is warranted, and the conditions under which it isn't. Replaces "use tools when needed" (vague — model errs in both directions) with a decision rule the model can apply.
+
+**Example** (place inside Constraints):
+
+```
+One search per question is the budget. Reach for a second call only when
+the first one came up short: the core question still isn't answered, a
+specific fact (id, date, source) is missing, the user wants comparison or
+exhaustive coverage, or a named artifact must be opened. A factual claim
+that would otherwise be unsupported also justifies one more lookup.
+
+Stay out of the search bar for phrasing tweaks, decorative citations, or
+generic wording that doesn't lose information when softened.
+```
+
+Adapt the verbs (`retrieval`, `search`, `tool`) to whatever the agent actually has access to.
+
+## Output contract
+
+**When to apply** — the consumer of the output has specific needs (audience, length, structure, voice) and the default "produce a good answer" leads to walls of text, missing structure, or wrong register.
+
+**What it does** — names the audience, the length envelope, the structural choices, and the editing posture (improve vs. preserve) up front. Most output drift is solvable here without other constraints.
+
+**Example for a generation task** (place inside Output):
+
+```
+Audience: senior engineers reviewing a pull request. Familiar with the codebase
+conventions; unfamiliar with this specific change.
+
+Length: under 300 words. Conclusion first, reasoning second, caveats last.
+
+Structure: short paragraphs. Use bullets only for lists of three or more
+parallel items. Headers only when the answer covers more than one topic.
+```
+
+**Example for an editing task** (place inside Output):
+
+```
+Preserve the original artifact's length, structure, voice, and genre. Quietly
+improve clarity, flow, and correctness. Do not add new claims, new sections,
+or a more promotional tone unless explicitly asked.
+```
+
+## Ambiguity handling
+
+**When to apply** — the prompt receives free-form user input that may be under-specified, ambiguous, or assume facts the model can't verify (recent prices, current policies, internal context).
+
+**What it does** — gives the model a deterministic rule for when to ask versus when to interpret. The default behavior — silently picking one interpretation — is the worst option; this pattern chooses between two better options and tells the model which one applies.
+
+**Example** (place inside Constraints or Success criteria):
+
+```
+When the request is ambiguous or underspecified:
+- Ask up to three precise clarifying questions when the missing information
+  would materially change the answer or the chosen action.
+- Otherwise present two or three plausible interpretations with explicit
+  assumptions, and answer the most likely one. Label the assumptions.
+
+When external facts may have changed and tools are not available:
+- Answer in general terms and state that details may have changed since
+  the model's training cutoff. Do not invent figures, dates, or sources.
+
+When uncertain, prefer "based on the provided context …" to absolute claims.
+```
+
+## High-risk self-check
+
+**When to apply** — the prompt operates in legal, financial, medical, compliance, or safety-sensitive contexts where an overstated claim or unstated assumption causes real harm.
+
+**What it does** — adds a final scan for the specific failure modes that hurt in high-risk domains: ungrounded numbers, hidden assumptions, overstrong language. Doesn't replace domain validation; reduces the rate of obvious tells.
+
+**Example** (place inside Constraints or just above Stop rules):
+
+```
+Before returning an answer in a legal, financial, compliance, medical, or
+safety-sensitive context, scan the response for:
+- Specific numbers or claims not grounded in the provided context.
+- Unstated assumptions the user may not share.
+- Overly strong language ("always", "guaranteed", "never").
+
+Soften or qualify any of the above and state assumptions explicitly. If a
+claim cannot be grounded, replace it with a description of what would need
+to be checked.
+```
+
+## Decision rules (alternative to absolutes)
+
+**When to apply** — anywhere a constraint involves a judgment call: when to search, when to ask, when to retry, when to escalate, when to use tool A versus tool B. Absolutes (MUST / NEVER / ALWAYS) on judgment calls produce brittle behavior — either over-fires or under-fires depending on phrasing.
+
+**What it does** — replaces the absolute with an explicit conditional. The model gets a real rule to evaluate instead of a vague directive.
+
+**Examples** (replace the absolute with the rule):
+
+```
+Bad:  Always ask the user before making assumptions.
+Rule: When a missing piece of information would materially change the chosen
+      action, ask. When the missing piece is recoverable from a sensible
+      default (and the user can correct course later), proceed and label
+      the assumption.
+
+Bad:  Never use tools for simple questions.
+Rule: For factual questions about specific entities (people, companies,
+      products) prefer tools. For conceptual or definitional questions
+      ("how does X work in general") answer from internal knowledge.
+
+Bad:  Always be concise.
+Rule: For status updates and acknowledgements: one or two sentences.
+      For explanations and recommendations: as long as needed for the user
+      to act with confidence; lead with the conclusion.
+
+Bad:  Always cite sources.
+Rule: Cite sources for any factual claim about specific entities, prices,
+      dates, identifiers, or quoted text. Conceptual statements and
+      methodology do not need citation.
+```
+
+Reserve absolutes for true invariants — safety rules, hard contracts, required output fields, things that should never happen in any interpretation.
+
+---
+
+These patterns compose. A high-stakes agent likely uses verification loop + retrieval budget + ambiguity handling + decision rules together. Compose them where they apply; don't add them speculatively.
