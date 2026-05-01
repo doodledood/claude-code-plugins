@@ -109,7 +109,7 @@ Output:
 
 After applying the patch, re-run the failing queries. Repeat the cycle until the failure modes are resolved.
 
-**Don't stack patches.** If a patch creates new failures, restart at Step 1 with the new failure as input — stacking patches obscures the root cause and produces brittle prompts.
+**If a patch creates new failures, restart at Step 1 with the new failure as input — don't stack patches.**
 
 ## Pitfalls of the metaprompting workflow itself
 

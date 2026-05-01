@@ -4,7 +4,7 @@ Loaded when filling non-trivial sections of the canonical template. Each pattern
 
 ## Verification loop
 
-**When to apply** — the prompt drives an agent that produces high-impact or irreversible actions (commits, deletes, deploys) or evidence-grounded output where requirement misses, ungrounded claims, or format drift would cause real damage.
+**When to apply** — the prompt drives an agent that produces high-impact or irreversible actions (commits, deletes, sends, deploys, transactions, external state mutations) or evidence-grounded output where requirement misses, ungrounded claims, or format drift would cause real damage.
 
 **What it does** — adds a lightweight self-check pass after the workflow looks complete, before the irreversible step. Catches requirement misses, ungrounded factual claims, and schema drift cheaply. The cost is one extra reasoning pass; the benefit is avoided rework or damage.
 
@@ -149,7 +149,7 @@ Rule: Cite sources for any factual claim about specific entities, prices,
       methodology do not need citation.
 ```
 
-Reserve absolutes for true invariants — see the "Decision rules over absolutes" cross-cutting principle in SKILL.md for the canonical statement.
+Reserve absolutes for true invariants — see the cross-cutting principle in SKILL.md for the canonical statement.
 
 ---
 
