@@ -1,6 +1,6 @@
 # Multi-Repo Manifest Workflow
 
-Canonical reference for tasks whose changeset spans multiple repositories. Read this when a manifest declares `Repos:` in its Intent. Core skills (`/define`, `/do`, `/verify`, `/done`, `/auto`, `AMENDMENT_MODE`) summarize the rules below and link here for the full specification. Optional consumer skills (`/tend-pr`, `/tend-pr-tick`, `/drive`, `/drive-tick`) describe how they ride the shared-manifest pattern in their own files — they are add-ons, not part of the core multi-repo workflow.
+Canonical reference for tasks whose changeset spans multiple repositories. Read this when a manifest declares `Repos:` in its Intent. Core skills (`/define`, `/do`, `/verify`, `/done`, `/auto`, `AMENDMENT_MODE`) summarize the rules below and link here for the full specification. Optional consumer skills (`/drive`, `/drive-tick`) describe how they ride the shared-manifest pattern in their own files — they are add-ons, not part of the core multi-repo workflow.
 
 Single-repo manifests (no `Repos:` field) are unaffected by everything below.
 
@@ -14,33 +14,42 @@ The manifest is **internal**. It is a working document for the user and the agen
 
 ## b. Persistence
 
-The canonical manifest lives at `/tmp/manifest-{timestamp}.md`. No archival. No copying to `.manifest/` for multi-repo. No primary repo "owns" it.
+The canonical manifest lives at `/tmp/manifest-{timestamp}.md`. No primary repo "owns" it.
 
 If the file is lost (reboot, `/tmp` cleared, session death), re-run `/define` against the same task. The recreated manifest restarts the working state; in-flight PRs continue under the new manifest path.
 
 This is an explicit trade-off: durability infrastructure is more cost than re-running `/define` is occasional pain.
 
-## c. Repo Registration
+## c. Manifest Schema Additions
 
-The manifest's `## 1. Intent & Context` section declares its multi-repo scope:
+Multi-repo manifests extend the standard single-repo schema with three optional fields. Single-repo manifests omit all of them.
 
-```markdown
-- **Repos:**                                  # optional, multi-repo only
-    - backend: /home/user/projects/api
-    - frontend: /home/user/projects/web
-- **Branch:** claude/sso-integration          # optional, single string (see §j)
-```
+**Intent & Context** declares two additional fields:
 
-Each deliverable that belongs to a specific repo carries a `repo:` tag matching one of the names above:
+- **Repos:** (multi-repo only) — a name → absolute-path map listing every repo in scope. Names are short identifiers used by deliverables; paths are absolute filesystem locations.
+
+  ```markdown
+  - **Repos:**
+      - backend: /home/user/projects/api
+      - frontend: /home/user/projects/web
+  ```
+
+- **Branch:** (multi-repo only) — a single string naming the branch used in every repo. By convention, all repos in a multi-repo changeset share the same branch name (see §j); divergent per-repo branch names are not supported in this version.
+
+  ```markdown
+  - **Branch:** claude/sso-integration
+  ```
+
+**Each deliverable** that belongs to a specific repo carries a `**Repo:**` tag matching one of the `Repos:` names:
 
 ```markdown
 ### Deliverable 3: SSO endpoint
 **Repo:** `backend`
 ```
 
-`Repos:` and `repo:` exist for **documentation** — readers (human and agent) know which deliverable lives where. They are **not** an enforcement mechanism for `/do` or `/verify` (see §d). Optional consumer skills may use the tags for their own scope inference (e.g., a PR-tending tool routing feedback on backend's PR to backend-tagged deliverables), but core skills do not depend on this.
+**Verify methods** include `deferred-auto`, valid in any manifest (single-repo or multi-repo) for criteria the user explicitly triggers — most commonly cross-repo gates that depend on prerequisites the user controls. See §e for behavior.
 
-Single-repo manifests omit both `Repos:` and `repo:` entirely.
+**Documentation, not enforcement.** `Repos:` and `repo:` are for readers (human and agent) — they do not gate `/do` or `/verify` (see §d). Optional consumer skills may use the tags for their own scope inference (e.g., a PR-tending tool routing feedback on backend's PR to backend-tagged deliverables), but core skills do not depend on this.
 
 ## d. /do Navigation
 
@@ -95,6 +104,7 @@ When the user signals readiness ("all PRs deployed"), they invoke:
 This runs **only** `deferred-auto` criteria. Flag interactions:
 
 - `--deferred` + `--scope` is supported. `--scope` narrows the deferred set to in-scope deliverables.
+- INV-G\* deferred-auto criteria are deliverable-scope-independent — `--scope` does not cover them. They are covered only by a `--deferred` pass with empty `--scope`. `/done` remains gated on `/escalate` "Deferred-Auto Pending" until that uncovered set runs green.
 - `--deferred` does not interact with `--final`. It never enters the final-gate machinery.
 - `--deferred` inherits `--mode`. Same parallelism and model routing as the parent invocation.
 
@@ -120,7 +130,7 @@ There is **no concurrency engineering**. Two writers amending the same manifest 
 
 **Do not add file locking.** The collision rate is low (writes are brief), and the recovery cost is small compared to the complexity of locking, deadlock handling, and stale-lock cleanup.
 
-This pattern is the contract for any optional PR-tending consumer skill (e.g., `/tend-pr`, `/drive`); those skills describe their per-PR usage in their own files.
+This pattern is the contract for any optional PR-tending consumer skill (e.g., `/drive`); those skills describe their per-PR usage in their own files.
 
 ## g. /done — One Per Manifest, Gated on Deferred-Auto
 
@@ -144,11 +154,11 @@ The system supports this workflow but does not automate it. Coordination is a hu
 
 ## i. /auto Behavior
 
-`/auto` chains `/define` → `/do` → optionally `/tend-pr`. The `/do` step **navigates all repos** declared in `Repos:` (per §d — no filter logic, LLM uses absolute paths from the map). A single `/auto` invocation can therefore complete the whole multi-repo implementation phase.
+`/auto` chains `/define` → `/do` → optionally `/drive`. The `/do` step **navigates all repos** declared in `Repos:` (per §d — no filter logic, LLM uses absolute paths from the map). A single `/auto` invocation can therefore complete the whole multi-repo implementation phase.
 
-The per-cwd limitation is `/tend-pr`: when `--tend-pr` is set, `/auto` invokes `/tend-pr` from cwd, which sets up tending for cwd's PR only — `/tend-pr` is PR-bound by construction (see §f). To tend the other repos' PRs, invoke `/tend-pr` from each other repo's cwd.
+The per-cwd limitation is `/drive`: when `--drive` is set, `/auto` invokes `/drive` from cwd, which sets up tending for cwd's PR only — `/drive` is PR-bound by construction (see §f). To tend the other repos' PRs, invoke `/drive` from each other repo's cwd.
 
-This is the only multi-repo footgun in `/auto`: users may assume `--tend-pr` covers all PRs, when it covers only cwd's. The implementation phase itself runs to completion across all repos in one go.
+This is the only multi-repo footgun in `/auto`: users may assume `--drive` covers all PRs, when it covers only cwd's. The implementation phase itself runs to completion across all repos in one go.
 
 ## j. Branch-Name Convention
 
