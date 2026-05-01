@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "last_synced_at": "2026-05-01T17:13:29Z",
+  "agents": [
+    "change-intent-reviewer.md",
+    "code-bugs-reviewer.md",
+    "code-design-reviewer.md",
+    "code-maintainability-reviewer.md",
+    "code-simplicity-reviewer.md",
+    "code-testability-reviewer.md",
+    "context-file-adherence-reviewer.md",
+    "contracts-reviewer.md",
+    "criteria-checker.md",
+    "docs-reviewer.md",
+    "manifest-verifier.md",
+    "prose-value-reviewer.md",
+    "test-quality-reviewer.md",
+    "type-safety-reviewer.md"
+  ],
+  "hooks": [
+    "hook_utils.py",
+    "post_compact_hook.py",
+    "posttool_log_hook.py",
+    "pretool_verify_hook.py",
+    "prompt_submit_hook.py",
+    "pyproject.toml",
+    "stop_do_hook.py",
+    "thinking_disciplines_pretool_hook.py",
+    "thinking_disciplines_prompt_hook.py"
+  ],
+  "skills": [
+    "auto",
+    "define",
+    "do",
+    "done",
+    "drive",
+    "drive-tick",
+    "escalate",
+    "figure-out",
+    "stop-thinking-disciplines",
+    "thinking-disciplines",
+    "verify"
+  ]
+}
