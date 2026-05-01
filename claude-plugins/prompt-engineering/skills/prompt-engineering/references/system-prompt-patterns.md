@@ -2,16 +2,16 @@
 
 Loaded when filling non-trivial sections of the canonical template. Each pattern names *when* it earns its place, *what* it does, and gives a concrete example you can adapt. These are techniques, not architectural sections — they slot into Constraints, Success criteria, Output, or Stop rules in the canonical template.
 
-## Verification loop
+## End-of-run verification
 
-**When to apply** — the prompt drives an agent that produces high-impact or irreversible actions (commits, deletes, sends, deploys, transactions, external state mutations) or evidence-grounded output where requirement misses, ungrounded claims, or format drift would cause real damage.
+**When to apply** — the prompt drives an agent that produces high-impact or irreversible actions (commits, deletes, deploys) or evidence-grounded output where requirement misses, ungrounded claims, or format drift would cause real damage.
 
-**What it does** — adds a lightweight self-check pass after the workflow looks complete, before the irreversible step. Catches requirement misses, ungrounded factual claims, and schema drift cheaply. The cost is one extra reasoning pass; the benefit is avoided rework or damage.
+**What it does** — adds a lightweight self-check pass after the workflow looks complete, before the irreversible step. Catches requirement misses, ungrounded factual claims, and schema drift before they ship.
 
 **Example** (place inside Constraints or just above Stop rules):
 
 ```
-Before any final answer or irreversible step, run a quick self-check:
+Before any final answer or irreversible step, run a self-check:
 does the output cover what the user asked? Are the factual claims grounded
 in tool output, retrieved content, or supplied context — not memory? Does
 the format match what was requested? If the next action has external
@@ -20,7 +20,13 @@ consequences, narrate the action plus its parameters and pause for confirm.
 If any check fails, revise before continuing — never paper over a gap.
 ```
 
-For agents that mutate external state, condense to:
+## Per-action narrate-execute-confirm
+
+**When to apply** — agents that mutate external state with each tool call (file writes, API calls, deploys). Sibling pattern to end-of-run verification, not a substitute. Use both for high-impact agents: per-action for the running discipline, end-of-run for final coverage.
+
+**What it does** — applies a tight discipline to every state-changing tool call so each mutation is observable and recoverable.
+
+**Example** (place inside Constraints):
 
 ```
 Treat every state-changing tool call as narrate → execute → confirm. The
@@ -28,7 +34,7 @@ narrate step states what you're about to do and the inputs. The confirm
 step states the outcome and what you checked. Skip neither.
 ```
 
-## Retrieval / tool budget
+## Tool-call escalation rule
 
 **When to apply** — the prompt drives an agent with search, retrieval, or tool-loop access. Without a budget, agents over-tool ("just one more search") inflating latency and cost without improving correctness, or under-tool when it matters.
 
@@ -37,17 +43,18 @@ step states the outcome and what you checked. Skip neither.
 **Example** (place inside Constraints):
 
 ```
-One search per question is the budget. Reach for a second call only when
-the first one came up short: the core question still isn't answered, a
-specific fact (id, date, source) is missing, the user wants comparison or
-exhaustive coverage, or a named artifact must be opened. A factual claim
-that would otherwise be unsupported also justifies one more lookup.
+Default to the smallest number of searches that answers the question.
 
-Stay out of the search bar for phrasing tweaks, decorative citations, or
-generic wording that doesn't lose information when softened.
+When current results don't answer the core question, a required fact
+(id, date, source) is missing, the user asked for comparison or
+exhaustive coverage, or a named artifact must be opened — escalate
+with another search. Otherwise, stop and answer.
+
+When you'd search to polish phrasing, add decorative citations, or
+support generic wording — don't.
 ```
 
-Adapt verbs (`retrieval`, `search`, `tool`) to the agent's available tools.
+Adapt verbs (`retrieval`, `search`, `tool`) to the agent's available tools. The principle is *escalate-on-condition*, not a fixed cap.
 
 ## Output contract
 
@@ -86,9 +93,10 @@ or a more promotional tone unless explicitly asked.
 
 ```
 When the request is ambiguous or underspecified:
-- Ask up to three precise clarifying questions when the missing information
+- Ask the smallest number of precise clarifying questions that resolve
+  material ambiguity — typically one or two — when missing information
   would materially change the answer or the chosen action.
-- Otherwise present two or three plausible interpretations with explicit
+- Otherwise present the most likely plausible interpretations with explicit
   assumptions, and answer the most likely one. Label the assumptions.
 
 When external facts may have changed and tools are not available:
@@ -149,7 +157,7 @@ Rule: Cite sources for any factual claim about specific entities, prices,
       methodology do not need citation.
 ```
 
-Reserve absolutes for true invariants — see the cross-cutting principle in SKILL.md for the canonical statement.
+Reserve absolutes for true invariants — see the "Decision rules over absolutes" cross-cutting principle in SKILL.md for the canonical statement.
 
 ---
 

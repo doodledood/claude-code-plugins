@@ -4,7 +4,7 @@ Loaded when an existing prompt fails in production and you want the model to hel
 
 The shape is two separate calls — diagnose first, revise second. Skipping the diagnosis step (asking directly for a fix) tends to produce vague or shallow rewrites that miss the real cause.
 
-## Before you start — when metaprompting is the wrong tool
+## Pre-flight check — when metaprompting is the wrong tool
 
 - If the prompt is missing a goal or success criteria entirely, no diagnosis call will surface it — fix the gap directly.
 - If the model lacks a capability the prompt is asking for (e.g., reliable arithmetic on long numbers, accurate citations without retrieval), no prompt change will fix it — change the architecture.
@@ -109,7 +109,9 @@ Output:
 
 After applying the patch, re-run the failing queries. Repeat the cycle until the failure modes are resolved.
 
-**If a patch creates new failures, restart at Step 1 with the new failure as input — don't stack patches.**
+**Don't stack patches.** If a patch creates new failures, restart at Step 1 with the new failure as input — stacking patches obscures the root cause and produces brittle prompts.
+
+**Stop if the cycle isn't converging.** If repeated cycles produce no improvement on the named failure modes, the issue likely isn't a prompt problem. Revisit the pre-flight check at the top of this file — model capability gaps and missing goals don't fix with metaprompting.
 
 ## Pitfalls of the metaprompting workflow itself
 
