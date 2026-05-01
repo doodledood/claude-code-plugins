@@ -20,7 +20,7 @@ consequences, narrate the action plus its parameters and pause for confirm.
 If any check fails, revise before continuing — never paper over a gap.
 ```
 
-For agents that mutate external state, the same idea fits inside one tight rule:
+For agents that mutate external state, condense to:
 
 ```
 Treat every state-changing tool call as narrate → execute → confirm. The
@@ -47,13 +47,13 @@ Stay out of the search bar for phrasing tweaks, decorative citations, or
 generic wording that doesn't lose information when softened.
 ```
 
-Adapt the verbs (`retrieval`, `search`, `tool`) to whatever the agent actually has access to.
+Adapt verbs (`retrieval`, `search`, `tool`) to the agent's available tools.
 
 ## Output contract
 
 **When to apply** — the consumer of the output has specific needs (audience, length, structure, voice) and the default "produce a good answer" leads to walls of text, missing structure, or wrong register.
 
-**What it does** — names the audience, the length envelope, the structural choices, and the editing posture (improve vs. preserve) up front. Most output drift is solvable here without other constraints.
+**What it does** — names the audience, the length envelope, the structural choices, and the editing posture (improve vs. preserve) up front. Output drift often resolves at this layer alone — try this before adding constraints elsewhere.
 
 **Example for a generation task** (place inside Output):
 
@@ -61,7 +61,8 @@ Adapt the verbs (`retrieval`, `search`, `tool`) to whatever the agent actually h
 Audience: senior engineers reviewing a pull request. Familiar with the codebase
 conventions; unfamiliar with this specific change.
 
-Length: under 300 words. Conclusion first, reasoning second, caveats last.
+Length: short enough to read in one sitting. Conclusion first, reasoning second,
+caveats last.
 
 Structure: short paragraphs. Use bullets only for lists of three or more
 parallel items. Headers only when the answer covers more than one topic.
@@ -140,7 +141,7 @@ Rule: For factual questions about specific entities (people, companies,
 Bad:  Always be concise.
 Rule: For status updates and acknowledgements: one or two sentences.
       For explanations and recommendations: as long as needed for the user
-      to act with confidence; lead with the conclusion.
+      to act with confidence.
 
 Bad:  Always cite sources.
 Rule: Cite sources for any factual claim about specific entities, prices,
@@ -148,8 +149,8 @@ Rule: Cite sources for any factual claim about specific entities, prices,
       methodology do not need citation.
 ```
 
-Reserve absolutes for true invariants — safety rules, hard contracts, required output fields, things that should never happen in any interpretation.
+Reserve absolutes for true invariants — see the cross-cutting principle in SKILL.md for the canonical statement.
 
 ---
 
-These patterns compose. A high-stakes agent likely uses verification loop + retrieval budget + ambiguity handling + decision rules together. Compose them where they apply; don't add them speculatively.
+These patterns compose — pick by failure mode, not by category. Add them where they apply, not speculatively.

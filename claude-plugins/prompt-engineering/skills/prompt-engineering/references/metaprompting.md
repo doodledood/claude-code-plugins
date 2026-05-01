@@ -1,8 +1,14 @@
 # Metaprompting
 
-Loaded when an existing prompt fails in production and you want the model to help diagnose and fix it. Different verb from authoring: instead of writing a prompt from scratch, you use a model to inspect a prompt and its failure traces, then propose a surgical patch.
+Loaded when an existing prompt fails in production and you want the model to help diagnose and fix it. Different verb from authoring: instead of writing a prompt from scratch, you use a model to inspect a prompt and its failure traces, then propose a surgical revision — the full prompt redelivered with minimal targeted edits.
 
-The shape is two separate calls — diagnose first, patch second. Skipping the diagnosis step (asking directly for a fix) tends to produce vague or shallow rewrites that miss the real cause.
+The shape is two separate calls — diagnose first, revise second. Skipping the diagnosis step (asking directly for a fix) tends to produce vague or shallow rewrites that miss the real cause.
+
+## Before you start — when metaprompting is the wrong tool
+
+- If the prompt is missing a goal or success criteria entirely, no diagnosis call will surface it — fix the gap directly.
+- If the model lacks a capability the prompt is asking for (e.g., reliable arithmetic on long numbers, accurate citations without retrieval), no prompt change will fix it — change the architecture.
+- If the failure is a single bug from a typo or contradiction visible on a quick read, just fix it.
 
 ## Step 1 — Diagnose only
 
@@ -10,7 +16,7 @@ Feed the model the current system prompt plus a small set of logged failures. As
 
 **Constraints** to include in the diagnosis call:
 - Identify distinct failure modes — name and describe each.
-- For each failure mode, quote or paraphrase the specific lines of the system prompt likely causing or reinforcing it. Include contradictions ("be concise" vs. "err on the side of completeness", "avoid tools" vs. "always use tools for events over 30 attendees").
+- For each failure mode, quote or paraphrase the specific lines of the system prompt likely causing or reinforcing it. Include contradictions (e.g., "be concise" vs. "err on the side of completeness").
 - For each failure mode, briefly explain how those lines steer the agent toward the observed behavior.
 - Return the analysis in a structured-but-readable format.
 
@@ -56,17 +62,19 @@ failure_modes:
       why_it_matters: ...
 ```
 
-## Step 2 — Surgical patch
+## Step 2 — Surgical revision
 
 Feed the diagnosis from Step 1 back into a separate call. Ask for a patch — small explicit edits that resolve the issues without rewriting the prompt.
 
-**Constraints** to include in the patch call:
+**Constraints** to include in the revision call:
 - Do not redesign the agent from scratch.
 - Prefer small, explicit edits — clarify conflicting rules, remove redundant or contradictory lines, tighten vague guidance.
 - Make tradeoffs explicit (e.g., "when to prioritize concision over completeness", "exactly when tools must vs. must not be called").
 - Keep overall structure and length roughly similar to the original, unless a short consolidation removes obvious duplication.
 
-**Example patch prompt**:
+Re-include the original system prompt verbatim in the revision call — Step 2 doesn't inherit context from Step 1.
+
+**Example revision prompt**:
 
 ```
 You previously analyzed this system prompt and its failure modes.
@@ -99,20 +107,16 @@ Output:
    ready to drop in.
 ```
 
-After applying the patch, re-run the failing queries. Repeat the cycle until the failure modes you started with are resolved.
+After applying the patch, re-run the failing queries. Repeat the cycle until the failure modes are resolved.
 
-## Two failure modes to avoid
+**If a patch creates new failures, restart at Step 1 with the new failure as input — don't stack patches.**
+
+## Pitfalls of the metaprompting workflow itself
 
 **Too many failure types in one metaprompt.** When the failure traces span unrelated failure modes (output too long + tool over-eagerness + unit confusion + hallucinated facts, all in one batch), the diagnosis call struggles to connect threads and the patch call produces shallow fixes. Group similar failures and run the cycle separately for each group. One cycle per coherent failure mode.
 
-**Accepting overly specific patch recommendations.** A single patch call may produce edits that fix the specific traces you fed it but generalize poorly — the model overfits to the examples. Run the patch call several times; look for changes that appear across runs as cross-cutting suggestions. Treat single-run-only suggestions as candidates for a smaller patch rather than the main fix.
+**Accepting overly specific patch recommendations.** A single patch call may produce edits that fix the specific traces you fed it but generalize poorly — the model overfits to the examples. Run the patch call multiple times and look for changes that appear across runs; those are cross-cutting suggestions. Treat single-run-only suggestions as candidates for a smaller targeted patch rather than the main fix.
 
 ## When to add evals
 
-Metaprompting without evals is iteration in the dark. Once a failure mode is named, write the smallest eval that distinguishes the failing behavior from the desired behavior — even a hand-graded set of ten queries. Use it to confirm the patch actually helps before merging.
-
-## When metaprompting is the wrong tool
-
-- If the prompt is missing a goal or success criteria entirely, no diagnosis call will surface it — fix the gap directly first.
-- If the model lacks a capability the prompt is asking for (e.g., reliable arithmetic on long numbers, accurate citations without retrieval), no prompt change will fix it — change the architecture instead.
-- If the failure is a single bug from a typo or contradiction you can spot in 30 seconds of reading, just fix it.
+Metaprompting without evals is iteration in the dark. Once a failure mode is named, write the smallest eval that distinguishes the failing behavior from the desired behavior — even a tiny hand-graded set works. Use it to confirm the patch actually helps before merging.

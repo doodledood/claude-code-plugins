@@ -1,6 +1,6 @@
 ---
 name: prompt-engineering
-description: 'Craft, update, or review LLM prompts from first principles. Use when creating new prompts, updating existing ones, or reviewing prompt structure. Ensures prompts define WHAT and WHY, not HOW. Triggers: write a prompt, edit a prompt, review a prompt, system prompt, skill, agent, prompt engineering.'
+description: 'Craft, update, or review LLM prompts from first principles. Use when creating new prompts, updating existing ones, reviewing prompt structure, or diagnosing a failing prompt. Ensures prompts define WHAT and WHY, not HOW. Triggers: write a prompt, edit a prompt, review a prompt, improve a prompt, diagnose prompt failure, fix failing prompt, system prompt, skill, agent.'
 ---
 
 **User request**: $ARGUMENTS
@@ -15,7 +15,9 @@ Create, update, or review an LLM prompt. Prompts act as manifests: clear goal, c
 
 **If reviewing**: Read the prompt, scan against the canonical template, cross-cutting principles, and anti-patterns. Report issues without modifying the file. For deeper structural audit, delegate to `/review-prompt`.
 
-**If creating or updating a skill**: Read `references/skills.md` for skill-specific architecture patterns (folder structure, progressive disclosure, gotchas, setup config, description-as-trigger, skill type awareness) before proceeding.
+**If creating or updating an agent**: Declare every required tool in frontmatter — agents run isolated and don't inherit tools (see Agents specialization below).
+
+**If diagnosing a failing prompt**: Read `references/metaprompting.md` for the diagnose-from-failures → surgical-revision workflow.
 
 ## Before writing — discover context
 
@@ -43,7 +45,7 @@ Missing domain knowledge creates ambiguous prompts. You can't surface latent req
 | **Domain terms** | Ask for definitions, don't guess. Jargon you don't understand creates ambiguous prompts. |
 | **Missing examples** | Ask for good/bad output examples when success criteria are unclear. |
 
-Continue probing until further questions yield nothing new or the user signals enough. Err toward more probing — every requirement discovered now is one fewer failure later.
+When unsure whether to keep probing, ask one more question — every requirement discovered now is one fewer failure later.
 
 Critical ambiguities (those that would cause prompt failure) require clarification even if the user wants to move on. Minor ambiguities can be documented with chosen defaults and proceed. When unsure, ask — a prompt built on assumptions fails in ways the user didn't expect.
 
@@ -64,16 +66,18 @@ Stop rules
 | Section | What goes here |
 |---------|----------------|
 | **Role** | Identity and stance — who the model is, what context it operates in, what it's responsible for. One or two sentences. |
-| **Personality** | Voice, tone, formality, warmth, directness. Shapes how the assistant *sounds* to the user. **Skip when** the prompt is a worker, internal-pipeline, transformation, extraction, or any non-user-facing task — Personality is for conversational and customer-facing surfaces only. |
+| **Personality** | Voice, tone, formality, warmth, directness. Shapes how the assistant *sounds* to the user. Skip when the prompt is a worker, internal-pipeline, transformation, extraction, or any non-user-facing task — Personality is for conversational and customer-facing surfaces only. |
 | **Goal** | The user-visible outcome the run produces. State the destination, not the path. |
 | **Success criteria** | What must be true before the final answer. Include the **degradation paths**: when to **retry** (transient failure), **fallback** (alternative method), **abstain** (refuse with reason), **ask** (for the smallest missing field). The four verbs prevent loops and silent guessing. |
 | **Constraints** | Rules that must hold throughout the run — policy, safety, business, evidence, side-effect limits. Reserve absolutes (MUST/NEVER) for true invariants; for judgment calls (when to search, ask, iterate, retry), use decision rules: "When X, do Y; otherwise Z." When multiple non-invariant rules apply, mark priority (MUST > SHOULD > PREFER) so conflicts resolve predictably. |
 | **Output** | Format, length, audience, structure. Be specific only where it changes behavior — don't over-prescribe shape the model already gets right from Goal. |
-| **Stop rules** | Loop control: when to stop pursuing more information and answer with what you have. The exit-decision rule for tool/iteration loops, distinct from Success (target state) and degradation (handling non-success). |
+| **Stop rules** | Loop control: when to stop pursuing more information and answer with what you have. Distinct from Success (target state) and degradation (non-success behavior). |
+
+**Stop rules vs. Success criteria** — Success names the target state ("the answer covers the asked question with grounded claims"); Stop names the loop-exit ("when one more search would not change the answer, write"). Conflating them causes agents to either over-search or stop early.
 
 Most prompts use these sections as physical headers. Complex multi-phase prompts may organize physically by phase or theme, as long as every applicable section is answered somewhere checkable.
 
-For non-trivial sections, pull techniques from `references/system-prompt-patterns.md` rather than inventing — verification loops, retrieval/tool budgets, output contracts, ambiguity handling, high-risk self-check, decision-rules examples.
+For non-trivial sections, pull techniques from `references/system-prompt-patterns.md` rather than inventing — verification loops, retrieval/tool budgets, output contracts, ambiguity handling, high-risk self-check, decision-rules.
 
 ## Specializations
 
@@ -86,7 +90,7 @@ A skill is a directory, not a file. SKILL.md is the entry; companion files (refe
 - **Folder architecture** — directory with SKILL.md + appropriate companions. Domain knowledge and reference data live in companions, not front-loaded in SKILL.md (progressive disclosure).
 - **Description as trigger** — the frontmatter `description` field is a *trigger specification* for the model's matching algorithm, not a human summary. Pattern: **what + when + trigger terms users actually say**, under 1024 characters (Claude Code's enforced limit). Strong: "Adversarial code review that spawns a fresh-eyes subagent. Use for PR review, code audit, pre-merge quality check." Weak: "Helps with code review."
 - **Gotchas** — observed failure modes the skill actually hits, not theoretical risks. Specific (names the failure), actionable (says what to do instead), grounded (observed, not hypothetical). Highest-signal content in any skill.
-- **Setup config** — skills needing user-specific configuration (channel names, project IDs) persist it in a config file in the skill directory. Don't ask every session.
+- **Setup config** — skills needing user-specific configuration (channel names, project IDs) persist it in a config file under the skill directory; read it on invocation rather than re-asking.
 
 Skill scaffold (starting frame):
 
@@ -102,7 +106,7 @@ description: 'What it does. When to use. Trigger terms.'
 
 {Branch on empty input: ask, error, or default}
 
-{Sections per the canonical template, scoped to the skill's job}
+{Sections per the canonical template, scoped to the skill's job. Personality only if user-facing.}
 
 ## Gotchas
 
@@ -127,7 +131,7 @@ These apply to every section of every prompt.
 | **WHAT and WHY, not HOW** | State goals and constraints. Don't prescribe steps the model already knows how to do. |
 | **Trust capability, enforce discipline** | The model knows how to search, analyze, generate. Specify guardrails, not procedure. |
 | **Maximize information density** | Every word earns its place. Fewer words / same meaning / better. |
-| **Decision rules over absolutes** | Reserve MUST / NEVER / ALWAYS for true invariants (safety rules, required output fields, hard constraints). For judgment calls, write decision rules: "When X, do Y; otherwise Z." |
+| **Decision rules over absolutes** | Reserve MUST / NEVER / ALWAYS (and all-caps emphatic absolutes) for true invariants — safety rules, required output fields, hard constraints. For judgment calls, write decision rules: "When X, do Y; otherwise Z." Ordinary modal usage ("must hold", "must be true") is fine. |
 | **Avoid arbitrary numbers** | "Max 4 rounds" becomes rigid. State the principle: "stop when converged." Numbers earn their place only when they're the actual constraint. |
 | **Emotional tone** | Keep arousal low; aim for trusted-advisor; normalize failure in iterative prompts. (Full rationale in Emotional tone section below.) |
 | **Updates: high-signal only** | Every change must address a real failure mode or materially improve clarity. (Discipline in When updating section below.) |
@@ -156,12 +160,16 @@ Watch for **contradictory rules** and **priority collisions** — two rules that
 |--------------|---------|-----|
 | Prescribing HOW | "First search, then read, then analyze..." | State goal: "Understand the pattern" |
 | Arbitrary limits | "Max 3 iterations", "2-4 examples" | Principle: "until converged", "as needed" |
-| Capability instructions | "Use grep to search", "Read the file" | Remove — model knows how |
+| Capability instructions | Generic "Use grep to search" / "Read the file" | Remove |
 | Rigid checklists in authored prompts | Step-by-step procedure baked into the prompt | Convert to goal + constraints (memento and metaprompting are exempt — order is the point) |
 | Weak hedging / vague language | "Try to", "maybe", "if possible", "be helpful", "use good judgment", "when appropriate" | Direct imperative: "Do X" — and replace vague success criteria with checkable conditions |
 | Absolutes for judgment calls | "ALWAYS", "NEVER", "MUST" applied to non-invariants | Decision rule: "When X, do Y; otherwise Z" |
-| Buried critical info | Important rules in middle | Surface prominently |
+| Buried critical info | Safety / output-contract rules buried mid-paragraph | Surface near the top of the section that owns them |
 | Over-engineering | 10 phases for a simple task | Match complexity to need |
+
+**Notes on carve-outs:**
+- *Capability instructions* — specific data-flow ("read `/etc/config` first") is fine; generic capability narration isn't.
+- *Weak hedging* — banned as top-level directives. Fine in explanatory prose where the surrounding sentence makes the action concrete.
 
 ## Multi-phase: memento pattern
 
@@ -185,7 +193,7 @@ Prompts shape the model's internal emotional state before generation. Research o
 
 | Principle | What it means | Why |
 |-----------|---------------|-----|
-| **Keep arousal low** | Avoid urgency language ("CRITICAL", "you MUST"), excessive praise ("you're amazing at this!"), and pressure framing. | High-arousal emotions causally drive sycophancy (positive arousal) or corner-cutting and misalignment (negative arousal). |
+| **Keep arousal low** | Avoid urgency framing ("CRITICAL", "you MUST do this NOW", all-caps imperatives), excessive praise ("you're amazing at this!"), and pressure language. Ordinary modal usage ("must hold", "must be true") is fine. | High-arousal emotions causally drive sycophancy (positive arousal) or corner-cutting and misalignment (negative arousal). |
 | **Opening framing propagates** | The emotional tone set in a prompt's opening persists into the model's response planning. A tense opening produces a tense response. | Emotional context from early tokens propagates through later processing layers, even when subsequent content is neutral. |
 | **Normalize failure in iterative prompts** | For agentic or multi-step prompts, frame failure as acceptable: "if this approach doesn't work, try another." | Repeated failures build desperation that causally drives reward hacking and corner-cutting. |
 | **Sycophancy ↔ harshness tradeoff** | Pushing toward warmth and positivity increases sycophancy. Pushing away from warmth increases bluntness. Aim for a "trusted advisor" tone — honest pushback delivered with care. | Positive-valence emotion representations causally increase agreement-seeking; their absence produces unnecessary harshness. |
@@ -193,15 +201,14 @@ Prompts shape the model's internal emotional state before generation. Research o
 
 ## Before shipping — validation checklist
 
-- [ ] All ambiguities resolved through user questions
-- [ ] Domain context gathered (terms, conventions, constraints)
+- [ ] Critical ambiguities resolved through user questions; minor ambiguities documented with chosen defaults
+- [ ] Domain terms defined, conventions confirmed, success criteria stated
 - [ ] Goals stated, not steps prescribed
 - [ ] No arbitrary numbers (or justified if present)
 - [ ] Weak language replaced with direct imperatives
-- [ ] Critical rules surfaced prominently
-- [ ] Complexity matches the task
-- [ ] Each word earns its place
-- [ ] Emotional tone calibrated (low arousal, failure normalized if iterative)
+- [ ] Critical rules surfaced near the top of their owning section
+- [ ] Complexity matches the task — no section longer than its job requires
+- [ ] Emotional tone calibrated — no all-caps urgency, no excessive praise; failure normalized if iterative
 - [ ] If multi-phase: memento pattern applied correctly
 - [ ] If user-facing: Personality section present and calibrated
 
