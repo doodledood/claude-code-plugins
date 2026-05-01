@@ -3,9 +3,9 @@ name: prompt-engineering
 description: 'Craft, update, or review LLM prompts from first principles. Use when creating new prompts, updating existing ones, reviewing prompt structure, or diagnosing a failing prompt. Ensures prompts define WHAT and WHY, not HOW. Triggers: write a prompt, edit a prompt, review a prompt, improve a prompt, diagnose prompt failure, fix failing prompt, system prompt, skill, agent.'
 ---
 
-**User request**: $ARGUMENTS
+**User request**: $ARGUMENTS  *(the user's invocation text, bound by the harness; branch on it per Goal below)*
 
-A skill that helps the user create, update, review, or diagnose LLM prompts. The skill teaches a canonical seven-section structure, applies first-principles discipline, and guides the author through context discovery and pre-ship validation. This document follows its own template — Role / Goal / Success criteria / Constraints / Output / Stop rules below, with the body of knowledge it applies as expansion. Personality is skipped (this is a worker prompt — non-user-facing).
+*This skill applies its own canonical seven-section template to itself — Role / Goal / Success criteria / Constraints / Output / Stop rules. Personality is skipped (worker prompt). Body of knowledge follows the operational frame.*
 
 ## Role
 
@@ -36,7 +36,7 @@ The produced prompt:
 Degradation paths — when target success isn't achievable, fall back deliberately rather than guessing:
 
 - **Retry** — when a draft is unclear; revise once with fresh perspective before producing more text.
-- **Fallback** — when context discovery surfaces a different prompt class; redirect (e.g., to `/review-prompt` or `references/metaprompting.md`) rather than forcing fit.
+- **Fallback** — when context discovery surfaces a different problem class than first read (e.g., the user wanted a metaprompt-diagnosis but framed it as "review"); redirect to the right tool (`references/metaprompting.md` for failure-trace-driven workflows; `/review-prompt` for deeper structural audit beyond what this skill produces inline) rather than forcing fit.
 - **Abstain** — when the user's underlying need isn't a prompt problem (model capability gap, missing data, wrong architecture); name the architectural problem instead of writing a prompt.
 - **Ask** — when a critical ambiguity would cause prompt failure; ask narrow specific questions, not open-ended ones.
 
@@ -46,30 +46,26 @@ Cross-cutting rules that apply throughout the work. The full tables live in the 
 
 - **WHAT and WHY, not HOW.** State goals and constraints; trust capability for procedure.
 - **Information density.** Every word earns its place.
-- **Decision rules over absolutes.** Reserve MUST/NEVER/ALWAYS (and emphatic absolutes) for true invariants; for judgment calls, write decision rules. Ordinary modal usage is fine.
+- **Decision rules over absolutes.** Reserve MUST/NEVER/ALWAYS (and emphatic absolutes) for true invariants; for judgment calls, write decision rules. Ordinary modal usage ("must hold", "must be true") is fine.
 - **No arbitrary numbers.** State the principle, not the threshold, unless the threshold itself is the constraint.
 - **Emotional tone low.** Trusted-advisor stance; normalize failure in iterative prompts; no urgency framing or excessive praise.
 - **Updates are high-signal only.** Every edit must address a real failure mode or materially improve clarity.
-- **No silent dropping** when restructuring an existing prompt. Preserve high-signal content; relocate or fold rather than drop.
+- **No silent dropping** when restructuring an existing prompt. If a rule, example, or carve-out is doing real work in the original, it must survive the restructure — relocate or fold, don't drop. Restructure isn't license to lose load-bearing content.
 
-Anti-patterns to avoid: Prescribing HOW · Arbitrary limits · Capability instructions · Rigid checklists in authored prompts · Weak hedging / vague language · Absolutes for judgment calls · Buried critical info · Over-engineering. Full table below.
+Anti-patterns table is in the body below.
 
 ## Output
 
-Per branch:
+The artifact varies by branch (the prompt file written or edited in place; a Markdown issues report; a redirect to the metaprompting reference). See Goal above for per-branch artifacts. Match output complexity to the prompt's complexity — a three-line worker prompt doesn't need a memento pattern.
 
-- **Create / Update** — the prompt file, written or edited in place.
-- **Review** — a Markdown issues report (severity, location, recommended fix); no file modifications.
-- **Diagnose** — redirect to the metaprompting reference; the workflow itself produces a surgical revision.
-
-Match output complexity to the prompt's complexity. A three-line worker prompt doesn't need a memento pattern.
+Hard invariant: the **Review** branch never modifies the file under review. It only produces a report.
 
 ## Stop rules
 
 - **Pre-ship**: every applicable item on the Validation Checklist below is satisfied.
 - **Probing**: when questions yield nothing new or the user signals enough.
 - **Updates**: when changes are no longer high-signal — don't iterate for the sake of iteration.
-- **Review**: when issues are reported with locations and fixes; the review branch never modifies files.
+- **Review**: when every applicable principle has been checked and findings are reported with locations and fixes.
 - **Diagnose**: when the metaprompting cycle produces a revision that resolves the named failure modes.
 
 ---
@@ -220,7 +216,7 @@ Watch for **contradictory rules** and **priority collisions** — two rules that
 | Prescribing HOW | "First search, then read, then analyze..." | State goal: "Understand the pattern" |
 | Arbitrary limits | "Max 3 iterations", "2-4 examples" | Principle: "until converged", "as needed" |
 | Capability instructions | Generic "Use grep to search" / "Read the file" | Remove |
-| Rigid checklists in authored prompts | Step-by-step procedure baked into the prompt | Convert to goal + constraints (memento and metaprompting are exempt — order is the point) |
+| Rigid checklists in authored prompts | Step-by-step procedure baked into the prompt for the model to follow at runtime | Convert to goal + constraints. Author-facing checklists (validation lists, review rubrics) and order-bearing patterns (memento, metaprompting) are exempt — they're not steps the model is told to follow at runtime |
 | Weak hedging / vague language | "Try to", "maybe", "if possible", "be helpful", "use good judgment", "when appropriate" | Direct imperative: "Do X" — and replace vague success criteria with checkable conditions |
 | Absolutes for judgment calls | "ALWAYS", "NEVER", "MUST" applied to non-invariants | Decision rule: "When X, do Y; otherwise Z" |
 | Buried critical info | Safety / output-contract rules buried mid-paragraph | Surface near the top of the section that owns them |
@@ -260,9 +256,11 @@ Prompts shape the model's internal emotional state before generation. Research o
 
 ## Before shipping — validation checklist
 
+- [ ] Defines WHAT and WHY, not HOW (no procedural step-prescription where the model already knows the procedure)
 - [ ] Critical ambiguities resolved through user questions; minor ambiguities documented with chosen defaults
 - [ ] Domain terms defined, conventions confirmed, success criteria stated
 - [ ] Goals stated, not steps prescribed
+- [ ] Absolutes reserved for true invariants — judgment calls use decision rules
 - [ ] No arbitrary numbers (or justified if present)
 - [ ] Weak language replaced with direct imperatives
 - [ ] Critical rules surfaced near the top of their owning section
@@ -270,6 +268,7 @@ Prompts shape the model's internal emotional state before generation. Research o
 - [ ] Emotional tone calibrated — no all-caps urgency, no excessive praise; failure normalized if iterative
 - [ ] If multi-phase: memento pattern applied correctly
 - [ ] If user-facing: Personality section present and calibrated
+- [ ] If restructuring an existing prompt: high-signal content preserved, relocated, or folded — not silently dropped
 
 ## Gotchas
 
