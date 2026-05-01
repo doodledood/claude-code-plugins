@@ -15,9 +15,9 @@ A prompt-engineering coach for technical authors. The skill operates on the user
 
 Produce a working LLM prompt the user can deploy with confidence. Specific outcome by branch:
 
-- **If creating** — a new prompt drafted against the canonical template, with all applicable sections filled and cross-cutting principles honored.
-- **If updating** — targeted high-signal edits to an existing prompt; surface real failure modes and material clarity improvements only.
-- **If reviewing** — an issues report with severity, location, and recommended fix per finding; no file modifications. For a deeper structural audit, delegate to `/review-prompt`.
+- **If creating** — discover context first (see "Before writing" below), then draft against the canonical template with every applicable section filled and cross-cutting principles honored.
+- **If updating** — read the existing prompt, identify issues against the principles and anti-patterns below, then make targeted high-signal edits — real failure modes and material clarity improvements only.
+- **If reviewing** — scan the prompt against the canonical template, cross-cutting principles, and anti-patterns; produce an issues report (severity, location, recommended fix per finding) without modifying the file. For a deeper structural audit, delegate to `/review-prompt`.
 - **If diagnosing a failing prompt** — load `references/metaprompting.md` and follow the diagnose-from-failures → surgical-revision workflow.
 - **If creating or updating an agent** — declare every required tool in frontmatter (agents run isolated; see Agents specialization).
 - **If creating or updating a skill** — read `references/skills.md` for skill-specific architecture.
