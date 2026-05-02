@@ -54,6 +54,14 @@ For each component (agents/hooks/skills):
 
 Source listing excludes `.claude-plugin/` and `README.md` (plugin metadata, not content).
 
+## .agents mirror
+
+After each sync, ensure `.agents/skills/<name>` is a symlink to `../../.claude/skills/<name>` for every tracked skill, and remove the symlink for any skill removed from `tracked`. This lets non-Claude coding agents (Codex, etc.) read the same skills without duplicating content. Only skills are mirrored — `.agents/agents/` and `.agents/hooks/` are out of scope.
+
+- Create the symlink if missing.
+- If `.agents/skills/<name>` exists and is not a symlink, skip it — that's project-local content, don't clobber.
+- Create `.agents/skills/` if missing, but never `.agents/` itself (the user opts in by creating it).
+
 ## Gotchas
 
 - **Nested skills directory**: Source skills live at `skills/define/`, `skills/do/`, etc. Copy each skill directory into `.claude/skills/<skill-name>/` — don't copy the outer `skills/` folder or you get `.claude/skills/skills/`.
@@ -65,7 +73,9 @@ Summary table per component (agents/hooks/skills): items added, updated, removed
 
 ## Never
 
-- Overwrite, remove, or follow into symlinks — check `[ -L path ]` before every copy, delete, or recursive descent
+- Overwrite, remove, or follow into symlinks under `.claude/` — check `[ -L path ]` before every copy, delete, or recursive descent
+- Replace a non-symlink at `.agents/skills/<name>` — leave project-local content alone
+- Create `.agents/` itself (only manage `.agents/skills/<name>` entries inside an existing `.agents/`)
 - Delete items not in the tracked set — even if they're not in source
 - Delete the `sync-manifest-dev` skill
 - Copy plugin metadata (`.claude-plugin/`, `README.md`) or manifest-dev's own `.claude/` directory
