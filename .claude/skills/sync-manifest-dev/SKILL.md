@@ -60,7 +60,7 @@ After each sync, ensure `.agents/skills/<name>` is a symlink to `../../.claude/s
 
 - Create the symlink if missing.
 - If `.agents/skills/<name>` exists and is not a symlink, skip it — that's project-local content, don't clobber.
-- Create `.agents/skills/` if missing, but never `.agents/` itself (the user opts in by creating it).
+- Create `.agents/` and `.agents/skills/` if missing.
 
 ## Gotchas
 
@@ -75,7 +75,6 @@ Summary table per component (agents/hooks/skills): items added, updated, removed
 
 - Overwrite, remove, or follow into symlinks under `.claude/` — check `[ -L path ]` before every copy, delete, or recursive descent
 - Replace a non-symlink at `.agents/skills/<name>` — leave project-local content alone
-- Create `.agents/` itself (only manage `.agents/skills/<name>` entries inside an existing `.agents/`)
 - Delete items not in the tracked set — even if they're not in source
 - Delete the `sync-manifest-dev` skill
 - Copy plugin metadata (`.claude-plugin/`, `README.md`) or manifest-dev's own `.claude/` directory
