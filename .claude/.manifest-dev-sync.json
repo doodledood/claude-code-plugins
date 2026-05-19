@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-05-02T08:44:29Z",
+  "last_synced_at": "2026-05-19T15:10:00Z",
   "agents": [
     "change-intent-reviewer.md",
     "code-bugs-reviewer.md",
@@ -12,33 +12,26 @@
     "contracts-reviewer.md",
     "criteria-checker.md",
     "docs-reviewer.md",
-    "manifest-verifier.md",
+    "github-pr-lifecycle.md",
+    "operational-readiness-reviewer.md",
     "prose-value-reviewer.md",
+    "slack-poller.md",
     "test-quality-reviewer.md",
     "type-safety-reviewer.md"
   ],
   "hooks": [
     "hook_utils.py",
     "post_compact_hook.py",
-    "posttool_log_hook.py",
-    "pretool_verify_hook.py",
-    "prompt_submit_hook.py",
     "pyproject.toml",
-    "stop_do_hook.py",
-    "thinking_disciplines_pretool_hook.py",
-    "thinking_disciplines_prompt_hook.py"
+    "stop_do_hook.py"
   ],
   "skills": [
     "auto",
     "define",
     "do",
     "done",
-    "drive",
-    "drive-tick",
     "escalate",
     "figure-out",
-    "stop-thinking-disciplines",
-    "thinking-disciplines",
-    "verify"
+    "figure-out-team"
   ]
 }
