@@ -15,6 +15,7 @@
     { "name": "frontend-design", "source": "./claude-plugins/frontend-design" },
     { "name": "life-ops", "source": "./claude-plugins/life-ops" },
     { "name": "writing", "source": "./claude-plugins/writing" },
-    { "name": "marketing", "source": "./claude-plugins/marketing" }
+    { "name": "marketing", "source": "./claude-plugins/marketing" },
+    { "name": "hermes-tweet", "source": "./claude-plugins/hermes-tweet" }
   ]
 }
