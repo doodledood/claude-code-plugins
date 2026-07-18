@@ -33,3 +33,6 @@ hermes plugins install Xquik-dev/hermes-tweet --enable
 For non-interactive installs, set `XQUIK_API_KEY` before calling `tweet_read`. Without a key, Hermes Tweet should still expose the no-network `tweet_explore` tool.
 
 Action endpoints stay disabled unless `HERMES_TWEET_ENABLE_ACTIONS=true`.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.

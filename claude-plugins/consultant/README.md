@@ -17,7 +17,7 @@ Different models have different strengths. Sometimes you want a second opinion o
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.10+
 - [uv](https://docs.astral.sh/uv/) for dependency management
 - API key for your chosen provider
 

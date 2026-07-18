@@ -86,3 +86,6 @@ Expected behavior:
 - `tweet_explore` works without an API call.
 - `tweet_read` requires `XQUIK_API_KEY`.
 - `tweet_action` stays hidden or disabled unless `HERMES_TWEET_ENABLE_ACTIONS=true`.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.

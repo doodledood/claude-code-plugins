@@ -1,6 +1,6 @@
 {
   "name": "hermes-tweet",
-  "description": "Guidance for installing and operating Hermes Tweet as the native Hermes Agent X/Twitter plugin with read-first workflows and gated actions",
+  "description": "Read-first guidance for the native Hermes Agent X/Twitter plugin with gated actions. Not affiliated with X Corp.",
   "version": "0.1.6",
   "author": {
     "name": "Xquik",
