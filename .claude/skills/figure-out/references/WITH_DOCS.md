@@ -1,33 +1,47 @@
-# figure-out: --with-docs
+# figure-out: docs mode
 
-Loaded when `--with-docs` appears in args. Adds three behaviors to figure-out: **bootstrap** (initialize CONTEXT.md if missing), **inline glossary captures** (write project vocabulary as terms surface), and **ADR offers** (record decisions worth keeping). Without the flag, this file isn't read.
+The loading layer activates this reference only after the investigation is relevant to the active project or one of its mapped contexts. It adds three behaviors from that point: **bootstrap** (initialize CONTEXT.md if missing), **inline glossary captures** (write project vocabulary as terms surface), and **ADR offers** (record decisions worth keeping).
 
 ## Override: these writes ARE the action
 
-The master frame in `SKILL.md` says: *"Clarifying answers feed exploration, not action. Don't leap to the implied move — not the edit, not even the proposal."*
+The master frame in `SKILL.md` says answers and agreement feed exploration, not action — don't leap to the implied move, not the edit, not even the proposal.
 
-In `--with-docs` mode that frame has two explicit exceptions. **Glossary captures and ADR offers are not deferred work — they are the action of this mode.** Execute them inline as they trigger. Do not batch to the end of the session. Do not wait for the user to ask. The writes are the deliverable; the deferred-action posture does not apply to them.
+When project docs are active, that frame has two explicit exceptions. **Glossary captures and ADR offers are not deferred work — they are the action of this mode.** Execute them inline as they trigger. Do not batch to the end of the session. Do not wait for the user to ask. The writes are the deliverable; the deferred-action posture does not apply to them.
 
 (The default figure-out posture still applies to everything else — design proposals, code edits, plan synthesis. Only glossary writes and ADR offers carve out.)
 
-## Bootstrap (at session start)
+## Bootstrap (when project relevance exists)
 
-Before pressing the topic, check the documentation surface:
+Once project relevance exists, resolve the active context file and load it if it exists:
 
-1. **`CONTEXT.md` at repo root** — if it exists, load it as evidence. Project vocabulary is a source the user is already working from.
-2. **No `CONTEXT.md`** → propose minimal initialization: *"No CONTEXT.md exists for this repo. Want a minimal scaffold I can grow as terms resolve?"* On accept, write a starter file (project name, one-sentence purpose, empty Language section). On decline, skip the proactive scaffold and don't re-offer it — but subsequent per-turn glossary captures may still create `CONTEXT.md` lazily on first resolution. (The user opted into docs by passing `--with-docs`; declining the scaffold only declines the *proactive* write, not the inline captures that the flag exists for.)
-3. **`CONTEXT-MAP.md` at root** → the repo has multiple contexts. Follow the map to the relevant context's `CONTEXT.md`. Ask which context if unclear.
-4. **Multiple distinct domains emerge mid-session** → propose splitting via `CONTEXT-MAP.md` + per-context `CONTEXT.md`. Don't do this preemptively; only when the conversation actually crosses domain boundaries.
+1. **`CONTEXT-MAP.md` at root** → the repo has multiple contexts. Follow the map to the relevant context's `CONTEXT.md`. Ask which context if unclear.
+2. **No `CONTEXT-MAP.md`** → the active context is the repo-root `CONTEXT.md`.
+3. **Active `CONTEXT.md` exists** → load it as evidence. Project vocabulary is a source the user is already working from.
+4. **Active `CONTEXT.md` is missing** → offer minimal initialization for that context: *"No CONTEXT.md exists for this repo/context. Want a minimal scaffold I can grow as terms resolve?"* On accept, write a starter file at the active context path (context name, one-sentence purpose, empty Language section). On decline, skip the proactive scaffold and don't re-offer it for that context — but subsequent per-turn glossary captures may still create the active `CONTEXT.md` lazily on first earned resolution. (Declining the scaffold only declines the *proactive* write, not the inline captures that docs mode exists for.)
+5. **Multiple distinct domains emerge mid-session** → propose splitting via `CONTEXT-MAP.md` + per-context `CONTEXT.md`. Don't do this preemptively; only when the conversation actually crosses domain boundaries. If the user accepts a split and a relevant per-context `CONTEXT.md` is missing, offer the same minimal initialization for that new context.
 
 ## Glossary captures (per-turn, inline, no offer)
 
-**After every user response**, check for these signals:
+**After every counterparty response — or, in self-answered runs, every resolved question —** check for glossary candidates — but write only candidates that pass the earned-entry gate.
 
-- **A noun got defined** — user used a domain term and stated what they mean by it.
+A candidate earns entry when it would help a future agent model this project correctly because at least one is true:
+
+- **Project-specific meaning** — the term means something here that ordinary English or generic tool knowledge would not supply.
+- **Ambiguity reduction** — confusing it with a near-synonym, alias, or overloaded term would change behavior.
+- **Durable workflow boundary** — the term marks where responsibility, authority, completion, or verification changes hands.
+- **Load-bearing relationship** — the relationship/cardinality between terms changes how future work should be understood.
+- **Observed ambiguity** — the session exposed a clash with existing vocabulary or resolved a fuzzy term into a canonical one.
+
+Do **not** capture merely because a noun was defined. Do not write obvious ordinary terms, generic platform vocabulary without a project-specific meaning, implementation labels, file paths, code structure, design decisions, or one-off explanations. If an existing entry already covers the term, do not rewrite it unless the user's meaning conflicts with it or materially sharpens it.
+
+Signals that can trigger a write after the earned-entry gate passes:
+
+- **A project-language term got defined** — user used a term with project-specific meaning and stated what they mean by it.
+- **A load-bearing relationship got stated or changed** — user articulated a relationship or cardinality between project-language terms that would change future understanding.
 - **A clash with the existing glossary** — user's term conflicts with an existing `CONTEXT.md` entry.
 - **A fuzzy term got canonicalized** — agent or user proposed a canonical name for an overloaded term and it stuck.
 
-If any of these fires → **write to `CONTEXT.md` before asking the next question. No offer, no batch.** Capture as it happens. Create `CONTEXT.md` lazily on the first resolution if it doesn't exist (per Bootstrap above).
+If a signal fires and the candidate earns entry → **write to `CONTEXT.md` before asking the next question. No offer, no batch.** Capture as it happens. Create `CONTEXT.md` lazily on the first resolution if it doesn't exist (per Bootstrap above). If the gate does not pass, do not write; keep figuring out.
 
 When the user's term conflicts with the existing glossary, surface the clash as a lead: *"Glossary defines X as A; you seem to mean B — which is it?"*
 
@@ -35,11 +49,37 @@ When the user uses a fuzzy or overloaded term, propose a canonical one: *"'Accou
 
 ## ADR offers (two-pass capture)
 
-The ADR gate, format, lifecycle, immutability discipline, and cross-reference rules live in the adjacent **`ADR_FORMAT.md`** — read it. This section only covers *when and how to offer* during a figure-out conversation.
+This section carries the gate — everything needed to decide *whether* to offer, per turn, without loading another file. The write-time mechanics (template, MADR sections, naming, lifecycle, immutability, cross-references) live in the adjacent **`ADR_FORMAT.md`** — read it only when an offer is accepted and an ADR is about to be written.
+
+### The gate
+
+The threshold is **downstream architectural impact** — decisions that shape the system's structure, constrain future options, or would be costly to reverse. The gate is category match + Decision Test + anti-patterns; there is no separate AND-of-conditions trigger.
+
+**ADR-worthy (record these):**
+
+| Source | What to capture |
+|--------|----------------|
+| **Architecture choices** | Technology, patterns, component structure, integration approach |
+| **Trade-off resolutions** | When competing concerns were weighed and one was preferred |
+| **Scope decisions with rationale** | Deliberate inclusion/exclusion that shapes the system boundary |
+| **Key constraint decisions** | Invariants established from multiple valid options |
+| **Approach pivots** | When implementation adjusts architecture based on reality |
+
+**NOT ADR-worthy (skip these):**
+
+| Category | Why not |
+|----------|---------|
+| **Quality gate selections** | Verification configuration, not architecture |
+| **Process guidance defaults** | How-to-work, not system structure |
+| **Mechanical choices** | Obvious implementations with no meaningful alternatives |
+| **Known assumptions** | Defaults chosen without deliberation — no alternatives weighed |
+| **Bug fixes** | Corrections, not decisions (unless the fix involves an architectural choice) |
+
+**Decision Test** (when uncertain): *"Would a new team member joining in 6 months benefit from knowing WHY this was decided this way?"* If yes → ADR. If they'd just accept it as obvious → skip.
 
 ### Pass 1 — per-turn (high-confidence)
 
-**After every user response**, check the ADR gate (see `ADR_FORMAT.md`: category match + Decision Test + anti-patterns). When the gate fires *clearly* on a decision just articulated — user chose B over A with explicit reasoning, a scope boundary just got drawn, a key constraint just got named — **offer immediately**:
+**After every counterparty response — or, in self-answered runs, every resolved question —** check the gate above. When it fires *clearly* on a decision just articulated — user chose B over A with explicit reasoning, a scope boundary just got drawn, a key constraint just got named — **offer immediately**:
 
 > *"This looks ADR-worthy — [name the category and the Decision Test result]. Want me to record it?"*
 

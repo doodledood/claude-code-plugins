@@ -1,37 +1,18 @@
 {
   "version": 1,
-  "last_synced_at": "2026-05-19T15:10:00Z",
-  "agents": [
-    "change-intent-reviewer.md",
-    "code-bugs-reviewer.md",
-    "code-design-reviewer.md",
-    "code-maintainability-reviewer.md",
-    "code-simplicity-reviewer.md",
-    "code-testability-reviewer.md",
-    "context-file-adherence-reviewer.md",
-    "contracts-reviewer.md",
-    "criteria-checker.md",
-    "docs-reviewer.md",
-    "github-pr-lifecycle.md",
-    "operational-readiness-reviewer.md",
-    "prose-value-reviewer.md",
-    "slack-poller.md",
-    "test-quality-reviewer.md",
-    "type-safety-reviewer.md"
-  ],
-  "hooks": [
-    "hook_utils.py",
-    "post_compact_hook.py",
-    "pyproject.toml",
-    "stop_do_hook.py"
-  ],
+  "last_synced_at": "2026-07-23T06:22:12Z",
+  "agents": [],
+  "hooks": [],
   "skills": [
     "auto",
+    "check-pr",
     "define",
     "do",
     "done",
     "escalate",
     "figure-out",
-    "figure-out-team"
+    "figure-out-team",
+    "poll-slack",
+    "review-code"
   ]
 }
