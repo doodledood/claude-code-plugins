@@ -1,30 +1,20 @@
-# figure-out: --autonomous
+# figure-out: autonomous mode
 
-Loaded when args contain `--autonomous` (typically passed by `/auto` chaining figure-out → define → do without user wait). Without the flag, default interactive behavior applies.
+There is no user to wait on — and no user to **press back**. In interactive mode the user is a second presser, catching branches you skipped and demanding depth, with the one-question-per-turn cadence pacing that across turns; autonomous mode removes both the presser and the cadence, so the completeness bar **rises** — you play both roles. And the master frame's *explore-don't-ask* default goes absolute here: you must clear every unknown that investigation or derivation can clear without the user — dig to the truth rather than guessing, because here trustworthiness and truth outrank speed. An assumption is the last resort, never a shortcut around work you could have done yourself: only a question that genuinely needs the user — a true preference, a call unknowable without asking — falls to a low-confidence assumption.
 
-## What changes
+Your first action on activation — before the first question, before any investigation — is to establish a durable goal-setting backstop for the run. If the active harness exposes a goal-setting or continuation capability, set the goal directly with the Read's completion contract; otherwise print this copy-pasteable contract for the user to apply manually:
 
-For each load-bearing question on the tree:
+```
+Investigate <topic> until the Read is named with full anatomy: every load-bearing branch pressed; Evidence Ledger explicit; assumptions separated from verified and inferred claims; independent re-derivation run or explicitly unavailable; rival set no longer moving; confidence and overturn conditions stated. Do not stop at a first-pass read. For diagnosis-shaped work, finding where the symptom concentrates is only localization, not a complete Read: name the concrete mechanism — the variable, difference, or sequence that produces the symptom, including why this case differs when the question is comparative — or earn an underdetermined Read by naming the surviving explanations and showing which feasible probes that could distinguish them were run, what they showed, or why they were blocked. Clear every unknown you can without me — investigate to the truth rather than guessing, since trustworthiness outranks speed — recording an assumption only for what genuinely needs me, and halting only for a blocker that truly requires my input. Record compact progress checkpoints when the leading read, evidence, assumptions, blockers, or next crux changes. Stop if the run stalls — consecutive turns that move neither the Evidence Ledger nor the rival set.
+```
 
-1. Pose the question internally — the same one you'd otherwise ask the user.
-2. Generate your recommended answer with brief rationale.
-3. Adopt the recommended answer as the resolution.
-4. Surface the resolution (question, recommended answer, rationale) in the conversation so the downstream encoder (`/define`) can consume it.
-5. When confidence in the answer is low *and* the answer is load-bearing, flag for `Known Assumption` so `/define` records it as `ASM-*` with "Default chosen, impact if wrong" semantics. This is the user's hook to amend later if the default proves wrong.
-6. Move to the next load-bearing question.
+This is the standalone-run backstop: when figure-out is the whole run, the Read is the deliverable and this is the terminal completion contract. Suppress it only when you can clearly see `--autonomous` is chained under a broader parent workflow that owns continuation **and** carries this Read-completion contract — full anatomy, every load-bearing branch pressed, independent re-derivation, and rival set no longer moving — either as the parent's terminal condition when the Read itself is the final deliverable, or as a required phase checkpoint before downstream `/define`/`/do` outcome gates. If the visible parent is weak (for example it only says "Read named") or lacks the full Read bar, do not replace or narrow that parent into a Read-only goal. Augment the parent only when the harness can do so without narrowing it; otherwise print or carry this Read-level contract as a local checkpoint and satisfy it before returning to the parent chain. When in doubt, preserve the broader parent and surface the Read contract — a missing backstop costs more than a redundant one.
 
-## What stays the same
+- At each load-bearing question, pose it, generate your recommended answer with brief rationale, and adopt that answer as the resolution — the same one you'd have recommended to the user.
+- User-addressed offers and asks — the docs-mode scaffold offer, ADR offers, the ask-for-rejected-alternatives, the mid-session scratch offer, the latent-criteria artifact offer, and any similar offer — resolve the same way instead of waiting: self-accept when the offer's gate clearly fires and the needed content is derivable from the session; otherwise record the item as a flagged candidate surfaced with the read. An offer never blocks on a reply. The latent-criteria artifact offer always takes the second branch — the content it needs is the user's reaction, which is never derivable from the session — so don't produce the artifact; record the criterion as a Known Assumption candidate (`ASM-*`) instead.
+- Surface each resolution (question, answer, rationale) in the conversation so downstream consumers (e.g. `/define`) can read it as prior context.
+- When confidence in a load-bearing resolution is low, flag it as a Known Assumption candidate so `/define` records it as `ASM-*` ("default chosen, impact if wrong") — the user's hook to amend later if the default proves wrong.
+- Before naming the read, self-supply the presses a user would otherwise force from you — those the master pre-naming gate and the topic's probe file already name; the absence of someone asking is not license to skip them. And because in this mode no one audits the read before it's relied on — the condition under which the master discipline already calls for an independent re-derivation — run that re-derivation pass before naming, not only when the read is contested.
+- Then surface the read with its full anatomy and stop — chaining into execution belongs to the caller.
 
-- Walking every branch of the decision tree (design choices, diagnostic hypotheses, commitment questions).
-- Leverage ordering — next load-bearing question first.
-- Stack discipline — return to the original question after investigation detours.
-- Explore instead of asking when discoverable (code, docs, the world) — already doesn't require the user.
-- Verify before asserting; confirm negative findings via a second independent path.
-
-## Stop condition
-
-Stop when the high-leverage unknowns are resolved — remaining ones wouldn't shift the read. Surface the shared understanding in the conversation so the next skill in the chain reads it as prior context.
-
-## Note on "hold positions under pushback"
-
-In autonomous mode there is no user pushback to hold a position against. The discipline still applies if a downstream skill (e.g., a verifier finding) contradicts a resolution — re-examine evidence rather than reflexively flipping.
+With no user pushback to hold positions against, the hold-positions discipline applies to downstream contradictions instead (e.g. a verifier finding) — re-examine the evidence rather than reflexively flipping.
