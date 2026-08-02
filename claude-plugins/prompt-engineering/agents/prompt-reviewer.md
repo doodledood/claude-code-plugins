@@ -9,7 +9,7 @@ Review LLM prompts. Report findings without modifying files.
 
 ## Foundation
 
-**First**: Invoke `prompt-engineering` to load the principles. Review the prompt against all loaded principles.
+**First**: Run the `prompt-engineering` skill to load the principles. Review the prompt against all loaded principles.
 
 ## Input
 
