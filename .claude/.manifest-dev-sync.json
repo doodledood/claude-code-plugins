@@ -1,10 +1,11 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-02T04:32:23Z",
+  "last_synced_at": "2026-08-02T06:50:00Z",
   "agents": [],
   "hooks": [],
   "skills": [
     "auto",
+    "babysit-pr",
     "check-pr",
     "define",
     "do",
@@ -12,7 +13,12 @@
     "escalate",
     "figure-out",
     "figure-out-team",
+    "handoff",
     "poll-slack",
-    "review-code"
-  ]
+    "review-code",
+    "review-pr",
+    "teach-me",
+    "walk-pr"
+  ],
+  "source_commit": "ee45c26a498b901de8a48a538ca49fcc8f1d18dd"
 }
