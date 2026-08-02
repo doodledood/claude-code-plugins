@@ -18,6 +18,28 @@ Sync manifest-dev plugin components into this repo's `.claude/` directory. manif
 | Target | `.claude/` in this repo |
 | Tracking file | `.claude/.manifest-dev-sync.json` |
 
+## Fetching the source
+
+Get a clean copy of `doodledood/manifest-dev` at `/tmp/manifest-dev` before syncing. Default branch is `main`.
+
+**Get a real clone first.** Call the `add_repo` MCP tool for `doodledood/manifest-dev` (public, read access), then clone it:
+
+```bash
+git clone --depth 1 https://github.com/doodledood/manifest-dev /workspace/manifest-dev
+```
+
+Then run the staging helper, which picks that clone up automatically:
+
+```bash
+bash .claude/skills/sync-manifest-dev/stage-source.sh
+```
+
+**Why a clone rather than a download.** In Claude Code on the web, GitHub is gated to the session's authorized repos, so `git clone`, `codeload` tarballs, and `api.github.com` all return 403 for this repo until `add_repo` widens that gate. Without it the helper falls back to reconstructing the tree from public CDNs — and that path builds its file list from jsDelivr's *cached* metadata tree, which lags upstream and can silently **under-list**.
+
+That is not hypothetical. A sync through the CDN path in another repo shipped `skills/do/` with its `SKILL.md` and none of its four `references/` files. Nothing failed: `/do` simply could not load its verification-mode reference and fell back to in-session self-verification, reporting a mode it was not performing. Missing files here degrade behavior quietly rather than erroring, which is what makes an incomplete source worse than a failed one.
+
+The helper now chases companion files named in staged text to repair under-listing, and states outright that it cannot certify completeness — but that is a backstop. A clone is the fix.
+
 ## Sync scope
 
 | Component | Source dir | Target dir |
