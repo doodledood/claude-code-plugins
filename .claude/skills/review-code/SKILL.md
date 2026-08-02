@@ -10,7 +10,7 @@ Audit a change along **one** review dimension and report findings. This skill is
 
 ## Input
 
-`$ARGUMENTS` carries the **dimension** plus optional scope, e.g. `dimension=code-bugs` or `code-bugs src/foo.ts`. Callers (manifest verifiers) typically spawn a general-purpose agent and activate this skill with the dimension. If no dimension is given, list the available dimensions and ask which one — never audit "everything at once"; one invocation = one dimension.
+`$ARGUMENTS` carries the **dimension** plus optional scope, e.g. `dimension=code-bugs` or `code-bugs src/foo.ts`. Manifest gate instructions activate this skill with the dimension under `/do`'s selected evaluator. If no dimension is given, list the available dimensions and ask which one — never audit "everything at once"; one invocation = one dimension.
 
 ## Dimensions and thresholds
 
@@ -32,7 +32,7 @@ Load `references/<dimension>.md` for the requested dimension and follow it. The 
 | `prose-value` | `references/prose-value.md` | advisory | no MEDIUM-or-higher findings |
 | `context-file-adherence` | `references/context-file-adherence.md` | advisory | no MEDIUM-or-higher findings |
 
-The split is structural: **defect-finders** report only certain divergences/defects/contract-mismatches/type-holes — every LOW there is real signal. **Advisory** dimensions surface taste-level improvements where LOW is usually could-be-better, not is-broken.
+The split is structural: **defect-finders** report only divergences/defects/contract-mismatches/type-holes that name their trigger — every LOW there is real signal. **Advisory** dimensions surface taste-level improvements where LOW is usually could-be-better, not is-broken.
 
 ## Determining scope (shared across dimensions)
 
@@ -70,6 +70,7 @@ Each dimension's reference refines these with domain-specific calibration — de
 - **Location**: `file:line`
 - **Severity**: Critical | High | Medium | Low
 - **Description**: [what's wrong]
+- **Trigger**: [the condition under which the defect manifests — the concrete input, state, or sequence that produces the failure, or for a static mismatch such as a contract or signature divergence, the call or consumer path that reaches it — required on defect-finder dimensions]
 - **Impact**: [what it breaks / why it matters]
 - **Recommended fix**: [specific change]
 
@@ -92,5 +93,5 @@ When invoked as a manifest acceptance gate, end with one verdict:
 
 - **One ref only.** Load exactly the reference for the requested dimension. Loading several defeats progressive disclosure and blurs the orthogonality boundaries each dimension defines against its neighbors.
 - **Respect the role threshold.** Reporting a LOW on an advisory dimension as if it blocks (or dropping a LOW on a defect-finder) miscalibrates the gate.
-- **Certainty over suspicion** (defect-finders). "This might be a bug" is not reportable; "this WILL fail when X" is. An empty report beats false positives.
+- **Reportability is a stated trigger, not a confidence level** (defect-finders). Name the condition under which the defect manifests: "this WILL fail when X", with X written down. Where the defect is static rather than sequential — a contract or signature mismatch that is wrong on every call — the trigger is the call or consumer path that reaches it. A finding that cannot name its trigger is not reportable however strongly you suspect it — "this might be a bug", "this looks fragile", "this could break under load" all fail the test. Someone reading only the finding must be able to tell whether it clears this bar, which is what holds the bar in one place across reviewers rather than moving it with whoever is reading. A stated trigger is necessary rather than sufficient — each dimension's own actionability filter still applies on top of it. An empty report beats false positives.
 - **Don't cross dimensions.** Each reference lists what it owns and what belongs to a sibling dimension. A maintainability smell is not a bug; a type hole is not a design critique. Report only what the loaded dimension owns; let the other dimensions' invocations catch the rest.
