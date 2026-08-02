@@ -68,7 +68,7 @@ user-invocable: true       # Optional: show in slash command menu (default: true
 
 ### Writing and Updating Prompts
 
-**Use `prompt-engineering:prompt-engineering` for all prompt work** - crafting new prompts, updating existing ones, or reviewing prompt structure. The skill encapsulates first-principles guidelines for writing effective prompts.
+**Use `prompt-engineering` for all prompt work** - crafting new prompts, updating existing ones, or reviewing prompt structure. The skill encapsulates first-principles guidelines for writing effective prompts.
 
 ### Tool Definitions
 
