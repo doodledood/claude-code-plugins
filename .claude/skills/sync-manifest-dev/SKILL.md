@@ -49,7 +49,7 @@ These repos carry a `.claude/.manifest-dev-sync.json` and sync together under `-
 
 | Repo | Layout | Notes |
 |---|---|---|
-| `doodledood/second-brain` | plain | |
+| `doodledood/second-brain` | plain + `.agents/` mirror | |
 | `doodledood/aviramk.dev` | plain + `.agents/` mirror | |
 | `doodledood/trueelo` | plain, no `.agents/` | no mirror to manage |
 | `doodledood/claude-code-plugins` | plain + `.agents/` mirror | `review-prompt` is a foreign symlink, always skipped |
