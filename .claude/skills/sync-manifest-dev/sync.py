@@ -36,16 +36,67 @@ def combined_source(src_root, comp):
     return out
 
 
-def classify(repo, comp, name):
+def repo_layout(repo):
+    """"inverted" if this repo keeps real skill content in .agents/skills/.
+
+    One skill already stored that way settles it for the whole repo, which is
+    what lets a NEW skill land on the same side as its neighbours instead of
+    leaving the repo half inverted.
+    """
+    mirror_dir = os.path.join(repo, ".agents", "skills")
+    if not os.path.isdir(mirror_dir):
+        return "plain"
+    for name in sorted(os.listdir(mirror_dir)):
+        entry = os.path.join(mirror_dir, name)
+        link = os.path.join(repo, ".claude", "skills", name)
+        if (os.path.isdir(entry) and not os.path.islink(entry)
+                and os.path.islink(link)
+                and os.path.realpath(link) == os.path.realpath(entry)):
+            return "inverted"
+    return "plain"
+
+
+def wrong_side(repo, comp, name, layout):
+    """True when an inverted repo holds this skill the plain way round.
+
+    A previous run created it before the layout was taken into account. Left
+    alone it stays a real .claude/ directory with a .agents/ symlink onto it —
+    it resolves fine, so nothing ever fails, and the repo quietly accumulates
+    skills its own convention does not match.
+    """
+    if layout != "inverted" or comp != "skills":
+        return False
+    real = os.path.join(repo, ".claude", "skills", name)
+    link = os.path.join(repo, ".agents", "skills", name)
+    return (os.path.isdir(real) and not os.path.islink(real)
+            and os.path.islink(link)
+            and os.path.realpath(link) == os.path.realpath(real))
+
+
+def flip_to_inverted(repo, name):
+    """Move real content to .agents/skills/<name>, leave .claude/ a symlink."""
+    real = os.path.join(repo, ".claude", "skills", name)
+    link = os.path.join(repo, ".agents", "skills", name)
+    os.remove(link)
+    shutil.move(real, link)
+    os.symlink(os.path.join("../..", ".agents", "skills", name), real)
+
+
+def classify(repo, comp, name, layout="plain"):
     """Where a component lands, and whether we are allowed to write there.
 
     direct  - ordinary path under .claude/, write it
     mirror  - inverted layout: .claude/ side is a symlink onto real content in
               this repo's own .agents/skills/, so write through to that content
+    adopt   - a skill absent from an inverted repo. The real content belongs in
+              .agents/skills/, with a .claude/ symlink onto it, so it matches
+              the skills already there.
     foreign - a symlink pointing anywhere else (another plugin's source).
               Never write, never delete, never track.
     """
     target = os.path.join(repo, ".claude", comp, name)
+    if layout == "inverted" and comp == "skills" and not os.path.lexists(target):
+        return "adopt", os.path.join(repo, ".agents", "skills", name)
     if not os.path.islink(target):
         return "direct", target
     real = os.path.realpath(target)
@@ -100,13 +151,18 @@ def main():
         for c in COMPONENTS:
             tracked[c] = list(prev.get(c, []))
 
-    report, failures = {}, []
+    layout = repo_layout(repo)
+    report, failures, flipped = {}, [], []
     for comp in COMPONENTS:
         src = combined_source(src_root, comp)
         added, updated, unchanged, removed, skipped, refused = [], [], [], [], [], []
 
         for name, spath in sorted(src.items()):
-            kind, target = classify(repo, comp, name)
+            if wrong_side(repo, comp, name, layout):
+                flipped.append(name)
+                if not check_only:
+                    flip_to_inverted(repo, name)
+            kind, target = classify(repo, comp, name, layout)
             if kind == "foreign":
                 skipped.append({"name": name,
                                 "reason": "symlink -> " + os.path.relpath(target, repo)})
@@ -117,6 +173,9 @@ def main():
             existed = os.path.exists(target)
             if not check_only:
                 replace(spath, target)
+                if kind == "adopt":
+                    os.symlink(os.path.join("../..", ".agents", "skills", name),
+                               os.path.join(repo, ".claude", "skills", name))
             (updated if existed else added).append(name)
 
         for name in tracked[comp]:
@@ -125,7 +184,7 @@ def main():
             if comp == "skills" and name == SELF_SKILL:
                 refused.append({"name": name, "reason": "self"})
                 continue
-            kind, target = classify(repo, comp, name)
+            kind, target = classify(repo, comp, name, layout)
             if kind == "foreign":
                 refused.append({"name": name,
                                 "reason": "symlink -> " + os.path.relpath(target, repo)})
@@ -134,6 +193,10 @@ def main():
                 continue
             if not check_only:
                 shutil.rmtree(target) if os.path.isdir(target) else os.remove(target)
+                # Inverted layout: the content just deleted was the .agents/ side,
+                # so the .claude/ symlink onto it would be left dangling.
+                if kind == "mirror":
+                    os.remove(os.path.join(repo, ".claude", comp, name))
             removed.append(name)
 
         # Track only what this sync actually owns here. An item skipped because
@@ -146,19 +209,20 @@ def main():
 
         if not check_only:
             for name in sorted(set(src) - skipped_names):
-                _, target = classify(repo, comp, name)
+                _, target = classify(repo, comp, name, layout)
                 if not identical(src[name], target):
                     failures.append(f"{comp}/{name}")
 
     # --- .agents/skills mirror ---------------------------------------------
-    mirror = {"created": [], "skipped": [], "removed": [], "inverted": []}
+    mirror = {"created": [], "skipped": [], "removed": [], "inverted": [],
+              "flipped": flipped}
     mirror_dir = os.path.join(repo, ".agents", "skills")
     if os.path.isdir(os.path.join(repo, ".agents")):
         if not check_only:
             os.makedirs(mirror_dir, exist_ok=True)
         for name in report["skills"]["tracked"]:
             link = os.path.join(mirror_dir, name)
-            kind, _ = classify(repo, "skills", name)
+            kind, _ = classify(repo, "skills", name, layout)
             if kind == "mirror":
                 mirror["inverted"].append(name)   # real content already lives here
                 continue
@@ -195,12 +259,12 @@ def main():
         report_path = f"/tmp/manifest-dev-sync-report-{slug}.json"
         with open(report_path, "w") as fh:
             json.dump({"repo": repo, "source_commit": source_commit,
-                       "components": report, "mirror": mirror,
+                       "layout": layout, "components": report, "mirror": mirror,
                        "verification_failures": failures}, fh, indent=2)
 
     # --- summary ------------------------------------------------------------
     name = os.path.basename(os.path.abspath(repo))
-    print(f"\n=== {name}{' (check only)' if check_only else ''} ===")
+    print(f"\n=== {name} [{layout}]{' (check only)' if check_only else ''} ===")
     print(f"{'component':<9}{'added':>7}{'updated':>9}{'same':>6}"
           f"{'removed':>9}{'skipped':>9}{'refused':>9}")
     for comp in COMPONENTS:
