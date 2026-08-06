@@ -73,12 +73,21 @@ Upstream currently ships no `agents/` or `hooks/` directories at all. That is no
 
 First run (no tracking file): `tracked` is empty, nothing is deleted, the file is written at the end.
 
+## Repo layout
+
+A repo is **inverted** when at least one skill already keeps its real content in `.agents/skills/<name>` with `.claude/skills/<name>` a symlink onto it. One such skill settles it for the whole repo, and that verdict decides which side a *new* skill's real content goes on. Otherwise the repo is **plain**.
+
+The verdict is per repo because a per-skill reading leaves a repo half inverted: a skill absent from both sides reads as a plain write and lands as a real `.claude/` directory among neighbours stored the other way round. Both arrangements resolve, so nothing fails and the split stays invisible until someone reads the tree — pi-plugins carried two such skills before this was fixed.
+
+`sync.py` prints the verdict in its summary header. Treat a repo you expect to be inverted printing `[plain]` as a finding to check, not a detail: new content will land on the other side from everything already there.
+
 ## Symlink classification
 
 Classify every target before touching it:
 
 - **direct** — not a symlink. Write it.
 - **mirror** — `.claude/skills/<name>` is a symlink onto real content in *this repo's own* `.agents/skills/<name>` (the inverted layout, pi-plugins). Write through to the resolved path. The symlink stays; both paths keep resolving to the same content.
+- **adopt** — a skill absent from an inverted repo. Its real content goes to `.agents/skills/<name>`, with `.claude/skills/<name>` created as a symlink onto it, matching the skills already there.
 - **foreign** — a symlink pointing anywhere else. Never write, never delete, never track.
 
 The mirror test needs both halves: the resolved path's parent must be this repo's `.agents/skills/`, **and** the `.agents/skills/<name>` entry must be a real directory rather than a symlink. Testing only that the two sides resolve equal will corrupt a foreign plugin — in `claude-code-plugins`, `.claude/skills/review-prompt` and `.agents/skills/review-prompt` both resolve into `claude-plugins/prompt-engineering/`, because the `.agents` entry is an ordinary mirror symlink pointing back at `.claude/`. The realness of the `.agents` entry is what separates the two layouts.
@@ -92,10 +101,12 @@ Where `.agents/` exists, every tracked skill is reachable at `.agents/skills/<na
 - Missing → create a symlink to `../../.claude/skills/<name>`.
 - Already a symlink → leave it.
 - Exists and is not a symlink → skip, that is project-local content.
-- Classified **mirror** → nothing to do, the real content already lives there.
-- Skill dropped from `tracked` → remove its symlink.
+- Classified **mirror** or **adopt** → nothing to do, the real content already lives there.
+- Skill dropped from `tracked` → remove its symlink. On an inverted repo the real content *is* the `.agents/` side, so removing a skill there deletes both sides; leaving the `.claude/` symlink behind would leave it dangling.
 
 Never create `.agents/` itself. The user opts in by creating it; `trueelo` has none and must stay that way.
+
+On an inverted repo, a skill found sitting the plain way round is flipped back: real content moved to `.agents/skills/<name>`, `.claude/skills/<name>` replaced by a symlink onto it. The summary reports these as `mirror flipped`. It is a move, so expect the diff to show the content deleted on one side and added on the other.
 
 ## Running it
 
