@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-06T22:05:41Z",
+  "last_synced_at": "2026-08-07T14:02:59Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -17,11 +17,12 @@
     "next-ticket",
     "poll-slack",
     "prompt-engineering",
+    "re-pitch",
     "review-code",
     "review-pr",
     "teach-me",
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "1f41e53d145b1bb208b3fae0d738a7f95becaeec"
+  "source_commit": "b941a81cd467a4d214563ab8be165090c0edb6e7"
 }
