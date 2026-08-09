@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-08T21:03:47Z",
+  "last_synced_at": "2026-08-09T20:52:53Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -14,6 +14,7 @@
     "figure-out",
     "figure-out-team",
     "handoff",
+    "init-context",
     "next-ticket",
     "poll-slack",
     "prompt-engineering",
@@ -24,5 +25,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "ad6769f13eb0a480536646ea485cf2150c2d3817"
+  "source_commit": "cab1c23c658dd2a1a0c35e7fa52564b7892f4513"
 }
