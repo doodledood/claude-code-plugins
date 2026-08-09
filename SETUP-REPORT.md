@@ -26,7 +26,7 @@ works today.
 
 ## Glossary candidates — awaiting ratification
 
-Nothing has been written to `CONTEXT.md`. Accept the ones you want; the rest are dropped.
+**Ratified 2026-08-09 — all four accepted and written to `CONTEXT.md`.**
 
 | Term | Proposed definition | Why it earns entry |
 |------|--------------------|--------------------|
