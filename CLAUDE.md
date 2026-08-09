@@ -23,7 +23,18 @@ uvx --from claude-plugins/consultant/skills/consultant/scripts consultant-cli --
 Read before building plugins:
 
 - **@docs/CUSTOMER.md** - Who we build for, messaging guidelines
+- **@CONTEXT.md** - Project language and relationships
 - **docs/LLM_CODING_CAPABILITIES.md** - LLM strengths/limitations, informs workflow design
+
+## Project Language and Decision Records
+
+**The glossary is not optional reading.** `CONTEXT.md` is imported above, so it is already in context. Where a harness does not support imports, read it at the start of every session before doing anything else. It exists to stop silent misreading, and nobody looks up a term they already believe they understand.
+
+**Read `docs/adr/` before re-deciding something.** Open the index at `docs/adr/README.md` when you are about to settle a question this project may already have settled, and when a change contradicts or narrows an existing decision. Outside those two moments, leave it closed.
+
+**Writing a decision record is one act, not three** — the record, the restatus of anything whose standing it changes, and the index, in one change. Step two is the one that gets dropped, and dropping any of them leaves the corpus asserting something untrue. Open `docs/adr/CONVENTIONS.md` before you start: it carries the bar, the template, and what each step actually requires.
+
+The current records are a **seed reconstructed from this repository's own history**, not a complete account of every decision taken. One of the four says outright that its rationale could not be recovered. Treat the corpus as a starting point to grow, and add records as decisions are made rather than assuming the past is fully captured.
 
 ## Repository Structure
 
