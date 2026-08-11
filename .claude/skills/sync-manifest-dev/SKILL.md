@@ -52,7 +52,7 @@ These repos carry a `.claude/.manifest-dev-sync.json` and sync together under `-
 | `doodledood/second-brain` | plain + `.agents/` mirror | |
 | `doodledood/aviramk.dev` | plain + `.agents/` mirror | |
 | `doodledood/trueelo` | plain, no `.agents/` | no mirror to manage |
-| `doodledood/woofandbeyond` | plain, no `.agents/` | no mirror to manage |
+| `doodledood/woofandbeyond` | plain, `.agents/skills` symlinked whole | every skill mirrored at once; per-skill entries all report `mirror skipped` |
 | `doodledood/claude-code-plugins` | plain + `.agents/` mirror | `review-prompt` is a foreign symlink, always skipped |
 | `doodledood/pi-plugins` | **inverted** | real content in `.agents/skills/`, `.claude/skills/` symlinked to it |
 
@@ -99,13 +99,15 @@ Skipping every symlink instead fails the other way: in pi-plugins it syncs nothi
 
 Where `.agents/` exists, every tracked skill is reachable at `.agents/skills/<name>`, so non-Claude agents read the same content. Only skills are mirrored.
 
+Where `.agents/skills` is itself a symlink onto `.claude/skills` (woofandbeyond), the whole tree is already mirrored and every per-skill entry reports `mirror skipped`. That is the healthy result, not a failure.
+
 - Missing → create a symlink to `../../.claude/skills/<name>`.
 - Already a symlink → leave it.
 - Exists and is not a symlink → skip, that is project-local content.
 - Classified **mirror** or **adopt** → nothing to do, the real content already lives there.
 - Skill dropped from `tracked` → remove its symlink. On an inverted repo the real content *is* the `.agents/` side, so removing a skill there deletes both sides; leaving the `.claude/` symlink behind would leave it dangling.
 
-Never create `.agents/` itself. The user opts in by creating it; `trueelo` and `woofandbeyond` have none and must stay that way.
+Never create `.agents/` itself. The user opts in by creating it; `trueelo` has none and must stay that way.
 
 On an inverted repo, a skill found sitting the plain way round is flipped back: real content moved to `.agents/skills/<name>`, `.claude/skills/<name>` replaced by a symlink onto it. The summary reports these as `mirror flipped`. It is a move, so expect the diff to show the content deleted on one side and added on the other.
 
