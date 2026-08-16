@@ -2,6 +2,12 @@
 
 A ticket is a self-sufficient prose work packet: everything needed to pick it up, do it, and judge it done — readable by a person or an agent, with or without manifest-dev. The convention is the contract; a venue (files, GitHub Issues, any tracker) is a rendering of it. Nothing may depend on a venue feature beyond what a venue reference maps.
 
+## The Ticket unit
+
+A Ticket is one independently schedulable lifecycle unit. Work belongs together when it shares one outcome and would be assigned, prioritized, blocked, and closed together. A separate Ticket earns its coordination cost only when managing it separately has real value.
+
+A finished Manifest therefore becomes one Shaped Ticket by default. Its Deliverables guide execution inside that Ticket. A caller who explicitly wants delegation or parallel pickup may split on those existing Deliverable boundaries. The same rule applies to findings and questions: group related items, and do not turn every thought or observation into store state.
+
 ## Two kinds
 
 The kinds split on one question: is the decision space closed?
@@ -9,7 +15,7 @@ The kinds split on one question: is the decision space closed?
 - **Shaped ticket** — every decision that shapes the work is already made: no open question remains whose answer would change what gets built or what done means. Someone picks it up and builds; its definition of done says when they're finished.
 - **Question ticket** — at least one such question is still open. Someone picks it up and investigates; done means the question is answered with evidence and the answer recorded. Resolving one often spawns shaped tickets.
 
-The write-time test: try to name a question whose answer would change the work or its definition of done. Naming one makes the ticket a question ticket, however much context it already carries — half-investigated work is a question ticket with a thick "what's already known", not a shaped ticket. Choices where any competent answer within the ticket's stated rules is acceptable — naming, internal structure, mechanical detail — are execution, not shaping, and leaving them open does not reopen the kind.
+The kind test applies after the Ticket unit is justified. A separate Question Ticket exists only when the question needs independent assignment, priority, blocking, or closure. Then try to name a question whose answer would change the work or its definition of done. Naming one makes that unit a Question Ticket, however much context it already carries — half-investigated work is a Question Ticket with a thick "what's already known", not a Shaped Ticket. Choices where any competent answer within the Ticket's stated rules is acceptable — naming, internal structure, mechanical detail — are execution, not shaping, and leaving them open does not reopen the kind.
 
 The bar is a property of the ticket's content, never of where it came from: no particular workflow or artifact needs to have produced a shaped ticket, and none makes a ticket shaped while such a question stays open.
 
@@ -17,11 +23,23 @@ The kind is declared on the ticket, so the picker knows which tool to bring.
 
 ## The Auto grant
 
-A ticket of either kind may carry **Auto** — an opt-in grant, declared when the ticket is written, that unattended automation may take it end to end: do the work and judge it done, with nobody watching.
+A ticket of either kind may carry **Auto** — an opt-in grant, declared when the ticket is written,
+that unattended automation may take it end to end: do the work, judge it done, and complete any
+required landing, with nobody watching. For repository work, end to end includes merging through
+the repository's normal protections before the Ticket closes.
 
-- **Granting.** Grant only when neither doing the work nor judging it done needs any human's knowledge, taste, or authority — no done-judgment resting on someone's unstated criteria, no approval, no access an unattended worker won't have, no irreversible act, no decision deferred to mid-flight input. That bar is necessary but never sufficient: the author still chooses, and withheld trust alone is reason enough to withhold. When in doubt, don't grant.
+- **Granting.** Grant only when neither doing the work nor judging it done needs any human's knowledge, taste, or authority — no done-judgment resting on someone's unstated criteria, no approval, no access an unattended worker won't have, no irreversible act that requires separate human authority beyond the Auto grant, no decision deferred to mid-flight input. Ordinary landing through the repository's declared protections is within Auto; a repository policy that requires human approval is not. That bar is necessary but never sufficient: the author still chooses, and withheld trust alone is reason enough to withhold. When in doubt, don't grant.
 - **Absence is the fence.** A ticket without the grant is not touched by automation at all — no partial work, no prepping half the job. Nothing is ever marked "not auto"; silence already says it, which is also what keeps automation off items in a shared venue that were never tickets. A person may still hand an ungranted ticket to an agent and watch — that is the person working the ticket, outside the grant's jurisdiction.
 - **Surprises don't revoke.** A granted ticket's worker can still hit an unexpected blocker; it stops and surfaces rather than deciding what only a person can. That is the exception path working, not evidence the grant was wrong — only a step known at write time to need a person keeps the grant off.
+
+Auto is durable authority, not mutable queue state. Claiming, retrying, completing, or escalating
+an attempt does not remove and reapply it. Open state, claim ownership, and dependencies determine
+whether a granted Ticket is runnable. A person directly invoking `run-ticket` on an ungranted
+Ticket supplies authority for that supervised run; that does not grant later unattended work.
+
+A follow-up authored without a fresh human Auto grant at its own `ticket-up` boundary receives Auto only when its source carries Auto and the follow-up independently passes the granting test above. This keeps unattended and nested execution from widening its own authority. A person merely invoking `run-ticket` on an ungranted source does not change that rule for follow-ups discovered inside the run.
+
+A person directly authoring the follow-up through `ticket-up`, or explicitly reviewing and authorizing Auto at that authoring boundary, may grant the new Ticket independently of source Auto after it passes the same granting test. The person still chooses whether to grant; Shaped never implies Auto.
 
 ## Type
 
@@ -60,7 +78,7 @@ A question ticket carries Title, the question itself, why it matters, what's alr
 
 Each effort's store carries one small front file (in a file store, a README beside the tickets; in a tracker, the tracking item's body) holding only content that doesn't change as tickets close:
 
-- **Destination** — what reaching the end of this effort looks like, in a line or two. Pickers orient to it; "impact" in the priority rule is measured against it.
+- **Destination** — what reaching the end of this effort looks like, in a line or two. Pickers use it to judge what project value is delayed when a Ticket waits.
 - **Priority rule override**, when the effort ranks differently than the default below.
 - **Context pointers** — the key decision records, and where the effort's reads or logs live, so a cold picker gets effort-level orientation before opening a ticket.
 
@@ -69,18 +87,34 @@ Never put derivable state here: no ticket lists, statuses, or ready/next — any
 ## Lifecycle
 
 - **Status**: `open` → `done`. Done tickets roll off **by location**: in a file store, closing moves the ticket into a `done/` subfolder beside the open ones; in a tracker, closing the item removes it from open queries. Reading the open set never scales with closed history — the archive is the `done/` folder, the tracker's closed items, and git.
-- **Claiming**: mark a ticket claimed (a `Claimed by:` line, an assignee, the venue's equivalent) when you pick it, not when you get around to starting it — the gap between the two is where somebody else picks the same one. Open and unclaimed means takeable; claimed means not.
+- **Claiming**: mark a ticket claimed (a `Claimed by:` line, an assignee, the venue's equivalent) when you pick it, not when you get around to starting it — the gap between the two is where somebody else picks the same one. Open and unclaimed means takeable; a human claim pauses automation. A claim held by the store's stable automation identity represents work in progress or an interrupted attempt the scheduled recovery path may resume after the host's single-flight guard admits it.
 - **Ready**: a ticket is ready when it is open, unclaimed, and every ticket it depends on is done. Blocked is derived from unmet dependencies, never stored as a status.
-- **Closing**: record the outcome on the ticket (the work's landing place, or the question's answer), mark it done and roll it off (move it to `done/`, or close the item), and check what the close changed: tickets it made ready, and outcomes that need interpreting. An outcome that needs judging while no existing ticket depends on this one spawns that question ticket as part of the close — the next thinking step stays reachable through the store, never through someone's initiative.
+- **Closing**: record the outcome on the Ticket (the merged or otherwise landed work, or the question's recorded answer), mark it done and roll it off (move it to `done/`, or close the item), and check what the close changed: Tickets it made ready, and outcomes that need interpreting. A branch or mergeable pull request is not a landed repository outcome. Create a Question Ticket for interpretation only when that question needs an independently managed lifecycle; otherwise record or answer it with the current outcome.
+- **Escalating an attempt**: record the blocker, attempts, evidence, preserved-work references, and human input needed on the same Ticket. Leave it open, retain Auto when present, and transfer or preserve its claim for human continuation. The human records continuation context and releases the claim after resolving the blocker; the ordinary readiness rule then returns the Ticket to unattended eligibility. Escalation ends an execution attempt, not the Ticket's work, and never makes dependents ready.
+
+## Automated execution
+
+Issue events are a fast path for ready Auto Tickets. A scheduled `sweep-tickets` invocation is the
+correctness path: it resumes one interrupted automation-owned Ticket, or otherwise selects one
+ready Auto Ticket, invokes `run-ticket`, and stops. Closing one Ticket naturally makes a dependent
+Ticket eligible for a later sweep; no ready label or label pulse is needed.
+
+Both paths use one trigger adapter contract: stable automation identity, canonical per-Ticket
+single-flight, finite provider retries, and one terminal infrastructure-failure handoff to a
+configured person. Those are runner responsibilities, not Ticket fields. See
+`AUTOMATED_EXECUTION.md` for the integration boundary.
 
 ## Priority
 
-"What should I work on?" reads the ready tickets in this order (a store may state a different rule; the stated rule wins):
+A store may state a different priority rule; that explicit rule wins. Otherwise choose among ready Tickets by **expected project value lost while work waits**, not by a fixed urgency, unblocking, impact, or cheapness ladder.
 
-1. **Urgent** — a real expiring window. Rare; jumps the queue.
-2. **Unblocking** — frees the most other tickets.
-3. **Impact** — biggest lever toward the effort's goal.
-4. **Cheap** — effort as tiebreak among equals.
+Compare the strongest candidates in the orderings that actually compete. If A goes first, ask what project value is lost while B waits for the constrained resource A occupies; reverse the comparison for B first. Prefer the ordering with lower expected loss. Count material consequences of delay: ongoing or expiring harm, durable benefit that starts later, downstream work whose earliest useful start actually moves, and information whose later arrival worsens or delays a material decision. These are causes of the same loss, not independent scores to add twice.
+
+Use current **executor-native serial time** only when duration materially changes what another Ticket loses by waiting. For a human-facing picker, the constrained time is interactive human attention until the human-dependent uncertainty or authority is resolved; routine implementation an AI can continue afterward is not human duration. For unattended work, use current end-to-end agent execution and landing time. Do not infer days from traditional feature size or apply a fixed agent-speed multiplier. When plausible runtimes are all short relative to the value consequences, treat them as effectively equal; shorter work is then only a tiebreak.
+
+Unless the conversation explicitly scopes an effort or the store declares an intentional effort order, a human-facing picker compares ready Tickets across efforts and reads the relevant effort destinations to judge the consequences. Continuity with an effort already in flight is only a tiebreak. Auto is not intrinsic priority, but it can affect allocation when project context or configured automation establishes that unattended capacity is actually available soon enough to take that work; the marker alone proves authority, not that such a runner exists. Type is never a priority input.
+
+An unattended picker first applies its own eligibility boundary — including Auto and configured filters — then uses the same delay-loss rule for new work inside that set. Recovery of an interrupted owned attempt remains ahead of starting new work because it is lifecycle recovery, not a fresh backlog choice.
 
 ## Dependencies and parallelism
 
