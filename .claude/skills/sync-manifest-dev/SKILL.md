@@ -51,10 +51,12 @@ These repos carry a `.claude/.manifest-dev-sync.json` and sync together under `-
 |---|---|---|
 | `doodledood/second-brain` | plain + `.agents/` mirror | |
 | `doodledood/aviramk.dev` | plain + `.agents/` mirror | |
-| `doodledood/trueelo` | plain, no `.agents/` | no mirror to manage |
+| `doodledood/trueelo` | plain + `.agents/` mirror | |
 | `doodledood/woofandbeyond` | plain, `.agents/skills` symlinked whole | every skill mirrored at once; per-skill entries all report `mirror skipped` |
 | `doodledood/claude-code-plugins` | plain + `.agents/` mirror | `review-prompt` is a foreign symlink, always skipped |
 | `doodledood/pi-plugins` | **inverted** | real content in `.agents/skills/`, `.claude/skills/` symlinked to it |
+
+The Layout column is a convenience, not the source of truth. Repos gain and lose `.agents/` between syncs on their own — trueelo did, one sync after this table said it never would. Read the tree, trust `sync.py`'s printed verdict over this column, and correct a row that no longer matches instead of trusting it.
 
 A repo joins the fleet when it gains the tracking file. If one of these no longer has it, drop it and say so rather than recreating it.
 
@@ -107,7 +109,7 @@ Where `.agents/skills` is itself a symlink onto `.claude/skills` (woofandbeyond)
 - Classified **mirror** or **adopt** → nothing to do, the real content already lives there.
 - Skill dropped from `tracked` → remove its symlink. On an inverted repo the real content *is* the `.agents/` side, so removing a skill there deletes both sides; leaving the `.claude/` symlink behind would leave it dangling.
 
-Never create `.agents/` itself. The user opts in by creating it; `trueelo` has none and must stay that way.
+Never create `.agents/` itself. The user opts in by creating it, and a repo without one must stay that way.
 
 On an inverted repo, a skill found sitting the plain way round is flipped back: real content moved to `.agents/skills/<name>`, `.claude/skills/<name>` replaced by a symlink onto it. The summary reports these as `mirror flipped`. It is a move, so expect the diff to show the content deleted on one side and added on the other.
 
