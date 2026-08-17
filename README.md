@@ -81,10 +81,11 @@ Foundational documents for solo developers and small teams. Define once, referen
 
 Craft, analyze, and optimize prompts from first principles.
 
-- `/prompt-engineering` - Craft or update prompts from first principles (WHAT/WHY not HOW)
-- `/review-prompt` - Analyze against 10-Layer Architecture framework (read-only)
+- `/auto-optimize-prompt` - Loop a prompt through review and fixes until it converges
 - `/optimize-prompt-token-efficiency` - Iteratively optimize for token efficiency
 - `/compress-prompt` - Compress into single dense paragraph for context injection
+
+`/prompt-engineering` and `/review-prompt` come from [manifest-dev](https://github.com/doodledood/manifest-dev), not from this plugin.
 
 ### frontend-design
 

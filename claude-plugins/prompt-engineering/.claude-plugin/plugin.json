@@ -1,7 +1,7 @@
 {
   "name": "prompt-engineering",
-  "description": "Tools for crafting, reviewing, analyzing, refining, and optimizing LLM prompts for clarity, precision, goal effectiveness, and token efficiency",
-  "version": "3.0.0",
+  "description": "Optimization passes over an existing LLM prompt \u2014 convergence, token efficiency, and compression. Authoring and review come from manifest-dev.",
+  "version": "4.0.0",
   "author": {
     "name": "doodledood",
     "email": "aviram.kofman@gmail.com"
