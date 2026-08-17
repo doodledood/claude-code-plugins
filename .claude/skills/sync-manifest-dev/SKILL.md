@@ -131,7 +131,7 @@ Stage the source once, then per repo:
 2. Branch. Use one branch name across the fleet so the PRs read as one change, unless the session was handed a designated branch.
 3. Run `sync.py`. If it exits non-zero, stop on that repo and report — never commit a failed verification.
 4. Read `git status` before committing. This is what caught the foreign-plugin corruption: **any path outside `.claude/` and `.agents/` means the sync wrote somewhere it should not have.**
-5. Commit, push, and open a PR stating the upstream commit range, the per-component counts, and anything skipped and why. A skip is a fact the reviewer needs, not an omission to hide.
+5. Commit, push, and open a PR stating the upstream commit range, the per-component counts, and anything skipped and why. A skip is a fact the reviewer needs, not an omission to hide. Read the PR base from the repo rather than assuming `main` — `git ls-remote --symref origin HEAD` gives it, and one fleet repo answers `master`, which fails PR creation with a 422 that names only the base field.
 
 Close with one fleet table: repo, PR link, counts, anything skipped. `pi-plugins` runs `check-version-bump`, which only fires on `packages/` changes and so passes on a sync.
 
