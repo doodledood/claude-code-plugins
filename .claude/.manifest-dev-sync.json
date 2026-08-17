@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-17T06:21:50Z",
+  "last_synced_at": "2026-08-17T06:45:03Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -23,6 +23,7 @@
     "re-pitch",
     "review-code",
     "review-pr",
+    "review-prompt",
     "run-ticket",
     "sweep-tickets",
     "teach-me",

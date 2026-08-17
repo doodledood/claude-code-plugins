@@ -37,7 +37,7 @@ Standalone utilities that work independently. `/explore-codebase` for structural
 Define customer profiles and brand guidelines once, reference consistently across sessions.
 
 ### prompt-engineering
-Three modes: `/review-prompt` (read-only analysis), `/optimize-prompt-precision` (eliminate ambiguities), `/optimize-prompt-goal` (goal effectiveness).
+Optimization passes over a prompt you already have: `/auto-optimize-prompt` (loop until converged), `/optimize-prompt-token-efficiency`, `/compress-prompt`. Authoring and review live upstream in manifest-dev.
 
 ### frontend-design
 Frontend design patterns including scrollytelling (scroll-driven storytelling with pinned sections, progressive reveals, parallax effects).
