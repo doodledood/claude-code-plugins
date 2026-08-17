@@ -1,7 +1,7 @@
 # ADR: review-prompt is deferred to manifest-dev, like the prompt-engineering skill before it
 
 ## Status
-Accepted
+Accepted — superseded by 20260817-prompt-engineering-plugin-retired, which retired the plugin this record declined to retire
 
 ## Area
 Plugin boundaries

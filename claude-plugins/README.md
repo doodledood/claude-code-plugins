@@ -17,7 +17,6 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `consultant` | Multi-provider LLM consultations via LiteLLM. Get perspectives from OpenAI, Google, local models without leaving Claude Code. |
 | `vibe-extras` | Codebase exploration, web research, git utilities (rebase, history rewrite), documentation maintenance, AI slop cleanup, review persona generation, autonomous PR merge prep. |
 | `solo-dev` | Foundational documents: customer profiles, brand guidelines, design systems. |
-| `prompt-engineering` | Prompt analysis and refinement against structured frameworks. |
 | `frontend-design` | Frontend design patterns for distinctive, non-generic UI experiences. |
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
 | `writing` | Writing toolkit: anti-AI prose principles (incl. Wikipedia:Signs of AI writing patterns and era-tracked vocabulary), iterative review loop, author voice capture, voice-matched content generation. |
@@ -35,9 +34,6 @@ Standalone utilities that work independently. `/explore-codebase` for structural
 
 ### solo-dev
 Define customer profiles and brand guidelines once, reference consistently across sessions.
-
-### prompt-engineering
-Optimization passes over a prompt you already have: `/auto-optimize-prompt` (loop until converged), `/optimize-prompt-token-efficiency`, `/compress-prompt`. Authoring and review live upstream in manifest-dev.
 
 ### frontend-design
 Frontend design patterns including scrollytelling (scroll-driven storytelling with pinned sections, progressive reveals, parallax effects).

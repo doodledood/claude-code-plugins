@@ -9,7 +9,6 @@
   },
   "plugins": [
     { "name": "consultant", "source": "./claude-plugins/consultant" },
-    { "name": "prompt-engineering", "source": "./claude-plugins/prompt-engineering" },
     { "name": "solo-dev", "source": "./claude-plugins/solo-dev" },
     { "name": "vibe-extras", "source": "./claude-plugins/vibe-extras" },
     { "name": "frontend-design", "source": "./claude-plugins/frontend-design" },

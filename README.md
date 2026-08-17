@@ -77,16 +77,6 @@ Foundational documents for solo developers and small teams. Define once, referen
 **Other:**
 - `/audit-ux` - Check UI changes against your design guidelines
 
-### prompt-engineering
-
-Craft, analyze, and optimize prompts from first principles.
-
-- `/auto-optimize-prompt` - Loop a prompt through review and fixes until it converges
-- `/optimize-prompt-token-efficiency` - Iteratively optimize for token efficiency
-- `/compress-prompt` - Compress into single dense paragraph for context injection
-
-`/prompt-engineering` and `/review-prompt` come from [manifest-dev](https://github.com/doodledood/manifest-dev), not from this plugin.
-
 ### frontend-design
 
 Frontend design patterns for distinctive, non-generic UI experiences.
@@ -126,7 +116,6 @@ claude-code-plugins/
 │   ├── consultant/            # Multi-provider LLM consultations
 │   ├── vibe-extras/           # Research, git, docs, cleanup utilities
 │   ├── solo-dev/              # Customer profiles, brand, design docs
-│   ├── prompt-engineering/    # Prompt analysis and refinement
 │   ├── frontend-design/       # Frontend design patterns
 │   ├── life-ops/              # Personal decision-making advisor
 │   ├── writing/               # Writing toolkit (anti-AI prose, voice, generation)

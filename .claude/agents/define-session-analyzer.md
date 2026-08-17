@@ -35,7 +35,7 @@ Rules or constraints the user adds to every manifest regardless of task. Example
 Workflow preferences that aren't verifiable but guide execution. Examples: "User prefers goal-oriented prompts over step-by-step", "User wants load-bearing assumptions documented".
 
 ### Quality Gate Adjustments
-Modifications the user makes to default quality gates. Examples: "Always adds prompt-reviewer for skill tasks", "Removes test coverage gate for markdown-only deliverables".
+Modifications the user makes to default quality gates. Examples: "Always adds a doc-freshness gate for skill tasks", "Removes test coverage gate for markdown-only deliverables".
 
 ### Other
 Patterns that don't fit the categories above but reveal user preferences worth preserving.
