@@ -22,7 +22,7 @@ Sync manifest-dev plugin components into a repo's `.claude/` directory. manifest
 | Role | Path |
 |---|---|
 | Remote | `https://github.com/doodledood/manifest-dev` (public, default branch `main`) |
-| Clone | `/workspace/manifest-dev` |
+| Clone | `/workspace/manifest-dev`, or `/workspace/doodledood/manifest-dev` from a read-only grant |
 | Staged source | `/tmp/manifest-dev/claude-plugins/manifest-dev{,-tools}/` |
 | Tracking file | `.claude/.manifest-dev-sync.json` (per target repo) |
 
@@ -37,9 +37,9 @@ git clone --depth 1 https://github.com/doodledood/manifest-dev /workspace/manife
 bash .claude/skills/sync-manifest-dev/stage-source.sh
 ```
 
-Where the session gates GitHub to authorized repos, request read access first — the repo is public, so the request is granted immediately without attaching anything. Treat that as the ordinary path rather than an escalation to avoid.
+Where the session gates GitHub to authorized repos, request read access first — the repo is public, so the request is granted immediately without attaching anything. Treat that as the ordinary path rather than an escalation to avoid. The grant names the directory to clone into, and a read-only grant makes it owner-prefixed (`/workspace/doodledood/manifest-dev`); clone where it says, and `stage-source.sh` will find it there.
 
-`stage-source.sh` picks up a clone at `/workspace/manifest-dev` (or `$MANIFEST_DEV_CLONE`) and copies it to `/tmp/manifest-dev`. Record the clone's `git rev-parse HEAD` — it becomes `source_commit` in every tracking file, and diffing it against the previous value gives you the upstream commit list for the PR body.
+`stage-source.sh` picks up a clone at `/workspace/manifest-dev` or `/workspace/doodledood/manifest-dev` (or `$MANIFEST_DEV_CLONE`) and copies it to `/tmp/manifest-dev`. Record the clone's `git rev-parse HEAD` — it becomes `source_commit` in every tracking file, and diffing it against the previous value gives you the upstream commit list for the PR body.
 
 **Use the clone. The CDN fallback in `stage-source.sh` is a degraded source, not an equivalent one** — it rebuilds the tree from a cached index that can silently under-list. It once shipped `skills/do/` with `SKILL.md` and none of its four `references/` files: nothing errored, `/do` just quietly fell back to self-verification while reporting a mode it was not running. Fall back only if read access is denied, and say so in the PR when you do.
 
@@ -53,7 +53,7 @@ These repos carry a `.claude/.manifest-dev-sync.json` and sync together under `-
 | `doodledood/aviramk.dev` | plain + `.agents/` mirror | |
 | `doodledood/trueelo` | plain + `.agents/` mirror | |
 | `doodledood/woofandbeyond` | plain, `.agents/skills` symlinked whole | every skill mirrored at once; per-skill entries all report `mirror skipped` |
-| `doodledood/claude-code-plugins` | plain + `.agents/` mirror | `review-prompt` is a foreign symlink, always skipped |
+| `doodledood/claude-code-plugins` | plain + `.agents/` mirror | |
 | `doodledood/pi-plugins` | **inverted** | real content in `.agents/skills/`, `.claude/skills/` symlinked to it |
 
 The Layout column is a convenience, not the source of truth. Repos gain and lose `.agents/` between syncs on their own — trueelo did, one sync after this table said it never would. Read the tree, trust `sync.py`'s printed verdict over this column, and correct a row that no longer matches instead of trusting it.
@@ -93,7 +93,7 @@ Classify every target before touching it:
 - **adopt** — a skill absent from an inverted repo. Its real content goes to `.agents/skills/<name>`, with `.claude/skills/<name>` created as a symlink onto it, matching the skills already there.
 - **foreign** — a symlink pointing anywhere else. Never write, never delete, never track.
 
-The mirror test needs both halves: the resolved path's parent must be this repo's `.agents/skills/`, **and** the `.agents/skills/<name>` entry must be a real directory rather than a symlink. Testing only that the two sides resolve equal will corrupt a foreign plugin — in `claude-code-plugins`, `.claude/skills/review-prompt` and `.agents/skills/review-prompt` both resolve into `claude-plugins/prompt-engineering/`, because the `.agents` entry is an ordinary mirror symlink pointing back at `.claude/`. The realness of the `.agents` entry is what separates the two layouts.
+The mirror test needs both halves, each rejecting a different thing. The resolved path's parent must be this repo's own `.agents/skills/`, which keeps a foreign symlink into another plugin from being written through. And the `.agents/skills/<name>` entry must be a real directory rather than a symlink, which separates an inverted repo from a plain one whose `.agents/` side mirrors back at `.claude/`. In `claude-code-plugins`, `.agents/skills/review-prompt` is exactly that mirror symlink: both sides resolve to one path, the real content is on the `.claude/` side, and testing only that they resolve equal would read the repo as inverted and write new skills to the wrong side.
 
 Skipping every symlink instead fails the other way: in pi-plugins it syncs nothing and reports success.
 
