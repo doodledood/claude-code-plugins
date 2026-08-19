@@ -1,11 +1,12 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-17T07:27:17Z",
+  "last_synced_at": "2026-08-19T04:52:55Z",
   "agents": [],
   "hooks": [],
   "skills": [
     "auto",
     "babysit-pr",
+    "chat-surface",
     "check-pr",
     "define",
     "do",
@@ -24,11 +25,12 @@
     "review-code",
     "review-pr",
     "review-prompt",
+    "review-writing",
     "run-ticket",
     "sweep-tickets",
     "teach-me",
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "bea977cb68765ef622a878d812145b91d22181d4"
+  "source_commit": "65a6ac12f5069c1f918d5e0ddc58cf14ac7f4de9"
 }

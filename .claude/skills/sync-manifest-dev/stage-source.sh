@@ -25,7 +25,7 @@ rm -rf "$DEST" && mkdir -p "$DEST"
 # integrity note in Tier 2), so a real checkout is strictly preferred. The agent
 # gets one by calling the `add_repo` MCP tool for this repo and cloning it; see
 # SKILL.md → "Fetching the source".
-for candidate in "${MANIFEST_DEV_CLONE:-}" /workspace/manifest-dev; do
+for candidate in "${MANIFEST_DEV_CLONE:-}" /workspace/manifest-dev /workspace/doodledood/manifest-dev; do
   [ -n "$candidate" ] || continue
   if [ -d "$candidate/claude-plugins" ]; then
     echo ">> using local clone at $candidate (complete source)"
