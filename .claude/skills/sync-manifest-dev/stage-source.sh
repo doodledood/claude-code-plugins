@@ -29,8 +29,27 @@ for candidate in "${MANIFEST_DEV_CLONE:-}" /workspace/manifest-dev /workspace/do
   [ -n "$candidate" ] || continue
   if [ -d "$candidate/claude-plugins" ]; then
     echo ">> using local clone at $candidate (complete source)"
+    # The recorded commit must be the clone's UPSTREAM state, never its local
+    # HEAD. A session may have this clone parked on a branch of its own, and the
+    # sync then stamps that branch's commit as the source of every file it
+    # copied — content correct, provenance a lie, and nothing complains.
+    commit=""; from=""
+    for ref in "origin/$REF" origin/HEAD "$REF"; do
+      commit=$(git -C "$candidate" rev-parse --verify --quiet "$ref^{commit}" || true)
+      if [ -n "$commit" ]; then from="$ref"; break; fi
+    done
+    if [ -n "$commit" ] && [ "$from" = "$REF" ]; then
+      echo "!! no remote-tracking ref for $REF; using local $REF ($commit)." \
+           "Fetch origin if that is not the upstream state." >&2
+    fi
+    if [ -z "$commit" ]; then
+      echo "!! cannot resolve an upstream commit for $REF in $candidate — fetch origin and retry" >&2
+      exit 1
+    fi
     rm -rf "$DEST" && mkdir -p "$DEST"
     cp -R "$candidate/claude-plugins" "$DEST/"
+    printf '%s\n' "$commit" > "$DEST/.source-commit"
+    echo ">> source commit $commit (from $from) -> $DEST/.source-commit"
     exit 0
   fi
 done
@@ -40,7 +59,10 @@ tar_url="https://codeload.github.com/$REPO/tar.gz/refs/heads/$REF"
 code=$("${CURL[@]}" -o /tmp/manifest-dev.tar.gz -w "%{http_code}" "$tar_url" || echo 000)
 if [ "$code" = "200" ] && tar -tzf /tmp/manifest-dev.tar.gz >/dev/null 2>&1; then
   tar -xzf /tmp/manifest-dev.tar.gz -C "$DEST" --strip-components=1
+  printf 'unresolved-tarball@%s\n' "$REF" > "$DEST/.source-commit"
   echo ">> tarball OK"
+  echo "!! no commit sha on this path — .source-commit records unresolved-tarball@$REF, which"
+  echo "!! no later run can diff against. Prefer a clone (see SKILL.md)."
   exit 0
 fi
 echo ">> tarball path unavailable (HTTP $code) — falling back to CDN reconstruction"
@@ -227,3 +249,7 @@ print("!! CDN reconstruction cannot certify completeness — a file no staged te
 print("!! names is undetectable here. For a guaranteed-complete source, call the")
 print("!! add_repo MCP tool for this repo, clone it, and re-run (see SKILL.md).")
 PY
+
+printf 'unresolved-cdn@%s\n' "$REF" > "$DEST/.source-commit"
+echo "!! no commit sha on this path — .source-commit records unresolved-cdn@$REF, which no"
+echo "!! later run can diff against. Prefer a clone (see SKILL.md)."
