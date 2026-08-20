@@ -22,7 +22,7 @@ Sync manifest-dev plugin components into a repo's `.claude/` directory. manifest
 | Role | Path |
 |---|---|
 | Remote | `https://github.com/doodledood/manifest-dev` (public, default branch `main`) |
-| Clone | `/workspace/manifest-dev`, or `/workspace/doodledood/manifest-dev` from a read-only grant |
+| Clone | wherever the access grant names — `stage-source.sh` searches for it |
 | Staged source | `/tmp/manifest-dev/claude-plugins/manifest-dev{,-tools}/` |
 | Tracking file | `.claude/.manifest-dev-sync.json` (per target repo) |
 
@@ -30,16 +30,16 @@ Both plugins sync into the same `.claude/` target and share one tracking file. `
 
 ### Fetching it
 
-Clone it, then stage:
+Clone it beside this repo, then stage:
 
 ```bash
-git clone --depth 1 https://github.com/doodledood/manifest-dev /workspace/manifest-dev
+git clone --depth 1 https://github.com/doodledood/manifest-dev ../manifest-dev
 bash .claude/skills/sync-manifest-dev/stage-source.sh
 ```
 
-Where the session gates GitHub to authorized repos, request read access first — the repo is public, so the request is granted immediately without attaching anything. Treat that as the ordinary path rather than an escalation to avoid. The grant names the directory to clone into, and a read-only grant makes it owner-prefixed (`/workspace/doodledood/manifest-dev`); clone where it says, and `stage-source.sh` will find it there.
+Where the session gates GitHub to authorized repos, request read access first — the repo is public, so the request is granted immediately without attaching anything. Treat that as the ordinary path rather than an escalation to avoid. The grant names the directory to clone into, and that name wins over the path above: the workspace root differs by environment, and a read-only grant owner-prefixes it. `stage-source.sh` searches the roots a clone lands in, so cloning where the grant says is enough; name an unusual one with `MANIFEST_DEV_CLONE=<path>` rather than moving the clone.
 
-`stage-source.sh` picks up a clone at `/workspace/manifest-dev` or `/workspace/doodledood/manifest-dev` (or `$MANIFEST_DEV_CLONE`) and copies it to `/tmp/manifest-dev`. It resolves the source commit too and writes it to `/tmp/manifest-dev/.source-commit` — pass that to `sync.py` rather than reading the clone's `HEAD`, which names the sync's own commit whenever a session has that clone parked on a branch of its own. The recorded value becomes `source_commit` in every tracking file, and diffing it against the previous one gives you the upstream commit list for the PR body. On either CDN path there is no sha to record, so the file says `unresolved-…` instead: the sync still works, but that entry is one no later run can diff against.
+It copies the clone to `/tmp/manifest-dev`, and resolves the source commit too, writing it to `/tmp/manifest-dev/.source-commit` — pass that to `sync.py` rather than reading the clone's `HEAD`, which names the sync's own commit whenever a session has that clone parked on a branch of its own. The recorded value becomes `source_commit` in every tracking file, and diffing it against the previous one gives you the upstream commit list for the PR body. On either CDN path there is no sha to record, so the file says `unresolved-…` instead: the sync still works, but that entry is one no later run can diff against.
 
 **Use the clone. The CDN fallback in `stage-source.sh` is a degraded source, not an equivalent one** — it rebuilds the tree from a cached index that can silently under-list. It once shipped `skills/do/` with `SKILL.md` and none of its four `references/` files: nothing errored, `/do` just quietly fell back to self-verification while reporting a mode it was not running. Fall back only if read access is denied, and say so in the PR when you do.
 
