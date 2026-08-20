@@ -25,7 +25,18 @@ rm -rf "$DEST" && mkdir -p "$DEST"
 # integrity note in Tier 2), so a real checkout is strictly preferred. The agent
 # gets one by calling the `add_repo` MCP tool for this repo and cloning it; see
 # SKILL.md → "Fetching the source".
-for candidate in "${MANIFEST_DEV_CLONE:-}" /workspace/manifest-dev /workspace/doodledood/manifest-dev; do
+# The workspace root is environment-dependent (/workspace in some sessions, $HOME
+# in a remote one), so a single hardcoded prefix silently misses a real clone and
+# drops the run to the degraded CDN tiers below. Derive the roots instead: the
+# directory holding this repo, since fleet clones sit side by side, then $HOME
+# and /workspace. A root holding no clone costs one failed test.
+_repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
+_candidates=("${MANIFEST_DEV_CLONE:-}")
+for _root in "$(dirname "$_repo_root")" "${HOME:-}" /workspace; do
+  [ -n "$_root" ] || continue
+  _candidates+=("$_root/manifest-dev" "$_root/doodledood/manifest-dev")
+done
+for candidate in "${_candidates[@]}"; do
   [ -n "$candidate" ] || continue
   if [ -d "$candidate/claude-plugins" ]; then
     echo ">> using local clone at $candidate (complete source)"
