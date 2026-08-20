@@ -39,7 +39,7 @@ bash .claude/skills/sync-manifest-dev/stage-source.sh
 
 Where the session gates GitHub to authorized repos, request read access first — the repo is public, so the request is granted immediately without attaching anything. Treat that as the ordinary path rather than an escalation to avoid. The grant names the directory to clone into, and a read-only grant makes it owner-prefixed (`/workspace/doodledood/manifest-dev`); clone where it says, and `stage-source.sh` will find it there.
 
-`stage-source.sh` picks up a clone at `/workspace/manifest-dev` or `/workspace/doodledood/manifest-dev` (or `$MANIFEST_DEV_CLONE`) and copies it to `/tmp/manifest-dev`. Record the clone's `git rev-parse HEAD` — it becomes `source_commit` in every tracking file, and diffing it against the previous value gives you the upstream commit list for the PR body.
+`stage-source.sh` picks up a clone at `/workspace/manifest-dev` or `/workspace/doodledood/manifest-dev` (or `$MANIFEST_DEV_CLONE`) and copies it to `/tmp/manifest-dev`. It resolves the source commit too and writes it to `/tmp/manifest-dev/.source-commit` — pass that to `sync.py` rather than reading the clone's `HEAD`, which names the sync's own commit whenever a session has that clone parked on a branch of its own. The recorded value becomes `source_commit` in every tracking file, and diffing it against the previous one gives you the upstream commit list for the PR body. On either CDN path there is no sha to record, so the file says `unresolved-…` instead: the sync still works, but that entry is one no later run can diff against.
 
 **Use the clone. The CDN fallback in `stage-source.sh` is a degraded source, not an equivalent one** — it rebuilds the tree from a cached index that can silently under-list. It once shipped `skills/do/` with `SKILL.md` and none of its four `references/` files: nothing errored, `/do` just quietly fell back to self-verification while reporting a mode it was not running. Fall back only if read access is denied, and say so in the PR when you do.
 
@@ -119,7 +119,7 @@ On an inverted repo, a skill found sitting the plain way round is flipped back: 
 python3 .claude/skills/sync-manifest-dev/sync.py <repo-root> /tmp/manifest-dev/claude-plugins <source-commit> [--check]
 ```
 
-`sync.py` implements everything above, verifies every synced item against the source after copying, and exits non-zero if any differ. It only rewrites items whose content actually changed, so the diff stays small. The machine-readable report for the PR body goes to `/tmp/manifest-dev-sync-report-<repo>.json`, outside the repo so it cannot be committed.
+`<source-commit>` is the line in `/tmp/manifest-dev/.source-commit`. `sync.py` implements everything above, verifies every synced item against the source after copying, and exits non-zero if any differ. It only rewrites items whose content actually changed, so the diff stays small. The machine-readable report for the PR body goes to `/tmp/manifest-dev-sync-report-<repo>.json`, outside the repo so it cannot be committed.
 
 Do not re-derive the algorithm by hand. The symlink classification above was written after a hand-rolled pass corrupted a foreign plugin's source.
 
