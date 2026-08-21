@@ -21,6 +21,7 @@ First-principles workflows for Claude Code. Quality output you can trust.
 | `life-ops` | Personal decision-making advisor. Situation discovery → targeted research → ranked recommendation. |
 | `writing` | Writing toolkit: anti-AI prose principles (incl. Wikipedia:Signs of AI writing patterns and era-tracked vocabulary), iterative review loop, author voice capture, voice-matched content generation. |
 | `marketing` | Value-first social media promotion. Browse X, find high-signal posts, craft varied replies with writing review, post after approval. |
+| `hermes-tweet` | Read-first installation and operation guidance for the native Hermes Agent X/Twitter plugin, with explicit action gates. |
 
 > **See also:** [manifest-dev](https://github.com/doodledood/manifest-dev) for manifest-driven development—define acceptance criteria, let the verify-fix loop handle the rest.
 
@@ -46,6 +47,9 @@ All writing skills consolidated. `human-writing` provides research-backed anti-A
 
 ### marketing
 Value-first promotion on X (Twitter). `/promote-on-x` browses your feed, finds posts where your product adds genuine value, crafts structurally varied replies using the writing plugin, and posts after user approval. Requires Claude in Chrome extension and writing plugin.
+
+### hermes-tweet
+Read-first guidance for the native [Hermes Tweet](https://github.com/Xquik-dev/hermes-tweet) plugin. `/hermes-tweet` covers installation, configuration, capability discovery, reads, and explicitly approved actions. Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 
 ## Contributing
 

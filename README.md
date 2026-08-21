@@ -106,6 +106,18 @@ Value-first promotion on social platforms. Finds high-signal posts and crafts re
 
 Requires Claude in Chrome extension and the writing plugin.
 
+### hermes-tweet
+
+Read-first guidance for installing, configuring, and operating the native
+[Hermes Tweet](https://github.com/Xquik-dev/hermes-tweet) X/Twitter plugin.
+Routes discovery and reads through dedicated tools, while keeping account
+actions behind explicit approval and an opt-in runtime gate.
+
+- `/hermes-tweet` - Install, configure, verify, and operate Hermes Tweet
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ## Repository Structure
 
 ```
@@ -119,7 +131,8 @@ claude-code-plugins/
 │   ├── frontend-design/       # Frontend design patterns
 │   ├── life-ops/              # Personal decision-making advisor
 │   ├── writing/               # Writing toolkit (anti-AI prose, voice, generation)
-│   └── marketing/             # Value-first social media promotion
+│   ├── marketing/             # Value-first social media promotion
+│   └── hermes-tweet/          # Read-first Hermes Agent X/Twitter guidance
 └── README.md
 ```
 
