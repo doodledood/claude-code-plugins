@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-23T04:12:27Z",
+  "last_synced_at": "2026-08-23T13:49:01Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -32,5 +32,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "e8bdb7781eecf64d003aae357b7663e9a1143e7c"
+  "source_commit": "2b76d7990e5ddbbc8978fa6ab296c42db3ca2b73"
 }

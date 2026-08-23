@@ -54,6 +54,7 @@ These repos carry a `.claude/.manifest-dev-sync.json` and sync together under `-
 | `doodledood/trueelo` | plain + `.agents/` mirror | |
 | `doodledood/woofandbeyond` | plain, `.agents/skills` symlinked whole | every skill mirrored at once; per-skill entries all report `mirror skipped` |
 | `doodledood/claude-code-plugins` | plain + `.agents/` mirror | |
+| `doodledood/seats-app` | plain, no `.agents/` | nothing is mirrored — the sync never creates `.agents/`, and this repo has none |
 | `doodledood/pi-plugins` | **inverted** | real content in `.agents/skills/`, `.claude/skills/` symlinked to it |
 
 The Layout column is a convenience, not the source of truth. Repos gain and lose `.agents/` between syncs on their own — trueelo did, one sync after this table said it never would. Read the tree, trust `sync.py`'s printed verdict over this column, and correct a row that no longer matches instead of trusting it.
