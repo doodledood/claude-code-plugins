@@ -44,6 +44,12 @@ for candidate in "${_candidates[@]}"; do
     # HEAD. A session may have this clone parked on a branch of its own, and the
     # sync then stamps that branch's commit as the source of every file it
     # copied — content correct, provenance a lie, and nothing complains.
+    #
+    # The staged tree comes from that same commit (git archive), never from the
+    # working tree: a second sync in one session fetches, origin/main advances,
+    # the checkout does not, and cp -R would stamp the NEW sha onto the OLD files.
+    # Every tracking file would then name a commit its content does not carry, and
+    # the next run would diff from that sha and skip the missed changes for good.
     commit=""; from=""
     for ref in "origin/$REF" origin/HEAD "$REF"; do
       commit=$(git -C "$candidate" rev-parse --verify --quiet "$ref^{commit}" || true)
@@ -58,7 +64,7 @@ for candidate in "${_candidates[@]}"; do
       exit 1
     fi
     rm -rf "$DEST" && mkdir -p "$DEST"
-    cp -R "$candidate/claude-plugins" "$DEST/"
+    git -C "$candidate" archive "$commit" claude-plugins | tar -x -C "$DEST"
     printf '%s\n' "$commit" > "$DEST/.source-commit"
     echo ">> source commit $commit (from $from) -> $DEST/.source-commit"
     exit 0
