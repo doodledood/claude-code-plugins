@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-25T20:45:29Z",
+  "last_synced_at": "2026-08-26T16:02:36Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -11,6 +11,7 @@
     "define",
     "do",
     "done",
+    "eli5",
     "escalate",
     "figure-out",
     "figure-out-team",
@@ -32,5 +33,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "f208ed9043cf03bc7bb0f2ec0c17016704440548"
+  "source_commit": "d13f1a4930abcb67a6c4edfed4daf6ffff7efc49"
 }
