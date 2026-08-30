@@ -1,12 +1,11 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-30T07:55:33Z",
+  "last_synced_at": "2026-08-30T10:20:44Z",
   "agents": [],
   "hooks": [],
   "skills": [
     "auto",
     "babysit-pr",
-    "chat-surface",
     "check-pr",
     "define",
     "do",
@@ -18,11 +17,12 @@
     "handoff",
     "init-context",
     "just-auto",
+    "just-define",
     "just-do",
+    "just-figure-out",
     "next-ticket",
     "poll-slack",
     "prompt-engineering",
-    "re-pitch",
     "review-code",
     "review-pr",
     "review-prompt",
@@ -33,5 +33,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "04472e0efb2840254e59aaeef6e38d2c09d5189e"
+  "source_commit": "351f09c7c2f5f64121b042ff62a0d25b6204fc8e"
 }
