@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-08-30T14:09:19Z",
+  "last_synced_at": "2026-09-01T14:58:00Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -8,6 +8,7 @@
     "babysit-pr",
     "check-pr",
     "define",
+    "design",
     "do",
     "done",
     "eli5",
@@ -24,6 +25,7 @@
     "poll-slack",
     "prompt-engineering",
     "review-code",
+    "review-design",
     "review-pr",
     "review-prompt",
     "review-writing",
@@ -33,5 +35,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "b38f1f9dc217d9eeb010009f1c2e39cacecd1d1d"
+  "source_commit": "18b0725ac4eb2a73cc5feaa7bba47e75fd91dd5e"
 }
