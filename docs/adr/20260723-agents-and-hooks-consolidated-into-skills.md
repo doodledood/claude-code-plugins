@@ -31,3 +31,4 @@ _Not recovered._
 ## Source
 - Retroactive — reconstructed from commit 24fa05a / PR #111 during project setup; no originating discussion found
 - Session: (no session — captured post-hoc)
+- Related: [20260904-repository-local-specialists-are-skills-not-agents](20260904-repository-local-specialists-are-skills-not-agents.md) extends this to the components this repository holds on its own account, which this record did not reach

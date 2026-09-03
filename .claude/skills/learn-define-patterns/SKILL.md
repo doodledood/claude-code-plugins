@@ -36,7 +36,11 @@ Session JSONL files live at `~/.claude/projects/{project-path-encoded}/{session-
 
 # Per-Session Analysis
 
-Use the `define-session-analyzer` agent to analyze each session independently. Each agent receives a session file path and an output path (`/tmp/define-learn-{session-id}.md`). Sessions with zero extractable patterns are normal — count them in the final summary.
+Analyze each session in its own fresh worker — one worker per session, all running independently. Point each worker at `define-session-analyzer`, the skill directory beside this one (`.agents/skills/define-session-analyzer/SKILL.md`, mirroring `.claude/skills/define-session-analyzer/SKILL.md`): that file is the worker's instructions, and its directory is the root any relative path inside it resolves against. Hand each worker the two inputs that skill's `## Input` section names — the path to one session `.jsonl` file, and an output path of `/tmp/define-learn-{session-id}.md` — and take back the markdown analysis it writes there.
+
+The separate context is the point: it keeps the patterns found in one session from anchoring how the next one is read. Give every session its own worker even where one worker could carry two.
+
+Sessions with zero extractable patterns are normal — count them in the final summary.
 
 # Aggregated Output
 

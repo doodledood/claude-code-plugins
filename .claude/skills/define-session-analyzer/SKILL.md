@@ -1,7 +1,7 @@
 ---
 name: define-session-analyzer
-description: 'Analyze a single /define session transcript to extract user preference patterns. Spawned by learn-define-patterns skill for parallel per-session analysis.'
-tools: Read, Grep, Glob, Bash, Write
+description: 'Called by learn-define-patterns for one /define session transcript: extracts the user preference patterns it evidences — probing hints, trade-off defaults, recurring invariants, process guidance, quality gate adjustments — and writes them to a given path. One session per run. Not for direct use.'
+user-invocable: false
 ---
 
 # Define Session Analyzer
@@ -104,6 +104,6 @@ Empty categories: include the header with "None identified." underneath.
 | Constraint | Rule |
 |------------|------|
 | **Evidence-based only** | Every pattern needs a quote or paraphrase from the session. No inferences without evidence. |
-| **Actionable patterns** | Each pattern should be specific enough to change /define's behavior. "User cares about quality" is too vague. "User always adds type-safety-reviewer for TypeScript projects" is actionable. |
+| **Actionable patterns** | Each pattern should be specific enough to change /define's behavior. "User cares about quality" is too vague. "User always adds a type-safety gate for TypeScript projects" is actionable. |
 | **One session** | Analyze only the session file provided. Don't read other sessions or make cross-session claims. |
 | **Write output** | Write the analysis to the specified output file path when complete. |
