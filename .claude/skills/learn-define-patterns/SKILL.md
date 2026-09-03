@@ -36,7 +36,17 @@ Session JSONL files live at `~/.claude/projects/{project-path-encoded}/{session-
 
 # Per-Session Analysis
 
-Use the `define-session-analyzer` agent to analyze each session independently. Each agent receives a session file path and an output path (`/tmp/define-learn-{session-id}.md`). Sessions with zero extractable patterns are normal — count them in the final summary.
+Analyze each session in its own fresh worker — one worker per session, all running independently.
+
+Each worker's instructions are the `define-session-analyzer` skill, which lives at `.claude/skills/define-session-analyzer/SKILL.md` relative to the repository root. (`.agents/skills/define-session-analyzer` is a symlink to that skill's directory, so `.agents/skills/define-session-analyzer/SKILL.md` reaches the same file.) If your harness can hand a worker a file to follow, give it that path. If it cannot, read the file yourself and pass its full contents as the worker's instructions — it is self-contained and refers to no other file.
+
+Give each worker the two inputs that skill's `## Input` section names: the path to one session `.jsonl` file, and the output path `/tmp/define-learn-{session-id}.md`, where `{session-id}` is that session file's name without the `.jsonl` extension. Each worker needs to be able to read its session file and write that output file; give it whatever your harness calls those.
+
+Wait for every worker to finish, then aggregate from the written files rather than from whatever a worker reported on the way out — the written file is the deliverable. Once they have all finished, a worker that left no file at its output path failed; treat that as an error and say so in the summary, separately from the sessions that ran fine and yielded nothing.
+
+The separate context is the point: it keeps the patterns found in one session from anchoring how the next one is read. Give every session its own worker even where one worker could carry two.
+
+Sessions with zero extractable patterns are normal — count them in the final summary.
 
 # Aggregated Output
 
@@ -86,4 +96,4 @@ When merging with an existing `## /define Preferences` section: preserve all exi
 
 # Summary
 
-After writing, output a summary: sessions analyzed, sessions with patterns (and sessions with zero patterns), patterns extracted, patterns approved, contradictions found, and which CLAUDE.md was written to.
+After writing, output a summary: sessions analyzed, sessions with patterns (and sessions with zero patterns), workers that finished without leaving an analysis file, patterns extracted, patterns approved, contradictions found, and which CLAUDE.md was written to.
