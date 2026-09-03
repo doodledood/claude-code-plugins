@@ -14,7 +14,12 @@ away from being committed.
 Exits non-zero if post-copy verification finds any synced item differing from
 source, so a caller can fail loudly instead of committing a partial sync.
 """
-import filecmp, json, os, shutil, sys
+
+import filecmp
+import json
+import os
+import shutil
+import sys
 from datetime import datetime, timezone
 
 COMPONENTS = ("agents", "hooks", "skills")
@@ -37,7 +42,7 @@ def combined_source(src_root, comp):
 
 
 def repo_layout(repo):
-    """"inverted" if this repo keeps real skill content in .agents/skills/.
+    """ "inverted" if this repo keeps real skill content in .agents/skills/.
 
     One skill already stored that way settles it for the whole repo, which is
     what lets a NEW skill land on the same side as its neighbours instead of
@@ -49,9 +54,12 @@ def repo_layout(repo):
     for name in sorted(os.listdir(mirror_dir)):
         entry = os.path.join(mirror_dir, name)
         link = os.path.join(repo, ".claude", "skills", name)
-        if (os.path.isdir(entry) and not os.path.islink(entry)
-                and os.path.islink(link)
-                and os.path.realpath(link) == os.path.realpath(entry)):
+        if (
+            os.path.isdir(entry)
+            and not os.path.islink(entry)
+            and os.path.islink(link)
+            and os.path.realpath(link) == os.path.realpath(entry)
+        ):
             return "inverted"
     return "plain"
 
@@ -68,9 +76,12 @@ def wrong_side(repo, comp, name, layout):
         return False
     real = os.path.join(repo, ".claude", "skills", name)
     link = os.path.join(repo, ".agents", "skills", name)
-    return (os.path.isdir(real) and not os.path.islink(real)
-            and os.path.islink(link)
-            and os.path.realpath(link) == os.path.realpath(real))
+    return (
+        os.path.isdir(real)
+        and not os.path.islink(real)
+        and os.path.islink(link)
+        and os.path.realpath(link) == os.path.realpath(real)
+    )
 
 
 def flip_to_inverted(repo, name):
@@ -105,9 +116,12 @@ def classify(repo, comp, name, layout="plain"):
     # The .agents entry must be REAL content, not a symlink. A .agents symlink
     # is the ordinary mirror pointing back at .claude/, so both sides resolve to
     # whatever foreign path .claude/ names and resolved-equality proves nothing.
-    if (comp == "skills"
-            and os.path.isdir(entry) and not os.path.islink(entry)
-            and os.path.dirname(real) == os.path.realpath(mirror_dir)):
+    if (
+        comp == "skills"
+        and os.path.isdir(entry)
+        and not os.path.islink(entry)
+        and os.path.dirname(real) == os.path.realpath(mirror_dir)
+    ):
         return "mirror", real
     return "foreign", real
 
@@ -135,8 +149,9 @@ def identical(a, b):
     _, mismatch, errors = filecmp.cmpfiles(a, b, cmp.common_files, shallow=False)
     if mismatch or errors:
         return False
-    return all(identical(os.path.join(a, d), os.path.join(b, d))
-               for d in cmp.common_dirs)
+    return all(
+        identical(os.path.join(a, d), os.path.join(b, d)) for d in cmp.common_dirs
+    )
 
 
 def main():
@@ -147,7 +162,8 @@ def main():
     track_path = os.path.join(repo, ".claude", ".manifest-dev-sync.json")
     tracked = {c: [] for c in COMPONENTS}
     if os.path.exists(track_path):
-        prev = json.load(open(track_path))
+        with open(track_path) as fh:
+            prev = json.load(fh)
         for c in COMPONENTS:
             tracked[c] = list(prev.get(c, []))
 
@@ -164,8 +180,12 @@ def main():
                     flip_to_inverted(repo, name)
             kind, target = classify(repo, comp, name, layout)
             if kind == "foreign":
-                skipped.append({"name": name,
-                                "reason": "symlink -> " + os.path.relpath(target, repo)})
+                skipped.append(
+                    {
+                        "name": name,
+                        "reason": "symlink -> " + os.path.relpath(target, repo),
+                    }
+                )
                 continue
             if identical(spath, target):
                 unchanged.append(name)
@@ -174,8 +194,10 @@ def main():
             if not check_only:
                 replace(spath, target)
                 if kind == "adopt":
-                    os.symlink(os.path.join("../..", ".agents", "skills", name),
-                               os.path.join(repo, ".claude", "skills", name))
+                    os.symlink(
+                        os.path.join("../..", ".agents", "skills", name),
+                        os.path.join(repo, ".claude", "skills", name),
+                    )
             (updated if existed else added).append(name)
 
         for name in tracked[comp]:
@@ -186,8 +208,12 @@ def main():
                 continue
             kind, target = classify(repo, comp, name, layout)
             if kind == "foreign":
-                refused.append({"name": name,
-                                "reason": "symlink -> " + os.path.relpath(target, repo)})
+                refused.append(
+                    {
+                        "name": name,
+                        "reason": "symlink -> " + os.path.relpath(target, repo),
+                    }
+                )
                 continue
             if not os.path.exists(target):
                 continue
@@ -203,9 +229,15 @@ def main():
         # its target belongs to another plugin was never written by us, so
         # recording it would make a later run eligible to delete it.
         skipped_names = {s["name"] for s in skipped}
-        report[comp] = {"tracked": sorted(set(src) - skipped_names),
-                        "added": added, "updated": updated, "unchanged": unchanged,
-                        "removed": removed, "skipped": skipped, "refused": refused}
+        report[comp] = {
+            "tracked": sorted(set(src) - skipped_names),
+            "added": added,
+            "updated": updated,
+            "unchanged": unchanged,
+            "removed": removed,
+            "skipped": skipped,
+            "refused": refused,
+        }
 
         if not check_only:
             for name in sorted(set(src) - skipped_names):
@@ -214,8 +246,13 @@ def main():
                     failures.append(f"{comp}/{name}")
 
     # --- .agents/skills mirror ---------------------------------------------
-    mirror = {"created": [], "skipped": [], "removed": [], "inverted": [],
-              "flipped": flipped}
+    mirror = {
+        "created": [],
+        "skipped": [],
+        "removed": [],
+        "inverted": [],
+        "flipped": flipped,
+    }
     mirror_dir = os.path.join(repo, ".agents", "skills")
     if os.path.isdir(os.path.join(repo, ".agents")):
         if not check_only:
@@ -224,12 +261,12 @@ def main():
             link = os.path.join(mirror_dir, name)
             kind, _ = classify(repo, "skills", name, layout)
             if kind == "mirror":
-                mirror["inverted"].append(name)   # real content already lives here
+                mirror["inverted"].append(name)  # real content already lives here
                 continue
             if os.path.islink(link):
                 continue
             if os.path.exists(link):
-                mirror["skipped"].append(name)    # project-local, don't clobber
+                mirror["skipped"].append(name)  # project-local, don't clobber
                 continue
             if not check_only:
                 os.symlink(os.path.join("../..", ".claude", "skills", name), link)
@@ -244,12 +281,14 @@ def main():
                 mirror["removed"].append(name)
 
     # --- tracking file ------------------------------------------------------
-    out = {"version": 1,
-           "last_synced_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-           "agents": report["agents"]["tracked"],
-           "hooks": report["hooks"]["tracked"],
-           "skills": report["skills"]["tracked"],
-           "source_commit": source_commit}
+    out = {
+        "version": 1,
+        "last_synced_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "agents": report["agents"]["tracked"],
+        "hooks": report["hooks"]["tracked"],
+        "skills": report["skills"]["tracked"],
+        "source_commit": source_commit,
+    }
     if not check_only:
         os.makedirs(os.path.dirname(track_path), exist_ok=True)
         with open(track_path, "w") as fh:
@@ -258,20 +297,33 @@ def main():
         slug = os.path.basename(os.path.abspath(repo))
         report_path = f"/tmp/manifest-dev-sync-report-{slug}.json"
         with open(report_path, "w") as fh:
-            json.dump({"repo": repo, "source_commit": source_commit,
-                       "layout": layout, "components": report, "mirror": mirror,
-                       "verification_failures": failures}, fh, indent=2)
+            json.dump(
+                {
+                    "repo": repo,
+                    "source_commit": source_commit,
+                    "layout": layout,
+                    "components": report,
+                    "mirror": mirror,
+                    "verification_failures": failures,
+                },
+                fh,
+                indent=2,
+            )
 
     # --- summary ------------------------------------------------------------
     name = os.path.basename(os.path.abspath(repo))
     print(f"\n=== {name} [{layout}]{' (check only)' if check_only else ''} ===")
-    print(f"{'component':<9}{'added':>7}{'updated':>9}{'same':>6}"
-          f"{'removed':>9}{'skipped':>9}{'refused':>9}")
+    print(
+        f"{'component':<9}{'added':>7}{'updated':>9}{'same':>6}"
+        f"{'removed':>9}{'skipped':>9}{'refused':>9}"
+    )
     for comp in COMPONENTS:
         r = report[comp]
-        print(f"{comp:<9}{len(r['added']):>7}{len(r['updated']):>9}"
-              f"{len(r['unchanged']):>6}{len(r['removed']):>9}"
-              f"{len(r['skipped']):>9}{len(r['refused']):>9}")
+        print(
+            f"{comp:<9}{len(r['added']):>7}{len(r['updated']):>9}"
+            f"{len(r['unchanged']):>6}{len(r['removed']):>9}"
+            f"{len(r['skipped']):>9}{len(r['refused']):>9}"
+        )
     for comp in COMPONENTS:
         for key in ("added", "removed"):
             for item in report[comp][key]:
@@ -282,8 +334,10 @@ def main():
     for key, vals in mirror.items():
         if vals:
             print(f"  mirror {key}: {', '.join(vals)}")
-    print(f"  tracked: agents={len(out['agents'])} hooks={len(out['hooks'])} "
-          f"skills={len(out['skills'])}")
+    print(
+        f"  tracked: agents={len(out['agents'])} hooks={len(out['hooks'])} "
+        f"skills={len(out['skills'])}"
+    )
     if not check_only:
         print(f"  report: {report_path}")
 

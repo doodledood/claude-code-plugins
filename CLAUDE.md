@@ -7,8 +7,11 @@ Claude Code plugins marketplace - a curated collection of plugins with agents, s
 ## Development Commands
 
 ```bash
-# Lint, format, typecheck
-ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
+# Every check this repository has, in one command. Needs uv; installs the rest itself.
+./scripts/check.sh
+
+# Same checks, applying the lint and format fixes instead of only reporting them
+./scripts/check.sh --fix
 
 # Test plugin locally
 /plugin marketplace add /path/to/claude-code-plugins
@@ -17,6 +20,14 @@ ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
 # Run consultant CLI
 uvx --from claude-plugins/consultant/skills/consultant/scripts consultant-cli --help
 ```
+
+`scripts/check.sh` runs the lint, the format check, the type check, the unit tests, and the plugin
+version gate, and CI runs the same script on every pull request. Tool versions are pinned in the
+`dev` dependency group in `pyproject.toml`, so a local run and a CI run cannot disagree.
+
+**`black` was dropped in favour of `ruff format`**, which is black-compatible and comes from a tool
+this repository already installs. `pytest` was never installed; the tests are stdlib `unittest` and
+need no dependency at all. `mypy` stays, and type-checks the paths its `files` setting names.
 
 ## Foundational Documents
 
@@ -40,7 +51,10 @@ The current records are a **seed reconstructed from this repository's own histor
 
 - `.claude-plugin/marketplace.json` - Registry of all plugins
 - `claude-plugins/` - Individual plugins, each with `.claude-plugin/plugin.json`
-- `pyproject.toml` - Python tooling config (ruff, black, mypy)
+- `pyproject.toml` - Python tooling config (ruff, mypy) and the pinned `dev` dependency group
+- `scripts/check.sh` - The one pre-PR command; CI runs it too
+- `scripts/check_plugin_versions.py` - The plugin version gate
+- `tests/` - Unit tests for the version gate, run by `scripts/check.sh`
 
 ### Plugin Components
 
@@ -55,9 +69,8 @@ Each plugin can contain:
 
 Hooks are Python scripts in `hooks/` that respond to Claude Code events. Shared utilities live in `hook_utils.py`.
 
-**When modifying hooks**:
-1. Run linting: `ruff check --fix claude-plugins/<plugin>/hooks/ && black claude-plugins/<plugin>/hooks/`
-2. Run type check: `mypy claude-plugins/<plugin>/hooks/`
+**When modifying hooks**: run `./scripts/check.sh`, the same command every other change runs. There
+is no per-directory variant to remember.
 
 ### Skills
 
@@ -115,18 +128,34 @@ See each plugin's README for architecture details.
 
 ## Plugin Versioning
 
-When updating plugin files, bump version in `.claude-plugin/plugin.json`:
+**This rule is enforced.** `scripts/check_plugin_versions.py` runs inside `./scripts/check.sh` and
+in CI, and fails any change that breaks it. What follows describes what that gate accepts.
+
+When a change edits a file under `claude-plugins/<plugin>/`, raise the version in that plugin's
+`.claude-plugin/plugin.json`:
 - **Patch** (0.0.x): Bug fixes, typos
 - **Minor** (0.x.0): New features, new skills/agents
 - **Major** (x.0.0): Breaking changes
 
-README-only changes don't require version bumps.
+The new version must be *higher* than the one at the merge base, not merely different.
 
-**After version bump**: Add entry to `CHANGELOG.md`:
+README-only changes don't require version bumps. A change that touches a `README.md` **and**
+anything else in the same plugin does.
+
+**After version bump**: add a line to `CHANGELOG.md` carrying the plugin's name in brackets and
+the new version, both on one line:
+
 ```
-## YYYY-MM-DD
 - [plugin-name] vX.Y.Z - Brief description of change
 ```
+
+The name in brackets is the `name` field from `plugin.json`, which is not always the directory
+name — `claude-plugins/PLUGIN_TEMPLATE/` is `[plugin-template]`.
+
+Where the line sits is up to you. This file groups entries under `## [Unreleased]` and under
+`## YYYY-MM-DD` headings, and the gate accepts either; it checks that the entry exists, not where.
+
+New plugins need the same changelog line for their initial version.
 
 ## Adding New Components
 
@@ -152,11 +181,16 @@ When adding agents, skills, or hooks:
 ## Before PR
 
 ```bash
-# Lint, format, typecheck
-ruff check --fix claude-plugins/ && black claude-plugins/ && mypy
+./scripts/check.sh
 ```
 
-Bump plugin version if plugin files changed.
+That is the whole list. It runs the lint, the format check, the type check, the unit tests, and the
+plugin version gate, and exits non-zero naming whichever step failed. CI runs the same script on
+the pull request, so a green run here is the result CI will reproduce.
+
+The version gate compares against `origin/main` by default and includes uncommitted work, so it
+answers the question you actually have before committing. Pass `--base <ref>` to compare against
+something else.
 
 ## Coding Conventions
 

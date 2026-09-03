@@ -1,0 +1,32 @@
+name: checks
+
+# Runs the same script a contributor runs before opening a pull request. Nothing here re-lists the
+# individual tools: the list lives in scripts/check.sh alone, so a green local run predicts a green
+# CI run.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to a commit, with the release tag in the comment. A tag can be moved;
+      # a commit cannot.
+      - name: Check out the pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version gate resolves a merge base against the pull request's base commit, which a
+          # shallow checkout does not contain.
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.9"
+
+      - name: Run the pre-PR checks
+        run: ./scripts/check.sh --base "${{ github.event.pull_request.base.sha }}"
