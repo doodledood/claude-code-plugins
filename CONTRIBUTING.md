@@ -201,6 +201,8 @@ Update your plugin's README.md:
 
 Before submitting your PR:
 
+- [ ] `./scripts/check.sh` passes — lint, formatting, types, tests, and the plugin version gate
+- [ ] Plugin version bumped and a `CHANGELOG.md` line added, unless the change is README-only
 - [ ] Plugin name follows kebab-case convention
 - [ ] `plugin.json` has all required fields
 - [ ] Version follows semantic versioning (1.0.0)

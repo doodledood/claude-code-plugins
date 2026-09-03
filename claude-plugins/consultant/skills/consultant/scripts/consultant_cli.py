@@ -62,7 +62,7 @@ def validate_context_size(
     print(f"- Input: {total_tokens:,} tokens ({num_files} files)")
     print(f"- Limit: {max_tokens:,} tokens")
     print(
-        f"- Available: {available_tokens:,} tokens ({int((available_tokens/max_tokens)*100)}%)\n"
+        f"- Available: {available_tokens:,} tokens ({int((available_tokens / max_tokens) * 100)}%)\n"
     )
 
     if total_tokens > max_tokens:
@@ -78,7 +78,7 @@ def validate_context_size(
         )
 
     if total_tokens > available_tokens:
-        print(f"⚠️  WARNING: Using {int((total_tokens/max_tokens)*100)}% of context")
+        print(f"⚠️  WARNING: Using {int((total_tokens / max_tokens) * 100)}% of context")
         print("   Consider reducing input size for better response quality\n")
 
     return True
