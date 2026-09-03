@@ -40,7 +40,9 @@ Analyze each session in its own fresh worker — one worker per session, all run
 
 Each worker's instructions are the `define-session-analyzer` skill, which lives at `.claude/skills/define-session-analyzer/SKILL.md` relative to the repository root. (`.agents/skills/define-session-analyzer/SKILL.md` is a symlink to that same file; either path reaches it.) If your harness can hand a worker a file to follow, give it that path. If it cannot, read the file yourself and pass its full contents as the worker's instructions — it is self-contained and refers to no other file.
 
-Give each worker the two inputs that skill's `## Input` section names: the path to one session `.jsonl` file, and the output path `/tmp/define-learn-{session-id}.md`, where `{session-id}` is that session file's name without the `.jsonl` extension. Each worker writes its analysis to the path you gave it. Aggregate from those files rather than from whatever a worker reports on finishing — the written file is the deliverable.
+Give each worker the two inputs that skill's `## Input` section names: the path to one session `.jsonl` file, and the output path `/tmp/define-learn-{session-id}.md`, where `{session-id}` is that session file's name without the `.jsonl` extension. Each worker needs to be able to read its session file and write that output file; give it whatever your harness calls those.
+
+Aggregate from the written files rather than from whatever a worker reports on finishing — the written file is the deliverable. A worker that leaves no file at its output path failed; treat that as an error and say so in the summary, separately from the sessions that ran fine and yielded nothing.
 
 The separate context is the point: it keeps the patterns found in one session from anchoring how the next one is read. Give every session its own worker even where one worker could carry two.
 
