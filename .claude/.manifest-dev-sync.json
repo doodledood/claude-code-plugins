@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_synced_at": "2026-09-03T05:40:58Z",
+  "last_synced_at": "2026-09-03T15:36:24Z",
   "agents": [],
   "hooks": [],
   "skills": [
@@ -27,6 +27,9 @@
     "review-code",
     "review-design",
     "review-pr",
+    "review-pr-holistic",
+    "review-pr-judgment",
+    "review-pr-thread-verify",
     "review-prompt",
     "review-writing",
     "run-ticket",
@@ -35,5 +38,5 @@
     "ticket-up",
     "walk-pr"
   ],
-  "source_commit": "3363e1a4256eb28a0b37d7bff8a7eb5a006f089e"
+  "source_commit": "fce7e9011093b4c864fdc3f0d187a753e7ea64ae"
 }
