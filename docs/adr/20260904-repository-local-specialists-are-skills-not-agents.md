@@ -1,7 +1,7 @@
 # ADR: This repository's own specialists are skills, not agents
 
 ## Status
-Accepted
+Accepted — narrowed by [20260904-define-session-learning-skills-retired](20260904-define-session-learning-skills-retired.md), which retired `define-session-analyzer` and its caller; the rule set here still governs `code-coverage-reviewer` and anything added later
 
 ## Area
 Plugin structure
