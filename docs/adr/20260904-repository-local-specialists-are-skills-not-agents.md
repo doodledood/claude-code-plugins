@@ -1,7 +1,7 @@
 # ADR: This repository's own specialists are skills, not agents
 
 ## Status
-Accepted
+Accepted — every specialist it converted has since been retired, by [20260904-define-session-learning-skills-retired](20260904-define-session-learning-skills-retired.md) and [20260904-code-coverage-reviewer-retired](20260904-code-coverage-reviewer-retired.md), the latter closing the retirement decision this record left open; the rule set here is untouched and governs anything added later
 
 ## Area
 Plugin structure
