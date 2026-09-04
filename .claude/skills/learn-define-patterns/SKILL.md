@@ -31,16 +31,16 @@ Every `/define` session, users make the same corrections, add the same invariant
 
 Session transcripts are JSONL files, one per session, grouped into a directory per project. Where your harness keeps them varies — on Claude Code they are `~/.claude/projects/{encoded-project-path}/{session-id}.jsonl`. Where you cannot find the store, ask the user for the directory rather than guessing at one.
 
-Search every project directory, not the one whose name looks like this project. These preferences describe the user, not one repository, and they may be written to a user-level CLAUDE.md — so a `/define` interview run anywhere counts. Do not reconstruct an encoded directory name from a project path either: the encoding collapses `/` and `.` to the same character, so two different projects can produce one name. A session's id is its filename without the `.jsonl` extension; the `cwd` field carried on most lines tells you which project a session was working in, if you want to report that.
+Search every directory in the store, not the one whose name looks like this project. These preferences describe the user, not one repository, and they may be written to a user-level CLAUDE.md — so a `/define` interview run anywhere counts. **Every** directory means every one: scratch and temporary workspaces the harness created for itself hold real interviews too, and excluding them because they are not repositories can empty the result set on its own. Do not reconstruct an encoded directory name from a project path either: the encoding collapses `/` and `.` to the same character, so two different projects can produce one name. A session's id is its filename without the `.jsonl` extension; the `cwd` field carried on most lines tells you which project a session was working in, if you want to report that.
 
 **A session qualifies** on two conditions, and it needs both.
 
 *It invoked the define family.* Look for two signals, because harnesses use both and a rule covering one finds nothing on a machine using the other:
 
-- A `<command-name>` value, such as `/manifest-dev:define`.
+- A `<command-name>` value — but only inside a slash-command payload in the `user` slot, the block that carries `<command-message>` and `<command-args>` beside it. The tag also appears inside quoted command text and captured tool output, where it names nothing that ran.
 - An assistant `tool_use` named `Skill` whose `input.skill` names the skill, such as `openclaw-skills:just-define`.
 
-Match on the final segment after any plugin namespace, and accept `just-define` alongside `define`.
+Match on the final segment after any plugin namespace, and accept `just-define` alongside `define`. A wrapper that reaches `/define` indirectly, such as `just-auto`, needs no rule of its own: the nested invocation is itself a `Skill` tool use and the second signal catches it.
 
 *And a person spoke in it.* A `/define` invocation alone means nothing: the goal-based variants run unattended inside autonomous chains, and a subagent session carries its parent's dispatch brief in the user slot. Require at least one real human turn, as `define-session-analyzer/SKILL.md` defines one under **What counts as a human turn** — the same test the workers use. This is also what keeps subagent transcripts out, including the sidecar ones stored under a parent session's own directory; excluding them by where they sit misses the subagent sessions that sit at the top level.
 
@@ -58,11 +58,13 @@ Each session is analyzed in its own fresh worker. Dispatch one worker per sessio
 
 Then give each worker the two inputs that skill's `## Input` section names: the session file path, and `/tmp/define-learn-{session-id}.md` as its output path. A worker needs to be able to read its session file and write that output file; give it whatever your harness calls those.
 
+**Delete anything already sitting at those output paths before you dispatch.** The paths are derived from session ids, so an earlier run of this skill leaves files exactly where this run expects to find its own — including for sessions this run rejected. Clearing them first is what makes a file's presence afterwards mean *this* run wrote it, which is the whole basis of the failure check below.
+
 The separate context is the point: a worker that has read one session cannot carry another session's framing into it, so give each session its own worker even where one worker could carry several.
 
 Each worker writes its report to the output path and returns that path with a pattern count. Wait for every worker to finish, then aggregate from the written files rather than from whatever a worker reported on the way out — the written file is the deliverable, and a returned count says which files hold patterns, not what those patterns are. A report fills empty categories with "None identified."; that is not a pattern, so do not carry it into the aggregate or count it as one.
 
-Once they have all finished, look for a file at each worker's output path. A worker that left none there failed, whatever it returned on the way out. Treat that as an error and say so in the summary, counted separately from the sessions that ran fine and yielded nothing — fold the two together and a crashed worker reads as an ordinary empty session, which silently narrows the aggregate to whichever sessions happened to survive. Sessions with zero extractable patterns are themselves normal; count those in the final summary too.
+Once they have all finished, look for a file at each worker's output path. A worker that left none there — or left one that is empty or unparseable — failed, whatever it returned on the way out. Treat that as an error and say so in the summary, counted separately from the sessions that ran fine and yielded nothing: fold the two together and a crashed worker reads as an ordinary empty session, which silently narrows the aggregate to whichever workers happened to survive. Do not retry silently and do not abort the run; aggregate what you have and let the summary carry the gap, so the user approves patterns knowing which sessions are missing from them. Sessions with zero extractable patterns are themselves normal; count those in the final summary too.
 
 # Aggregated Output
 
