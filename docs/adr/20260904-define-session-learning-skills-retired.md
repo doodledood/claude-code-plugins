@@ -22,9 +22,9 @@ Aviram ruled the pair superseded: an older approach to a problem he no longer so
 
 This follows [20260817-prompt-engineering-plugin-retired](20260817-prompt-engineering-plugin-retired.md): when Aviram rules capability superseded, this repository deletes it rather than carrying it deprecated. Git holds the history for anyone who wants the text back.
 
-The removal narrows [20260904-repository-local-specialists-are-skills-not-agents](20260904-repository-local-specialists-are-skills-not-agents.md) without overturning it. That record's rule — components this repository keeps for itself are skills, dispatched by path and never by naming a harness primitive — still governs, and still governs `code-coverage-reviewer`, the one repository-local specialist that remains. Only two of its instances are gone.
+The removal narrows [20260904-repository-local-specialists-are-skills-not-agents](20260904-repository-local-specialists-are-skills-not-agents.md) without overturning it. That record's rule — components this repository keeps for itself are skills, dispatched by path and never by naming a harness primitive — still governs anything added later. Two of the three instances it converted are gone here.
 
-`code-coverage-reviewer` stays as that record left it: converted, orphaned, and documented as an orphan, with its retirement an open decision on its own evidence. This retirement rests on a ruling about the `/define` learning loop and reaches nothing else.
+The third, `code-coverage-reviewer`, is retired in the same pull request, but on separate evidence and as a separate decision: [20260904-code-coverage-reviewer-retired](20260904-code-coverage-reviewer-retired.md). This record rests on a ruling about the `/define` learning loop and reaches nothing else.
 
 ## Alternatives Considered
 
@@ -44,4 +44,4 @@ The removal narrows [20260904-repository-local-specialists-are-skills-not-agents
 
 ## Source
 - Session: Aviram's ruling that both skills are superseded, given directly and with retirement as the instruction
-- Related: narrows [20260904-repository-local-specialists-are-skills-not-agents](20260904-repository-local-specialists-are-skills-not-agents.md); follows the retirement precedent in [20260817-prompt-engineering-plugin-retired](20260817-prompt-engineering-plugin-retired.md)
+- Related: narrows [20260904-repository-local-specialists-are-skills-not-agents](20260904-repository-local-specialists-are-skills-not-agents.md); follows the retirement precedent in [20260817-prompt-engineering-plugin-retired](20260817-prompt-engineering-plugin-retired.md); landed alongside [20260904-code-coverage-reviewer-retired](20260904-code-coverage-reviewer-retired.md)
