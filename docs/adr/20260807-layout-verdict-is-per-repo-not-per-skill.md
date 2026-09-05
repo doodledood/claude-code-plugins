@@ -1,7 +1,7 @@
 # ADR: The sync tool decides skill layout once per repository, not per skill
 
 ## Status
-Accepted
+Superseded by 20260905-use-installed-manifest-dev-plugins
 
 ## Area
 Plugin sync

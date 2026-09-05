@@ -92,7 +92,7 @@ user-invocable: true       # Optional: show in slash command menu (default: true
 
 ### Writing and Updating Prompts
 
-**Run the `prompt-engineering` skill for all prompt work** - crafting new prompts, updating existing ones, or reviewing prompt structure. The skill encapsulates first-principles guidelines for writing effective prompts. Deliberately unscoped: it is supplied by whichever source is installed (currently synced from manifest-dev-tools), so naming a plugin here would break the moment it moves again.
+**Run the `prompt-engineering` skill for all prompt work** - crafting new prompts, updating existing ones, or reviewing prompt structure. The skill encapsulates first-principles guidelines for writing effective prompts. Deliberately unscoped: it is supplied by whichever source is installed (the installed manifest-dev-tools plugin), so naming a plugin here would break the moment it moves again.
 
 ### Tool Definitions
 
