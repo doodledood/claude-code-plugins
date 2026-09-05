@@ -1,7 +1,7 @@
 # ADR: The sync tool deletes only what it previously wrote
 
 ## Status
-Accepted
+Superseded by 20260905-use-installed-manifest-dev-plugins
 
 ## Area
 Plugin sync

@@ -1,5 +1,7 @@
 # Project setup report
 
+This report records the repository setup at its original assessment. The sync terminology below describes that historical layout; current skill installation is recorded in [the plugin-only decision](docs/adr/20260905-use-installed-manifest-dev-plugins.md).
+
 Wiring installed: `docs/adr/CONVENTIONS.md`, `docs/adr/README.md`, `CONTEXT.md`, and a
 Project Language and Decision Records section in `CLAUDE.md` (`AGENTS.md` is a symlink to it,
 so both harnesses read the same file).
